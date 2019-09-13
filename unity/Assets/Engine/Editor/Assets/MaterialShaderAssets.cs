@@ -1,0 +1,1069 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using CFUtilPoolLib;
+using UnityEditor;
+using UnityEngine;
+using CFEngine;
+
+namespace CFEngine.Editor
+{
+    public struct ShaderPropertyValue
+    {
+        public int shaderID;
+        public string shaderKeyName;
+        public Vector4 value;
+    }
+
+    public struct ShaderTexPropertyValue
+    {
+        public int shaderID;
+        public string shaderKeyName;
+        public Texture value;
+        public string path;
+    }
+
+    struct MaterialAnalyzeModify
+    {
+        public uint flag;
+        public uint matOffset;
+        public uint pbsTexOffset;
+        public uint renderTypeOffset;
+    }
+
+    internal struct MaterialContext
+    {
+        public List<ShaderTexPropertyValue> textureValue;
+        public BlendMode blendMode;
+
+        public short customMatIndex;
+        public uint flag;
+
+        public int renderQueue;
+
+        public List<ShaderPropertyValue> shaderIDs;
+
+        public void SetFlag(EMatFlag f, bool add)
+        {
+            if (add)
+            {
+                flag |= (uint)f;
+            }
+            else
+            {
+                flag &= ~((uint)f);
+            }
+        }
+
+        public bool HasFlag(EMatFlag f)
+        {
+            return (flag & (uint)f) != 0;
+        }
+
+        public static MaterialContext GetContext()
+        {
+            MaterialContext context = new MaterialContext();
+            context.textureValue = new List<ShaderTexPropertyValue>();
+            context.shaderIDs = new List<ShaderPropertyValue>();
+            context.customMatIndex = -1;
+            return context;
+        }
+    }
+
+    internal class MaterialShaderAssets
+    {
+
+        internal class ShaderValue
+        {
+            public ShaderValue(string n, ShaderUtil.ShaderPropertyType t)
+            {
+                name = n;
+                type = t;
+            }
+            public string name = "";
+            public ShaderUtil.ShaderPropertyType type = ShaderUtil.ShaderPropertyType.Float;
+
+            public virtual void SetValue(Material mat)
+            {
+
+            }
+
+            public static void GetShaderValue(Material mat, List<ShaderValue> shaderValueLst)
+            {
+                Shader shader = mat.shader;
+                int count = ShaderUtil.GetPropertyCount(shader);
+                for (int i = 0; i < count; ++i)
+                {
+                    ShaderValue sv = null;
+                    string name = ShaderUtil.GetPropertyName(shader, i);
+                    ShaderUtil.ShaderPropertyType type = ShaderUtil.GetPropertyType(shader, i);
+                    switch (type)
+                    {
+                        case ShaderUtil.ShaderPropertyType.Color:
+                            sv = new ShaderColorValue(name, type, mat);
+                            break;
+                        case ShaderUtil.ShaderPropertyType.Vector:
+                            sv = new ShaderVectorValue(name, type, mat);
+                            break;
+                        case ShaderUtil.ShaderPropertyType.Float:
+                            sv = new ShaderFloatValue(name, type, mat);
+                            break;
+                        case ShaderUtil.ShaderPropertyType.Range:
+                            sv = new ShaderFloatValue(name, type, mat);
+                            break;
+                        case ShaderUtil.ShaderPropertyType.TexEnv:
+                            sv = new ShaderTexValue(name, type, mat);
+                            break;
+                    }
+                    shaderValueLst.Add(sv);
+                }
+                ShaderKeyWordValue keyword = new ShaderKeyWordValue(mat);
+                shaderValueLst.Add(keyword);
+            }
+        }
+
+        internal class ShaderIntValue : ShaderValue
+        {
+            public ShaderIntValue(string n, ShaderUtil.ShaderPropertyType t, Material mat) : base(n, t)
+            {
+                value = mat.GetInt(n);
+            }
+            public int value = 0;
+            public override void SetValue(Material mat)
+            {
+                mat.SetInt(name, value);
+            }
+        }
+
+        internal class ShaderFloatValue : ShaderValue
+        {
+            public ShaderFloatValue(string n, ShaderUtil.ShaderPropertyType t, Material mat) : base(n, t)
+            {
+                value = mat.GetFloat(n);
+            }
+            public float value = 0;
+            public override void SetValue(Material mat)
+            {
+                mat.SetFloat(name, value);
+            }
+        }
+
+        internal class ShaderVectorValue : ShaderValue
+        {
+            public ShaderVectorValue(string n, ShaderUtil.ShaderPropertyType t, Material mat) : base(n, t)
+            {
+                value = mat.GetVector(n);
+            }
+            public Vector4 value = Vector4.zero;
+            public override void SetValue(Material mat)
+            {
+                mat.SetVector(name, value);
+            }
+        }
+        internal class ShaderColorValue : ShaderValue
+        {
+            public ShaderColorValue(string n, ShaderUtil.ShaderPropertyType t, Material mat) : base(n, t)
+            {
+                value = mat.GetColor(n);
+            }
+            public Color value = Color.black;
+            public override void SetValue(Material mat)
+            {
+                mat.SetColor(name, value);
+            }
+        }
+        internal class ShaderTexValue : ShaderValue
+        {
+            public ShaderTexValue(string n, ShaderUtil.ShaderPropertyType t, Material mat) : base(n, t)
+            {
+                value = mat.GetTexture(n);
+                offset = mat.GetTextureOffset(n);
+                scale = mat.GetTextureScale(n);
+            }
+            public Texture value = null;
+            public Vector2 offset = Vector2.zero;
+            public Vector2 scale = Vector2.one;
+
+            public override void SetValue(Material mat)
+            {
+                mat.SetTexture(name, value);
+                //mat.SetTextureOffset(name, offset);
+                //mat.SetTextureScale(name, scale);
+            }
+        }
+        internal class ShaderKeyWordValue : ShaderValue
+        {
+            public ShaderKeyWordValue(Material mat) : base("", ShaderUtil.ShaderPropertyType.Float)
+            {
+                if (mat.shaderKeywords != null)
+                {
+                    string[] tmp = mat.shaderKeywords;
+                    keywordValue = new string[tmp.Length];
+
+                    for (int i = 0; i < tmp.Length; ++i)
+                    {
+                        keywordValue[i] = tmp[i];
+                    }
+                }
+                blendMode = GetBlendMode(mat);
+            }
+            public string[] keywordValue = null;
+            public BlendMode blendMode = BlendMode.Opaque;
+            public override void SetValue(Material mat)
+            {
+                mat.shaderKeywords = keywordValue;
+                SetupMaterialWithBlendMode(mat, blendMode);
+            }
+        }
+
+        internal class RenderQueueValue : ShaderValue
+        {
+            public RenderQueueValue(Material mat) : base("", ShaderUtil.ShaderPropertyType.Float)
+            {
+                if (mat.shader.name == "Custom/PBS/Role" && mat.shader.name.EndsWith("_upper"))
+                {
+                    renderQueue = 2451;
+                }
+            }
+            public int renderQueue = -1;
+            public override void SetValue(Material mat)
+            {
+                mat.renderQueue = renderQueue;
+            }
+        }
+        internal static List<ShaderValue> shaderValue = new List<ShaderValue>();
+
+        [MenuItem("Assets/Tool/Material_Clear")]
+        static void ClearMat()
+        {
+            CommonAssets.enumMat.cb = (mat, path) =>
+            {
+                ClearMat(mat);
+            };
+            CommonAssets.EnumAsset<Material>(CommonAssets.enumMat, "ClearMat");
+        }
+
+        public static void ClearMat(Material mat)
+        {
+            shaderValue.Clear();
+            ShaderValue.GetShaderValue(mat, shaderValue);
+            Material emptyMat = new Material(mat.shader);
+            mat.CopyPropertiesFromMaterial(emptyMat);
+            UnityEngine.Object.DestroyImmediate(emptyMat);
+            for (int i = 0; i < shaderValue.Count; ++i)
+            {
+                ShaderValue sv = shaderValue[i];
+                sv.SetValue(mat);
+            }
+        }
+
+
+        internal static void ExtractMaterialsFromAsset(ModelImporter modelImporter, string destinationPath)
+        {
+            SerializedObject serializedObject = new UnityEditor.SerializedObject(modelImporter);
+            //SerializedProperty externalObjects = serializedObject.FindProperty("m_ExternalObjects");
+            SerializedProperty materials = serializedObject.FindProperty("m_Materials");
+            for (int i = 0; i < materials.arraySize; ++i)
+            {
+                SerializedProperty arrayElementAtIndex = materials.GetArrayElementAtIndex(i);
+                string stringValue = arrayElementAtIndex.FindPropertyRelative("name").stringValue;
+                Material mat = null;
+                //Material matLow = null;
+                for (int j = 0; j < AssetsConfig.GlobalAssetsConfig.MaterialShaderMap.Length; j += 2)
+                {
+                    string keys = AssetsConfig.GlobalAssetsConfig.MaterialShaderMap[j];
+                    string value = AssetsConfig.GlobalAssetsConfig.MaterialShaderMap[j + 1];
+                    if (string.IsNullOrEmpty(keys))
+                    {
+                        mat = new Material(Shader.Find(value));
+                    }
+                    else
+                    {
+                        string[] keysList = keys.Split('|');
+                        foreach (string key in keysList)
+                        {
+                            if (stringValue.EndsWith(key))
+                            {
+                                mat = new Material(Shader.Find(value));
+                                break;
+                            }
+                        }
+                    }
+
+                }
+
+                if (mat != null)
+                {
+                    mat.name = stringValue;
+                    Material newMat = AssetDatabase.LoadAssetAtPath<Material>(string.Format("{0}/{1}.mat", destinationPath, stringValue));
+                    if (newMat != null)
+                    {
+                        newMat.shader = mat.shader;
+                    }
+                    else
+                    {
+                        newMat = CommonAssets.CreateAsset<Material>(destinationPath, stringValue, ".mat", mat);
+                    }
+                    ClearMat(newMat);
+                    if (newMat != mat)
+                    {
+                        Object.DestroyImmediate(mat);
+                    }
+
+                }
+            }
+        }
+
+        internal static void SetPBSMaterial(Material mat, string materialFolder, string materialName)
+        {
+            string baseTexPath = string.Format(AssetsConfig.GlobalAssetsConfig.BaseTex_Format_Path, materialFolder, materialName);
+            Texture2D baseTex = AssetDatabase.LoadAssetAtPath<Texture2D>(baseTexPath);
+            mat.SetTexture("_BaseTex", baseTex);
+            if (materialName.EndsWith("_hair"))
+            {
+
+            }
+            else
+            {
+                TextureImporter assetImporter = AssetImporter.GetAtPath(baseTexPath) as TextureImporter;
+                if (assetImporter != null)
+                {
+                    SetupMaterialWithBlendMode(mat, assetImporter.DoesSourceTextureHaveAlpha() ? BlendMode.Cutout : BlendMode.Opaque);
+                }
+                string pbsTexPath = string.Format(AssetsConfig.GlobalAssetsConfig.PbsTex_Format_Path, materialFolder, materialName);
+                mat.SetTexture("_PBSTex", AssetDatabase.LoadAssetAtPath<Texture2D>(pbsTexPath));
+            }
+
+            //Material lowMat = AssetDatabase.LoadAssetAtPath<Material>(string.Format("{0}/{1}_low.mat", materialFolder, materialName));
+            //if (lowMat != null)
+            //{
+            //    lowMat.SetTexture("_BaseTex", baseTex);
+            //}
+        }
+
+        internal static bool IsHLSLorCGINC(string path)
+        {
+            return path.EndsWith(".hlsl") || path.EndsWith(".cginc");
+        }
+
+        internal static void ReImportShader()
+        {
+            for (int i = 0; i < AssetsConfig.GlobalAssetsConfig.ResourceShaders.Length; ++i)
+            {
+                string shaderFolder = AssetsConfig.GlobalAssetsConfig.ResourceShaders[i];
+                DirectoryInfo di = new DirectoryInfo(shaderFolder);
+                FileInfo[] files = di.GetFiles("*.shader", SearchOption.AllDirectories);
+                foreach (FileInfo fi in files)
+                {
+                    string path = fi.FullName.Replace("\\", "/");
+                    int index = path.IndexOf(shaderFolder);
+                    path = path.Substring(index);
+                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+                }
+            }
+
+        }
+
+        public static void SetupMaterialWithBlendMode(Material material, BlendMode blendMode, bool resetRenderQueue = true, int renderQueue = -1)
+        {
+            switch (blendMode)
+            {
+                case BlendMode.Opaque:
+                    material.SetOverrideTag("RenderType", "");
+                    if (material.HasProperty("_SrcBlend"))
+                        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                    if (material.HasProperty("_DstBlend"))
+                        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+                    if (material.HasProperty("_ZWrite"))
+                        material.SetInt("_ZWrite", 1);
+                    material.DisableKeyword("_ALPHA_TEST");
+                    material.DisableKeyword("_ALPHA_PREMULT");
+                    if (resetRenderQueue)
+                    {
+                        if (renderQueue != -1)
+                            material.renderQueue = renderQueue;
+                        else
+                            material.renderQueue = -1;
+                    }
+
+                    break;
+                case BlendMode.Cutout:
+                    material.SetOverrideTag("RenderType", "TransparentCutout");
+                    if (material.HasProperty("_SrcBlend"))
+                        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                    if (material.HasProperty("_DstBlend"))
+                        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+                    if (material.HasProperty("_ZWrite"))
+                        material.SetInt("_ZWrite", 1);
+                    material.EnableKeyword("_ALPHA_TEST");
+                    if (resetRenderQueue)
+                    {
+                        if (renderQueue != -1)
+                            material.renderQueue = renderQueue;
+                        else
+                            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
+                    }
+                    break;
+                case BlendMode.CutoutTransparent:
+                    material.SetOverrideTag("RenderType", "TransparentCutout");
+                    if (material.HasProperty("_SrcBlend"))
+                        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                    if (material.HasProperty("_DstBlend"))
+                        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                    if (material.HasProperty("_ZWrite"))
+                        material.SetInt("_ZWrite", 1);
+                    material.EnableKeyword("_ALPHA_TEST");
+                    if (resetRenderQueue)
+                    {
+                        if (renderQueue != -1)
+                            material.renderQueue = renderQueue;
+                        else
+                            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
+                    }
+                    // if (material.name.EndsWith("_upper"))
+                    //     material.renderQueue = 3000;
+                    break;
+                case BlendMode.Transparent:
+                    material.SetOverrideTag("RenderType", "Transparent");
+                    if (material.HasProperty("_SrcBlend"))
+                        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                    if (material.HasProperty("_DstBlend"))
+                        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                    if (material.HasProperty("_ZWrite"))
+                        material.SetInt("_ZWrite", 0);
+                    material.DisableKeyword("_ALPHA_TEST");
+                    // material.EnableKeyword ("_ALPHA_PREMULT");
+                    if (resetRenderQueue)
+                    {
+                        if (renderQueue != -1)
+                            material.renderQueue = renderQueue;
+                        else
+                            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                    }
+                    break;
+            }
+        }
+
+        internal static BlendMode GetBlendMode(Material material)
+        {
+            bool alphaTest = material.IsKeywordEnabled("_ALPHA_TEST");
+            bool alphaBlend = material.HasProperty("_DstBlend") &&
+                material.GetInt("_DstBlend") == (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha;
+            if (!alphaTest && !alphaBlend)
+            {
+                return BlendMode.Opaque;
+            }
+            else if (alphaTest && !alphaBlend)
+            {
+                return BlendMode.Cutout;
+            }
+            else if (alphaTest && alphaBlend)
+            {
+                return BlendMode.CutoutTransparent;
+            }
+            return BlendMode.Transparent;
+        }
+        // internal static bool IsDefaultSceneMat (Material material)
+        // {
+        //     string[] defaultSceneMat = AssetsConfig.GlobalAssetsConfig.DefaultSceneMat;
+        //     for (int i = 0; i < defaultSceneMat.Length; ++i)
+        //     {
+        //         if (material.shader.name == defaultSceneMat[i])
+        //             return true;
+        //     }
+        //     return false;
+        // }
+
+        // internal static void GetDefaultMatProperty (Material material,
+        //     ref MaterialContext context,
+        //     List<ShaderKeyProperty> shaderKeys,
+        //     ref MaterialAnalyzeModify mam)
+        // {
+        //     if (shaderKeys != null)
+        //     {
+        //         for (int i = 0; i < shaderKeys.Count; ++i)
+        //         {
+        //             var skp = shaderKeys[i];
+        //             if (context.shaderIDs.FindIndex ((x) => { return x.shaderID == skp.shaderID; }) < 0)
+        //             {
+        //                 if (material.HasProperty (skp.key))
+        //                 {
+        //                     if (skp.isTex)
+        //                     {
+        //                         Texture tex = material.GetTexture (skp.key);
+        //                         if (tex != null)
+        //                         {
+        //                             ShaderTexPropertyValue stpv = new ShaderTexPropertyValue ()
+        //                             {
+        //                             shaderID = skp.shaderID,
+        //                             value = tex,
+        //                             path = tex.name
+        //                             };
+        //                             context.textureValue.Add (stpv);
+        //                             if (skp.flag != 0)
+        //                             {
+        //                                 mam.flag |= skp.flag;
+        //                             }
+        //                         }
+        //                         // else
+        //                         // {
+        //                         //     return false;
+        //                         // }
+        //                     }
+        //                     else
+        //                     {
+        //                         Vector4 param = material.GetVector (skp.key);
+        //                         if (!skp.hasDefaultValue || skp.hasDefaultValue &&
+        //                             !CommonAssets.IsSameProperty (param, skp.defaultValue))
+        //                         {
+        //                             ShaderPropertyValue spv = new ShaderPropertyValue ()
+        //                             {
+        //                                 shaderID = skp.shaderID,
+        //                                 value = param,
+        //                             };
+        //                             context.shaderIDs.Add (spv);
+        //                             if (skp.flag != 0)
+        //                             {
+        //                                 mam.flag |= skp.flag;
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //                 // else
+        //                 // {
+        //                 //     return false;
+        //                 // }
+        //             }
+        //         }
+        //         // return true;
+        //     }
+        //     // return false;
+        // }
+        internal static void AddMaterialProperty(
+            ref MaterialContext context,
+            Texture tex, int shaderID)
+        {
+            ShaderTexPropertyValue stpv = new ShaderTexPropertyValue()
+            {
+                shaderID = shaderID,
+                value = tex,
+                path = tex.name
+            };
+            context.textureValue.Add(stpv);
+        }
+
+        internal static void AddMaterialProperty(
+            ref MaterialContext context,
+            Vector4 param, int shaderID)
+        {
+            ShaderPropertyValue stpv = new ShaderPropertyValue()
+            {
+                shaderID = shaderID,
+                value = param,
+            };
+            context.shaderIDs.Add(stpv);
+        }
+
+        internal static bool AddMaterialProperty(
+            ref MaterialContext context,
+            Material material,
+            ShaderProperty sp)
+        {
+            if (material.HasProperty(sp.shaderProperty))
+            {
+                if (sp.isTex)
+                {
+                    Texture tex = material.GetTexture(sp.shaderProperty);
+                    if (tex != null)
+                    {
+                        ShaderTexPropertyValue stpv = new ShaderTexPropertyValue()
+                        {
+                            shaderID = sp.shaderID,
+                            value = tex,
+                            path = tex.name
+                        };
+                        context.textureValue.Add(stpv);
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.LogErrorFormat("null tex property:{0} mat:{1}", sp.shaderProperty, material.name);
+                        return false;
+                    }
+                }
+                else
+                {
+                    Vector4 param = material.GetVector(sp.shaderProperty);
+                    ShaderPropertyValue spv = new ShaderPropertyValue()
+                    {
+                        shaderID = sp.shaderID,
+                        value = param,
+                    };
+                    context.shaderIDs.Add(spv);
+                    return true;
+                }
+            }
+            return false;
+
+        }
+
+        static string[] shaderNameKeys = null;
+        static ShaderProperty shareSp = new ShaderProperty();
+        internal static bool AddMaterialProperty(
+            ref MaterialContext context,
+            Material material,
+            ShaderValue sv,
+            List<ShaderProperty> shaderPropertyKey)
+        {
+            if (sv.name == "_Cutoff" ||
+                sv.name == "_SrcBlend" ||
+                sv.name == "_DstBlend" ||
+                sv.name == "_ZWrite" ||
+                sv.name == "_DebugMode")
+                return false;
+
+            ShaderProperty sp = shaderPropertyKey.Find((x) => { return x.shaderProperty == sv.name; });
+            if (sp != null)
+            {
+                return AddMaterialProperty(ref context, material, sp);
+            }
+            else
+            {
+                if (shaderNameKeys == null)
+                {
+                    shaderNameKeys = System.Enum.GetNames(typeof(EShaderKeyID));
+                    for (int i = 0; i < shaderNameKeys.Length; ++i)
+                    {
+                        shaderNameKeys[i] = "_" + shaderNameKeys[i];
+                    }
+                }
+                for (int i = 0; i < shaderNameKeys.Length; ++i)
+                {
+                    if (shaderNameKeys[i] == sv.name)
+                    {
+                        shareSp.shaderID = i;
+                        shareSp.isTex = sv is ShaderTexValue;
+                        shareSp.shaderProperty = sv.name;
+                        return AddMaterialProperty(ref context, material, shareSp);
+                    }
+                }
+                Debug.LogErrorFormat("null property:{0} mat:{1}", sv.name, material.name);
+                return false;
+            }
+        }
+
+        internal static void GetDefaultMatProperty(Material material,
+            ref MaterialContext context,
+            List<MatShaderType> matShaderType,
+            List<ShaderProperty> commonShaderProperty,
+            List<ShaderProperty> shaderPropertyKey,
+            ref MaterialAnalyzeModify mam)
+        {
+            string tag = material.GetTag("RenderType", false);
+            if (tag == "TransparentCutout")
+            {
+                context.blendMode = BlendMode.Cutout;
+            }
+            else if (tag == "Transparent")
+            {
+                context.blendMode = BlendMode.Transparent;
+            }
+            else
+            {
+                Shader shader = material.shader;
+                if (shader != null && shader.name.Contains("Cutout"))
+                    context.blendMode = BlendMode.Cutout;
+                else
+                    context.blendMode = BlendMode.Opaque;
+            }
+
+            for (int i = 0; i < matShaderType.Count; ++i)
+            {
+                var mst = matShaderType[i];
+                if (material.shader == mst.shader)
+                {
+                    bool hasFeature = false;
+                    if (string.IsNullOrEmpty(mst.macro))
+                    {
+                        hasFeature = true;
+                    }
+                    else
+                    {
+                        if (mst.macro.Contains("|"))
+                        {
+                            hasFeature = true;
+                            string[] keys = mst.macro.Split('|');
+                            for (int j = 0; j < keys.Length; ++j)
+                            {
+                                string key = keys[j];
+                                if (key.StartsWith("!"))
+                                {
+                                    key = key.Substring(1);
+                                    hasFeature &= !material.IsKeywordEnabled(key);
+                                }
+                                else
+                                {
+                                    hasFeature &= material.IsKeywordEnabled(keys[j]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            hasFeature = material.IsKeywordEnabled(mst.macro);
+                        }
+
+                    }
+
+                    if (hasFeature)
+                    {
+                        for (int j = 0; j < mst.shaderPropertys.Count; ++j)
+                        {
+                            var sp = mst.shaderPropertys[j];
+                            if (!AddMaterialProperty(ref context, material, sp))
+                            {
+                                hasFeature = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (hasFeature)
+                    {
+                        if (mst.findPropertyType == FindPropertyType.CommonProperty)
+                        {
+                            for (int j = 0; j < commonShaderProperty.Count; ++j)
+                            {
+                                var sp = commonShaderProperty[j];
+                                AddMaterialProperty(ref context, material, sp);
+                            }
+                        }
+                        else if (mst.findPropertyType == FindPropertyType.FindAll)
+                        {
+                            shaderValue.Clear();
+                            ShaderValue.GetShaderValue(material, shaderValue);
+                            for (int j = 0; j < shaderValue.Count; ++j)
+                            {
+                                var sv = shaderValue[j];
+                                if (!(sv is ShaderKeyWordValue))
+                                    AddMaterialProperty(ref context, material, sv, shaderPropertyKey);
+                            }
+                        }
+                        if (mst.hasPbs)
+                        {
+                            if (material.IsKeywordEnabled("_PBS_FROM_PARAM"))
+                            {
+                                Vector4 param = material.GetVector("_PbsParam");
+                                AddMaterialProperty(ref context, param, (int)EShaderKeyID.PbsParam);
+                            }
+                            else
+                            {
+                                if (material.HasProperty("_PBSTex"))
+                                {
+                                    Texture tex = material.GetTexture("_PBSTex");
+                                    if (tex != null)
+                                    {
+                                        AddMaterialProperty(ref context, tex, (int)EShaderKeyID.PBSTex);
+                                        Vector4 uvst1 = material.GetVector("_uvST1");
+                                        AddMaterialProperty(ref context, uvst1, (int)EShaderKeyID.uvST1);
+                                        if (material.IsKeywordEnabled("_PBS_HALF_FROM_PARAM"))
+                                        {
+                                            Vector4 param = material.GetVector("_PbsParam");
+                                            AddMaterialProperty(ref context, param, (int)EShaderKeyID.PbsParam);
+                                        }
+                                        mam.pbsTexOffset = mst.pbsOffset;
+                                    }
+                                }
+
+                            }
+                        }
+                        mam.matOffset = (uint)mst.matOffset;
+                        if (mst.matFlag != 0)
+                        {
+                            mam.flag |= mst.matFlag;
+                        }
+
+                        if (mst.hasCutout)
+                        {
+                            mam.renderTypeOffset = context.blendMode == BlendMode.Cutout ? mst.renderTypeOffset : 0;
+                        }
+                        else if (mst.hasTransparent) { }
+                        else if (mst.hasTransparentCout)
+                        {
+                            mam.renderTypeOffset = context.blendMode == BlendMode.CutoutTransparent ? mst.renderTypeOffset : 0;
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            int renderQueue = material.renderQueue;
+            if (renderQueue == -1)
+            {
+                switch (context.blendMode)
+                {
+                    case BlendMode.Opaque:
+                        renderQueue = 2000;
+                        break;
+                    case BlendMode.Cutout:
+                        renderQueue = 2450;
+                        break;
+                    case BlendMode.CutoutTransparent:
+                        renderQueue = 2550;
+                        break;
+                    case BlendMode.Transparent:
+                        renderQueue = 3000;
+                        break;
+                }
+            }
+            context.renderQueue = renderQueue;
+        }
+
+        static string[] keyWords = new string[]
+        {
+        "_PBS_FROM_PARAM",
+        "_PBS_HALF_FROM_PARAM",
+        "_PBS_M_FROM_PARAM ",
+        "_PBS_NO_IBL",
+        "_OVERLAY",
+        "_ETX_EFFECT",
+        "_NEED_BOX_PROJECT_REFLECT",
+        "_INSTANCE",
+        "_PARALLAX_EFFECT",
+        "_SPLAT1",
+        "_SPLAT2",
+        "_SPLAT3",
+        "_SPLAT4",
+        "_TERRAIN_LODCULL",
+        "_SHADOW_MAP",
+        "_SELF_SHADOW_MAP",
+        "_ALPHA_FROM_COLOR",
+        "_CUSTOM_LIGHTMAP_ON",
+        };
+
+        static KeywordFlags[] keyWordFlag = new KeywordFlags[]
+        {
+        KeywordFlags._PBS_FROM_PARAM,
+        KeywordFlags._PBS_HALF_FROM_PARAM,
+        KeywordFlags._PBS_M_FROM_PARAM,
+        KeywordFlags._PBS_NO_IBL,
+        KeywordFlags._OVERLAY,
+        KeywordFlags._ETX_EFFECT,
+        KeywordFlags._NEED_BOX_PROJECT_REFLECT,
+        KeywordFlags._INSTANCE,
+        KeywordFlags._PARALLAX_EFFECT,
+        KeywordFlags._SPLAT1,
+        KeywordFlags._SPLAT2,
+        KeywordFlags._SPLAT3,
+        KeywordFlags._SPLAT4,
+        KeywordFlags._TERRAIN_LODCULL,
+        KeywordFlags._SHADOW_MAP,
+        KeywordFlags._SELF_SHADOW_MAP,
+        KeywordFlags._ALPHA_FROM_COLOR
+        };
+
+        // static string[] rolekeyWords = new string[]
+        // {
+        //     "_ETX_EFFECT",
+        //     "_SHADOW_MAP",
+        //     "_ALPHA_FROM_COLOR",
+        // };
+
+        // static EffectKeywordFlags[] roleKeyWordFlag = new EffectKeywordFlags[]
+        // {
+        //     EffectKeywordFlags._ETX_EFFECT,
+        //     EffectKeywordFlags._SHADOW_MAP,
+        //     EffectKeywordFlags._ALPHA_FROM_COLOR,
+        // };
+        public static string GetKeyWords(KeywordFlags keyWord)
+        {
+            string keywordStr = "";
+            for (int i = 0; i < keyWordFlag.Length; ++i)
+            {
+                KeywordFlags flag = keyWordFlag[i];
+                if (((uint)(keyWord & flag)) != 0)
+                {
+                    if (!string.IsNullOrEmpty(keywordStr))
+                        keywordStr += "|";
+                    keywordStr += keyWords[i];
+                }
+            }
+            return keywordStr;
+        }
+        // public static string GetKeyWords (EffectKeywordFlags keyWord)
+        // {
+        //     string keywordStr = "";
+        //     for (int i = 0; i < roleKeyWordFlag.Length; ++i)
+        //     {
+        //         EffectKeywordFlags flag = roleKeyWordFlag[i];
+        //         if (((uint) (keyWord & flag)) != 0)
+        //         {
+        //             if (!string.IsNullOrEmpty (keywordStr))
+        //                 keywordStr += "|";
+        //             keywordStr += rolekeyWords[i];
+        //         }
+        //     }
+        //     return keywordStr;
+        // }
+
+        public static Material GetDummyMat(string name)
+        {
+            string path = string.Format("{0}/{1}/{2}.mat",
+                AssetsConfig.GlobalAssetsConfig.ResourcePath,
+                AssetsConfig.GlobalAssetsConfig.DummyMatFolder, name);
+            return AssetDatabase.LoadAssetAtPath<Material>(path);
+
+        }
+        public static void RefeshMat(Material mat, BlendMode blendMode, KeywordFlags keyWord, bool enableLightMap, bool enableShadow)
+        {
+            if (mat != null)
+            {
+                mat.shaderKeywords = null;
+                for (int i = 0; i < keyWordFlag.Length; ++i)
+                {
+                    KeywordFlags flag = keyWordFlag[i];
+                    if (((uint)(keyWord & flag)) != 0)
+                    {
+                        mat.EnableKeyword(keyWords[i]);
+                    }
+                }
+                if (enableLightMap)
+                    mat.EnableKeyword("_CUSTOM_LIGHTMAP_ON");
+                if (enableShadow)
+                    mat.EnableKeyword("_SHADOW_MAP");
+                SetupMaterialWithBlendMode(mat, blendMode);
+            }
+        }
+
+        public static void CreateDummyMat(string name, Shader shader, BlendMode blendMode, KeywordFlags keyWord, bool enableLightMap, bool enableShadow)
+        {
+            if (shader != null)
+            {
+                Material mat = new Material(shader);
+                RefeshMat(mat, blendMode, keyWord, enableLightMap, enableShadow);
+                CommonAssets.CreateAsset<Material>(string.Format("{0}/{1}",
+                    AssetsConfig.GlobalAssetsConfig.ResourcePath,
+                    AssetsConfig.GlobalAssetsConfig.DummyMatFolder), name, ".mat", mat);
+            }
+        }
+        // public static void CreateDummyMat (string name, Shader shader, BlendMode blendMode, EffectKeywordFlags keyWord)
+        // {
+        //     if (shader != null)
+        //     {
+        //         Material mat = new Material (shader);
+        //         for (int i = 0; i < roleKeyWordFlag.Length; ++i)
+        //         {
+        //             EffectKeywordFlags flag = roleKeyWordFlag[i];
+        //             if (((uint) (keyWord & flag)) != 0)
+        //             {
+        //                 mat.EnableKeyword (rolekeyWords[i]);
+        //             }
+        //         }
+
+        //         SetupMaterialWithBlendMode (mat, blendMode);
+        //         CommonAssets.CreateAsset<Material> (string.Format ("{0}/{1}",
+        //             AssetsConfig.GlobalAssetsConfig.ResourcePath,
+        //             AssetsConfig.GlobalAssetsConfig.DummyMatFolder), name, ".mat", mat);
+        //     }
+        // }
+
+        private static BlendMode GetBlendMode(EBlendType blendType)
+        {
+            BlendMode mode = BlendMode.Opaque;
+            if (blendType == EBlendType.Cutout)
+                mode = BlendMode.Cutout;
+            else if (blendType == EBlendType.CutoutTransparent)
+                mode = BlendMode.CutoutTransparent;
+            else if (blendType == EBlendType.Transparent)
+                mode = BlendMode.Transparent;
+            return mode;
+        }
+        public static void DefaultMat(AssetsConfig.DummyMaterialInfo dmi)
+        {
+            if (dmi.shader != null)
+            {
+                string name = dmi.name;
+                CreateDummyMat(name, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, true, false);
+                if (dmi.shadowMat)
+                {
+                    CreateDummyMat(name + dmi.ext1, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, true, true);
+                }
+                // if (dmi.lightmapMode == ELightMapMode.LightmapMat)
+                // {
+                //     CreateDummyMat(name + dmi.ext1, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, true, false);
+                //     if (dmi.shadowMat)
+                //     {
+                //         CreateDummyMat(name + dmi.ext2, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, false, true);
+                //         CreateDummyMat(name + dmi.ext3, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, true, true);
+                //     }
+                // }
+                // else
+                // {
+                //     if (dmi.shadowMat)
+                //     {
+                //         CreateDummyMat(name + dmi.ext2, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, false, true);
+                //     }
+                // }
+            }
+        }
+        public static void DefaultRefeshMat(AssetsConfig.DummyMaterialInfo dmi)
+        {
+            BlendMode blendMode = GetBlendMode(dmi.blendType);
+            RefeshMat(dmi.mat, blendMode, (KeywordFlags)dmi.flag, true, false);
+            RefeshMat(dmi.mat1, blendMode, (KeywordFlags)dmi.flag, true, true);
+        }
+
+        public static void DefaultEffectMat(AssetsConfig.DummyMaterialInfo dmi, bool multiMat)
+        {
+            if (dmi.shader != null)
+            {
+                string name = dmi.name;
+                if (multiMat)
+                {
+                    if ((dmi.blendType & EBlendType.Opaque) != 0)
+                        CreateDummyMat(name, dmi.shader, BlendMode.Opaque, (KeywordFlags)dmi.flag, false, false);
+                    if ((dmi.blendType & EBlendType.Cutout) != 0)
+                        CreateDummyMat(name + dmi.ext1, dmi.shader, BlendMode.Cutout, (KeywordFlags)dmi.flag, false, false);
+                    if ((dmi.blendType & EBlendType.CutoutTransparent) != 0)
+                        CreateDummyMat(name + dmi.ext2, dmi.shader, BlendMode.CutoutTransparent, (KeywordFlags)dmi.flag, false, false);
+                }
+                else
+                {
+                    CreateDummyMat(name, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, false, false);
+                }
+            }
+        }
+
+        // [MenuItem ("Assets/Tool/Material_DummyMat")]
+        // public static void DefaultMat ()
+        // {
+        //     var sceneDummyMaterials = AssetsConfig.GlobalAssetsConfig.sceneDummyMaterials;
+        //     for (ESceneMaterial i = ESceneMaterial.SceneCommon; i < ESceneMaterial.Num; ++i)
+        //     {
+        //         int index = (int) i;
+        //         var sdm = sceneDummyMaterials[index];
+        //         string name = AssetsConfig.sceneMatNames[index * 2];
+        //         if (!string.IsNullOrEmpty (name))
+        //             DefaultMat (sdm, name, AssetsConfig.sceneMatNames[index * 2 + 1]);
+        //     }
+        // }
+
+        // [MenuItem ("Assets/Tool/Material_Test")]
+        // public static void Test ()
+        // {
+        //     string path = "Assets/BundleRes/Scene/Scene_battle_8V8/Scene_battle_8V8.bytes";
+        //     try
+        //     {
+        //         FileStream fs = new FileStream (path, FileMode.Open);
+        //         FileStream fs1 = new FileStream (path, FileMode.Open);
+        //     }
+        //     catch
+        //     {
+        //         XDebug.singleton.AddErrorLog2 ("Load File Error:{0}", path);
+        //     }
+        // }
+    }
+}

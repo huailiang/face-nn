@@ -1,0 +1,10 @@
+unity/*.csproj
+unity/*.sln
+unity/obj
+unity/Library
+unity/Temp
+unity/Assets/Creatures*
+unity/Assets/Table*
+**/.vscode
+**/.vs
+

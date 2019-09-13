@@ -1,0 +1,92 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/scene.unity
+    guid: f20c945e20e770c4db9fc9361dcd6bf8
+  - enabled: 1
+    path: Assets/Scenes/empty.unity
+    guid: fd7266f3f7955ff40a7573d01fb38c20
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/Select_scene/Select_scene.unity
+    guid: a2457f85fa456304ba89c66531d4fd8e
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/multiplayer01/multiplayer01.unity
+    guid: 968fab3eb1141174a926ea1899dfdad5
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/OpenWorld_HoarfrostHollow/OpenWorld_HoarfrostHollow.unity
+    guid: 9885d87d819c9a942b630bee976b2694
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/OpenWorld_HoarfrostHollow/OpenWorld_HoarfrostHollow_design.unity
+    guid: d7d35accc66c4ee4db1f1fe964b3fabd
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/OpenWorld_NorthernRuins/OpenWorld_NorthernRuins_gaoyan.unity
+    guid: 138d1a1ee9e086f4691f55bb7724467b
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/test/test.unity
+    guid: 6ccdea7d4de649e4f81ef5eb330334f8
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/OpenWorld_NorthernRuins/OpenWorld_NorthernRuins.unity
+    guid: a712937403b44c64782f992d7d4e2658
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/battle/Scene_battle_8V8/Scene_battle_8V8.unity
+    guid: fc77fcde4b489cd4eb86faaf444cebed
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/raid/raid_queen/raid_queen.unity
+    guid: 813281c7eeda3e446b758e4d9041f863
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/OpenWorld_NorthernRuins/OpenWorld_NorthernRuins_moqiujun.unity
+    guid: d19d02bca99e8e3439c062092656fde0
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/OpenWorld_NorthernRuins/OpenWorld_NorthernRuins_design.unity
+    guid: 2b9221c47cbe24d4daaad04cf413ebe2
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/Elite/scene_tower/scene_tower.unity
+    guid: 8077d437d7bb6ed449e9dba7b257a182
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/battle/Scene_battle_1V1/Scene_battle_1V1_design.unity
+    guid: 40b14be3464bbcf4596753ec1a523e20
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/raid/raid_Bley/raid_Bley.unity
+    guid: 6e2ac0ca338ee13489957bc7852720d6
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/Elite/scene_tower/scene_tower_edit.unity
+    guid: d324c2d9ff56b8a43b8e4ee0d15aed32
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/raid/raid_Bley/raid_Bley_edit.unity
+    guid: c77cdf842baaa2c479210e7c2b99775c
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/raid/raid_reddog/raid_reddog.unity
+    guid: 365464d08e241d740893d1ee9596b647
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/kuhan/kuhan_edit.unity
+    guid: b80950fbe5f059f458f3d271c414ac16
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/battle/Scene_battle_1V1/Scene_battle_1V1.unity
+    guid: b3aa90a0bed964a41993af9efefac112
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/kuhan/kuhan.unity
+    guid: 0b00109eb85e7ea438e30f4b592564bd
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/raid/raid_reddog/raid_reddog_edit.unity
+    guid: 08d520488c5f6ca4c8d56d37757fa23b
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/Elite/scene_altar/scene_altar.unity
+    guid: 97d0b497af0273440ace26186277415f
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/raid/raid_reddog/raid_reddog_design.unity
+    guid: 1314fc71324d451468aee7e82d7d696f
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/Elite/scene_altar/scene_altar_design.unity
+    guid: c352563d4f4f2484a99bcdba4476ddc3
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/Elite/scene_lavasat/scene_lavasat_design.unity
+    guid: c3b43c6ce70daf44eb5b049bfd16a580
+  - enabled: 1
+    path: Assets/Scenes/Scenelib/Elite/scene_lavasat/scene_lavasat.unity
+    guid: b8bf3d07ed3aca74f9321b2c3fc91d6a
+  m_configObjects: {}

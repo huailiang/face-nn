@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - UI
+  - AirWall
+  - AirWallNotCamera
+  - TempNavMeshItemDestroyable
+  - BindedRes
+  - ChatUI
+  - LevelDynamic
+  - Shadow
+  - Mount
+  - Mount_BindedRes
+  - Timeline
+  - Culling
+  - ClimbPoint
+  - Weapon
+  - Role
+  - Enemy
+  - IgnoreUI
+  - AirWallGrid
+  - DynamicPointLight
+  - AimThrowGrid
+  - SpecialAction
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - Terrain
+  - Enemy
+  - Role
+  - 
+  - BigGuy
+  - NoneEntity
+  - 
+  - 
+  - Npc
+  - AllEntity
+  - Dummy
+  - 
+  - Player
+  - Resources
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - InVisiblity
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: UISorting
+    uniqueID: 1411885903
+    locked: 0

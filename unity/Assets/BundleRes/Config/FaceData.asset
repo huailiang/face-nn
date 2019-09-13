@@ -1,0 +1,728 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 995562899, guid: 42edf25479b12054d8c65447895935e6, type: 3}
+  m_Name: FaceData
+  m_EditorClassIdentifier: 
+  headData:
+  - dataIndex: 0
+    name: "\u989D\u5934"
+    icon: ui_faceicon_0_0
+    v2ID: 1
+    v2ID2: 0
+    v2Type: 1
+    properities: 02000000
+    values: 0a000000000000000000000000000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 0
+  - dataIndex: 3
+    name: "\u4E24\u988A"
+    icon: ui_faceicon_0_1
+    v2ID: 4
+    v2ID2: 3
+    v2Type: 2
+    properities: 
+    values: 00000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 0
+  - dataIndex: 5
+    name: "\u56DB\u767D"
+    icon: ui_faceicon_0_2
+    v2ID: 6
+    v2ID2: 5
+    v2Type: 0
+    properities: 
+    values: 000000000000000000000000000000000000000000000000000000000000000000000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 0
+  - dataIndex: 7
+    name: "\u4E0B\u989D"
+    icon: ui_faceicon_0_3
+    v2ID: 8
+    v2ID2: 7
+    v2Type: 2
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 0
+  - dataIndex: 9
+    name: "\u4E0B\u5DF4"
+    icon: ui_faceicon_0_4
+    v2ID: 10
+    v2ID2: 9
+    v2Type: 2
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 0
+  - dataIndex: 11
+    name: "\u4E0B\u5DF4\u5C16"
+    icon: ui_faceicon_0_5
+    v2ID: 12
+    v2ID2: 11
+    v2Type: 2
+    properities: 0d00000050000000
+    values: 0300000000000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 0
+  senseData:
+  - dataIndex: 15
+    name: "\u7709\u6BDB\u6574\u4F53"
+    icon: ui_faceicon_1_0
+    v2ID: 20
+    v2ID2: 19
+    v2Type: 0
+    properities: 1500000016000000
+    values: 0900000005000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 0
+  - dataIndex: 19
+    name: "\u7709\u68A2"
+    icon: ui_faceicon_1_1
+    v2ID: 24
+    v2ID2: 23
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 0
+  - dataIndex: 21
+    name: "\u7709\u4E2D"
+    icon: ui_faceicon_1_2
+    v2ID: 26
+    v2ID2: 25
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 0
+  - dataIndex: 23
+    name: "\u7709\u5C3E"
+    icon: ui_faceicon_1_3
+    v2ID: 28
+    v2ID2: 27
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 0
+  - dataIndex: 25
+    name: "\u773C\u775B\u6574\u4F53"
+    icon: ui_faceicon_2_0
+    v2ID: 15
+    v2ID2: 14
+    v2Type: 0
+    properities: 100000001100000012000000
+    values: 030000000500000000000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 1
+  - dataIndex: 30
+    name: "\u4E0A\u773C\u7751"
+    icon: ui_faceicon_2_1
+    v2ID: 30
+    v2ID2: 29
+    v2Type: 0
+    properities: 1f000000
+    values: 05000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 1
+  - dataIndex: 33
+    name: "\u4E0B\u773C\u7751"
+    icon: ui_faceicon_2_2
+    v2ID: 33
+    v2ID2: 32
+    v2Type: 0
+    properities: 22000000
+    values: 05000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 1
+  - dataIndex: 36
+    name: "\u5185\u773C\u89D2"
+    icon: ui_faceicon_2_3
+    v2ID: 36
+    v2ID2: 35
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 1
+  - dataIndex: 38
+    name: "\u5916\u773C\u89D2"
+    icon: ui_faceicon_2_4
+    v2ID: 38
+    v2ID2: 37
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 1
+  - dataIndex: 40
+    name: "\u773C\u73E0\u4F4D\u7F6E"
+    icon: ui_faceicon_2_5
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 27000000
+    values: 05000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 1
+  - dataIndex: 41
+    name: "\u9F3B\u5B50\u6574\u4F53"
+    icon: ui_faceicon_3_0
+    v2ID: 41
+    v2ID2: 40
+    v2Type: 0
+    properities: 2a0000002b000000
+    values: 0a00000000000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: -156.25
+    faceType: 1
+    type: 2
+  - dataIndex: 45
+    name: "\u9F3B\u5C16"
+    icon: ui_faceicon_3_1
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 2c0000002d0000002e000000
+    values: 010000000200000000000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: -180
+    faceType: 1
+    type: 2
+  - dataIndex: 48
+    name: "\u9F3B\u7FFC"
+    icon: ui_faceicon_3_3
+    v2ID: 48
+    v2ID2: 47
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: -180
+    faceType: 1
+    type: 2
+  - dataIndex: 50
+    name: "\u9F3B\u6881"
+    icon: ui_faceicon_3_4
+    v2ID: 50
+    v2ID2: 49
+    v2Type: 0
+    properities: 3300000034000000
+    values: 0a00000000000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: -156.25
+    faceType: 1
+    type: 2
+  - dataIndex: 54
+    name: "\u5C71\u6839"
+    icon: ui_faceicon_3_5
+    v2ID: 54
+    v2ID2: 53
+    v2Type: 0
+    properities: 37000000
+    values: 0a000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: -180
+    faceType: 1
+    type: 2
+  - dataIndex: 57
+    name: "\u5634\u5507\u6574\u4F53"
+    icon: ui_faceicon_4_0
+    v2ID: 57
+    v2ID2: 56
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 3
+  - dataIndex: 59
+    name: "\u4E0A\u5507"
+    icon: ui_faceicon_4_4
+    v2ID: 67
+    v2ID2: 66
+    v2Type: 0
+    properities: 4400000049000000
+    values: 0000000005000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 3
+  - dataIndex: 63
+    name: "\u4E0A\u5507\u73E0"
+    icon: ui_faceicon_4_2
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 3c0000003d0000003e000000
+    values: 010000000200000000000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 3
+  - dataIndex: 66
+    name: "\u4E0B\u5507\u73E0"
+    icon: ui_faceicon_4_3
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 3f0000004000000041000000
+    values: 010000000200000000000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 3
+  - dataIndex: 69
+    name: "\u4E0B\u5507"
+    icon: ui_faceicon_4_5
+    v2ID: 70
+    v2ID2: 69
+    v2Type: 0
+    properities: 470000004a000000
+    values: 0000000005000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 3
+  - dataIndex: 73
+    name: "\u5507\u89D2"
+    icon: ui_faceicon_4_1
+    v2ID: 59
+    v2ID2: 58
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 3
+  - dataIndex: 75
+    name: "\u5F00\u53E3"
+    icon: ui_faceicon_4_6
+    v2ID: 72
+    v2ID2: 72
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 1
+    type: 3
+  - dataIndex: 77
+    name: "\u8033\u5ED3"
+    icon: ui_faceicon_5_0
+    v2ID: 76
+    v2ID2: 75
+    v2Type: 0
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: -132.633
+    faceType: 1
+    type: 4
+  - dataIndex: 79
+    name: "\u8033\u5782"
+    icon: ui_faceicon_5_1
+    v2ID: 78
+    v2ID2: 77
+    v2Type: 0
+    properities: 4f000000
+    values: 00000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: -132.633
+    faceType: 1
+    type: 4
+  paintData:
+  - dataIndex: 82
+    name: "\u7709\u59861"
+    icon: ui_faceicon_6_0
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: e8030000f4030000f5030000
+    values: 0b0000000c00000006000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 0
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Brow_01
+  - dataIndex: 85
+    name: "\u7709\u59862"
+    icon: ui_faceicon_6_1
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: fc030000fd030000fe030000
+    values: 0b0000000c00000006000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 0
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Brow_02
+  - dataIndex: 88
+    name: "\u7709\u59863"
+    icon: ui_faceicon_6_2
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 0b0400000c0400000d040000
+    values: 0b0000000c00000006000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 0
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Brow_03
+  - dataIndex: 91
+    name: "\u773C\u5F711"
+    icon: ui_faceicon_7_0
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: e9030000f6030000f7030000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 1
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Eye_01
+  - dataIndex: 94
+    name: "\u773C\u5F712"
+    icon: ui_faceicon_7_1
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: ff0300000004000001040000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 1
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Eye_02
+  - dataIndex: 97
+    name: "\u773C\u5F713"
+    icon: ui_faceicon_7_2
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 0e0400000f04000010040000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 1
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Eye_03
+  - dataIndex: 100
+    name: "\u77B3\u82721"
+    icon: ui_faceicon_8_0
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: ea030000eb030000ec030000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 2
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Pupil_01
+  - dataIndex: 103
+    name: "\u77B3\u82722"
+    icon: ui_faceicon_8_1
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 020400000304000004040000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 2
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Pupil_02
+  - dataIndex: 106
+    name: "\u77B3\u82723"
+    icon: ui_faceicon_8_2
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 110400001204000013040000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 2
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Pupil_03
+  - dataIndex: 109
+    name: "\u5507\u5F691"
+    icon: ui_faceicon_9_0
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: ee030000ef030000f0030000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 3
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Mouth_01
+  - dataIndex: 112
+    name: "\u5507\u5F692"
+    icon: ui_faceicon_9_1
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 050400000604000007040000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 3
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Mouth_02
+  - dataIndex: 115
+    name: "\u5507\u5F693"
+    icon: ui_faceicon_9_2
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 140400001504000016040000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 3
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Mouth_03
+  - dataIndex: 118
+    name: "\u65E0"
+    icon: ui_faceicon_na
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 
+    values: 
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 4
+    offset:
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    - {x: 0, y: 0}
+    texture: 
+  - dataIndex: 118
+    name: "\u9762\u7EB91"
+    icon: ui_faceicon_10_2
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: f1030000f2030000f3030000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 4
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Face_01
+  - dataIndex: 121
+    name: "\u9762\u7EB92"
+    icon: ui_faceicon_10_0
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 08040000090400000a040000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 4
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Face_02
+  - dataIndex: 124
+    name: "\u9762\u7EB93"
+    icon: ui_faceicon_10_1
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 170400001804000019040000
+    values: 060000000b0000000c000000
+    camPos: {x: -0.02, y: 1.7, z: -1.77}
+    dummyRot: 180
+    faceType: 2
+    type: 4
+    offset:
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    - {x: 256, y: 256}
+    texture: Face_03
+  shapeData:
+  - dataIndex: 0
+    name: "\u9ED1\u6697\u5957\u7537"
+    icon: ui_faceicon_11_0_male
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 
+    values: 
+    camPos: {x: 0, y: 1.04, z: -13}
+    dummyRot: 180
+    faceType: 3
+    suitID: 2
+  - dataIndex: 0
+    name: "\u91D1\u5C5E\u5957"
+    icon: ui_faceicon_11_1_male
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 
+    values: 
+    camPos: {x: 0, y: 1.04, z: -13}
+    dummyRot: 180
+    faceType: 3
+    suitID: 1
+  - dataIndex: 0
+    name: "\u9ED1\u6697\u5957\u5973"
+    icon: ui_faceicon_11_2
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 
+    values: 
+    camPos: {x: 0, y: 1.04, z: -13}
+    dummyRot: 180
+    faceType: 3
+    suitID: 5
+  - dataIndex: 0
+    name: "\u821E\u8005\u5957"
+    icon: ui_faceicon_11_1
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 
+    values: 
+    camPos: {x: 0, y: 1.04, z: -13}
+    dummyRot: 180
+    faceType: 3
+    suitID: 11
+  - dataIndex: 0
+    name: "\u5361\u9C81\u521D\u59CB\u5957"
+    icon: ui_faceicon_11_2_male
+    v2ID: 0
+    v2ID2: 0
+    v2Type: 3
+    properities: 
+    values: 
+    camPos: {x: 0, y: 1.2, z: -15.5}
+    dummyRot: 180
+    faceType: 3
+    suitID: 6
+  shapeInfo:
+  - shape: 1
+    vinfo: {x: 0.66, y: 0.66, z: 0.66, w: 0.4}
+  - shape: 2
+    vinfo: {x: 0.66, y: 0.66, z: 0.66, w: 0.4}
+  - shape: 4
+    vinfo: {x: 1, y: 1, z: 1, w: 0}
+  - shape: 3
+    vinfo: {x: 1, y: 1, z: 1, w: 0}
