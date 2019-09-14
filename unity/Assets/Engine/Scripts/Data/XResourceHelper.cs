@@ -19,7 +19,7 @@ class TypeSpecializer<T>
     }
 }
 
-public class XResourceHelper : XSingleton<XResourceHelper>, IResourceHelp
+public class XResources : XSingleton<XResources>, IResourceHelp
 {
     public void CheckResource(UnityEngine.Object o, string path)
     {

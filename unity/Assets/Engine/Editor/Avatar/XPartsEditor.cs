@@ -44,7 +44,7 @@ public class XPartsEditor : Editor
         }
         if (GUILayout.Button("Face Weights"))
         {
-            XInterfaceMgr.singleton.AttachInterface<IResourceHelp>(XInterfaceMgr.ResourceHelperID, XResourceHelper.singleton);
+            XInterfaceMgr.singleton.AttachInterface<IResourceHelp>(XInterfaceMgr.ResourceHelperID, XResources.singleton);
             SkinnedMeshRenderer[] sks = part.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>();
             for (int i = 0; i < sks.Length; i++)
             {

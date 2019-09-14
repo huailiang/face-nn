@@ -14,7 +14,6 @@ namespace CFEngine
         public static readonly int UVTransform = Shader.PropertyToID("_UVTransform");
         public static readonly int DebugMode = Shader.PropertyToID("_PPDebugMode");
         public static readonly int DebugLayer = Shader.PropertyToID("_DebugLayer");
-        //postprocess
         //SMAA
         public static readonly int SMAA_Flip = Shader.PropertyToID("_SMAA_Flip");
         public static readonly int SMAA_Flop = Shader.PropertyToID("_SMAA_Flop");

@@ -187,8 +187,6 @@ namespace CFEngine.Editor
 
         public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)
         {
-            // _Emission property is lost after assigning Standard shader to the material
-            // thus transfer it before assigning the new shader
             if (m_Material != null)
             {
                 if (material.HasProperty("_Emission") && material.HasProperty("_EmissionColor"))
@@ -530,8 +528,6 @@ namespace CFEngine.Editor
             {
                 if (m_MaterialEditor != null)
                 {
-                    // foreach (var obj in m_MaterialEditor.targets)
-                    //     MaterialChanged ((Material) obj);
                     Update();
                 }
 
@@ -591,15 +587,6 @@ namespace CFEngine.Editor
                         GUILayout.EndHorizontal();
                     }
                 }
-
-                // if ((int) context.spi.property.floatValue == (int) DebugMode.HitEffect ||
-                //     (int) context.spi.property.floatValue == (int) DebugMode.HighLightEffect)
-                // {
-                //     if (baseColorMp != null)
-                //     {
-                //         m_MaterialEditor.ColorProperty (baseColorMp, baseColorMp.displayName);
-                //     }
-                // }
             }
 
         }

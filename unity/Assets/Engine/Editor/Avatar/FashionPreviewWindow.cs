@@ -29,7 +29,6 @@ namespace XEditor
         private AnimationClip clip;
         private GameObject go;
 
-        private XBoneTree tree;
         private XEntityPresentation.RowData pData;
 
 

@@ -5,6 +5,18 @@ using System.Collections;
 using CFUtilPoolLib;
 using System.IO;
 
+public class XTableReader
+{
+    public static bool ReadFile(string location, CVSReader reader)
+    {
+        CVSReader.Init();
+        XBinaryReader.Init();
+        XInterfaceMgr.singleton.AttachInterface<IResourceHelp>(XCommon.singleton.XHash("XResourceHelper"), XResources.singleton);
+
+        return XResourceLoaderMgr.singleton.ReadFile(location, reader);
+    }
+}
+
 public class XTableWriter
 {
     public static StreamWriter StartWriteFile(string path)

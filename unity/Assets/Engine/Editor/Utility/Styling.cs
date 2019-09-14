@@ -7,12 +7,9 @@ namespace CFEngine.Editor
     {
         public static readonly GUIStyle smallTickbox;
         public static readonly GUIStyle miniLabelButton;
-
         public static readonly Texture2D paneOptionsIconDark;
         public static readonly Texture2D paneOptionsIconLight;
-
         public static readonly GUIStyle labelHeader;
-
         public static readonly GUIStyle wheelLabel;
         public static readonly GUIStyle wheelThumb;
         public static readonly Vector2 wheelThumbSize;
@@ -57,4 +54,4 @@ namespace CFEngine.Editor
             preLabel = new GUIStyle("ShurikenLabel");
         }
     }
-} 
+}
