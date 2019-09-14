@@ -13,8 +13,6 @@ namespace CFEngine.Editor
         //lighting
         private SerializedProperty roleLight0;
         private SerializedProperty roleLight1;
-        private SerializedProperty useUnityLighting;
-
         //debugShadow
         private SerializedProperty fitWorldSpace;
         private SerializedProperty lookTarget;
@@ -39,8 +37,6 @@ namespace CFEngine.Editor
         {
             roleLight0 = FindProperty(x => x.roleLight0);
             roleLight1 = FindProperty(x => x.roleLight1);
-
-            useUnityLighting = FindProperty(x => x.useUnityLighting);
 
             fitWorldSpace = FindProperty(x => x.fitWorldSpace);
             shadowMapLevel = FindProperty(x => x.shadowMapLevel);
@@ -97,14 +93,7 @@ namespace CFEngine.Editor
                 }
             }
         }
-        private void CalcSplitLeftRight()
-        {
-            float k = Mathf.Tan(Mathf.Deg2Rad * (90 - splitAngle.value.floatValue));
-            float b = 1 + k;
-            splitLeft = -b / k;
-            splitRight = -splitLeft;
 
-        }
         public override void OnInspectorGUI()
         {
             serializedObject.Update();

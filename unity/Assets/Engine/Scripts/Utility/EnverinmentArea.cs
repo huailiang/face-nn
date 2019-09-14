@@ -619,7 +619,6 @@ namespace CFEngine
                 if (wrapper != null && wrapper.valid)
                 {
                     wrapper.Update();
-                    // envModifyList.Add (wrapper.envLerp as IEnverimnentModify);
                 }
             }
         }

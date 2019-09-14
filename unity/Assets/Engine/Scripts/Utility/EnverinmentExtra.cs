@@ -32,38 +32,6 @@ namespace CFEngine
         public Vector3 offset;
         public List<Light> lights = new List<Light> ();
     }
-    [System.Serializable]
-    public class ChunkLightInfo
-    {
-        public Light light;
-        public int index;
-    }
-
-    [System.Serializable]
-    public class ChunkLightVerticalBlock
-    {
-        public int yIndex;
-        public Vector3 offset;
-        public List<ChunkLightInfo> lightInfos = new List<ChunkLightInfo> ();
-    }
-
-    [System.Serializable]
-    public class ChunkLightIndex
-    {
-        public int xzIndex;
-        public float minY = 2000;
-        public int minYIndex = 1000;
-        public int maxYIndex = 0;
-        public List<ChunkLightVerticalBlock> lightVerticalBlock = new List<ChunkLightVerticalBlock> ();
-    }
-
-    [System.Serializable]
-    public class ChunkLightBlockInfo
-    {
-        public int chunkID = -1;
-        public List<ChunkLightIndex> lightIndexs = new List<ChunkLightIndex> ();
-        public List<Light> lights = new List<Light> ();
-    }
 
     public class MeshVertex
     {
@@ -74,13 +42,12 @@ namespace CFEngine
     [Serializable]
     public class LightLoopContext
     {
-        public int chunkWidth = 100;
-        public int chunkHeight = 100;
         public int widthCount = 100;
         public int heightCount = 100;
         public int xCount = 200;
         public int zCount = 200;
         public int lightGridSize = 5;
+        
         public Dictionary<int, LightBlockInfo> lightBlocks = new Dictionary<int, LightBlockInfo> ();
 
         public Dictionary<Mesh, MeshVertex> processMesh = new Dictionary<Mesh, MeshVertex> ();
@@ -109,10 +76,6 @@ namespace CFEngine
         public TransformRotationGUIWrapper roleLight1Rot;
 
 
-#endregion
-
-#region toggle
-        public bool useUnityLighting = false;
 #endregion
 
 #region debugShadow
@@ -264,31 +227,14 @@ namespace CFEngine
             SceneData.updateSceneView = SceneView_Update;
             SceneData.editorEditChunk = EditChunk;
             SceneData.editorSetRes = SetRes;
-
-            re.sceneData.enableShadow = true;
             if (shadowMapCb == null)
                 shadowMapCb = new CommandBuffer { name = "Editor Shadow Map Cb" };
-            if (re.sceneData.ShadowRT == null)
-            {
-                if (shadowMap == null)
-                {
-                    shadowMap = new RenderTexture (512, 512, 16, RenderTextureFormat.RG16, RenderTextureReadWrite.Linear)
-                    {
-                        name = "Shadowmap",
-                        hideFlags = HideFlags.DontSave,
-                        filterMode = FilterMode.Bilinear,
-                        wrapMode = TextureWrapMode.Clamp,
-                        anisoLevel = 0,
-                        autoGenerateMips = false,
-                        useMipMap = false
-                    };
-                    shadowMap.Create ();
-                }
-            }
+         
 
             shadowMat = AssetsConfig.GlobalAssetsConfig.ShadowCaster;
             UpdateShadowCaster ();
         }
+
         private void GetSceneViewCamera ()
         {
             if (sceneViewCamera == null)
@@ -310,6 +256,7 @@ namespace CFEngine
                 }
             }
         }
+
 #region debug
         public void RefreshDebug(bool isPP)
         {
@@ -323,6 +270,7 @@ namespace CFEngine
             debugContext.shaderID = isPP ? EnverinmentExtra.ppDebugShaderIDS : EnverinmentExtra.debugShaderIDS;
         }
 #endregion
+
 #region lighting
         private void PrepareTransformGui (Light light, ref TransformRotationGUIWrapper wrapper)
         {
@@ -359,9 +307,9 @@ namespace CFEngine
                 }
             }
         }
+
         public void SyncLightInfo ()
         {
-            useUnityLighting = true;
             if (re != null)
             {
                 PrepareTransformGui (roleLight0, ref roleLight0Rot);
@@ -401,9 +349,6 @@ namespace CFEngine
                 light.type = LightType.Directional;
                 light.cullingMask = 1 << GameObjectLayerHelper.InVisiblityLayer;
             }
-        }
-        public void PrepareLights (LightMask lightMask)
-        {
         }
 
         public void CleanLights ()
@@ -521,10 +466,7 @@ namespace CFEngine
                                                                 xzIndex = z * llc.xCount + x,
                                                                 yIndex = y,
                                                             };
-                                                            int xx;
-                                                            int zz;
                                                             llc.lightBlocks.Add (id, blockInfo);
-                                                            blockInfo.chunkID = LightLoopContext.FindChunkIndex (blockInfo.offset, llc.chunkWidth, llc.chunkHeight, llc.widthCount, llc.heightCount, out xx, out zz);
                                                         }
                                                         blockInfo.lights.Add (light);
                                                     }
@@ -813,33 +755,8 @@ namespace CFEngine
                 Handles.Label (pos, text);
             }
         }
-        void DrawSceneObjectBox (SceneChunk sc, SceneQuadTreeNode node)
-        {
-            if (sc.sceneObjects.IsValid () && sc.chunkState >= SceneChunk.ESceneChunkState.ChunkDataLoadFinish)
-            {
-                SceneQuadBlock sqb = sc.sceneObjects.SafeGet<SceneQuadBlock> (node.sceneQuadBlockIndex);
-                if (sqb != null)
-                {
-                    ushort soStart = 0;
-                    ushort soCount = 0;
-                    if (sc.SafeGetSceneObjectGroupIndex (sqb.sceneObjectGroupIndex, ref soStart, ref soCount))
-                    {
-                        for (ushort i = 0; i < soCount; ++i)
-                        {
-                            int soIndex = sc.GetSceneObjectIndex (soStart, i) + sc.sceneObjecStart;
-                            SceneObject so = sc.sceneObjects.SafeGet<SceneObject> (soIndex);
-                            if (so != null && so.asset.obj != null && so.mpRef != null)
-                            {
-                                DrawBox (so.draw, so.aabb);
-                                if (updateSceneObject)
-                                    sceneObjects.Add (so);
-                            }
-                        }
-                    }
-                }
+  
 
-            }
-        }
         void OnDrawGizmos ()
         {
             Color color = Gizmos.color;
@@ -887,12 +804,7 @@ namespace CFEngine
             {
                 m_drawGizmo ();
             }
-
             Gizmos.color = color;
-        }
-
-        private void DrawObject (SceneObject so, ComputeBuffer argBuffer, Material inVisibleMat)
-        {
         }
 
         public void SceneView_Update ()
