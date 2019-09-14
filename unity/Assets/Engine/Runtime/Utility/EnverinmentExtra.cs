@@ -32,7 +32,6 @@ namespace CFEngine
         Role = 0x0001,
         Scene = 0x0002,
         Sun = 0x0004,
-        Water = 0x0008,
     }
     public enum LightingMode
     {
@@ -174,9 +173,6 @@ namespace CFEngine
         public Light sunLight;
         [System.NonSerialized]
         public TransformRotationGUIWrapper sunLightRot;
-        public Light waterSunLight;
-        [System.NonSerialized]
-        public TransformRotationGUIWrapper waterSunLightRot;
         private GameObject dummyLightGo;
 
 #endregion
@@ -261,8 +257,6 @@ namespace CFEngine
 #region debug
         public bool debugFolder = true;
         public bool drawFrustum = false;
-        public bool drawCameraWall = false;
-        public bool drawDynamicWall = false;
         public bool drawInvisibleObj = false;
         public bool drawLodGrid = false;
         public bool drawTerrainGrid = false;
@@ -278,7 +272,6 @@ namespace CFEngine
         public bool drawLightBox = false;
 
         public ShaderDebugContext debugContext = new ShaderDebugContext();
-        public bool isPostProcessDebug = false;
         public bool isDebugLayer = false;
         public static int[] debugShaderIDS = new int[]
         {
@@ -371,7 +364,6 @@ namespace CFEngine
 
             GetSceneViewCamera ();
             forceUpdateFreeCamera |= XDebug.debugRoamingScene;
-            RefreshDebug(isPostProcessDebug);
         }
 
         void Start ()
@@ -448,7 +440,6 @@ namespace CFEngine
                 {
                     Vector3 pos = roleDummy.position;
                     re.sceneData.currentEntityPos = pos;
-                    re.interactiveParam = interactiveParam;
                     if (debugEnvArea && envObjects != null)
                     {
                         EnverinmentArea.TestArea (this, new Vector2 (pos.x, pos.z));
@@ -652,7 +643,6 @@ namespace CFEngine
                         bakeSceneLight1Rot = sceneLight1Rot;
                     }
                     SyncLightInfo (sunLight, ref sunLightRot, ref re.sunDir);
-                    SyncLightInfo (waterSunLight, ref waterSunLightRot, ref re.waterSunDir, true);
                 }
             }
         }
@@ -717,10 +707,6 @@ namespace CFEngine
                 {
                     PrepareLights (ref sunLight, ref re.sunDir, "sunLight");
                 }
-                if ((lightMask & LightMask.Water) != 0)
-                {
-                    PrepareLights (ref waterSunLight, ref re.waterSunDir, "waterLight");
-                }
             }
         }
 
@@ -750,11 +736,6 @@ namespace CFEngine
             {
                 GameObject.DestroyImmediate (sunLight.gameObject);
                 sunLightRot = null;
-            }
-            if (waterSunLight != null)
-            {
-                GameObject.DestroyImmediate (waterSunLight.gameObject);
-                waterSunLightRot = null;
             }
         }
         private void SyncLightInfo (Light light, ref LightInfo li)
@@ -1330,8 +1311,6 @@ namespace CFEngine
 #region freeCamera
         void OnValidate ()
         {
-            // if (Application.isPlaying)
-            //     enabled = enableInputCapture;
         }
 
         void CaptureInput ()
@@ -1574,28 +1553,7 @@ namespace CFEngine
             }
 
         }
-        void DrawDynamicWall(int wallIndex, int hitIndex, ref Color color,
-            ref Vector3 normal,ref Vector3 hitPoint,
-            ref Vector3 corner0, ref Vector3 corner1,
-            ref Vector3 corner0Bottom, ref Vector3 corner1Bottom)
-        {
-            if (wallIndex == hitIndex)
-            {
-                Gizmos.color = new Color(1, 0, 1, 0.3f);
-                Gizmos.DrawSphere(hitPoint, 0.2f);
-            }
-            else
-            {
-                Gizmos.color = color;
-            }
-            Gizmos.DrawLine(corner0, corner1);
-            Gizmos.DrawLine(corner1, corner1Bottom);
-            Gizmos.DrawLine(corner1Bottom, corner0Bottom);
-            Gizmos.DrawLine(corner0Bottom, corner0);
-            Vector3 center = corner0 + corner1 + corner0Bottom + corner1Bottom;
-            center /= 4;
-            Gizmos.DrawRay(center, normal);
-        }
+
         void DrawLightHandle (Transform t, Vector3 centerPos, float right, float up, Light l, string text)
         {
             if (l != null)
@@ -1780,79 +1738,6 @@ namespace CFEngine
                     }
                 }
 
-                if (drawCameraWall)
-                {
-#if DEBUG
-                    Gizmos.color = Color.red;
-                    Gizmos.DrawSphere(re.sceneData.cameraTarget, 0.3f);
-                    Gizmos.DrawLine(re.sceneData.lookAnchor, re.sceneData.cameraTarget);
-
-                    var it = chunks.GetEnumerator();
-                    while (it.MoveNext())
-                    {
-                        var chunk = it.Current.Value;
-                        for (int i = chunk.wallStart; i < chunk.wallEnd; ++i)
-                        {
-                            CameraWall wall = chunk.sceneObjects.Get<CameraWall> (i);
-                            if (wall.needCull)
-                            {
-                                Vector3 corner0 = wall.corner0;
-                                float top = corner0.y;
-
-                                Vector3 corner1 = wall.corner1;
-                                float buttom = corner1.y;
-                                corner1.y = top;
-                                Vector3 corner2 = wall.corner2;
-                                Vector3 corner3 = wall.corner3;
-
-                                Vector3 corner0Bottom = corner0;
-                                corner0Bottom.y = buttom;
-                                Vector3 corner1Bottom = corner1;
-                                corner1Bottom.y = buttom;
-                                Vector3 corner2Bottom = corner2;
-                                corner2Bottom.y = buttom;
-                                Vector3 corner3Bottom = corner3;
-                                corner3Bottom.y = buttom;
-
-                                Color hitColor = Color.white;
-                                int hitIndex = -1;
-                                if (wall.hitType != -1)
-                                {
-                                    hitColor = Color.green;
-                                }
-                                if (wall.needCull2)
-                                {
-                                    if (wall.hitType != -1)
-                                    {
-
-                                        //Gizmos.color = Color.green;
-                                    }
-                                    else
-                                    {
-                                        hitColor = new Color (0, 0.5f, 0.5f, 0.5f);
-                                    }
-                                }
-                                else
-                                {
-                                    hitColor = new Color (0.5f, 0.5f, 0, 0.5f);
-                                }
-                                hitIndex = wall.hitWallIndex;
-
-                                DrawDynamicWall(0, hitIndex, ref hitColor,
-                                    ref wall.normal0, ref wall.hitpos0, ref corner0, ref corner1, ref corner0Bottom, ref corner1Bottom);
-                                DrawDynamicWall(1, hitIndex, ref hitColor,
-                                    ref wall.normal1, ref wall.hitpos1, ref corner1, ref corner2, ref corner1Bottom, ref corner2Bottom);
-                                DrawDynamicWall(2, hitIndex, ref hitColor,
-                                    ref wall.normal2, ref wall.hitpos2, ref corner2, ref corner3, ref corner2Bottom, ref corner3Bottom);
-                                DrawDynamicWall(3, hitIndex, ref hitColor,
-                                    ref wall.normal3, ref wall.hitpos3, ref corner3, ref corner0, ref corner3Bottom, ref corner0Bottom);
-
-                               
-                            }
-                        }
-                    }
-#endif
-                }
                 if (drawPointLight)
                 {
                     if (XFxMgr.fxPointLight != null)
@@ -1900,31 +1785,6 @@ namespace CFEngine
                         }
                     }
                 
-            }
-            if (drawDynamicWall)
-            {
-                if (dynamicObjects != null)
-                {
-                    Gizmos.color = Color.green;
-                    var it = dynamicObjects.GetEnumerator ();
-                    while (it.MoveNext ())
-                    {
-                        var value = it.Current.Value;
-                        Vector3 pos0 = value.pos0;
-                        Vector3 pos2 = value.pos1;
-                        Vector3 pos1 = pos2;
-                        pos1.y = pos0.y;
-                        Vector3 pos3 = pos0;
-                        pos3.y = pos2.y;
-                        Gizmos.DrawLine(pos0, pos1);
-                        Gizmos.DrawLine(pos1, pos2);
-                        Gizmos.DrawLine(pos2, pos3);
-                        Gizmos.DrawLine(pos3, pos0);
-#if DEBUG
-                        Handles.Label((pos0 + pos1) * 0.5f, value.name);
-#endif
-                    }
-                }
             }
             if (drawTerrainHeight)
             {

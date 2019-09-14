@@ -12,11 +12,6 @@ using UnityEditor;
 #endif
 namespace CFEngine
 {
-    [System.Serializable]
-    public class WaterParam
-    {
-        public float baseVertDensity = 32f;
-    }
 
     [DisallowMultipleComponent, ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
@@ -37,7 +32,6 @@ namespace CFEngine
         // public float AmbientMax = 1.0f;
 
         public Vector3 sunDir = new Vector3(0, -1, 0);
-        public Vector3 waterSunDir = new Vector3(0, -1, 0);
 
         public AmbientModify ambient = null;
         //Shadow
@@ -50,14 +44,9 @@ namespace CFEngine
         public float shadowPower = 2f;
         public FogModify fog = null;
         public bool fogEnable = true;
-        // public FogParam Fog = new FogParam ();
         public bool enableWind = true;
         public RandomWindModify randomWind = null;
         public WaveWindModify waveWind = null;
-        // public WindParam Wind = new WindParam ();
-        // public WaveWindParam waveWind = new WaveWindParam ();
-        public float interactiveParam = 1;
-        // public WaterParam waterParam = new WaterParam ();
 
         [CFNoSerialized]
         public SceneData sceneData = null;
@@ -417,7 +406,6 @@ namespace CFEngine
                 Shader.SetGlobalVector(ShaderIDs.Env_HeighFogColorParameter1, fog.Color1.linear);
                 Shader.SetGlobalVector(ShaderIDs.Env_HeighFogColorParameter2, fog.Color2.linear);
             }
-            Shader.SetGlobalVector(ShaderIDs.Env_WaterSunDir, -waterSunDir);
         }
 
         private void UpdateCameraInternal()

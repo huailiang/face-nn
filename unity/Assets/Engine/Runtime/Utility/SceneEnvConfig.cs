@@ -9,10 +9,6 @@ namespace CFEngine
 
     public class SceneEnvConfig : ScriptableObject
     {
-        // public AmbientMode ambientMode = AmbientMode.Flat;
-        // public Color ambientSkyColor;
-        // public Color ambientEquatorColor;
-        // public Color ambientGroundColor;
 
         //IBL
         public string EnveriomentCubePath;
@@ -31,7 +27,6 @@ namespace CFEngine
         // public float AmbientMax = 1.0f;
 
         public Vector3 sunDir = new Vector3(0, -1, 0);
-        public Vector3 waterSunDir = new Vector3(0, -1, 0);
         //Shadow
         public float shadowScale = 0.5f;
         public float shadowDepthBias = -0.03f;

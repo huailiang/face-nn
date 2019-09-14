@@ -19,7 +19,6 @@ namespace CFEngine.Editor
         private SerializedProperty sceneRuntimeLight1;
 
         private SerializedProperty sunLight;
-        private SerializedProperty waterSunLight;
 
         private SerializedProperty fastEditLight;
         private SerializedProperty fastEditEnvLight;
@@ -57,8 +56,6 @@ namespace CFEngine.Editor
 
         //debug
         private SerializedProperty drawFrustum;
-        private SerializedProperty drawCameraWall;
-        private SerializedProperty drawDynamicWall;
         private SerializedProperty drawLodGrid;
         private SerializedProperty drawTerrainGrid;
 
@@ -71,8 +68,6 @@ namespace CFEngine.Editor
         private SerializedProperty drawWind;
         private SerializedProperty drawTerrainHeight;
         private SerializedProperty drawLightBox;
-
-        private SerializedProperty isPostProcessDebug;
         private SerializedProperty isDebugLayer;
 
         private SerializedProperty debugMode;
@@ -98,7 +93,6 @@ namespace CFEngine.Editor
             sceneRuntimeLight0 = FindProperty(x => x.sceneRuntimeLight0);
             sceneRuntimeLight1 = FindProperty(x => x.sceneRuntimeLight1);
             sunLight = FindProperty(x => x.sunLight);
-            waterSunLight = FindProperty(x => x.waterSunLight);
 
             fastEditLight = FindProperty(x => x.fastEditLight);
             fastEditEnvLight = FindProperty(x => x.fastEditEnvLight);
@@ -129,8 +123,6 @@ namespace CFEngine.Editor
             drawShadowLighing = FindProperty(x => x.drawShadowLighing);
 
             drawFrustum = FindProperty(x => x.drawFrustum);
-            drawCameraWall = FindProperty(x => x.drawCameraWall);
-            drawDynamicWall = FindProperty(x => x.drawDynamicWall);
             drawLodGrid = FindProperty(x => x.drawLodGrid);
             drawTerrainGrid = FindProperty(x => x.drawTerrainGrid);
 
@@ -151,7 +143,6 @@ namespace CFEngine.Editor
             debugEnvArea = FindProperty(x => x.debugEnvArea);
             drawLightBox = FindProperty(x => x.drawLightBox);
 
-            isPostProcessDebug = FindProperty(x => x.isPostProcessDebug);
             isDebugLayer = FindProperty(x => x.isDebugLayer);
             debugMode = FindProperty(x => x.debugContext.debugMode);
             debugDisplayType = FindProperty(x => x.debugContext.debugDisplayType);
@@ -238,10 +229,6 @@ namespace CFEngine.Editor
                     ToolsUtility.EndGroup();
                     ToolsUtility.BeginGroup("Sun Light");
                     LightInstpetorGui(sunLight, ee.sunLightRot, "SunLight");
-                    ToolsUtility.EndGroup();
-
-                    ToolsUtility.BeginGroup("Water Light");
-                    LightInstpetorGui(waterSunLight, ee.waterSunLightRot, "WaterLight");
                     ToolsUtility.EndGroup();
                 }
 
@@ -346,8 +333,6 @@ namespace CFEngine.Editor
                 if (ToolsUtility.BeginFolderGroup("Debug", ref ee.debugFolder))
                 {
                     EditorGUILayout.PropertyField(drawFrustum);
-                    EditorGUILayout.PropertyField(drawCameraWall);
-                    EditorGUILayout.PropertyField(drawDynamicWall);
                     EditorGUILayout.PropertyField(drawInvisibleObj);
                     EditorGUILayout.PropertyField(drawLodGrid);
                     EditorGUILayout.PropertyField(drawTerrainGrid);
@@ -416,11 +401,8 @@ namespace CFEngine.Editor
                         }
                     }
                     EditorGUI.BeginChangeCheck();
-                    EditorGUILayout.PropertyField(isPostProcessDebug);
                     if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject(target, "isPostProcessDebug");
-                        ee.RefreshDebug(isPostProcessDebug.boolValue);
                         debugMode.intValue = 0;
                         debugDisplayType.intValue = 0;
                         splitAngle.value.floatValue = 0;
@@ -428,27 +410,14 @@ namespace CFEngine.Editor
                     }
                     string[] debugNames = null;
                     bool refreshDebug = false;
-                    if (isPostProcessDebug.boolValue)
+
+                    if (GUILayout.Button("Refresh"))
                     {
-                        EditorGUI.BeginChangeCheck();
-                        EditorGUILayout.PropertyField(isDebugLayer);
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            Undo.RecordObject(target, "isDebugLayer");
-                            Shader.SetGlobalFloat(ShaderIDs.DebugLayer, isDebugLayer.boolValue ? 1 : 0);
-                        }
-                        debugNames = AssetsConfig.shaderPPDebugNames;
-                        ee.debugContext.shaderID = EnverinmentExtra.ppDebugShaderIDS;
+                        refreshDebug = true;
                     }
-                    else
-                    {
-                        if (GUILayout.Button("Refresh"))
-                        {
-                            refreshDebug = true;
-                        }
-                        debugNames = AssetsConfig.shaderDebugNames;
-                        ee.debugContext.shaderID = EnverinmentExtra.debugShaderIDS;
-                    }
+                    debugNames = AssetsConfig.shaderDebugNames;
+                    ee.debugContext.shaderID = EnverinmentExtra.debugShaderIDS;
+
 
                     if (debugNames != null)
                     {
@@ -551,7 +520,6 @@ namespace CFEngine.Editor
                     if (fastEditEnvLight != null && fastEditEnvLight.boolValue)
                     {
                         DrawLightHandle(t, pos, -4, 3, ee.sunLight, "SunLight");
-                        DrawLightHandle(t, pos, 4, 3, ee.waterSunLight, "WaterSunLight");
                     }
                     if (fastEditWind != null && fastEditWind.boolValue)
                     {
@@ -567,19 +535,6 @@ namespace CFEngine.Editor
                                 Undo.RecordObject(this, "Wind Pos");
                                 windParam.WindPos = windpos;
                             }
-                            // EditorGUI.BeginChangeCheck();
-                            // WaveWindModify waveWind = env.waveWind;
-                            // Quaternion rot = Handles.RotationHandle(Quaternion.LookRotation(waveWind.windPlane), pos);
-                            // if (EditorGUI.EndChangeCheck())
-                            // {
-                            //     Vector3 normal = rot * Vector3.forward;
-                            //     Vector2 mormalXZ = new Vector2(normal.x, normal.z);
-                            //     mormalXZ.Normalize();
-                            //     waveWind.windPlane.x = mormalXZ.x;
-                            //     waveWind.windPlane.z = mormalXZ.y;
-                            // }
-                            // Handles.ArrowHandleCap(100, pos, rot, 1, EventType.Repaint);
-                            // Handles.Label(pos, "Wind Dir");
                         }
                     }
                     Handles.color = temp;

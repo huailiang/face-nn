@@ -13,11 +13,6 @@ namespace CFEngine
             m_Sheets = new Dictionary<Shader, PropertySheet>();
         }
 
-        //public PropertySheet Get(string shaderName)
-        //{
-        //    return Get(Shader.Find(shaderName));
-        //}
-
         public PropertySheet Get(Shader shader)
         {
             PropertySheet sheet;
@@ -43,7 +38,7 @@ namespace CFEngine
         public void Release()
         {
             var it = m_Sheets.GetEnumerator();
-            while(it.MoveNext())
+            while (it.MoveNext())
             {
                 var sheet = it.Current.Value;
                 sheet.Release();

@@ -61,45 +61,26 @@ namespace CFEngine
 
                 // Because we have to support older platforms (GLES2/3, DX9 etc) we can't do all of
                 // this directly in the vertex shader using vertex ids :(
-                s_FullscreenTriangle.SetVertices (new List<Vector3>
+                s_FullscreenTriangle.SetVertices(new List<Vector3>
                 {
                     new Vector3 (-1f, -1f, 0f),
                     new Vector3 (-1f, 3f, 0f),
                     new Vector3 (3f, -1f, 0f)
                 });
-                s_FullscreenTriangle.SetIndices (new [] { 0, 1, 2 }, MeshTopology.Triangles, 0, false);
-                s_FullscreenTriangle.UploadMeshData (true);
+                s_FullscreenTriangle.SetIndices(new[] { 0, 1, 2 }, MeshTopology.Triangles, 0, false);
+                s_FullscreenTriangle.UploadMeshData(true);
 
                 return s_FullscreenTriangle;
             }
         }
 
-        //static Material s_CopyStdMaterial;
-        //public static Material copyStdMaterial
-        //{
-        //    get
-        //    {
-        //        if (s_CopyStdMaterial != null)
-        //            return s_CopyStdMaterial;
-
-        //        var shader = Shader.Find("Hidden/PostProcessing/CopyStd");
-        //        s_CopyStdMaterial = new Material(shader)
-        //        {
-        //            name = "PostProcess - CopyStd",
-        //            hideFlags = HideFlags.HideAndDontSave
-        //        };
-
-        //        return s_CopyStdMaterial;
-        //    }
-        //}
-
         static Material s_CopyMaterial;
-        public static Material GetCopyMaterial (Shader shader)
+        public static Material GetCopyMaterial(Shader shader)
         {
             if (s_CopyMaterial != null)
                 return s_CopyMaterial;
 
-            s_CopyMaterial = new Material (shader)
+            s_CopyMaterial = new Material(shader)
             {
                 name = "PostProcess - Copy",
                 hideFlags = HideFlags.HideAndDontSave
@@ -108,144 +89,83 @@ namespace CFEngine
             return s_CopyMaterial;
         }
 
-        //static PropertySheet s_CopySheet;
-        //public static PropertySheet copySheet
-        //{
-        //    get
-        //    {
-        //        if (s_CopySheet == null)
-        //            s_CopySheet = new PropertySheet(copyMaterial);
-
-        //        return s_CopySheet;
-        //    }
-        //}
 
         // Use a custom blit method to draw a fullscreen triangle instead of a fullscreen quad
         // https://michaldrobot.com/2014/04/01/gcn-execution-patterns-in-full-screen-passes/
-        public static void BlitFullscreenTriangle (this CommandBuffer cmd, ref RenderTargetIdentifier source, ref RenderTargetIdentifier destination, Shader shader, bool clear = false)
+        public static void BlitFullscreenTriangle(this CommandBuffer cmd, ref RenderTargetIdentifier source, ref RenderTargetIdentifier destination, Shader shader, bool clear = false)
         {
-            cmd.SetGlobalTexture (ShaderIDs.MainTex, source);
-            cmd.SetRenderTarget (destination);
+            cmd.SetGlobalTexture(ShaderIDs.MainTex, source);
+            cmd.SetRenderTarget(destination);
 
             if (clear)
-                cmd.ClearRenderTarget (true, true, Color.clear);
+                cmd.ClearRenderTarget(true, true, Color.clear);
 
-            cmd.DrawMesh (fullscreenTriangle, Matrix4x4.identity, GetCopyMaterial (shader), 0, 0);
+            cmd.DrawMesh(fullscreenTriangle, Matrix4x4.identity, GetCopyMaterial(shader), 0, 0);
         }
 
-        public static void BlitFullscreenTriangle (this CommandBuffer cmd, ref RenderTargetIdentifier source, ref RenderTargetIdentifier destination, PropertySheet propertySheet, int pass, bool clear = false)
+        public static void BlitFullscreenTriangle(this CommandBuffer cmd, ref RenderTargetIdentifier source, ref RenderTargetIdentifier destination, PropertySheet propertySheet, int pass, bool clear = false)
         {
-            cmd.SetGlobalTexture (ShaderIDs.MainTex, source);
-            cmd.SetRenderTarget (destination);
+            cmd.SetGlobalTexture(ShaderIDs.MainTex, source);
+            cmd.SetRenderTarget(destination);
 
             if (clear)
-                cmd.ClearRenderTarget (true, true, Color.clear);
+                cmd.ClearRenderTarget(true, true, Color.clear);
 
-            cmd.DrawMesh (fullscreenTriangle, Matrix4x4.identity, propertySheet.material, 0, pass, propertySheet.properties);
+            cmd.DrawMesh(fullscreenTriangle, Matrix4x4.identity, propertySheet.material, 0, pass, propertySheet.properties);
         }
-        public static void BlitFullscreenTriangle (this CommandBuffer cmd, RenderTexture source, RenderTexture destination, Shader shader, bool clear = false)
+        public static void BlitFullscreenTriangle(this CommandBuffer cmd, RenderTexture source, RenderTexture destination, Shader shader, bool clear = false)
         {
-            cmd.SetGlobalTexture (ShaderIDs.MainTex, source);
-            cmd.SetRenderTarget (destination);
+            cmd.SetGlobalTexture(ShaderIDs.MainTex, source);
+            cmd.SetRenderTarget(destination);
 
             if (clear)
-                cmd.ClearRenderTarget (true, true, Color.clear);
+                cmd.ClearRenderTarget(true, true, Color.clear);
 
-            cmd.DrawMesh (fullscreenTriangle, Matrix4x4.identity, GetCopyMaterial (shader), 0, 0);
+            cmd.DrawMesh(fullscreenTriangle, Matrix4x4.identity, GetCopyMaterial(shader), 0, 0);
         }
 
-        public static void BlitFullscreenTriangle (this CommandBuffer cmd, RenderTexture source, RenderTexture destination, PropertySheet propertySheet, int pass, bool clear = false)
+        public static void BlitFullscreenTriangle(this CommandBuffer cmd, RenderTexture source, RenderTexture destination, PropertySheet propertySheet, int pass, bool clear = false)
         {
             if (source != null)
-                cmd.SetGlobalTexture (ShaderIDs.MainTex, source);
-            cmd.SetRenderTarget (destination);
+                cmd.SetGlobalTexture(ShaderIDs.MainTex, source);
+            cmd.SetRenderTarget(destination);
 
             if (clear)
-                cmd.ClearRenderTarget (true, true, Color.clear);
+                cmd.ClearRenderTarget(true, true, Color.clear);
 
-            cmd.DrawMesh (fullscreenTriangle, Matrix4x4.identity, propertySheet.material, 0, pass, propertySheet.properties);
+            cmd.DrawMesh(fullscreenTriangle, Matrix4x4.identity, propertySheet.material, 0, pass, propertySheet.properties);
         }
 
-        public static void BlitFullscreenTriangle (this CommandBuffer cmd,  ref RenderTargetIdentifier source, RenderTexture destination, PropertySheet propertySheet, int pass, bool clear = false)
+        public static void BlitFullscreenTriangle(this CommandBuffer cmd, ref RenderTargetIdentifier source, RenderTexture destination, PropertySheet propertySheet, int pass, bool clear = false)
         {
-            cmd.SetGlobalTexture (ShaderIDs.MainTex, source);
-            cmd.SetRenderTarget (destination);
+            cmd.SetGlobalTexture(ShaderIDs.MainTex, source);
+            cmd.SetRenderTarget(destination);
 
             if (clear)
-                cmd.ClearRenderTarget (true, true, Color.clear);
+                cmd.ClearRenderTarget(true, true, Color.clear);
 
-            cmd.DrawMesh (fullscreenTriangle, Matrix4x4.identity, propertySheet.material, 0, pass, propertySheet.properties);
+            cmd.DrawMesh(fullscreenTriangle, Matrix4x4.identity, propertySheet.material, 0, pass, propertySheet.properties);
         }
-        
-        public static void BlitDepth (this CommandBuffer cmd, RenderTexture source, RenderTexture destination, Shader shader,int pass = 0)
+
+        public static void BlitDepth(this CommandBuffer cmd, RenderTexture source, RenderTexture destination, Shader shader, int pass = 0)
         {
-            cmd.SetGlobalTexture (ShaderIDs.MainTex, source);
-            cmd.SetRenderTarget (destination,BuiltinRenderTextureType.None);
+            cmd.SetGlobalTexture(ShaderIDs.MainTex, source);
+            cmd.SetRenderTarget(destination, BuiltinRenderTextureType.None);
 
 
-            cmd.DrawMesh (fullscreenTriangle, Matrix4x4.identity, GetCopyMaterial (shader), 0, pass);
+            cmd.DrawMesh(fullscreenTriangle, Matrix4x4.identity, GetCopyMaterial(shader), 0, pass);
         }
-        public static void EnableKeyword (string keyword, bool isEnable)
+        public static void EnableKeyword(string keyword, bool isEnable)
         {
             if (isEnable)
             {
-                Shader.EnableKeyword (keyword);
+                Shader.EnableKeyword(keyword);
             }
             else
             {
-                Shader.DisableKeyword (keyword);
+                Shader.DisableKeyword(keyword);
             }
         }
-        //public static void BlitFullscreenTriangle(this CommandBuffer cmd, RenderTargetIdentifier source, RenderTargetIdentifier destination, RenderTargetIdentifier depth, PropertySheet propertySheet, int pass, bool clear = false)
-        //{
-        //    cmd.SetGlobalTexture(ShaderIDs.MainTex, source);
-        //    cmd.SetRenderTarget(destination, depth);
-
-        //    if (clear)
-        //        cmd.ClearRenderTarget(true, true, Color.clear);
-
-        //    cmd.DrawMesh(fullscreenTriangle, Matrix4x4.identity, propertySheet.material, 0, pass, propertySheet.properties);
-        //}
-
-        //public static void BlitFullscreenTriangle(this CommandBuffer cmd, RenderTargetIdentifier source, RenderTargetIdentifier[] destinations, RenderTargetIdentifier depth, PropertySheet propertySheet, int pass, bool clear = false)
-        //{
-        //    cmd.SetGlobalTexture(ShaderIDs.MainTex, source);
-        //    cmd.SetRenderTarget(destinations, depth);
-
-        //    if (clear)
-        //        cmd.ClearRenderTarget(true, true, Color.clear);
-
-        //    cmd.DrawMesh(fullscreenTriangle, Matrix4x4.identity, propertySheet.material, 0, pass, propertySheet.properties);
-        //}
-
-        //public static void BlitFullscreenTriangle(Texture source, RenderTexture destination, Material material, int pass)
-        //{
-        //    var oldRt = RenderTexture.active;
-
-        //    material.SetPass(pass);
-        //    if (source != null)
-        //        material.SetTexture(ShaderIDs.MainTex, source);
-
-        //    Graphics.SetRenderTarget(destination);
-        //    Graphics.DrawMeshNow(fullscreenTriangle, Matrix4x4.identity);
-        //    RenderTexture.active = oldRt;
-        //}
-
-        // Fast basic copy texture if available, falls back to blit copy if not
-        // Assumes that both textures have the exact same type and format
-        //public static void CopyTexture(CommandBuffer cmd, RenderTargetIdentifier source, RenderTargetIdentifier destination)
-        //{
-        //    if (SystemInfo.copyTextureSupport > CopyTextureSupport.None)
-        //    {
-        //        cmd.CopyTexture(source, destination);
-        //        return;
-        //    }
-
-        //    cmd.BlitFullscreenTriangle(source, destination);
-        //}
-
-        // TODO: Generalize the GetTemporaryRT and Blit commands in order to support
-        // RT Arrays for Stereo Instancing/MultiView
 
         #endregion
 
@@ -267,26 +187,6 @@ namespace CFEngine
         }
 #endif
 
-        //         public static bool isVREnabled
-        //         {
-        //             get
-        //             {
-        // #if UNITY_EDITOR
-        //                 return UnityEditor.PlayerSettings.virtualRealitySupported;
-        // #elif UNITY_XBOXONE
-        //                 return false;
-        // #elif UNITY_2017_2_OR_NEWER
-        //                 return false;//return UnityEngine.XR.XRSettings.enabled;
-        // #elif UNITY_5_6_OR_NEWER
-        //                 return UnityEngine.VR.VRSettings.enabled;
-        // #endif
-        //             }
-        //         }
-
-        // public static bool isAndroidOpenGL
-        // {
-        //     get { return Application.platform == RuntimePlatform.Android && SystemInfo.graphicsDeviceType != GraphicsDeviceType.Vulkan; }
-        // }
 
         public static RenderTextureFormat defaultHDRRenderTextureFormat
         {
@@ -310,7 +210,7 @@ namespace CFEngine
             get { return QualitySettings.activeColorSpace == ColorSpace.Linear; }
         }
 
-        public static bool isFloatingPointFormat (RenderTextureFormat format)
+        public static bool isFloatingPointFormat(RenderTextureFormat format)
         {
             return format == RenderTextureFormat.DefaultHDR || format == RenderTextureFormat.ARGBHalf || format == RenderTextureFormat.ARGBFloat ||
                 format == RenderTextureFormat.RGFloat || format == RenderTextureFormat.RGHalf ||
@@ -318,7 +218,7 @@ namespace CFEngine
                 format == RenderTextureFormat.RGB111110Float;
         }
 
-        public static void Destroy (UnityObject obj)
+        public static void Destroy(UnityObject obj)
         {
             if (obj != null)
             {
@@ -328,38 +228,11 @@ namespace CFEngine
                 else
                     UnityObject.DestroyImmediate (obj);
 #else
-                UnityObject.Destroy (obj);
+                UnityObject.Destroy(obj);
 #endif
             }
         }
 
-        // public static bool IsResolvedDepthAvailable(Camera camera)
-        // {
-        //     // AFAIK resolved depth is only available on D3D11/12 via BuiltinRenderTextureType.ResolvedDepth
-        //     // TODO: Is there more proper way to determine this? What about SRPs?
-        //     var gtype = SystemInfo.graphicsDeviceType;
-        //     return camera.actualRenderingPath == RenderingPath.DeferredShading &&
-        //         (gtype == GraphicsDeviceType.Direct3D11 || gtype == GraphicsDeviceType.Direct3D12 || gtype == GraphicsDeviceType.XboxOne);
-        // }
-
-        //public static void DestroyProfile(PostProcessProfile profile, bool destroyEffects)
-        //{
-        //    if (destroyEffects)
-        //    {
-        //        foreach (var effect in profile.settings)
-        //            Destroy(effect);
-        //    }
-
-        //    Destroy(profile);
-        //}
-
-        //public static void DestroyVolume(PostProcessVolume volume, bool destroySharedProfile)
-        //{
-        //    if (destroySharedProfile)
-        //        DestroyProfile(volume.sharedProfile, true);
-
-        //    Destroy(volume);
-        //}
 
 #if UNITY_EDITOR
         // Returns ALL scene objects in the hierarchy, included inactive objects
@@ -393,161 +266,22 @@ namespace CFEngine
         }
 #endif
 
-        public static void CreateIfNull<T> (ref T obj)
-        where T : class, new ()
+        public static void CreateIfNull<T>(ref T obj)
+        where T : class, new()
         {
             if (obj == null)
-                obj = new T ();
+                obj = new T();
         }
 
         #endregion
 
         #region Maths
 
-        public static float Exp2 (float x)
+        public static float Exp2(float x)
         {
-            return Mathf.Exp (x * 0.69314718055994530941723212145818f);
+            return Mathf.Exp(x * 0.69314718055994530941723212145818f);
         }
-        // public static float MatrixDelta(Matrix4x4 mat0, Matrix4x4 mat1)
-        // {
-        //     float delta = mat0.m00 - mat1.m00;
-        //     delta += mat0.m33 - mat1.m33;
-        //     delta += mat0.m23 - mat1.m23;
-        //     delta += mat0.m13 - mat1.m13;
-        //     delta += mat0.m03 - mat1.m03;
-        //     delta += mat0.m32 - mat1.m32;
-        //     delta += mat0.m22 - mat1.m22;
-        //     delta += mat0.m02 - mat1.m02;
-        //     delta += mat0.m12 - mat1.m12;
-        //     delta += mat0.m21 - mat1.m21;
-        //     delta += mat0.m11 - mat1.m11;
-        //     delta += mat0.m01 - mat1.m01;
-        //     delta += mat0.m30 - mat1.m30;
-        //     delta += mat0.m20 - mat1.m20;
-        //     delta += mat0.m10 - mat1.m10;
-        //     delta += mat0.m31 - mat1.m31;
-        //     return delta;
-        // }
-        //        // Adapted heavily from PlayDead's TAA code
-        //        // https://github.com/playdeadgames/temporal/blob/master/Assets/Scripts/Extensions.cs
-        //        public static Matrix4x4 GetJitteredPerspectiveProjectionMatrix(Camera camera, Vector2 offset)
-        //        {
-        //            float vertical = Mathf.Tan(0.5f * Mathf.Deg2Rad * camera.fieldOfView);
-        //            float horizontal = vertical * camera.aspect;
-        //            float near = camera.nearClipPlane;
-        //            float far = camera.farClipPlane;
 
-        //            offset.x *= horizontal / (0.5f * camera.pixelWidth);
-        //            offset.y *= vertical / (0.5f * camera.pixelHeight);
-
-        //            float left = (offset.x - horizontal) * near;
-        //            float right = (offset.x + horizontal) * near;
-        //            float top = (offset.y + vertical) * near;
-        //            float bottom = (offset.y - vertical) * near;
-
-        //            var matrix = new Matrix4x4();
-
-        //            matrix[0, 0] = (2f * near) / (right - left);
-        //            matrix[0, 1] = 0f;
-        //            matrix[0, 2] = (right + left) / (right - left);
-        //            matrix[0, 3] = 0f;
-
-        //            matrix[1, 0] = 0f;
-        //            matrix[1, 1] = (2f * near) / (top - bottom);
-        //            matrix[1, 2] = (top + bottom) / (top - bottom);
-        //            matrix[1, 3] = 0f;
-
-        //            matrix[2, 0] = 0f;
-        //            matrix[2, 1] = 0f;
-        //            matrix[2, 2] = -(far + near) / (far - near);
-        //            matrix[2, 3] = -(2f * far * near) / (far - near);
-
-        //            matrix[3, 0] = 0f;
-        //            matrix[3, 1] = 0f;
-        //            matrix[3, 2] = -1f;
-        //            matrix[3, 3] = 0f;
-
-        //            return matrix;
-        //        }
-
-        //        public static Matrix4x4 GetJitteredOrthographicProjectionMatrix(Camera camera, Vector2 offset)
-        //        {
-        //            float vertical = camera.orthographicSize;
-        //            float horizontal = vertical * camera.aspect;
-
-        //            offset.x *= horizontal / (0.5f * camera.pixelWidth);
-        //            offset.y *= vertical / (0.5f * camera.pixelHeight);
-
-        //            float left = offset.x - horizontal;
-        //            float right = offset.x + horizontal;
-        //            float top = offset.y + vertical;
-        //            float bottom = offset.y - vertical;
-
-        //            return Matrix4x4.Ortho(left, right, bottom, top, camera.nearClipPlane, camera.farClipPlane);
-        //        }
-
-        //        public static Matrix4x4 GenerateJitteredProjectionMatrixFromOriginal(PostProcessRenderContext context, Matrix4x4 origProj, Vector2 jitter)
-        //        {
-        //#if UNITY_2017_2_OR_NEWER
-        //            var planes = origProj.decomposeProjection;
-
-        //            float vertFov = Math.Abs(planes.top) + Math.Abs(planes.bottom);
-        //            float horizFov = Math.Abs(planes.left) + Math.Abs(planes.right);
-
-        //            var planeJitter = new Vector2(jitter.x * horizFov / context.screenWidth,
-        //                                          jitter.y * vertFov / context.screenHeight);
-
-        //            planes.left += planeJitter.x;
-        //            planes.right += planeJitter.x;
-        //            planes.top += planeJitter.y;
-        //            planes.bottom += planeJitter.y;
-
-        //            var jitteredMatrix = Matrix4x4.Frustum(planes);
-
-        //            return jitteredMatrix;
-        //#else
-        //            var rTan = (1.0f + origProj[0, 2]) / origProj[0, 0];
-        //            var lTan = (-1.0f + origProj[0, 2]) / origProj[0, 0];
-
-        //            var tTan = (1.0f + origProj[1, 2]) / origProj[1, 1];
-        //            var bTan = (-1.0f + origProj[1, 2]) / origProj[1, 1];
-
-        //            float tanVertFov = Math.Abs(tTan) + Math.Abs(bTan);
-        //            float tanHorizFov = Math.Abs(lTan) + Math.Abs(rTan);
-
-        //            jitter.x *= tanHorizFov / context.screenWidth;
-        //            jitter.y *= tanVertFov / context.screenHeight;
-
-        //            float left = jitter.x + lTan;
-        //            float right = jitter.x + rTan;
-        //            float top = jitter.y + tTan;
-        //            float bottom = jitter.y + bTan;
-
-        //            var jitteredMatrix = new Matrix4x4();
-
-        //            jitteredMatrix[0, 0] = 2f / (right - left);
-        //            jitteredMatrix[0, 1] = 0f;
-        //            jitteredMatrix[0, 2] = (right + left) / (right - left);
-        //            jitteredMatrix[0, 3] = 0f;
-
-        //            jitteredMatrix[1, 0] = 0f;
-        //            jitteredMatrix[1, 1] = 2f / (top - bottom);
-        //            jitteredMatrix[1, 2] = (top + bottom) / (top - bottom);
-        //            jitteredMatrix[1, 3] = 0f;
-
-        //            jitteredMatrix[2, 0] = 0f;
-        //            jitteredMatrix[2, 1] = 0f;
-        //            jitteredMatrix[2, 2] = origProj[2, 2];
-        //            jitteredMatrix[2, 3] = origProj[2, 3];
-
-        //            jitteredMatrix[3, 0] = 0f;
-        //            jitteredMatrix[3, 1] = 0f;
-        //            jitteredMatrix[3, 2] = -1f;
-        //            jitteredMatrix[3, 3] = 0f;
-
-        //            return jitteredMatrix;
-        //#endif
-        //        }
 
         #endregion
 
