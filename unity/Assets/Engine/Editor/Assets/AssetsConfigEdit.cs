@@ -22,7 +22,7 @@ namespace CFEngine.Editor
             OpGenEffectMat,
             OpRefreshMat,
         }
-        // Use this for initialization
+
         private List<SerializedProperty> constPropertyList;
         private List<SerializedProperty> constListPropertyList;
         private List<SerializedProperty> commonPropertyList;

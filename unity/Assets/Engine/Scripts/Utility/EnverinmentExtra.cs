@@ -8,19 +8,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 namespace CFEngine
 {
-    public enum LightingEditMode
-    {
-        Enverinment,
-        UIScene,
-    }
-    public enum QuadTreeLevel
-    {
-        None,
-        Level0,
-        Level1,
-        Level2,
-        Level3
-    }
     public enum DrawType
     {
         Both,
@@ -32,11 +19,6 @@ namespace CFEngine
         Role = 0x0001,
         Scene = 0x0002,
         Sun = 0x0004,
-    }
-    public enum LightingMode
-    {
-        SimpleLoop,
-        Voxel
     }
     enum OpType
     {
@@ -96,7 +78,6 @@ namespace CFEngine
     {
         public int chunkID = -1;
         public List<ChunkLightIndex> lightIndexs = new List<ChunkLightIndex> ();
-
         public List<Light> lights = new List<Light> ();
     }
 
@@ -143,8 +124,6 @@ namespace CFEngine
         [System.NonSerialized]
         public TransformRotationGUIWrapper roleLight1Rot;
 
-        public static LightingEditMode editMode = LightingEditMode.Enverinment;
-
         public Light bakeSceneLight0;
 
         [System.NonSerialized]
@@ -178,13 +157,10 @@ namespace CFEngine
 #endregion
 
 #region toggle
-        public bool fastEditLight = false;
-        public bool fastEditEnvLight = false;
         public bool useUnityLighting = false;
 #endregion
 
 #region testObj
-        public bool testObjFolder = true;
         public Light pointLight;
         private float cycle = 0.0f;
         private float sign = 1.0f;
@@ -204,32 +180,6 @@ namespace CFEngine
         public bool intoEnvArea = true;
 #endregion
 
-#region fastRun
-        public bool fastRunFolder = true;
-        public bool loadGameAtHere = false;
-        public bool useCurrentScene = false;
-        public bool gotoScene = false;
-        public int sceneID = -1;
-        public bool replaceStartScene = false;
-        public bool useStaticBatch = false;
-#endregion
-
-#region freeCamera
-        public bool freeCameraFolder = true;
-        static Texture2D ms_invisibleCursor;
-
-        public bool forceUpdateFreeCamera = false;
-        public bool forceIgnore = false;
-        public bool holdRightMouseCapture = false;
-
-        public float lookSpeed = 5f;
-        public float moveSpeed = 5f;
-        public float sprintSpeed = 50f;
-
-        bool m_inputCaptured;
-        float m_yaw;
-        float m_pitch;
-#endregion
 
 #region debugShadow
 
@@ -255,11 +205,8 @@ namespace CFEngine
 
 #region debug
         public bool debugFolder = true;
-        public bool drawFrustum = false;
-        public bool drawInvisibleObj = false;
         public bool drawLodGrid = false;
         public bool drawTerrainGrid = false;
-        public QuadTreeLevel quadLevel = QuadTreeLevel.None;
         public int quadIndex = -1;
         public DrawType drawType = DrawType.Both;
         public bool showObjects = false;
@@ -312,7 +259,6 @@ namespace CFEngine
 #region voxelLights
 
         public bool voxelLightFolder = true;
-        public LightingMode lightMode = LightingMode.SimpleLoop;
         public List<ChunkLightBlockInfo> chunkLightBlocks = new List<ChunkLightBlockInfo> ();
         public List<Light> lights = new List<Light> ();
         public int minLightCount = 0;
@@ -354,45 +300,12 @@ namespace CFEngine
 
         void Awake ()
         {
-            if (!ms_invisibleCursor)
-            {
-                ms_invisibleCursor = new Texture2D (1, 1);
-                ms_invisibleCursor.SetPixel (0, 0, new Color32 (0, 0, 0, 0));
-            }
-
             GetSceneViewCamera ();
-            forceUpdateFreeCamera |= XDebug.debugRoamingScene;
         }
 
         void Start ()
         {
             Shader.SetGlobalFloat("_GlobalDebugMode", 0);
-            if (loadGameAtHere && Application.isPlaying)
-            {
-                if (null == XInterfaceMgr.singleton.GetInterface<IEntrance> (0))
-                {
-                    UnityEngine.SceneManagement.SceneManager.LoadScene (0);
-                    if (useCurrentScene)
-                    {
-                        XDebug.editorSceneReplace = UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name;
-                    }
-                    else
-                    {
-                        XDebug.editorSceneReplace = "";
-                    }
-                    if (gotoScene)
-                        XDebug.sceneID = sceneID;
-                    else
-                        XDebug.sceneID = -1;
-                    if (replaceStartScene)
-                        XDebug.startSceneID = sceneID;
-
-                    XDebug.startPos = transform.position;
-                    XDebug.startRot = transform.rotation.eulerAngles;
-
-                    XDebug.singleton.SetFlag (EDebugFlag.EDebug_StaticBatch, useStaticBatch);
-                }
-            }
         }
 
         void OnDestroy ()
@@ -433,59 +346,52 @@ namespace CFEngine
                 re = this.GetComponent<RenderingEnvironment> ();
             SyncLightInfo ();
 
+            if (roleDummy != null)
+            {
+                Vector3 pos = roleDummy.position;
+                re.sceneData.currentEntityPos = pos;
+                if (debugEnvArea && envObjects != null)
+                {
+                    EnverinmentArea.TestArea (this, new Vector2 (pos.x, pos.z));
+                }
+                UpdateArea ();
+            }
+
+            if (!isInit)
+            {
+                InitScene ();
+                isInit = true;
+            }
+
+            switch (opType)
+            {
+                case OpType.OpCollectLights:
+                    InnerCollectLights ();
+                    break;
+            }
+            opType = OpType.OpNone;
         
-                if (roleDummy != null)
-                {
-                    Vector3 pos = roleDummy.position;
-                    re.sceneData.currentEntityPos = pos;
-                    if (debugEnvArea && envObjects != null)
-                    {
-                        EnverinmentArea.TestArea (this, new Vector2 (pos.x, pos.z));
-                    }
-                    UpdateArea ();
-                }
-
-                if (!isInit)
-                {
-                    InitScene ();
-                    isInit = true;
-                }
-
-                switch (opType)
-                {
-                    case OpType.OpCollectLights:
-                        InnerCollectLights ();
-                        break;
-                }
-                opType = OpType.OpNone;
-            
-
-            if ((Application.isPlaying ||
-                    forceUpdateFreeCamera) && !forceIgnore)
-                UpdateFreeCamera ();
-
          
-                UpdateShadowCaster ();
-                BuildShadowMap ();
-                if (pointLight != null && pointLight.type == LightType.Point)
+            UpdateShadowCaster ();
+            BuildShadowMap ();
+            if (pointLight != null && pointLight.type == LightType.Point)
+            {
+                Vector3 pos = pointLight.transform.position;
+                float range = pointLight.range * pointLight.range;
+                float intensity = pointLight.intensity;
+                cycle += Time.deltaTime * sign;
+                if (Mathf.Abs (cycle) > UnityEngine.Random.Range (5, 8))
                 {
-                    Vector3 pos = pointLight.transform.position;
-                    float range = pointLight.range * pointLight.range;
-                    float intensity = pointLight.intensity;
-                    cycle += Time.deltaTime * sign;
-                    if (Mathf.Abs (cycle) > UnityEngine.Random.Range (5, 8))
-                    {
-                        sign = -sign;
-                    }
-                    intensity += Mathf.Sin (Time.time) * Mathf.PerlinNoise (cycle, Mathf.Cos (Time.time)) * intensity * 0.8f;
-                    // intensity += Mathf.Sin(cycle * Mathf.Cos(Time.time)) * intensity * 0.8f;
-                    Vector4 color = new Vector4 (Mathf.Pow (pointLight.color.r * intensity, 2.2f),
-                        Mathf.Pow (pointLight.color.g * intensity, 2.2f),
-                        Mathf.Pow (pointLight.color.b * intensity, 2.2f), range != 0 ? 1 / range : 1);
-                    Shader.SetGlobalColor (ShaderManager._ShaderKeyPointLightDir, new Vector4 (pos.x, pos.y, pos.z, range));
-
-                    Shader.SetGlobalColor (ShaderManager._ShaderKeyPointLightColor, color);
+                    sign = -sign;
                 }
+                intensity += Mathf.Sin (Time.time) * Mathf.PerlinNoise (cycle, Mathf.Cos (Time.time)) * intensity * 0.8f;
+                Vector4 color = new Vector4 (Mathf.Pow (pointLight.color.r * intensity, 2.2f),
+                    Mathf.Pow (pointLight.color.g * intensity, 2.2f),
+                    Mathf.Pow (pointLight.color.b * intensity, 2.2f), range != 0 ? 1 / range : 1);
+                Shader.SetGlobalColor (ShaderManager._ShaderKeyPointLightDir, new Vector4 (pos.x, pos.y, pos.z, range));
+
+                Shader.SetGlobalColor (ShaderManager._ShaderKeyPointLightColor, color);
+            }
             
             if (re != null)
             {
@@ -768,21 +674,8 @@ namespace CFEngine
         public void InitScene ()
         {
             terrainObjects.Clear ();
-
-            InitLighting ();
         }
 
-        private void InitLighting ()
-        {
-            if (lightMode == LightingMode.SimpleLoop)
-            {
-                //InitSimpleLoopLighting ();
-            }
-            else
-            {
-                RefreshVoxelLighting ();
-            }
-        }
 
         private static void FindLight (Transform trans, object param)
         {
@@ -797,7 +690,6 @@ namespace CFEngine
                         {
                             EnverinmentExtra ee = param as EnverinmentExtra;
                             ee.lights.Add (light);
-
                         }
                     }
                 }
@@ -805,12 +697,6 @@ namespace CFEngine
             }
         }
 
-        public void InitSimpleLoopLighting ()
-        {
-            lights.Clear ();
-            string path = AssetsConfig.EditorGoPath[0] + "/" + AssetsConfig.EditorGoPath[(int) AssetsConfig.EditorSceneObjectType.Light];
-            EditorCommon.EnumTargetObject (path, funFindLight, this);
-        }
 
         public void RefreshVoxelLighting ()
         {
@@ -1019,10 +905,7 @@ namespace CFEngine
                         }
                     }
                 }
-                //else
-                {
-                    EditorCommon.EnumChildObject (trans, param, funCollectLight);
-                }
+                EditorCommon.EnumChildObject (trans, param, funCollectLight);
             }
         }
 
@@ -1033,7 +916,6 @@ namespace CFEngine
                 ObjectCombine oc = trans.GetComponent<ObjectCombine> ();
                 if (oc != null)
                 {
-                    // oc.lights.Clear ();
                     if (oc.IsRenderValid () && oc.mesh != null)
                     {
                         LightLoopContext llc = param as LightLoopContext;
@@ -1073,9 +955,7 @@ namespace CFEngine
                                         if (llc.lightBlocks.TryGetValue (id, out blockInfo))
                                         {
                                             blockInfo.objCount++;
-                  
                                         }
-                                        //pc.points.Add(v);
                                     }
                                 }
                             }
@@ -1088,10 +968,7 @@ namespace CFEngine
 
                     }
                 }
-                // else
-                {
-                    EditorCommon.EnumChildObject (trans, param, funIntersectLightObjects);
-                }
+                EditorCommon.EnumChildObject (trans, param, funIntersectLightObjects);
             }
         }
         public void CollectLights ()
@@ -1102,7 +979,6 @@ namespace CFEngine
         {
             lightLoopContext.lightBlocks.Clear ();
             lightLoopContext.processMesh.Clear ();
-            // lightLoopContext.points.Clear ();
             chunkLightBlocks.Clear ();
             lights.Clear ();
             string path = AssetsConfig.EditorGoPath[0] + "/" + AssetsConfig.EditorGoPath[(int) AssetsConfig.EditorSceneObjectType.Light];
@@ -1176,7 +1052,7 @@ namespace CFEngine
                         lightVerticalBlock.lightInfos.Add (new ChunkLightInfo ()
                         {
                             light = l,
-                                index = lightIndex,
+                            index = lightIndex,
                         });
                     }
                     if (value.lights.Count > maxLightCount)
@@ -1192,8 +1068,6 @@ namespace CFEngine
                 }
             }
             chunkLightBlocks.Sort ((x, y) => { return x.chunkID.CompareTo (y.chunkID); });
-
-            InitLighting ();
             lightLoopContext.lightBlocks.Clear ();
             lightLoopContext.processMesh.Clear ();
             if (blockCount > 0)
@@ -1306,78 +1180,10 @@ namespace CFEngine
         }
 #endregion
 
-#region freeCamera
-        void OnValidate ()
-        {
-        }
 
-        void CaptureInput ()
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-
-            Cursor.SetCursor (ms_invisibleCursor, Vector2.zero, CursorMode.ForceSoftware);
-            m_inputCaptured = true;
-
-            m_yaw = transform.eulerAngles.y;
-            m_pitch = transform.eulerAngles.x;
-        }
-        void ReleaseInput ()
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.SetCursor (null, Vector2.zero, CursorMode.Auto);
-            m_inputCaptured = false;
-        }
-        void OnApplicationFocus (bool focus)
-        {
-            if (m_inputCaptured && !focus)
-                ReleaseInput ();
-        }
-        void UpdateFreeCamera ()
-        {
-            if (!m_inputCaptured)
-            {
-                if (!holdRightMouseCapture && Input.GetMouseButtonDown (0))
-                    CaptureInput ();
-                else if (holdRightMouseCapture && Input.GetMouseButtonDown (1))
-                    CaptureInput ();
-            }
-
-            if (!m_inputCaptured)
-                return;
-
-            if (m_inputCaptured)
-            {
-                if (!holdRightMouseCapture && Input.GetKeyDown (KeyCode.Escape))
-                    ReleaseInput ();
-                else if (!holdRightMouseCapture && Input.GetKeyDown (KeyCode.Q))
-                {
-                    ReleaseInput ();
-                    forceUpdateFreeCamera = false;
-                }
-                else if (holdRightMouseCapture && Input.GetMouseButtonUp (1))
-                    ReleaseInput ();
-
-            }
-
-            var rotStrafe = Input.GetAxis ("Mouse X");
-            var rotFwd = Input.GetAxis ("Mouse Y");
-
-            m_yaw = (m_yaw + lookSpeed * rotStrafe) % 360f;
-            m_pitch = (m_pitch - lookSpeed * rotFwd) % 360f;
-            transform.rotation = Quaternion.AngleAxis (m_yaw, Vector3.up) * Quaternion.AngleAxis (m_pitch, Vector3.right);
-
-            var speed = Time.deltaTime * (Input.GetKey (KeyCode.LeftShift) ? sprintSpeed : moveSpeed);
-            var forward = speed * Input.GetAxis ("Vertical");
-            var right = speed * Input.GetAxis ("Horizontal");
-            var up = speed * ((Input.GetKey (KeyCode.E) ? 1f : 0f) - (Input.GetKey (KeyCode.Q) ? 1f : 0f));
-            transform.position += transform.forward * forward + transform.right * right + Vector3.up * up;
-
-        }
-#endregion
 #region shadow
         private void UpdateShadowCaster ()
         {
-
             if (lookTarget == null)
             {
                 GameObject go = GameObject.Find ("LookTarget");
@@ -1455,7 +1261,6 @@ namespace CFEngine
                     Graphics.ExecuteCommandBuffer (shadowMapCb);
                     Graphics.SetRenderTarget (null);
                 }
-
             }
         }
         public void PrepareShadowCaster ()
@@ -1499,10 +1304,6 @@ namespace CFEngine
             {
                 quadTreeRef = obj as QuadTree;
             }
-            // else if (type == 2)
-            // {
-            //     envAreasRef = obj as EnvArea[];
-            // }
             else if (type == 3)
             {
                 sceneMats = obj as Material[];
@@ -1536,7 +1337,6 @@ namespace CFEngine
                             Gizmos.color = Color.red;
                             Gizmos.DrawWireCube (aabb.center, aabb.size);
                         }
-
                     }
                     break;
                 case DrawType.Cull:
@@ -1564,7 +1364,6 @@ namespace CFEngine
                 {
                     lt.rotation = rot;
                 }
-
                 Handles.color = l.color;
                 Handles.ArrowHandleCap (100, pos, rot, 2 * l.intensity, EventType.Repaint);
                 Handles.Label (pos, text);
@@ -1602,11 +1401,6 @@ namespace CFEngine
             Color color = Gizmos.color;
             if (mainCamera == null)
                 mainCamera = GetComponent<Camera> ();
-            if (mainCamera != null)
-            {
-                if (drawFrustum)
-                    CameraEditorUtils.DrawFrustumGizmo (mainCamera);
-            }
             if (drawShadowLighing)
             {
                 Gizmos.color = Color.yellow;
@@ -1643,49 +1437,9 @@ namespace CFEngine
                 {
                     sceneObjects.Clear ();
                 }
-                int level = (int) quadLevel;
-                if (level != 0)
-                {
-                    var it = chunks.GetEnumerator ();
-                    while (it.MoveNext ())
-                    {
-                        var sc = it.Current.Value;
-                        if (sc.usedChunkStartIndex >= 0)
-                        {
-                            int quadTreeOffset = sc.usedChunkStartIndex * QuadTree.blockNodeCount;
-                            int start = 0;
-                            int end = 1;
-                            if (level == 2)
-                            {
-                                start = 1;
-                                end = 5;
-                            }
-                            else if (level == 3 || level == 4)
-                            {
-                                start = 5;
-                                end = 21;
-                            }
-                            var nodeList = quadTreeRef.nodeList;
-
-                            if (level != 4)
-                            {
-                                for (int i = start; i < end; ++i)
-                                {
-                                    SceneQuadTreeNode node = nodeList[quadTreeOffset + i];
-                                    if (node != null)
-                                    {
-                                        DrawBox (node.draw, node.aabb);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
                 if (drawLodGrid)
                 {
                     var nodeList = quadTreeRef.nodeList;
-
                     var it = chunks.GetEnumerator ();
                     while (it.MoveNext ())
                     {
@@ -1742,35 +1496,33 @@ namespace CFEngine
             }
             if (debugEnvArea)
             {
-                    for (int i = 0; i < envObjects.Count; ++i)
+                for (int i = 0; i < envObjects.Count; ++i)
+                {
+                    var envObject = envObjects[i];
+                    Transform t = envObject.transform;
+                    for (int j = 0; j < envObject.areaList.Count; ++j)
                     {
-                        var envObject = envObjects[i];
-                        Transform t = envObject.transform;
-
-                        for (int j = 0; j < envObject.areaList.Count; ++j)
+                        var areaBox = envObject.areaList[j];
+                        if (envObject == lastArea)
                         {
-                            var areaBox = envObject.areaList[j];
-                            if (envObject == lastArea)
+                            Color boxColor = Color.Lerp (new Color (1, 1, 1, 0.2f), Color.white, lastArea.blinkTime);
+                            lastArea.blinkTime += Time.deltaTime;
+                            if (lastArea.blinkTime > 1.0f)
                             {
-                                Color boxColor = Color.Lerp (new Color (1, 1, 1, 0.2f), Color.white, lastArea.blinkTime);
-                                lastArea.blinkTime += Time.deltaTime;
-                                if (lastArea.blinkTime > 1.0f)
-                                {
-                                    lastArea.blinkTime = 0;
-                                }
-                                Gizmos.color = boxColor;
+                                lastArea.blinkTime = 0;
                             }
-                            else
-                                Gizmos.color = envObject.color;
-
-                            Vector3 worldPos = areaBox.center + t.position;
-                            Quaternion rot = Quaternion.Euler (0, areaBox.rotY, 0);
-                            Gizmos.matrix = Matrix4x4.TRS (worldPos, rot, Vector3.one);
-                            Gizmos.DrawWireCube (Vector3.zero, areaBox.size);
-                            Gizmos.matrix = Matrix4x4.identity;
+                            Gizmos.color = boxColor;
                         }
+                        else
+                            Gizmos.color = envObject.color;
+
+                        Vector3 worldPos = areaBox.center + t.position;
+                        Quaternion rot = Quaternion.Euler (0, areaBox.rotY, 0);
+                        Gizmos.matrix = Matrix4x4.TRS (worldPos, rot, Vector3.one);
+                        Gizmos.DrawWireCube (Vector3.zero, areaBox.size);
+                        Gizmos.matrix = Matrix4x4.identity;
                     }
-                
+                }
             }
             if (drawTerrainHeight)
             {
@@ -1786,7 +1538,6 @@ namespace CFEngine
                         Vector3 v0 = Vector3.zero;
                         Vector3 v1 = Vector3.zero;
                         Vector3 v2 = Vector3.zero;
-
                         for (int z = 0; z < SceneData.terrainGridCount; ++z)
                         {
                             for (int x = 0; x < SceneData.terrainGridCount; ++x)
@@ -1849,23 +1600,19 @@ namespace CFEngine
                 for (int i = 0; i < chunkLightBlocks.Count; ++i)
                 {
                     var clb = chunkLightBlocks[i];
-                    //if (saveChunkContext.toMap.ContainsKey(clb.chunkID))
+                    for (int j = 0; j < clb.lightIndexs.Count; ++j)
                     {
-                        for (int j = 0; j < clb.lightIndexs.Count; ++j)
+                        var cli = clb.lightIndexs[j];
+                        for (int k = 0; k < cli.lightVerticalBlock.Count; ++k)
                         {
-                            var cli = clb.lightIndexs[j];
-                            for (int k = 0; k < cli.lightVerticalBlock.Count; ++k)
+                            var clvb = cli.lightVerticalBlock[k];
+                            if (previewLightCount == 0 || clvb.lightInfos.Count == previewLightCount)
                             {
-                                var clvb = cli.lightVerticalBlock[k];
-                                if (previewLightCount == 0 || clvb.lightInfos.Count == previewLightCount)
-                                {
-                                    int debugIndex = Mathf.Clamp (clvb.lightInfos.Count / 5, 0, 4);
-                                    Gizmos.color = lightInfoColor[debugIndex];
-                                    Gizmos.DrawWireCube (clvb.offset + size, size);
-                                }
+                                int debugIndex = Mathf.Clamp (clvb.lightInfos.Count / 5, 0, 4);
+                                Gizmos.color = lightInfoColor[debugIndex];
+                                Gizmos.DrawWireCube (clvb.offset + size, size);
                             }
                         }
-
                     }
                 }
             }
@@ -1905,7 +1652,6 @@ namespace CFEngine
             rb.passID = 0;
             renderBatches.Add (rb);
             RenderingManager.instance.SetPostAlphaCommand (renderBatches);
-            // editorCommandBuffer.DrawMesh(mesh, matrix, material, 0, 0);
         }
 #endregion
     }
