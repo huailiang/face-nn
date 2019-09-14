@@ -154,20 +154,11 @@ namespace CFEngine
         public static readonly int Env_HeighFogColorParameter0 = Shader.PropertyToID("_HeightFogColor0");
         public static readonly int Env_HeighFogColorParameter1 = Shader.PropertyToID("_HeightFogColor1");
         public static readonly int Env_HeighFogColorParameter2 = Shader.PropertyToID("_HeightFogColor2");
-        //Wind
-        public static readonly int Env_WindDir = Shader.PropertyToID("_WindDir");
-        public static readonly int Env_WindPos = Shader.PropertyToID("_WindPos");
-        public static readonly int Env_WindPlane = Shader.PropertyToID("_WindPlane");
-        public static readonly int Env_WindParam0 = Shader.PropertyToID("_WindParam0");
-        public static readonly int Env_WindParam1 = Shader.PropertyToID("_WindParam1");
+
         public static readonly int Env_EffectParameter = Shader.PropertyToID("_EffectParameter");
         public static readonly int Env_Interactive = Shader.PropertyToID("_Interactive");
 
 
-        //keyword
-        //Fog
-        // public static readonly string Env_FogAnimtionOn = "FOG_ANIMATION_ON";
-        public static readonly string Env_WindOn = "_GLOBAL_WIND_EFFECT";
         //Weather
         public static readonly string Weather_RainDay = "RAINDAY_ON";
 

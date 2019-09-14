@@ -37,9 +37,6 @@ namespace CFEngine
         public float shadowPower = 2f;
         public bool fogEnable = true;
         public FogModify fog = new FogModify();
-        public bool enableWind = true;
-        public RandomWindModify randomWind = new RandomWindModify();
-        public WaveWindModify waveWind = new WaveWindModify();
         public float interactiveParam = 1;
 
         public CameraClearFlags clearFlag = CameraClearFlags.Skybox;

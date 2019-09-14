@@ -44,9 +44,6 @@ namespace CFEngine
         public float shadowPower = 2f;
         public FogModify fog = null;
         public bool fogEnable = true;
-        public bool enableWind = true;
-        public RandomWindModify randomWind = null;
-        public WaveWindModify waveWind = null;
 
         [CFNoSerialized]
         public SceneData sceneData = null;
@@ -78,8 +75,6 @@ namespace CFEngine
         public bool envLighingFolder = true;
         [System.NonSerialized]
         public bool fogFolder = true;
-        [System.NonSerialized]
-        public bool windFolder = true;
         public static bool isPreview = false;
         [System.NonSerialized]
         public float shadowOrthoSize;
@@ -272,24 +267,11 @@ namespace CFEngine
                 ambient = new AmbientModify();
             if (fog == null)
                 fog = new FogModify();
-            if (randomWind == null)
-                randomWind = new RandomWindModify();
-            if (waveWind == null)
-                waveWind = new WaveWindModify();
 #if UNITY_EDITOR
             lighting.needUpdate = true;
             ambient.needUpdate = true;
             fog.needUpdate = true;
 #endif
-            randomWind.m_windStrengthUpdateTime = randomWind.WindStrengthUpdateTime;
-            randomWind.m_windDirectionUpdateTime = randomWind.WindDirectionUpdateTime;
-            randomWind.rotation = Quaternion.identity;
-            randomWind.RotateAxis.Normalize();
-            waveWind.windForceDelta = 1 / (waveWind.fastWindTime * waveWind.slowWindScale);
-
-            // float rotAngle = waveWind.rotAngle * Mathf.Deg2Rad;
-            // waveWind.windParam0 = new Vector4(waveWind.disorder, Mathf.Cos(rotAngle), Mathf.Sin(rotAngle), waveWind.strength);
-            // waveWind.windParam1.x = waveWind.strengthScale;
 
             RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_ThunderKeyWord, false);
             RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_RainbowKeyWord, false);
@@ -451,130 +433,6 @@ namespace CFEngine
             }
         }
 
-        private void UpdateWind(float deltaTime)
-        {
-            //RuntimeUtilities.EnableKeyword (ShaderIDs.Env_WindOn, enableWind);
-            if (enableWind)
-            {
-                Vector3 forward = randomWind.rotation * Vector3.forward;
-                randomWind.m_windDir.x = forward.x;
-                randomWind.m_windDir.y = forward.y;
-                randomWind.m_windDir.z = forward.z;
-
-                if (randomWind.WindStrengthCurve != null)
-                    randomWind.m_windDir.w = Mathf.Lerp(randomWind.WindStrengthRange.x, randomWind.WindStrengthRange.y,
-                        randomWind.WindStrengthCurve.Evaluate(randomWind.m_windStrengthUpdateTime / randomWind.WindStrengthUpdateTime));
-
-                if (randomWind.NeedWindStrengthReserve)
-                {
-                    if (randomWind.m_isWindStrengthReserve)
-                    {
-                        randomWind.m_windStrengthUpdateTime -= deltaTime;
-                    }
-                    else
-                    {
-                        randomWind.m_windStrengthUpdateTime += deltaTime;
-                    }
-                    if (randomWind.m_windStrengthUpdateTime >= randomWind.WindStrengthUpdateTime)
-                    {
-                        randomWind.m_isWindStrengthReserve = true;
-
-                    }
-                    if (randomWind.m_windStrengthUpdateTime <= 0)
-                    {
-                        randomWind.m_isWindStrengthReserve = false;
-                    }
-                }
-                else
-                {
-                    randomWind.m_windStrengthUpdateTime += deltaTime;
-                    if (randomWind.m_windStrengthUpdateTime >= randomWind.WindStrengthUpdateTime)
-                    {
-                        randomWind.m_windStrengthUpdateTime -= randomWind.WindStrengthUpdateTime;
-                    }
-                }
-                if (randomWind.NeedWindDirectionReserve)
-                {
-                    if (randomWind.m_isWindDirectionReserve)
-                    {
-                        randomWind.m_windDirectionUpdateTime -= deltaTime;
-                    }
-                    else
-                    {
-                        randomWind.m_windDirectionUpdateTime += deltaTime;
-                    }
-                    if (randomWind.m_windDirectionUpdateTime >= randomWind.WindDirectionUpdateTime)
-                    {
-                        randomWind.m_isWindDirectionReserve = true;
-                    }
-                    if (randomWind.m_windDirectionUpdateTime <= 0)
-                    {
-                        randomWind.m_isWindDirectionReserve = false;
-                    }
-                }
-                else
-                {
-                    randomWind.m_windDirectionUpdateTime += deltaTime;
-                    if (randomWind.m_windDirectionUpdateTime >= randomWind.WindDirectionUpdateTime)
-                    {
-                        randomWind.m_windDirectionUpdateTime -= randomWind.WindDirectionUpdateTime;
-                    }
-                }
-
-                Shader.SetGlobalVector(ShaderIDs.Env_WindDir, randomWind.m_windDir);
-
-                float t = randomWind.WindDirectionCurve != null ? randomWind.WindDirectionCurve.Evaluate(randomWind.m_windDirectionUpdateTime / randomWind.WindDirectionUpdateTime) : 0;
-                float angle = Mathf.Lerp(randomWind.StartAngle, randomWind.EndAngle, t);
-
-                float sina = Mathf.Sin(Mathf.Deg2Rad * angle * 0.5f);
-                float cosa = Mathf.Cos(Mathf.Deg2Rad * angle * 0.5f);
-#if UNITY_EDITOR
-                randomWind.RotateAxis.Normalize ();
-#endif
-                randomWind.rotation.x = sina * randomWind.RotateAxis.x;
-                randomWind.rotation.y = sina * randomWind.RotateAxis.y;
-                randomWind.rotation.z = sina * randomWind.RotateAxis.z;
-                randomWind.rotation.w = cosa;
-
-
-                Shader.SetGlobalVector(ShaderIDs.Env_WindPos, randomWind.WindPos);
-
-                float rotAngle = 20 * Mathf.Deg2Rad;
-
-                waveWind.forceScaleTime += deltaTime;
-                float slowTime0 = waveWind.slowWindScale * waveWind.fastWindTime;
-                float slowTime1 = slowTime0 * 2 + waveWind.fastWindTime;
-                if (waveWind.forceScaleTime < slowTime0)
-                {
-                    waveWind.strengthLerp = waveWind.forceScaleTime / slowTime0;
-                }
-                else if (waveWind.forceScaleTime > slowTime0 + waveWind.fastWindTime)
-                {
-                    if (waveWind.forceScaleTime > slowTime1)
-                    {
-                        waveWind.strengthLerp = 0;
-                        waveWind.forceScaleTime = 0;
-                    }
-                    else
-                    {
-                        waveWind.strengthLerp = 1 - (waveWind.forceScaleTime - slowTime0 - waveWind.fastWindTime) / slowTime0;
-                    }
-                }
-                else
-                {
-                    waveWind.strengthLerp = 1;
-                }
-
-                Vector4 windParam0 = new Vector4(Mathf.Cos(rotAngle), Mathf.Sin(rotAngle), waveWind.strength, waveWind.strengthScale);
-                windParam0.w = Mathf.Lerp(waveWind.strengthScale, waveWind.strengthScale * 5, waveWind.strengthLerp);
-
-
-                Shader.SetGlobalVector(ShaderIDs.Env_WindParam0, windParam0);
-                // Shader.SetGlobalVector(ShaderIDs.Env_WindParam1, new Vector4(windForce, 0, 0, 0));
-
-            }
-        }
-
         private void UpdateEnvArea(float deltaTime)
         {
             if (sceneData.globalObjectsRef.IsValid() &&
@@ -639,7 +497,6 @@ namespace CFEngine
 #endif
             UpdateCameraInternal();
             float deltaTime = Time.deltaTime;
-            UpdateWind(deltaTime);
             UpdateEnvArea(deltaTime);
         }
 
@@ -649,7 +506,7 @@ namespace CFEngine
         {
             if (!saveingFile)
             {
-                if (lighting != null && fog != null && randomWind != null && waveWind != null)
+                if (lighting != null && fog != null )
                 {
                     UpdateEnv();
                     bool hasFog = fogEnable;

@@ -22,7 +22,6 @@ namespace CFEngine.Editor
 
         private SerializedProperty fastEditLight;
         private SerializedProperty fastEditEnvLight;
-        private SerializedProperty fastEditWind;
         private SerializedProperty useUnityLighting;
 
         //testObj
@@ -65,7 +64,6 @@ namespace CFEngine.Editor
         private SerializedProperty showObjects;
         private SerializedProperty drawInvisibleObj;
         private SerializedProperty drawPointLight;
-        private SerializedProperty drawWind;
         private SerializedProperty drawTerrainHeight;
         private SerializedProperty drawLightBox;
         private SerializedProperty isDebugLayer;
@@ -96,7 +94,6 @@ namespace CFEngine.Editor
 
             fastEditLight = FindProperty(x => x.fastEditLight);
             fastEditEnvLight = FindProperty(x => x.fastEditEnvLight);
-            fastEditWind = FindProperty(x => x.fastEditWind);
             useUnityLighting = FindProperty(x => x.useUnityLighting);
             pointLight = FindProperty(x => x.pointLight);
             roleDummy = FindProperty(x => x.roleDummy);
@@ -118,7 +115,6 @@ namespace CFEngine.Editor
             fitWorldSpace = FindProperty(x => x.fitWorldSpace);
             shadowMapLevel = FindProperty(x => x.shadowMapLevel);
             shadowBound = FindProperty(x => x.shadowBound);
-            // shadowCasterProxy = FindProperty(x => x.shadowCasterProxy);
             lookTarget = FindProperty(x => x.lookTarget);
             drawShadowLighing = FindProperty(x => x.drawShadowLighing);
 
@@ -138,7 +134,6 @@ namespace CFEngine.Editor
             showObjects = FindProperty(x => x.showObjects);
             drawInvisibleObj = FindProperty(x => x.drawInvisibleObj);
             drawPointLight = FindProperty(x => x.drawPointLight);
-            drawWind = FindProperty(x => x.drawWind);
             drawTerrainHeight = FindProperty(x => x.drawTerrainHeight);
             debugEnvArea = FindProperty(x => x.debugEnvArea);
             drawLightBox = FindProperty(x => x.drawLightBox);
@@ -203,7 +198,6 @@ namespace CFEngine.Editor
             EditorGUILayout.PropertyField(fastEditLight);
 
             EditorGUILayout.PropertyField(fastEditEnvLight);
-            EditorGUILayout.PropertyField(fastEditWind);
             EnverinmentExtra ee = target as EnverinmentExtra;
             if (ee != null)
             {
@@ -382,7 +376,6 @@ namespace CFEngine.Editor
                     }
 
                     EditorGUILayout.PropertyField(drawPointLight);
-                    EditorGUILayout.PropertyField(drawWind);
                     EditorGUILayout.PropertyField(drawTerrainHeight);
                     EditorGUILayout.PropertyField(drawLightBox);
                     if (drawLightBox.boolValue)
@@ -520,22 +513,6 @@ namespace CFEngine.Editor
                     if (fastEditEnvLight != null && fastEditEnvLight.boolValue)
                     {
                         DrawLightHandle(t, pos, -4, 3, ee.sunLight, "SunLight");
-                    }
-                    if (fastEditWind != null && fastEditWind.boolValue)
-                    {
-                        RenderingEnvironment env = ee.re;
-                        if (env != null && env.enableWind)
-                        {
-                            RandomWindModify windParam = env.randomWind;
-                            EditorGUI.BeginChangeCheck();
-
-                            Vector3 windpos = Handles.PositionHandle(windParam.WindPos, Quaternion.identity);
-                            if (EditorGUI.EndChangeCheck())
-                            {
-                                Undo.RecordObject(this, "Wind Pos");
-                                windParam.WindPos = windpos;
-                            }
-                        }
                     }
                     Handles.color = temp;
                 }

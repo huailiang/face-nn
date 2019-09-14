@@ -180,7 +180,6 @@ namespace CFEngine
 #region toggle
         public bool fastEditLight = false;
         public bool fastEditEnvLight = false;
-        public bool fastEditWind = false;
         public bool useUnityLighting = false;
 #endregion
 
@@ -266,7 +265,6 @@ namespace CFEngine
         public bool showObjects = false;
 
         public bool drawPointLight = false;
-        public bool drawWind = false;
         public bool drawTerrainHeight = false;
 
         public bool drawLightBox = false;
@@ -1608,18 +1606,6 @@ namespace CFEngine
             {
                 if (drawFrustum)
                     CameraEditorUtils.DrawFrustumGizmo (mainCamera);
-            }
-            if (drawWind)
-            {
-                Gizmos.color = Color.red;
-                Vector3 pos = re.randomWind.WindPos;
-                Gizmos.DrawWireSphere (pos, 0.3f);
-
-                Gizmos.color = Color.blue;
-                Vector3 forward = re.randomWind.rotation * Vector3.forward;
-
-                Gizmos.DrawLine (pos, pos + forward * re.randomWind.m_windDir.w * 10);
-
             }
             if (drawShadowLighing)
             {

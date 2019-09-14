@@ -565,8 +565,6 @@ namespace CFEngine
         public AmbientWrapper ambientWrapper = new AmbientWrapper();
         public WeatherModify weatherModify = new WeatherModify();
         public FogWrapper fogWrapper = new FogWrapper();
-        public RandomWindModify randomWindModify = new RandomWindModify();
-        public WaveWindModify waveWindModify = new WaveWindModify();
         public BloomWrapper bloomWrapper = new BloomWrapper();
         public LutWrapper lutWrapper = new LutWrapper();
         public VolumnLightModify volumnLightModify = new VolumnLightModify();
