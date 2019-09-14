@@ -31,15 +31,11 @@ FLOAT3 GetLightColor0()
         return _LightColor0.xyz;
     #endif//LIGHTMAP_ON    
 #else//!_ADDLIGHTING
-    // #ifdef _SYSTEM_LIGHT
-    //     return _LightColor0.xyz;
-    // #else//!_SYSTEM_LIGHT
-        #ifdef _SCENE_EFFECT
-            return _DirectionalSceneLightColor0.xyz;
-        #else//!_SCENE_EFFECT
-            return _DirectionalLightColor0.xyz;
-        #endif//_SCENE_EFFECT
-    // #endif//_SYSTEM_LIGHT
+    #ifdef _SCENE_EFFECT
+        return _DirectionalSceneLightColor0.xyz;
+    #else//!_SCENE_EFFECT
+        return _DirectionalLightColor0.xyz;
+    #endif//_SCENE_EFFECT
 
 #endif//_ADDLIGHTING
 }
@@ -66,15 +62,13 @@ FLOAT3 GetLightDir0()
 #ifdef _ADDLIGHTING
     return _WorldSpaceLightPos0.xyz;
 #else//!_ADDLIGHTING
-    // #ifdef _SYSTEM_LIGHT
-    //     return _WorldSpaceLightPos0.xyz;
-    // #else//!_SYSTEM_LIGHT
-        #ifdef _SCENE_EFFECT
-            return  _DirectionalSceneLightDir0.xyz;
-        #else//!_SCENE_EFFECT
-            return _DirectionalLightDir0.xyz;
-        #endif//_SCENE_EFFECT
-    // #endif//_SYSTEM_LIGHT
+
+    #ifdef _SCENE_EFFECT
+        return  _DirectionalSceneLightDir0.xyz;
+    #else//!_SCENE_EFFECT
+        return _DirectionalLightDir0.xyz;
+    #endif//_SCENE_EFFECT
+
 #endif//_ADDLIGHTING
 }
 

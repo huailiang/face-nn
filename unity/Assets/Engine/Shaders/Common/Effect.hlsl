@@ -14,9 +14,6 @@ FLOAT4 _WindParam0;//x max range  y range z range scale
 #define _WindStrength _WindParam0.z
 #define _WindScale _WindParam0.w
 
-// FLOAT4 _WindParam1;
-// #define _WindRange _WindParam1.x
-// #define _WindForce _WindParam1.x
 #endif
 FLOAT4 _Interactive;
 
@@ -36,18 +33,11 @@ FLOAT3 rotate_vector(FLOAT3 v, FLOAT4 r)
 	return qmul(r, qmul(FLOAT4(v, 0), r_c)).xyz;
 }
 #ifdef _BLOCK_WIND_EFFECT
-// inline FLOAT Rand(FLOAT2 pos)
-// {
-// 	return frac(sin(dot(pos.xy,FLOAT2(12.9898,78.233)))*43758.5453);
-// }
+
 
 inline FLOAT2 WindStrength(FLOAT3 pos)
 {
 	return FLOAT2(pos.x +_Time.w *_WindStrength,pos.z +_Time.w *_WindStrength);
-		// 5*cos(0.01*pos.z + _Time.y*_WindStrength*0.2) +
-		// 4*sin(0.05*pos.z - _Time.y*_WindStrength*0.15) + 
-		// 4*sin(0.2*pos.z + _Time.y*_WindStrength*0.2) +
-		// 2*cos(0.6*pos.z - _Time.y*_WindStrength*0.4);
 }
 
 inline FLOAT2 Wind(FLOAT3 pos, FLOAT windStrength,FLOAT windForce)

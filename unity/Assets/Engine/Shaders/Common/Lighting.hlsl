@@ -15,17 +15,11 @@ FLOAT4 _LightmapScale;
 #define _LightmapShadowMaskInv _LightmapScale.y
 #define _ShadowIntensity _LightmapScale.z
 TEXTURE2D_SAMPLER2D(_LookupDiffuseSpec);
-// #ifndef _NO_RIM
-// FLOAT4 _Rim;//x:RimIntensity y:RimWidth
-// #endif
-// FLOAT4 _CameraPointLight;
+
 FLOAT4 glstate_lightmodel_ambient;
-
-
 
 FLOAT3 GetAmbient(FFragData FragData, FMaterialData MaterialData)
 {
-	//return glstate_lightmodel_ambient.xyz *2*_AmbientParam.x;
 	return ShadeSHPerPixel(MaterialData.WorldNormal, FragData.Ambient, FragData.WorldPosition)*_AmbientParam.x;
 }
 
@@ -115,26 +109,9 @@ FLightingData GetLighting(FFragData FragData,FMaterialData MaterialData DEBUG_PB
 #endif//_UN_LIGHT
 	LightingData.Shadow = GetAddShadow(FragData)*MaterialData.Shadow;
 	DEBUG_PBS_CUSTOMDATA_PARAM(Shadow, LightingData.Shadow)
-
 	return LightingData;
 }
 
-
-// FLightingData GetUnLighting(FFragData FragData, FMaterialData MaterialData DEBUG_PBS_ARGS)
-// {
-// 	DECLARE_OUTPUT(FLightingData, LightingData)
-// #ifndef _FULL_SSS
-// 	LightingData.DiffuseColor = MaterialData.BlendColor *(1 - MaterialData.Metallic);	// 1 mad
-// #endif//_FULL_SSS
-
-// 	LightingData.Shadow = GetAddShadow(FragData)*MaterialData.Shadow;
-// 	DEBUG_PBS_CUSTOMDATA_PARAM(Shadow, LightingData.Shadow)
-
-// 	LightingData.IndirectDiffuseLighting = GetAmbient(FragData, MaterialData, 0);
-// 	DEBUG_PBS_CUSTOMDATA_PARAM(AmbientDiffuse, LightingData.IndirectDiffuseLighting)
-	
-// 	return LightingData;
-// }
 
 #if defined(_FULL_SSS)||defined(_PART_SSS)||defined(_DOUBLE_LIGHTS)
 FLOAT CalcSpecular_SSS(FLOAT Roughness, FLOAT NoH, FLOAT3 H, FLOAT3 N)
@@ -155,19 +132,13 @@ FLOAT CalcSpecular_SSS(FLOAT Roughness, FLOAT NoH, FLOAT3 H, FLOAT3 N)
 
 #ifndef _FULL_SSS
 
-
 #if defined(LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON)
 TEXTURE2D_SAMPLER2D(unity_Lightmap);
-// FLOAT4 unity_Lightmap_HDR;
 
 inline FLOAT3 DecodeLightmap(FLOAT4 color)
 {
 #if defined(UNITY_LIGHTMAP_DLDR_ENCODING)//mobile
-	// #if defined(_GRASS_LIGHT)
-	// 	return color.rgb*4.59f;
-	// #else
-    	return color.rgb*4.59f;//pow(2.0,2.2);		
-	// #endif
+    return color.rgb*4.59f;//pow(2.0,2.2);		
 #elif defined(UNITY_LIGHTMAP_RGBM_ENCODING)//pc
     return (34.49 * pow(color.a, 2.2)) * color.rgb;//x=pow(5.0,2.2);y=2.2
 #else //defined(UNITY_LIGHTMAP_FULL_HDR)
@@ -279,9 +250,6 @@ FLOAT3 GetDirectLighting(FFragData FragData, FMaterialData MaterialData, FLighti
 
 FLOAT3 GetImageBasedReflectionLighting(FFragData FragData,FMaterialData MaterialData, FLightingData LightingData DEBUG_PBS_ARGS)
 {
-
-	// Compute fractional mip from roughness
-	//FLOAT AbsoluteSpecularMip = _EnvCubemapParam.w - 2 - 1.2 * log2(MaterialData.Roughness);
 	FLOAT r = sqrt(MaterialData.Roughness);
 	FLOAT AbsoluteSpecularMip = r * (1.7 - 0.7 * r) * _EnvCubemapParam.w;
 	FLOAT3 viewDir = FragData.WorldPosition_CamRelative;
@@ -411,11 +379,6 @@ FLOAT3 GetSkinLighting(FFragData FragData, FMaterialData MaterialData, FLighting
 #endif
 }
 
-// uint ExtractSubsurfaceProfileInt(FGBufferData BufferData)
-// {
-// 	// can be optimized
-// 	return uint(BufferData.CustomData.r * 255.0f + 0.5f);
-// }
 #define SSSS_SUBSURFACE_COLOR_OFFSET			0
 #define SSSS_TRANSMISSION_OFFSET				(SSSS_SUBSURFACE_COLOR_OFFSET+1)
 #define SSSS_BOUNDARY_COLOR_BLEED_OFFSET		(SSSS_TRANSMISSION_OFFSET+1)
@@ -444,30 +407,9 @@ void GetProfileDualSpecular( out FLOAT AverageToRoughness0, out FLOAT AverageToR
 	AverageToRoughness1 = Data.y * SSSS_MAX_DUAL_SPECULAR_ROUGHNESS;
 	LobeMix = Data.z;
 }
-// FLOAT3 DualSpecularGGX(FLOAT AverageRoughness, FLOAT Lobe0Roughness, FLOAT Lobe1Roughness, FLOAT LobeMix, FLOAT3 SpecularColor, FLOAT NoL)
-// {
-// 	FLOAT AverageAlpha2 = Pow4(AverageRoughness);
-// 	FLOAT Lobe0Alpha2 = Pow4(Lobe0Roughness);
-// 	FLOAT Lobe1Alpha2 = Pow4(Lobe1Roughness);
-
-// 	FLOAT Lobe0Energy = EnergyNormalization(Lobe0Alpha2, Context.VoH, AreaLight);
-// 	FLOAT Lobe1Energy = EnergyNormalization(Lobe1Alpha2, Context.VoH, AreaLight);
-
-// 	// Generalized microfacet specular
-// 	FLOAT D = lerp(D_GGX(Lobe0Alpha2, Context.NoH) * Lobe0Energy, D_GGX(Lobe1Alpha2, Context.NoH) * Lobe1Energy, LobeMix);
-// 	FLOAT Vis = Vis_SmithJointApprox(AverageAlpha2, Context.NoV, NoL); // Average visibility well approximates using two separate ones (one per lobe).
-// 	FLOAT3 F = F_Schlick(SpecularColor, Context.VoH);
-
-// 	return (D * Vis) * F;
-// }
 
 FLOAT3 SubsurfaceProfileBxDF(FFragData FragData, FMaterialData MaterialData, FLightingData LightingData DEBUG_PBS_ARGS)
 {
-	// BxDFContext Context;
-	// Init( Context, N, V, L );
-	// SphereMaxNoH( Context, AreaLight.SphereSinAlpha, true );
-	// Context.NoV = saturate( abs( Context.NoV ) + 1e-5 );
-
 	FLOAT AverageToRoughness0;
 	FLOAT AverageToRoughness1;
 	FLOAT LobeMix;
@@ -493,22 +435,6 @@ FLOAT3 SubsurfaceProfileBxDF(FFragData FragData, FMaterialData MaterialData, FLi
 	DEBUG_PBS_CUSTOMDATA_PARAM(DirectLightingColor, lighting)
 	return lighting;
 
-// #if USE_TRANSMISSION
-
-// 	FTransmissionProfileParams TransmissionParams = GetTransmissionProfileParams( GBuffer );
-
-// 	float Thickness = Shadow.TransmissionThickness;
-// 	Thickness = DecodeThickness(Thickness);
-// 	Thickness *= SSSS_MAX_TRANSMISSION_PROFILE_DISTANCE;
-// 	float3 Profile = GetTransmissionProfile(GBuffer, Thickness).rgb;
-
-// 	float3 RefracV = refract(V, -N, TransmissionParams.OneOverIOR);
-// 	float PhaseFunction = ApproximateHG( dot(-L, RefracV), TransmissionParams.ScatteringDistribution );
-// 	Lighting.Transmission = AreaLight.FalloffColor * Profile * (Falloff * PhaseFunction); // TODO: This probably should also include cosine term (NoL)
-
-// #else // USE_TRANSMISSION
-
-// 	Lighting.Transmission = 0;
 
 // #endif // USE_TRANSMISSION
 }

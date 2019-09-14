@@ -2,10 +2,7 @@
 #define PBS_HEAD_INCLUDE
 
 #include "Common.hlsl"
-// #include "ShadowLib.hlsl"
-// #ifdef _CUSTOM_UV_LAYOUT
-// 	#define _INPUT_UV0
-// #else//!_CUSTOM_UV_LAYOUT
+
 	#define _INPUT_UV0
 	#if (defined(LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON))&&!defined(_TERRAIN)
 		#define _INPUT_UV2		

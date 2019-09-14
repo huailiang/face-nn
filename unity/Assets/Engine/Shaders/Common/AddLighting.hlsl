@@ -1,10 +1,3 @@
-// Copyright 2018- PWRD, Inc. All Rights Reserved.
-
-//#include "BRDF.hlsl" 
-//#include "SH.hlsl"
-//#include "DebugHead.hlsl"
-//#include "../Colors.hlsl"
-
 #ifndef PBS_ADDLIGHTING_INCLUDE
 #define PBS_ADDLIGHTING_INCLUDE
 
@@ -50,10 +43,7 @@
 	#if defined(SHADOWS_DEPTH) && defined(SPOT)||defined(SHADOWS_SCREEN)&&defined(UNITY_NO_SCREENSPACE_SHADOWS)
 			FLOAT4x4 unity_WorldToShadow[4];
 	#endif
-//#ifdef DIRECTIONAL
-//#define UNITY_LIGHT_ATTENUATION(destName, input, worldPos) fixed destName = UNITY_SHADOW_ATTENUATION(input, worldPos);
-//#endif
-//
+
 	FLOAT4 _LightPositionRange;
 	FLOAT4 _LightProjectionParams;
 
@@ -201,17 +191,7 @@ StructuredBuffer<uint> _LightIndex;//count+index0,index1...
 StructuredBuffer<uint> _VerticalBlockIndex;
 StructuredBuffer<LightHeadIndex> _LightIndexHead;
 uint _LineBlockCount;//default 20
-// FLOAT _GridSize;
 FLOAT3 _WorldChunkOffset;
-// TEXTURE2D_2(_LightIndexTex0);
-// TEXTURE2D_2(_LightIndexTex1);
-// TEXTURE2D_2(_LightIndexTex2);
-// TEXTURE2D_2(_LightIndexTex3);
-// TEXTURE2D_2(_LightIndexTex4);
-// TEXTURE2D_2(_LightIndexTex5);
-// TEXTURE2D_2(_LightIndexTex6);
-// TEXTURE2D_2(_LightIndexTex7);
-// TEXTURE2D_2(_LightIndexTex8);
 
 FLOAT3 GetVoxelLighting(FFragData FragData,FMaterialData MaterialData,FLightingData LightingData)
 {
@@ -245,23 +225,10 @@ FLOAT3 GetVoxelLighting(FFragData FragData,FMaterialData MaterialData,FLightingD
 				// lightRadiusMask *= lightRadiusMask;		
 				FLOAT3 lighting = li.lightColor.xyz*ndotl*rcp(1+distanceSqr)*16*lightRadiusMask;
 				color += Diffuse_Burley( LightingData.DiffuseColor,MaterialData.Roughness,LightingData.NdotC,ndotl,LightingData.VdotH)*lighting;
-				// FLOAT h = SafeNormalize(FragData.CameraVector + ndir);
-				// FLOAT ndoth = saturate(dot(MaterialData.WorldNormal, h));
-				// color += LightingData.SpecularColor * CalcSpecular(MaterialData.Roughness, ndoth, h, MaterialData.WorldNormal)*lighting;
-				// color +=lighting;
+
 			}
 		}
 	}
-	// LightInfo li = _LightInfos[0];
-
-	// FLOAT3 dir =  li.lightPos.xyz - FragData.WorldPosition.xyz;
-	// FLOAT3 ndotl = saturate(dot(MaterialData.WorldNormal, normalize(dir)));
-
-	// FLOAT distanceSqr = dot(dir,dir);
-	// FLOAT lightRadiusMask = distanceSqr * li.lightPos.w * li.lightPos.w;
-	// lightRadiusMask = saturate(1 - lightRadiusMask);
-	// //lightRadiusMask *= lightRadiusMask;		
-	// lighting += li.lightColor.xyz*ndotl*rcp(1+distanceSqr)*16*lightRadiusMask;
 	return color;
 }
 

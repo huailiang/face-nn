@@ -1,4 +1,3 @@
-
 /**
 * Common.cginc: Common fun and paramaters.
 */
@@ -20,10 +19,7 @@ inline FLOAT4 TransformWorldToClipPos(in FLOAT4 WorldPosition)
 	return mul(_matrixVP, WorldPosition);
 }
 
-// inline FLOAT4 TransformWorldToViewPos(in FLOAT4 WorldPosition)
-// {
-// 	return mul(unity_MatrixV, WorldPosition);
-// }
+
 
 inline FLOAT4 TransformObjectToClipPos(in FLOAT3 pos)
 {
@@ -80,7 +76,6 @@ FLOAT AOMultiBounce( FLOAT3 Color, FLOAT AO, FLOAT AOBias )
 	FLOAT AO2 = AO*AO;
 	FLOAT AO3 = AO2*AO;
 	gray =  max(AO, (a*AO3 + b*AO2 + c*AO));
-// gray =  max( AO, ( ( AO * a + b ) * AO + c ) * AO );
 	return gray + 1 - AOBias;
 }
 
@@ -118,8 +113,6 @@ void FindBlocker(out FLOAT avgBlockerDepth, out FLOAT numBlockers, FLOAT2 uv, FL
 
 		FLOAT4 shadowMap = SAMPLE_TEXTURE2D(_ShadowMapTex, uv + offset);
 		FLOAT shadowMapDepth = DecodeFloatRGBA(shadowMap);
-		//FLOAT shadowMapDepth = g_ShadowDepthTexture.SampleLevel(CLAMPTRILINEAR, uv + offset, 0);
-		
 		if (shadowMapDepth < zReceiver)
 		{
 			blockerSum += shadowMapDepth;

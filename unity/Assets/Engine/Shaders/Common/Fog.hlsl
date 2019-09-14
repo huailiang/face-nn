@@ -23,15 +23,9 @@ FLOAT4 CalculateHeightFog(FLOAT3 wsPosition)
 #endif
 
 	FLOAT dist = length(wsPosition - _WorldSpaceCameraPos.xyz);
-	//FLOAT3 CamDir=wsPosition - _WorldSpaceCameraPos.xyz;
-	//FLOAT height01 = saturate((wsPosition.y )- _HeightFogParam.z);
-	//FLOAT heightCoef = pow(height01,4);
 	FLOAT d = max(0.0, dist - _HeightFogParam.w);
 	FLOAT c = _HeightFogParam.x ;
 	FLOAT fogAmount = (1.0 - exp(-d * c)); 	
-	//FLOAT fogHighLine = clamp(wsPosition.y*1-8.5,0,1);
-	//FLOAT W = (1-exp((-(max(0,(sqrt(dot(CamDir,CamDir))-_HeightFogParam.w)))*max((_HeightFogParam.z*fogHighLine),(0.1*_HeightFogParam.z)))));
-
 
 	return FLOAT4(fogAmount * fogAmount,0,0,0);
 }

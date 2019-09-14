@@ -6,12 +6,6 @@ namespace XEditor
 {
 	public class XEditorPath
 	{
-        public static readonly string Sce = "Assets/XScene/";
-        public static readonly string Skp = "Assets/BundleRes/SkillPackage/";
-        public static readonly string Crv = "Assets/Editor/EditorResources/Curve/";
-        public static readonly string San = "Assets/Editor/EditorResources/Server/Animation/";
-        public static readonly string Scb = "Assets/BundleRes/Table/SceneBlock/";
-
         private static readonly string _root = "Assets/BundleRes";
         private static readonly string _editor_root = "Assets/Editor";
         private static readonly string _editor_res_root = "Assets/Editor/EditorResources";

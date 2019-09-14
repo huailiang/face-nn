@@ -30,8 +30,6 @@ FLOAT4 CalculateHeightFog2(FLOAT3 wsPosition)
 FLOAT4 ParallaxMapping(FLOAT3 V,FLOAT3 L,FLOAT2 uv)
 {
 	FLOAT3 uvh = FLOAT3(uv.x,uv.y,0);
-	// FLOAT  s0 = _ParallaxParam.x;
-	// FLOAT  s1 = _ParallaxParam.y;
 	FLOAT  ss = 1.3;
 
 	for(int pi=0; pi < _ParallaxCount; pi++ )

@@ -9,8 +9,6 @@ public class XTableReader
     {
         CVSReader.Init();
         XBinaryReader.Init();
-        //XResourceLoaderMgr.singleton.SetLoadEditorResourceCallback(XResourceHelper.LoadEditorResource);
-
         XInterfaceMgr.singleton.AttachInterface<IResourceHelp>(XCommon.singleton.XHash("XResourceHelper"), XResourceHelper.singleton);
 
         return XResourceLoaderMgr.singleton.ReadFile(location, reader);
