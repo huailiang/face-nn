@@ -23,7 +23,6 @@ FLOAT4 fragAdd(FInterpolantsVSToPS Interpolants, in FLOAT4 SvPosition : SV_Posit
 
 
 		#if ENABLE_SKY_LIGHT
-			//@mw todo
 			// TODO: Also need to do specular.
 			Color += GetSkySHDiffuseSimple(MaterialParameters.WorldNormal) * ResolvedView.SkyLightColor.rgb * DiffuseColor;
 		#endif

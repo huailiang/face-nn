@@ -6,8 +6,6 @@
 #ifndef UNITY_POSTFX_STDLIB
 #define UNITY_POSTFX_STDLIB
 
-// -----------------------------------------------------------------------------
-// API macros
 
 #if defined(SHADER_API_D3D11)
     #include "API/D3D11.hlsl"
@@ -22,8 +20,8 @@
 #else
     #include "API/OpenGL.hlsl"
 #endif
-// -----------------------------------------------------------------------------
-// Constants
+
+
 #if defined(SHADER_STAGE_FRAGMENT)||defined(SHADER_STAGE_COMPUTE)
 #define FLOAT		half
 #define FLOAT2		half2
@@ -82,8 +80,7 @@ static const FLOAT4 ZEROES = (FLOAT4)0.0;
 #define INSTANCING_BUFFER_END(arr)        } arr##Array[INSTANCED_ARRAY_SIZE]; CBUFFER_END
 #define DEFINE_INSTANCED_PROP(type, var)  type var;
 #define ACCESS_INSTANCED_PROP(arr, var)   arr##Array[instanceID].var
-// -----------------------------------------------------------------------------
-// Compatibility functions
+
 
 #if (SHADER_TARGET < 50 && !defined(SHADER_API_PSSL))
 inline FLOAT rcp(FLOAT value)
@@ -628,8 +625,6 @@ VaryingsDefault VertDefault(AttributesDefault v)
     o.texcoord = o.texcoord * FLOAT2(1.0, -1.0) + FLOAT2(0.0, 1.0);
 #endif
 
-    //o.texcoordStereo = TransformStereoScreenSpaceTex(o.texcoord, 1.0);
-
     return o;
 }
 
@@ -640,7 +635,6 @@ VaryingsDefault VertUVTransform(AttributesDefault v)
     VaryingsDefault o;
     o.vertex = FLOAT4(v.vertex.xy, 0.0, 1.0);
     o.texcoord = TransformTriangleVertexToUV(v.vertex.xy) * _UVTransform.xy + _UVTransform.zw;
-    //o.texcoord = TransformStereoScreenSpaceTex(o.texcoord, 1.0);
     return o;
 }
 

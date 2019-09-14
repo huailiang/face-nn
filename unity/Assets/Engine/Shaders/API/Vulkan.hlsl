@@ -13,10 +13,6 @@ SamplerState global_point_clamp_sampler;
 #define TEXTURE2D_2(textureName) Texture2D textureName
 #define TEXCUBE_SAMPLERCUBE(textureName) samplerCUBE textureName
 #define TEXTURE2DARRAY_SAMPLER2D(textureName) Texture2DArray textureName; SamplerState sampler##textureName
-// #define TEX2DARRAY_SAMPLER2D(textureName) Texture2DArray textureName; SamplerState sampler_##texture
-
-// #define SAMPLER2D(textureName) sampler2D textureName
-// #define SHADOWMAP2D(textureName) Texture2D textureName; SamplerComparisonState sampler_##textureName
 
 #define TEXTURE2D_ARGS(textureName) sampler2D textureName
 #define TEXTURE2D_PARAM(textureName) textureName
@@ -34,14 +30,9 @@ SamplerState global_point_clamp_sampler;
 #define SAMPLE_TEXCUBE_LOD(textureName,coord,lod) texCUBElod (textureName,FLOAT4(coord, lod))
 #define SAMPLE_TEX2DARRAY(textureName,coord) textureName.Sample (sampler##textureName,coord)
 
-// #define LOAD_TEXTURE2D(textureName, texelSize, icoord2) textureName.Load(int3(icoord2, 0))
-// #define LOAD_TEXTURE2D_LOD(textureName, texelSize, icoord2) textureName.Load(int3(icoord2, lod))
 
 #define GATHER_TEXTURE2D(textureName, coord2) textureName.Gather(sampler##textureName, coord2)
 #define GATHER_TEXTURE2D_STATE(textureName,samplerName, coord2) textureName.Gather(samplerName, coord2)
-// #define GATHER_RED_TEXTURE2D(textureName, samplerName, coord2) textureName.GatherRed(samplerName, coord2)
-// #define GATHER_GREEN_TEXTURE2D(textureName, samplerName, coord2) textureName.GatherGreen(samplerName, coord2)
-// #define GATHER_BLUE_TEXTURE2D(textureName, samplerName, coord2) textureName.GatherBlue(samplerName, coord2)
 
 #define SAMPLE_DEPTH_TEXTURE(textureName, coord2) SAMPLE_TEXTURE2D(textureName, coord2).r
 #define SAMPLE_DEPTH_TEXTURE_LOD(textureName, coord2, lod) SAMPLE_TEXTURE2D_LOD(textureName, coord2, lod).r

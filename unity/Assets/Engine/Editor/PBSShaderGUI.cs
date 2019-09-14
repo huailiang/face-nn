@@ -1,5 +1,3 @@
-// Unity built-in shader source. Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
-
 using System;
 using System.Collections.Generic;
 using CFUtilPoolLib;
@@ -21,7 +19,7 @@ namespace CFEngine.Editor
         public class ShaderGroupInstance
         {
             public string name;
-            public List<ShaderPropertyInstance> spiList = new List<ShaderPropertyInstance> ();
+            public List<ShaderPropertyInstance> spiList = new List<ShaderPropertyInstance>();
 
             public bool hasCustomGroup = false;
         }
@@ -44,7 +42,7 @@ namespace CFEngine.Editor
             public static string skinText = "Skin";
             public static string debugText = "Debug";
             public static string debugMode = "Debug Mode";
-            public static readonly string[] blendNames = Enum.GetNames (typeof (BlendMode));
+            public static readonly string[] blendNames = Enum.GetNames(typeof(BlendMode));
 
         }
 
@@ -62,8 +60,8 @@ namespace CFEngine.Editor
             Color.white, //mipmap 9 white
         };
 
-        public delegate void DrawFun (ref DrawPropertyContext context);
-        Dictionary<string, DrawFun> customFunc = new Dictionary<string, DrawFun> ();
+        public delegate void DrawFun(ref DrawPropertyContext context);
+        Dictionary<string, DrawFun> customFunc = new Dictionary<string, DrawFun>();
         static DrawFun[] drawPropertyFun = new DrawFun[]
         {
             null,
@@ -78,26 +76,26 @@ namespace CFEngine.Editor
         static DrawFun drawGroupBegin = DrawGroupBegin;
         static DrawFun drawGroupEnd = DrawGroupEnd;
         List<ShaderGroupInstance> shaderPropertyGroups = null;
-        HashSet<string> hasDepency = new HashSet<string> ();
+        HashSet<string> hasDepency = new HashSet<string>();
         protected MaterialEditor m_MaterialEditor;
         MaterialProperty baseColorMp;
         protected Material m_Material;
         DebugData dd;
         bool m_FirstTimeApply = true;
-        List<DrawPropertyContext> drawList = new List<DrawPropertyContext> ();
-        protected virtual void FindProperties (MaterialProperty[] props)
+        List<DrawPropertyContext> drawList = new List<DrawPropertyContext>();
+        protected virtual void FindProperties(MaterialProperty[] props)
         {
             baseColorMp = null;
-            shaderPropertyGroups = new List<ShaderGroupInstance> ();
-            hasDepency.Clear ();
+            shaderPropertyGroups = new List<ShaderGroupInstance>();
+            hasDepency.Clear();
             for (int i = 0; i < AssetsConfig.GlobalAssetsConfig.ShaderGroupInfo.Count; ++i)
             {
                 string groupName = AssetsConfig.GlobalAssetsConfig.ShaderGroupInfo[i];
-                shaderPropertyGroups.Add (new ShaderGroupInstance () { name = groupName });
+                shaderPropertyGroups.Add(new ShaderGroupInstance() { name = groupName });
             }
 
             Shader shader = m_Material.shader;
-            var shaderFeatureMap = AssetsConfig.GetShaderFeatureList ();
+            var shaderFeatureMap = AssetsConfig.GetShaderFeatureList();
 
             for (int i = 0; i < AssetsConfig.GlobalAssetsConfig.ShaderInfos.Count; ++i)
             {
@@ -108,56 +106,56 @@ namespace CFEngine.Editor
                     {
                         string featurename = si.shaderFeatures[j];
                         AssetsConfig.ShaderFeature sf;
-                        if (shaderFeatureMap.TryGetValue (featurename, out sf))
+                        if (shaderFeatureMap.TryGetValue(featurename, out sf))
                         {
                             MaterialProperty mp = null;
-                            if (!string.IsNullOrEmpty (sf.propertyName))
+                            if (!string.IsNullOrEmpty(sf.propertyName))
                             {
-                                mp = FindProperty (sf.propertyName, props, false);
+                                mp = FindProperty(sf.propertyName, props, false);
                             }
                             if (sf.type == AssetsConfig.ShaderPropertyType.CustomGroup)
                             {
                                 for (int k = 0; k < sf.customProperty.Length; ++k)
                                 {
                                     var cp = sf.customProperty[k];
-                                    if (cp.valid && !string.IsNullOrEmpty (cp.desc))
+                                    if (cp.valid && !string.IsNullOrEmpty(cp.desc))
                                     {
                                         ShaderGroupInstance sgi = null;
-                                        if (string.IsNullOrEmpty (cp.subGroup))
+                                        if (string.IsNullOrEmpty(cp.subGroup))
                                         {
                                             sgi = shaderPropertyGroups[shaderPropertyGroups.Count - 1];
                                         }
                                         else
                                         {
-                                            sgi = shaderPropertyGroups.Find ((param) => { return param.name == cp.subGroup; });
+                                            sgi = shaderPropertyGroups.Find((param) => { return param.name == cp.subGroup; });
                                         }
 
                                         if (sgi == null)
                                         {
-                                            sgi = new ShaderGroupInstance () { name = cp.subGroup };
+                                            sgi = new ShaderGroupInstance() { name = cp.subGroup };
                                             sgi.hasCustomGroup = true;
-                                            shaderPropertyGroups.Add (sgi);
+                                            shaderPropertyGroups.Add(sgi);
                                         }
-                                        ShaderPropertyInstance spi = new ShaderPropertyInstance ();
+                                        ShaderPropertyInstance spi = new ShaderPropertyInstance();
                                         spi.shaderFeature = sf;
                                         spi.property = mp;
                                         spi.scp = cp;
                                         spi.customIndex = k;
-                                        sgi.spiList.Add (spi);
+                                        sgi.spiList.Add(spi);
                                     }
                                 }
                             }
                             else
                             {
-                                ShaderPropertyInstance spi = new ShaderPropertyInstance ();
+                                ShaderPropertyInstance spi = new ShaderPropertyInstance();
                                 spi.shaderFeature = sf;
                                 spi.property = mp;
-                                ShaderGroupInstance sgi = shaderPropertyGroups.Find ((param) => { return param.name == sf.shaderGroupName; });
+                                ShaderGroupInstance sgi = shaderPropertyGroups.Find((param) => { return param.name == sf.shaderGroupName; });
                                 if (sgi == null)
                                 {
                                     sgi = shaderPropertyGroups[shaderPropertyGroups.Count - 1];
                                 }
-                                sgi.spiList.Add (spi);
+                                sgi.spiList.Add(spi);
 
                                 if (sf.name == "Color")
                                 {
@@ -166,10 +164,10 @@ namespace CFEngine.Editor
                             }
 
                             if (sf.type == AssetsConfig.ShaderPropertyType.Keyword &&
-                                !hasDepency.Contains (sf.name) &&
-                                m_Material.IsKeywordEnabled (sf.propertyName))
+                                !hasDepency.Contains(sf.name) &&
+                                m_Material.IsKeywordEnabled(sf.propertyName))
                             {
-                                hasDepency.Add (sf.name);
+                                hasDepency.Add(sf.name);
                             }
                         }
                     }
@@ -177,71 +175,71 @@ namespace CFEngine.Editor
                 }
 
             }
-            customFunc.Clear ();
-            customFunc.Add ("BlendMode", BlendModePopup);
-            customFunc.Add ("Debug", DoDebugArea);
+            customFunc.Clear();
+            customFunc.Add("BlendMode", BlendModePopup);
+            customFunc.Add("Debug", DoDebugArea);
             AssetsConfig.RefreshShaderDebugNames();
             GameObject go = Selection.activeGameObject;
             if (go != null)
-                dd = go.GetComponent<DebugData> ();
-            Update ();
+                dd = go.GetComponent<DebugData>();
+            Update();
         }
 
-        public override void AssignNewShaderToMaterial (Material material, Shader oldShader, Shader newShader)
+        public override void AssignNewShaderToMaterial(Material material, Shader oldShader, Shader newShader)
         {
             // _Emission property is lost after assigning Standard shader to the material
             // thus transfer it before assigning the new shader
             if (m_Material != null)
             {
-                if (material.HasProperty ("_Emission") && material.HasProperty ("_EmissionColor"))
+                if (material.HasProperty("_Emission") && material.HasProperty("_EmissionColor"))
                 {
-                    m_Material.SetColor ("_EmissionColor", material.GetColor ("_Emission"));
+                    m_Material.SetColor("_EmissionColor", material.GetColor("_Emission"));
                 }
-                if (material.HasProperty ("_MainTex"))
+                if (material.HasProperty("_MainTex"))
                 {
-                    m_Material.SetTexture ("_BaseTex", material.GetTexture ("_MainTex"));
+                    m_Material.SetTexture("_BaseTex", material.GetTexture("_MainTex"));
                 }
-                if (material.HasProperty ("_BaseTex"))
+                if (material.HasProperty("_BaseTex"))
                 {
-                    m_Material.SetTexture ("_MainTex", material.GetTexture ("_BaseTex"));
+                    m_Material.SetTexture("_MainTex", material.GetTexture("_BaseTex"));
                 }
-                if (material.HasProperty ("_BumpMap"))
+                if (material.HasProperty("_BumpMap"))
                 {
-                    m_Material.SetTexture ("_PBSTex", material.GetTexture ("_BumpMap"));
+                    m_Material.SetTexture("_PBSTex", material.GetTexture("_BumpMap"));
                 }
             }
 
-            base.AssignNewShaderToMaterial (material, oldShader, newShader);
+            base.AssignNewShaderToMaterial(material, oldShader, newShader);
 
-            if (oldShader == null || !oldShader.name.Contains ("Legacy Shaders/"))
+            if (oldShader == null || !oldShader.name.Contains("Legacy Shaders/"))
             {
-                MaterialShaderAssets.SetupMaterialWithBlendMode (material, MaterialShaderAssets.GetBlendMode (material));
+                MaterialShaderAssets.SetupMaterialWithBlendMode(material, MaterialShaderAssets.GetBlendMode(material));
                 return;
             }
 
-            MaterialChanged (material);
+            MaterialChanged(material);
         }
 
-        public override void OnGUI (MaterialEditor materialEditor, MaterialProperty[] props)
+        public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] props)
         {
             m_MaterialEditor = materialEditor;
             m_Material = materialEditor.target as Material;
 
             if (m_FirstTimeApply)
             {
-                FindProperties (props);
-                MaterialChanged (m_Material);
+                FindProperties(props);
+                MaterialChanged(m_Material);
                 m_FirstTimeApply = false;
             }
-            ShaderPropertiesGUI ();
+            ShaderPropertiesGUI();
 
         }
 
-        private void Update ()
+        private void Update()
         {
             if (shaderPropertyGroups != null)
             {
-                drawList.Clear ();
+                drawList.Clear();
                 for (int i = 0; i < shaderPropertyGroups.Count; ++i)
                 {
                     ShaderGroupInstance sgi = shaderPropertyGroups[i];
@@ -270,16 +268,16 @@ namespace CFEngine.Editor
                         if (sf.type == AssetsConfig.ShaderPropertyType.CustomFun)
                         {
                             DrawFun fun = null;
-                            if (customFunc.TryGetValue (sf.name, out fun))
+                            if (customFunc.TryGetValue(sf.name, out fun))
                             {
-                                DrawPropertyContext context = new DrawPropertyContext ();
+                                DrawPropertyContext context = new DrawPropertyContext();
                                 context.fun = fun;
                                 context.material = m_Material;
                                 context.materialEditor = m_MaterialEditor;
                                 context.hasDepency = hasDepency;
                                 context.spi = spi;
                                 context.dd = dd;
-                                drawList.Add (context);
+                                drawList.Add(context);
                             }
                         }
                         else
@@ -293,13 +291,13 @@ namespace CFEngine.Editor
                                     string featureName = sf.dependencyPropertys.dependencyShaderProperty[k];
                                     if (sf.dependencyPropertys.dependencyType == AssetsConfig.DependencyType.Or)
                                     {
-                                        hasFeature |= hasDepency.Contains (featureName);
+                                        hasFeature |= hasDepency.Contains(featureName);
                                         if (hasFeature)
                                             break;
                                     }
                                     else if (sf.dependencyPropertys.dependencyType == AssetsConfig.DependencyType.And)
                                     {
-                                        hasFeature &= hasDepency.Contains (featureName);
+                                        hasFeature &= hasDepency.Contains(featureName);
                                         if (!hasFeature)
                                             break;
                                     }
@@ -312,10 +310,10 @@ namespace CFEngine.Editor
                             }
                             if (show && !sf.hide)
                             {
-                                var drawFun = drawPropertyFun[(int) sf.type];
+                                var drawFun = drawPropertyFun[(int)sf.type];
                                 if (drawFun != null)
                                 {
-                                    DrawPropertyContext context = new DrawPropertyContext ();
+                                    DrawPropertyContext context = new DrawPropertyContext();
                                     context.fun = drawFun;
                                     context.material = m_Material;
                                     context.materialEditor = m_MaterialEditor;
@@ -323,7 +321,7 @@ namespace CFEngine.Editor
                                     context.spi = spi;
                                     context.dd = dd;
                                     context.sgi = sgi;
-                                    drawList.Add (context);
+                                    drawList.Add(context);
                                 }
                             }
 
@@ -339,141 +337,141 @@ namespace CFEngine.Editor
                 }
             }
         }
-        private static void DrawTexFun (ref DrawPropertyContext context)
+        private static void DrawTexFun(ref DrawPropertyContext context)
         {
             if (context.spi.property != null)
             {
                 if (context.spi.shaderFeature.readOnly)
                 {
-                    EditorGUILayout.ObjectField (context.spi.property.displayName, context.spi.property.textureValue, typeof (Texture), false);
+                    EditorGUILayout.ObjectField(context.spi.property.displayName, context.spi.property.textureValue, typeof(Texture), false);
                 }
                 else
                 {
-                    EditorGUI.BeginChangeCheck ();
-                    context.materialEditor.TextureProperty (context.spi.property, context.spi.property.displayName, false);
-                    if (EditorGUI.EndChangeCheck ())
+                    EditorGUI.BeginChangeCheck();
+                    context.materialEditor.TextureProperty(context.spi.property, context.spi.property.displayName, false);
+                    if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject (context.materialEditor.target, context.spi.property.displayName);
+                        Undo.RecordObject(context.materialEditor.target, context.spi.property.displayName);
                         if (context.dd != null)
                         {
-                            context.dd.SetTexture (context.spi.property.name, context.spi.property.textureValue);
+                            context.dd.SetTexture(context.spi.property.name, context.spi.property.textureValue);
                         }
                     }
                 }
             }
 
         }
-        private static void DrawColorFun (ref DrawPropertyContext context)
+        private static void DrawColorFun(ref DrawPropertyContext context)
         {
             if (context.spi.property != null)
             {
                 if (context.spi.shaderFeature.readOnly)
                 {
-                    EditorGUILayout.ColorField (context.spi.property.displayName, context.spi.property.colorValue);
+                    EditorGUILayout.ColorField(context.spi.property.displayName, context.spi.property.colorValue);
                 }
                 else
                 {
-                    EditorGUI.BeginChangeCheck ();
-                    context.materialEditor.ColorProperty (context.spi.property, context.spi.property.displayName);
-                    if (EditorGUI.EndChangeCheck ())
+                    EditorGUI.BeginChangeCheck();
+                    context.materialEditor.ColorProperty(context.spi.property, context.spi.property.displayName);
+                    if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject (context.materialEditor.target, context.spi.property.displayName);
+                        Undo.RecordObject(context.materialEditor.target, context.spi.property.displayName);
                         if (context.dd != null)
                         {
-                            context.dd.SetColor (context.spi.property.name, context.spi.property.colorValue);
+                            context.dd.SetColor(context.spi.property.name, context.spi.property.colorValue);
                         }
                     }
                 }
             }
         }
 
-        private static void DrawVectorFun (ref DrawPropertyContext context)
+        private static void DrawVectorFun(ref DrawPropertyContext context)
         {
             if (context.spi.property != null)
             {
                 if (context.spi.shaderFeature.readOnly)
                 {
-                    EditorGUILayout.Vector4Field (context.spi.property.displayName, context.spi.property.vectorValue);
+                    EditorGUILayout.Vector4Field(context.spi.property.displayName, context.spi.property.vectorValue);
                 }
                 else
                 {
-                    EditorGUI.BeginChangeCheck ();
-                    context.materialEditor.VectorProperty (context.spi.property, context.spi.property.displayName);
-                    if (EditorGUI.EndChangeCheck ())
+                    EditorGUI.BeginChangeCheck();
+                    context.materialEditor.VectorProperty(context.spi.property, context.spi.property.displayName);
+                    if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject (context.materialEditor.target, context.spi.property.displayName);
+                        Undo.RecordObject(context.materialEditor.target, context.spi.property.displayName);
                         if (context.dd != null)
                         {
-                            context.dd.SetVector (context.spi.property.name, context.spi.property.vectorValue);
+                            context.dd.SetVector(context.spi.property.name, context.spi.property.vectorValue);
                         }
                     }
                 }
             }
         }
 
-        private static void DrawKeyWordFun (ref DrawPropertyContext context)
+        private static void DrawKeyWordFun(ref DrawPropertyContext context)
         {
-            bool isEnable = context.material.IsKeywordEnabled (context.spi.shaderFeature.propertyName);
+            bool isEnable = context.material.IsKeywordEnabled(context.spi.shaderFeature.propertyName);
             if (context.spi.shaderFeature.readOnly)
             {
-                EditorGUILayout.Toggle (context.spi.shaderFeature.name, isEnable);
+                EditorGUILayout.Toggle(context.spi.shaderFeature.name, isEnable);
             }
             else
             {
 
-                EditorGUI.BeginChangeCheck ();
-                bool enable = EditorGUILayout.Toggle (context.spi.shaderFeature.name, isEnable);
-                if (EditorGUI.EndChangeCheck ())
+                EditorGUI.BeginChangeCheck();
+                bool enable = EditorGUILayout.Toggle(context.spi.shaderFeature.name, isEnable);
+                if (EditorGUI.EndChangeCheck())
                 {
                     if (isEnable != enable)
                     {
-                        SetKeyword (context.material, context.spi.shaderFeature.propertyName, enable);
+                        SetKeyword(context.material, context.spi.shaderFeature.propertyName, enable);
                     }
-                    if (enable && !context.hasDepency.Contains (context.spi.shaderFeature.name))
-                        context.hasDepency.Add (context.spi.shaderFeature.name);
-                    else if (!enable && context.hasDepency.Contains (context.spi.shaderFeature.name))
-                        context.hasDepency.Remove (context.spi.shaderFeature.name);
+                    if (enable && !context.hasDepency.Contains(context.spi.shaderFeature.name))
+                        context.hasDepency.Add(context.spi.shaderFeature.name);
+                    else if (!enable && context.hasDepency.Contains(context.spi.shaderFeature.name))
+                        context.hasDepency.Remove(context.spi.shaderFeature.name);
 
-                    context.materialEditor.RegisterPropertyChangeUndo (context.spi.shaderFeature.name);
+                    context.materialEditor.RegisterPropertyChangeUndo(context.spi.shaderFeature.name);
                 }
             }
         }
 
-        private static void DrawCustomFun (ref DrawPropertyContext context)
+        private static void DrawCustomFun(ref DrawPropertyContext context)
         {
             if (context.spi.property != null)
             {
                 if (context.spi.shaderFeature.readOnly)
                 {
-                    EditorGUILayout.Vector4Field (context.spi.property.displayName, context.spi.property.vectorValue);
+                    EditorGUILayout.Vector4Field(context.spi.property.displayName, context.spi.property.vectorValue);
                 }
                 else
                 {
-                    EditorGUI.BeginChangeCheck ();
-                    CustomPropertyDrawer.OnGUI (context.spi.property, context.materialEditor, context.spi.shaderFeature);
-                    if (EditorGUI.EndChangeCheck ())
+                    EditorGUI.BeginChangeCheck();
+                    CustomPropertyDrawer.OnGUI(context.spi.property, context.materialEditor, context.spi.shaderFeature);
+                    if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject (context.materialEditor.target, context.spi.property.displayName);
+                        Undo.RecordObject(context.materialEditor.target, context.spi.property.displayName);
                     }
                 }
             }
         }
-        private static void DrawCustomGroupFun (ref DrawPropertyContext context)
+        private static void DrawCustomGroupFun(ref DrawPropertyContext context)
         {
             if (context.spi.property != null && context.spi.scp != null)
             {
                 var scp = context.spi.scp;
                 if (context.spi.shaderFeature.readOnly)
                 {
-                    EditorGUILayout.FloatField (scp.desc, context.spi.property.vectorValue[context.spi.customIndex]);
+                    EditorGUILayout.FloatField(scp.desc, context.spi.property.vectorValue[context.spi.customIndex]);
                 }
                 else
                 {
-                    EditorGUI.BeginChangeCheck ();
-                    CustomPropertyDrawer.OnGUI (context.spi.property, context.materialEditor, scp, context.spi.customIndex);
-                    if (EditorGUI.EndChangeCheck ())
+                    EditorGUI.BeginChangeCheck();
+                    CustomPropertyDrawer.OnGUI(context.spi.property, context.materialEditor, scp, context.spi.customIndex);
+                    if (EditorGUI.EndChangeCheck())
                     {
-                        Undo.RecordObject (context.materialEditor.target, context.spi.property.displayName);
+                        Undo.RecordObject(context.materialEditor.target, context.spi.property.displayName);
                     }
                 }
             }
@@ -484,7 +482,7 @@ namespace CFEngine.Editor
             {
                 if (context.spi.shaderFeature.readOnly)
                 {
-                    EditorGUILayout.IntField (context.spi.shaderFeature.name, context.material.renderQueue);
+                    EditorGUILayout.IntField(context.spi.shaderFeature.name, context.material.renderQueue);
                 }
                 else
                 {
@@ -511,7 +509,7 @@ namespace CFEngine.Editor
             EditorGUI.indentLevel--;
         }
 
-        protected virtual void ShaderPropertiesGUI ()
+        protected virtual void ShaderPropertiesGUI()
         {
             EditorGUIUtility.labelWidth = 0f;
 
@@ -524,39 +522,39 @@ namespace CFEngine.Editor
                     var dc = drawList[i];
                     if (dc.fun != null)
                     {
-                        dc.fun (ref dc);
+                        dc.fun(ref dc);
                     }
                 }
             }
-            if (EditorGUI.EndChangeCheck ())
+            if (EditorGUI.EndChangeCheck())
             {
                 if (m_MaterialEditor != null)
                 {
                     // foreach (var obj in m_MaterialEditor.targets)
                     //     MaterialChanged ((Material) obj);
-                    Update ();
+                    Update();
                 }
 
             }
         }
 
-        protected void BlendModePopup (ref DrawPropertyContext context)
+        protected void BlendModePopup(ref DrawPropertyContext context)
         {
-            BlendMode blendMode = MaterialShaderAssets.GetBlendMode (m_Material);
+            BlendMode blendMode = MaterialShaderAssets.GetBlendMode(m_Material);
 
-            EditorGUI.BeginChangeCheck ();
-            var mode = (BlendMode) EditorGUILayout.Popup (Styles.renderingMode, (int) blendMode, Styles.blendNames);
-            if (EditorGUI.EndChangeCheck ())
+            EditorGUI.BeginChangeCheck();
+            var mode = (BlendMode)EditorGUILayout.Popup(Styles.renderingMode, (int)blendMode, Styles.blendNames);
+            if (EditorGUI.EndChangeCheck())
             {
                 if (mode != blendMode)
                 {
-                    MaterialShaderAssets.SetupMaterialWithBlendMode (m_Material, mode);
+                    MaterialShaderAssets.SetupMaterialWithBlendMode(m_Material, mode);
                 }
             }
 
         }
 
-        protected void DoDebugArea (ref DrawPropertyContext context)
+        protected void DoDebugArea(ref DrawPropertyContext context)
         {
             if (context.spi.property != null)
             {
@@ -606,24 +604,24 @@ namespace CFEngine.Editor
 
         }
 
-        public static void SetupMaterialWithDebugMode (Material material, float debugMode)
+        public static void SetupMaterialWithDebugMode(Material material, float debugMode)
         {
-            material.SetFloat ("_DebugMode", (int) debugMode);
+            material.SetFloat("_DebugMode", (int)debugMode);
         }
 
-        protected void MaterialChanged (Material material)
+        protected void MaterialChanged(Material material)
         {
             MaterialShaderAssets.SetupMaterialWithBlendMode(material, MaterialShaderAssets.GetBlendMode(material), false);
             if (material.HasProperty("_DebugMode"))
                 SetupMaterialWithDebugMode(material, material.GetFloat("_DebugMode"));
         }
 
-        static void SetKeyword (Material m, string keyword, bool state)
+        static void SetKeyword(Material m, string keyword, bool state)
         {
             if (state)
-                m.EnableKeyword (keyword);
+                m.EnableKeyword(keyword);
             else
-                m.DisableKeyword (keyword);
+                m.DisableKeyword(keyword);
         }
     }
 } // namespace UnityEditor

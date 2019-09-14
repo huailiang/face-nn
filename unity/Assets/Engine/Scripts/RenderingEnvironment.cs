@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using CFUtilPoolLib;
 using UnityEngine;
-// using UnityEngine.Experimental.Rendering;
-
 using UnityEngine.Rendering;
 
 #if UNITY_EDITOR
@@ -10,9 +8,9 @@ using System;
 using System.Reflection;
 using UnityEditor;
 #endif
+
 namespace CFEngine
 {
-
     [DisallowMultipleComponent, ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
     public class RenderingEnvironment : MonoBehaviour
@@ -29,13 +27,10 @@ namespace CFEngine
         //Lighting
         public LightingModify lighting = null;
         public string SkyboxMatPath;
-        // public float AmbientMax = 1.0f;
-
         public Vector3 sunDir = new Vector3(0, -1, 0);
 
         public AmbientModify ambient = null;
         //Shadow
-
         public float shadowDepthBias = -0.03f;
         public float shadowNormalBias = 2.5f;
         public float shadowSmoothMin = 4f;
@@ -44,15 +39,13 @@ namespace CFEngine
         public float shadowPower = 2f;
         public FogModify fog = null;
         public bool fogEnable = true;
-
         [CFNoSerialized]
         public SceneData sceneData = null;
 
-        ////////////////// private param //////////////////
+
         private ResHandle EnveriomentCube;
         private ResHandle SkyBoxMat;
         private Cubemap SkyBox;
-        private float fov;
         //shadow
         [System.NonSerialized]
         public Vector3 cameraForward;
@@ -65,7 +58,6 @@ namespace CFEngine
         [System.NonSerialized]
         public Vector3 translatePos;
         [System.NonSerialized]
-
         public bool fitWorldSpace = true;
 
 #if UNITY_EDITOR
@@ -95,16 +87,12 @@ namespace CFEngine
             if (setLightColor)
             {
                 Vector4 lightColorIntensity;
-
                 lightColorIntensity = new Vector4(
                     Mathf.Pow(li.lightColor.r * li.lightDir.w, 2.2f),
                     Mathf.Pow(li.lightColor.g * li.lightDir.w, 2.2f),
                     Mathf.Pow(li.lightColor.b * li.lightDir.w, 2.2f), shadowIntensity);
-
                 Shader.SetGlobalVector(colorKey, lightColorIntensity);
-
             }
-
         }
 
         private void CalcLightMatrix(Bounds shadowBound, Vector3 looktargetCenter, float centerOffset, float shadowScale, float size, out Matrix4x4 viewMatrix, out Matrix4x4 projMatrix)
@@ -241,16 +229,12 @@ namespace CFEngine
 
             if (loadEnvCube && !string.IsNullOrEmpty(EnveriomentCubePath))
             {
-
                 string suffix = EnveriomentCubePath.EndsWith("HDR") ? ".exr" : ".tga";
                 string path = string.Format("{0}/{1}{2}", AssetsConfig.GlobalAssetsConfig.ResourcePath, EnveriomentCubePath, suffix);
                 EnveriomentCube.obj = AssetDatabase.LoadAssetAtPath<Cubemap>(path);
-
-
             }
             if (loadSkyBox && !string.IsNullOrEmpty(SkyboxMatPath))
             {
-
                 string path = string.Format("{0}/{1}.mat", AssetsConfig.GlobalAssetsConfig.ResourcePath, SkyboxMatPath);
                 SkyBoxMat.obj = AssetDatabase.LoadAssetAtPath<Material>(path);
             }
@@ -398,7 +382,6 @@ namespace CFEngine
                 Shader.SetGlobalVector(ShaderIDs.Env_GameViewCameraPos, sceneData.cameraPos);
 
                 float dist = -5;
-                // Vector3 sunForward = sceneLightInfo0.lightDir * Vector3.forward;
                 Vector3 sunPos = sunDir * 10 + sceneData.CameraTransCache.position;
                 int inrange = 1;
                 for (int i = 0; i < SceneData.frustumPlanes.Length; ++i)
@@ -417,7 +400,6 @@ namespace CFEngine
                 RenderingManager.instance.sunForward = new Vector4(sunDir.x, sunDir.y, sunDir.z, inrange);
                 if (sceneData.enableShadow)
                 {
-
                     lightProjectForward = -lighting.roleLightInfo0.lightDir;
                     cameraForward = sceneData.CameraTransCache.forward;
 
@@ -464,7 +446,6 @@ namespace CFEngine
                     }
                 }
 
-
                 EnverinmentContext context;
                 context.env = this;
                 context.envMgr = RenderingManager.instance;
@@ -489,7 +470,6 @@ namespace CFEngine
         public void ManualUpdate()
         {
 #if UNITY_EDITOR
-    
             if (sceneData.CameraRef == null)
             {
                 InitRender (this.GetComponent<Camera> ());
@@ -539,53 +519,6 @@ namespace CFEngine
             li.lightDir = l.transform.rotation * -Vector3.forward;
             li.lightColor = l.color;
             li.lightDir.w = (l.enabled && l.gameObject.activeInHierarchy) ? l.intensity : 0;
-        }
-
-
-
-        public void SaveEnvConfig(SceneEnvConfig sec)
-        {
-            ambient.ambientMode = RenderSettings.ambientMode;
-            if (RenderSettings.ambientMode == AmbientMode.Flat)
-            {
-                ambient.ambientSkyColor = RenderSettings.ambientLight;
-            }
-            else
-            {
-                ambient.ambientSkyColor = RenderSettings.ambientSkyColor;
-                ambient.ambientEquatorColor = RenderSettings.ambientEquatorColor;
-                ambient.ambientGroundColor = RenderSettings.ambientGroundColor;
-            }
-            Camera c = GetComponent<Camera>();
-            sec.clearFlag = c.clearFlags;
-            sec.clearColor = c.backgroundColor;
-            EditorCommon.SaveFieldInfo(typeof(RenderingEnvironment), typeof(SceneEnvConfig), this, sec);
-        }
-
-        public void LoadEnvConfig (SceneEnvConfig sec)
-        {
-            if (sec != null)
-            {
-                EditorCommon.SaveFieldInfo(typeof(SceneEnvConfig), typeof(RenderingEnvironment), sec, this, false);
-                RenderSettings.ambientMode = sec.ambient.ambientMode;
-                if (RenderSettings.ambientMode == AmbientMode.Flat)
-                {
-                    RenderSettings.ambientLight = sec.ambient.ambientSkyColor;
-                }
-                else
-                {
-                    RenderSettings.ambientSkyColor = sec.ambient.ambientSkyColor;
-                    RenderSettings.ambientEquatorColor = sec.ambient.ambientEquatorColor;
-                    RenderSettings.ambientGroundColor = sec.ambient.ambientGroundColor;
-                }
-
-                RenderSettings.skybox = null;
-                RenderSettings.fog = false;
-
-                Camera c = GetComponent<Camera>();
-                c.clearFlags = sec.clearFlag;
-                c.backgroundColor = sec.clearColor;
-            }
         }
 
 #endif

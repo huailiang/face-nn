@@ -40,7 +40,7 @@ namespace CFEngine.Editor
             var displayNameAttr = property.GetAttribute<CFDisplayNameAttribute>();
             if (displayNameAttr != null)
                 title.text = displayNameAttr.displayName;
-            
+
             // Add tooltip if it's missing and an attribute is available
             if (string.IsNullOrEmpty(title.tooltip))
             {
@@ -85,18 +85,13 @@ namespace CFEngine.Editor
             {
                 if (decorator.OnGUI(property, title, attribute))
                     return;
-                
+
                 // Attribute is invalid for the specified property; use default unity field instead
                 invalidProp = true;
             }
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                // Override checkbox
-                // var overrideRect = GUILayoutUtility.GetRect(17f, 17f, GUILayout.ExpandWidth(false));
-                // overrideRect.yMin += 4f;
-                // EditorUtilities.DrawOverrideCheckbox(overrideRect, property.overrideState);
-
                 // Property
                 // using (new EditorGUI.DisabledScope(!property.overrideState.boolValue))
                 {

@@ -3,7 +3,6 @@
 
 #include "Head.hlsl"
 #include "InterpolantsVSToPS.hlsl"
-#include "Effect.hlsl"
 
 struct FMobileShadingVSToPS
 {

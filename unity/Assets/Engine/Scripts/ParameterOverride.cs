@@ -15,7 +15,6 @@ namespace CFEngine
             return ((ParameterOverride<T>)this).value;
         }
 
-
         protected internal virtual void OnEnable()
         { }
 
@@ -41,7 +40,6 @@ namespace CFEngine
         }
         public virtual void Interp(Vector4 from, ParameterOverride to, float t)
         {
-
         }
 
         public virtual void Interp(ParameterOverride from, Enum to, float t)
@@ -183,7 +181,6 @@ namespace CFEngine
     [Serializable]
     public sealed class Vector3Parameter : ParameterOverride<Vector3>
     {
-
         public override void SetValue(UnityEngine.Vector4 value)
         {
             this.value = new Vector3(value.x, value.y, value.w);

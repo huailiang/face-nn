@@ -13,10 +13,6 @@
 
 #define TEXCUBE_SAMPLERCUBE(textureName) samplerCUBE textureName
 #define TEXTURE2DARRAY_SAMPLER2D(textureName) Texture2DArray textureName; SamplerState sampler##textureName
-// #define TEX2DARRAY_SAMPLER2D(textureName) Texture2DArray textureName; SamplerState sampler_##textureName
-
-// #define SAMPLER2D(textureName) sampler2D textureName
-// #define SHADOWMAP2D(textureName) Texture2D textureName; SamplerComparisonState sampler_##textureName
 
 #define TEXTURE2D_ARGS(textureName) sampler2D textureName
 #define TEXTURE2D_PARAM(textureName) textureName
@@ -33,10 +29,7 @@
 #define SAMPLE_TEXCUBE(textureName,coord2)  texCUBE(textureName, coord2)
 #define SAMPLE_TEXCUBE_LOD(textureName,coord,lod) texCUBElod (textureName,FLOAT4(coord, lod))
 #define SAMPLE_TEX2DARRAY(textureName,coord) textureName.Sample (sampler##textureName,coord)
-// #define SAMPLE_TEX2DARRAY(textureName,coord) textureName.Sample (sampler_##textureName,coord)
 
-// #define LOAD_TEXTURE2D(textureName, texelSize, icoord2) tex2D(textureName, icoord2 / texelSize)
-// #define LOAD_TEXTURE2D_LOD(textureName, texelSize, icoord2) tex2Dlod(textureName, float4(icoord2 / texelSize, 0.0, lod))
 #define GATHER_TEXTURE2D(textureName, coord2)
 #define GATHER_TEXTURE2D_STATE(textureName,samplerName, coord2)
 #define SAMPLE_DEPTH_TEXTURE(textureName, coord2) SAMPLE_TEXTURE2D(textureName, coord2).r

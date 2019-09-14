@@ -1,9 +1,5 @@
 Shader "Custom/Common/ShadowCaster" 
 {
-	Properties 
-	{
-	}
-
 	Subshader 
 	{
 		Tags{ "RenderType" = "Opaque" "IgnoreProjector" = "True"}
@@ -35,21 +31,6 @@ Shader "Custom/Common/ShadowCaster"
 			
 			FLOAT4 ApplyShadowBias(FLOAT3 positionWS, FLOAT3 normalWS, FLOAT3 lightDirection)
 			{
-				// FLOAT shadowCos = dot(lightDirection, normalWS);
-				// FLOAT shadowSine = sqrt(1-shadowCos*shadowCos);
-				// FLOAT normalBias = _ShadowBias.y * shadowSine;
-
-				// positionWS.xyz -= normalWS * normalBias;
-				// #if UNITY_REVERSED_Z
-				// 	FLOAT clamped = min(clipPos.z, clipPos.w*UNITY_NEAR_CLIP_VALUE);
-				// 		positionWS.z = min(positionCS.z, positionCS.w * 1);
-				// 	#else
-				// 		positionWS.z = max(positionCS.z, positionCS.w * -1);
-				// 	#endif
-				// #else
-				// FLOAT invNdotL = 1.0 - saturate(dot(lightDirection, normalWS));
-				// FLOAT scale = invNdotL * _ShadowBias.y;
-
 				// // normal bias is negative since we want to apply an inset normal offset
 				positionWS = lightDirection * _ShadowBias.xxx + positionWS;
 				// positionWS = normalWS * scale.xxx + positionWS;

@@ -143,12 +143,10 @@ namespace CFEngine
         public List<SceneObject> sceneObjects = new List<SceneObject> ();
 
         private CommandBuffer[] commandBuffer = null;
-
         private CommandBuffer editorCommandBuffer;
         private List<RenderBatch> renderBatches = new List<RenderBatch> ();
 
         private Material[] sceneMats;
-
         private Dictionary<uint, SceneDynamicObject> dynamicObjects;
 
 #endregion
@@ -541,24 +539,6 @@ namespace CFEngine
                         }
                     }
                 }
-            }
-        }
-
-        public void SaveEnvConfig (SceneEnvConfig sec)
-        {
-            if (re != null)
-            {
-                re.SaveEnvConfig (sec);
-            }
-        }
-
-        public void LoadEnvConfig (SceneEnvConfig sec)
-        {
-            SyncLightInfo (roleLight0, ref sec.lighting.roleLightInfo0);
-            SyncLightInfo (roleLight1, ref sec.lighting.roleLightInfo1);
-            if (re != null)
-            {
-                re.LoadEnvConfig (sec);
             }
         }
 

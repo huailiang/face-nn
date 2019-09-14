@@ -80,9 +80,6 @@ namespace CFEngine
         Lut,
         Bloom,
         GodRay,
-        // DofSetup,
-        // DofFlatten0,
-        // DofFlatten1,
     }
 
     public enum DebugDisplayType
@@ -372,7 +369,6 @@ namespace CFEngine
             Prefab,
             StaticPrefab,
             Instance,
-            // ExceptBakeMesh,
             MeshTerrain,
             UnityTerrain,
             Num,
@@ -453,10 +449,8 @@ namespace CFEngine
 
             public void Clone (ShaderFeature src)
             {
-
                 hide = src.hide;
                 readOnly = src.readOnly;
-                // name = src.name;
                 shaderGroupName = src.shaderGroupName;
                 propertyName = src.propertyName;
                 type = src.type;
@@ -577,7 +571,6 @@ namespace CFEngine
         [HideInInspector]
         public bool commonFolder = false;
         public Shader ScenePreview;
-        // public Shader TerrainPreview;
         public Shader TextureBake;
         [HideInInspector]
         public bool texCompressConfigFolder = false;
@@ -589,7 +582,6 @@ namespace CFEngine
             "Default",
             "Base",
             "Pbs",
-            "Scene",
             "Custom",
             "Rim",
             "Skin",
@@ -641,30 +633,9 @@ namespace CFEngine
             name = "BlendTex", shaderGroupName = "Scene", propertyName = "_BlendTex", type = ShaderPropertyType.Tex,
             dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "_SPLAT2", "_SPLAT3", "_SPLAT4" } }
             },
-            new ShaderFeature ()
-            {
-            name = "SplatTex0", shaderGroupName = "Scene", propertyName = "_BaseTex0", type = ShaderPropertyType.Tex,
-            dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "_SPLAT1", "_SPLAT2", "_SPLAT3", "_SPLAT4" } }
-            },
-            new ShaderFeature ()
-            {
-            name = "SplatTex1", shaderGroupName = "Scene", propertyName = "_BaseTex1", type = ShaderPropertyType.Tex,
-            dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "_SPLAT2", "_SPLAT3", "_SPLAT4" } }
-            },
-            new ShaderFeature ()
-            {
-            name = "SplatTex2", shaderGroupName = "Scene", propertyName = "_BaseTex2", type = ShaderPropertyType.Tex,
-            dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "_SPLAT3", "_SPLAT4" } }
-            },
-            new ShaderFeature ()
-            {
-            name = "SplatTex3", shaderGroupName = "Scene", propertyName = "_BaseTex3", type = ShaderPropertyType.Tex,
-            dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "_SPLAT4" } }
-            },
             new ShaderFeature () { name = "UVST", shaderGroupName = "Scene", propertyName = "_uvST", type = ShaderPropertyType.Vector },
             new ShaderFeature () { readOnly = true, name = "AtlasUVST", shaderGroupName = "Scene", propertyName = "_AtlasUVST", type = ShaderPropertyType.Vector },
             new ShaderFeature () { name = "MainColor", shaderGroupName = "Scene", propertyName = "_MainColor", type = ShaderPropertyType.Color },
-
             new ShaderFeature () { name = "Emission", shaderGroupName = "Custom", propertyName = "_EMISSION", type = ShaderPropertyType.Keyword },
             new ShaderFeature ()
             {
@@ -692,9 +663,7 @@ namespace CFEngine
             name = "OverlayColor", shaderGroupName = "Custom", propertyName = "_OverlayColor", type = ShaderPropertyType.Color,
             dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "Overlay" } }
             },
-            // new ShaderFeature () { name = "Rim", shaderGroupName = "Custom", propertyName = "_Rim", type = ShaderPropertyType.Custom },
             new ShaderFeature () { name = "Skin", shaderGroupName = "Custom", propertyName = "_SkinSpecularScatter", type = ShaderPropertyType.Custom },
-
         };
         [HideInInspector]
         public bool shaderInfoFolder = false;
@@ -703,12 +672,8 @@ namespace CFEngine
         [HideInInspector]
         public bool dummyMaterialsFolder = false;
         [HideInInspector]
-        public bool sceneDummyMaterialsFolder = false;
-        [HideInInspector]
         public List<DummyMaterialInfo> sceneDummyMaterials = new List<DummyMaterialInfo> (64);
 
-        [HideInInspector]
-        public bool effectMaterialsFolder = false;
         [HideInInspector]
         public bool roleMatFolder = false;
         [HideInInspector]
@@ -784,10 +749,6 @@ namespace CFEngine
             new ShaderProperty () { shaderProperty = "_EffectTex", isTex = true, shaderID = (int) EShaderKeyID.EffectTex },
             }
             },
-            new MatShaderType () { name = "Grass", matOffset = ESceneMaterial.SceneMassive, hasTransparentCout = true },
-            new MatShaderType () { name = "LavaSat", matOffset = ESceneMaterial.LavaSat },
-            new MatShaderType () { name = "SceneWater", matOffset = ESceneMaterial.SceneWater },
-            new MatShaderType () { name = "IceCave", matOffset = ESceneMaterial.IceCave },
         };
 
         private static AssetsConfig g_AssetsConfig;
@@ -879,9 +840,7 @@ namespace CFEngine
                             }
                             shaderDebugNames = debugTypeStr.ToArray();
                         }
-
                     }
-
                 }
                 catch (Exception)
                 {

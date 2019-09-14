@@ -5,8 +5,6 @@ using CFUtilPoolLib;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-// Singleton used to tracks all existing volumes in the scene
-// TODO: Deal with 2D volumes !
 
 public struct EffectLerpContext
 {
@@ -146,15 +144,9 @@ public sealed class RenderingManager : IRenderManager
 #endif
 
 
-
-#if UNITY_EDITOR
-    public readonly Dictionary<Type, PostProcessAttribute> settingsTypes;
-#endif
-
     RenderingManager()
     {
 #if UNITY_EDITOR
-        settingsTypes = new Dictionary<Type, PostProcessAttribute> ();
         ReloadBaseTypes ();
 #endif
         createRT[(int)ERTType.ESceneRT0] = GetSceneRT0;
@@ -198,9 +190,6 @@ public sealed class RenderingManager : IRenderManager
     }
     void CleanBaseTypes ()
     {
-
-        settingsTypes.Clear ();
-
     }
     // This will be called only once at runtime and everytime script reload kicks-in in the
     // editor as we need to keep track of any compatible post-processing effects in the project

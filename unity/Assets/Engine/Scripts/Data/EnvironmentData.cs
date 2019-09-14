@@ -2,16 +2,14 @@
 using CFUtilPoolLib;
 using UnityEngine;
 using System;
-
 using UnityEngine.Rendering;
 #if UNITY_EDITOR
 using System.IO;
 using UnityEditor;
 #endif
+
 namespace CFEngine
 {
-
-
     public struct EnverinmentContext
     {
         public RenderingEnvironment env;
@@ -67,11 +65,9 @@ namespace CFEngine
         }
         public void Reset()
         {
-
         }
         public void Release()
         {
-
         }
         public static void OnTrigger(bool into)
         {
@@ -108,7 +104,6 @@ namespace CFEngine
                 {
                     lightColorIntensity0 = main ? Vector4.one : new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
                 }
-
                 Shader.SetGlobalVector(colorKey, lightColorIntensity0);
             }
 
@@ -201,7 +196,6 @@ namespace CFEngine
         public Color ambientEquatorColor;
         public Color ambientGroundColor;
         public float AmbientMax = 1.0f;
-
         public string SkyboxMatPath = "";
         private ResHandle SkyBoxMat;
         private Cubemap SkyBox;
@@ -221,11 +215,9 @@ namespace CFEngine
         }
         public void Release()
         {
-
         }
         public static void OnTrigger(bool into)
         {
-
         }
         private void UpdateSkyBox(Material mat)
         {
@@ -340,35 +332,6 @@ namespace CFEngine
             bw.Write(am.SkyboxMatPath);
         }
 #endif
-    }
-
-    [Serializable]
-    public class WeatherModify : IEnverimnentModify, IEnverimnentLerp, ISceneObject
-    {
-
-        public EnverimentModifyType GetEnvType()
-        {
-            return EnverimentModifyType.Weather;
-        }
-        public void Reset()
-        {
-
-        }
-        public void Release()
-        {
-
-        }
-        public static void OnTrigger(bool into)
-        {
-
-        }
-#if UNITY_EDITOR
-        public bool needUpdate { get; set; }
-#endif
-        public void Lerp(ref EnverinmentContext context, float percent, bool into, int state)
-        {
-
-        }
     }
 
     [Serializable]
@@ -584,79 +547,6 @@ namespace CFEngine
 
         }
 #endif
-    }
-
-    [Serializable]
-    public class VolumnLightModify : IEnverimnentModify, IEnverimnentLerp, ISceneObject
-    {
-        public BoolParameter enabled = new BoolParameter { overrideState = true, value = false };
-        public FloatParameter depthThreshold = new FloatParameter { value = 0.8f };
-        public FloatParameter lightFactor = new FloatParameter { value = 1.2f };
-        public FloatParameter lightPowerFactor = new FloatParameter { value = 1.2f };
-        public FloatParameter lightRadius = new FloatParameter { value = 0.25f };
-        public FloatParameter samplerScale = new FloatParameter { value = 90f };
-        public IntParameter blurIteration = new IntParameter { value = 1 };
-        public ColorParameter color = new ColorParameter { value = Color.white };
-
-        public EnverimentModifyType GetEnvType()
-        {
-            return EnverimentModifyType.PPVolumLight;
-        }
-        public void Reset()
-        {
-
-        }
-        public void Release()
-        {
-
-        }
-        public static void OnTrigger(bool into)
-        {
-
-        }
-#if UNITY_EDITOR
-        public bool needUpdate { get; set; }
-#endif
-        public void Lerp(ref EnverinmentContext context, float percent, bool into, int state)
-        {
-
-        }
-    }
-
-    [Serializable]
-    public class VignetteModify : IEnverimnentModify, IEnverimnentLerp, ISceneObject
-    {
-        public BoolParameter enabled = new BoolParameter { overrideState = true, value = false };
-        public ColorParameter color = new ColorParameter { value = new Color(0f, 0f, 0f, 1f) };
-        public Vector2Parameter center = new Vector2Parameter { value = new Vector2(0.5f, 0.5f) };
-        public float intensity = 0;
-        public FloatParameter smoothness = new FloatParameter { value = 0.2f };
-        public FloatParameter roundness = new FloatParameter { value = 1f };
-        public BoolParameter rounded = new BoolParameter { value = false };
-
-        public EnverimentModifyType GetEnvType()
-        {
-            return EnverimentModifyType.PPVignette;
-        }
-        public void Reset()
-        {
-
-        }
-        public void Release()
-        {
-
-        }
-        public static void OnTrigger(bool into)
-        {
-
-        }
-#if UNITY_EDITOR
-        public bool needUpdate { get; set; }
-#endif
-        public void Lerp(ref EnverinmentContext context, float percent, bool into, int state)
-        {
-
-        }
     }
 
     [Serializable]

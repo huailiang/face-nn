@@ -3,7 +3,6 @@
 
 #include "Head.hlsl"
 #include "InterpolantsVSToPS.hlsl"
-#include "Effect.hlsl"
 #include "Instance.hlsl"
 
 struct FMobileShadingVSToPS
@@ -35,7 +34,6 @@ out FMobileShadingVSToPS Output)
 #endif//_TERRAIN_LODCULL
 	
 	FLOAT4 WorldPosition = INSTANCE_WPOS(Input.Position)
-	WorldPosition = VertexEffect(Input,WorldPosition);
 	Output.Position = TransformWorldToClipPos(WorldPosition);
 
 	Output.Interpolants = GetInterpolantsVSToPS(Input, WorldPosition);

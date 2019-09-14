@@ -21,11 +21,7 @@ namespace CFEngine.Editor
         internal SerializedParameter(SerializedProperty property, Attribute[] attributes)
         {
             baseProperty = property.Copy();
-
-            // var localCopy = baseProperty.Copy();
-            // localCopy.Next(true);
             value = baseProperty.Copy();
-
             this.attributes = attributes;
         }
 
@@ -42,7 +38,7 @@ namespace CFEngine.Editor
         public SerializedProperty overrideState { get; private set; }
 
         internal SerializedParameterOverride(SerializedProperty property, Attribute[] attributes)
-            :base()
+            : base()
         {
             baseProperty = property.Copy();
 
@@ -56,7 +52,7 @@ namespace CFEngine.Editor
         }
     }
 
-    
+
     public delegate void ButtonCallback();
 
     public class ResSerializedParameterOverride : SerializedParameterOverride

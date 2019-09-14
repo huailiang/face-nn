@@ -31,9 +31,6 @@ namespace CFEngine.Editor
         private string[] shaderGroupNames = null;
         private bool shaderGroupDirty = true;
         private List<string> shaderFeatures = new List<string>();
-        private List<string> matEnumNames = null;
-        private List<string> matEnumNames3 = null;
-        private List<string> matEnumNames4 = null;
         private AssetsConfig.DummyMaterialInfo genMat = null;
         private bool multiBlend;
 
@@ -45,7 +42,6 @@ namespace CFEngine.Editor
         private Rect groupRect;
         private Rect shaderFeatureRect;
         private Rect dummyMaterialsRect;
-
         private OpType opType = OpType.None;
         private int shaderFeatureCopyIndex = -1;
         private int matInfoCopyIndex = -1;
@@ -581,70 +577,8 @@ namespace CFEngine.Editor
                 {
                     opType = OpType.OpSaveAllSceneMat;
                 }
-                SceneMatGUI(ac);
-                RoleMatGUI(ac);
                 CustomMatGUI(ac);
             }
-        }
-        private void SceneMatGUI(AssetsConfig ac)
-        {
-            EditorGUI.indentLevel++;
-            ac.sceneDummyMaterialsFolder = EditorGUILayout.Foldout(ac.sceneDummyMaterialsFolder, "Scene Materials");
-            if (ac.sceneDummyMaterialsFolder)
-            {
-
-                EditorGUI.indentLevel++;
-                if (GUILayout.Button("GenAll", GUILayout.MaxWidth(80)))
-                {
-                    opType = OpType.OpGenAllSceneMat;
-                }
-                if (GUILayout.Button("RefreshAll", GUILayout.MaxWidth(80)))
-                {
-                    opType = OpType.OpRefreshAllSceneMat;
-                }
-                int matCount = (int)ESceneMaterial.Num;
-                InitMatNames(ac.sceneDummyMaterials, matCount, ref matEnumNames, typeof(ESceneMaterial));
-
-                for (int i = 0; i < matCount; ++i)
-                {
-                    var dummyMaterialInfo = ac.sceneDummyMaterials[i];
-                    SceneDummyMatGUI(dummyMaterialInfo, i, ((ESceneMaterial)dummyMaterialInfo.enumIndex).ToString());
-                }
-                EditorGUI.indentLevel--;
-            }
-            EditorGUI.indentLevel--;
-        }
-
-        private void RoleMatGUI(AssetsConfig ac)
-        {
-            EditorGUI.indentLevel++;
-            ac.effectMaterialsFolder = EditorGUILayout.Foldout(ac.effectMaterialsFolder, "Effects Materials");
-            if (ac.effectMaterialsFolder)
-            {
-                ac.roleMatFolder = EditorGUILayout.Foldout(ac.roleMatFolder, "Role Materials");
-                if (ac.roleMatFolder)
-                {
-                    int matCount = (int)ECharMaterial.Num;
-                    InitMatNames(ac.roleMaterials, matCount, ref matEnumNames3, typeof(ECharMaterial));
-                    for (int i = 0; i < matCount; ++i)
-                    {
-                        var dummyMaterialInfo = ac.roleMaterials[i];
-                        RoleDummyMatGUI(dummyMaterialInfo, i, ((ECharMaterial)dummyMaterialInfo.enumIndex).ToString(), true);
-                    }
-                }
-                ac.specialMatFolder = EditorGUILayout.Foldout(ac.specialMatFolder, "Special Materials");
-                if (ac.specialMatFolder)
-                {
-                    int matCount = (int)EEffectMaterial.Num;
-                    InitMatNames(ac.effectMaterials, matCount, ref matEnumNames4, typeof(EEffectMaterial));
-                    for (int i = 0; i < matCount; ++i)
-                    {
-                        var dummyMaterialInfo = ac.effectMaterials[i];
-                        RoleDummyMatGUI(dummyMaterialInfo, i, ((EEffectMaterial)dummyMaterialInfo.enumIndex).ToString(), false);
-                    }
-                }
-            }
-            EditorGUI.indentLevel--;
         }
         private void CustomMatGUI(AssetsConfig ac)
         {
@@ -869,7 +803,6 @@ namespace CFEngine.Editor
             }
         }
         private void ShaderFeatureInfoGUI(AssetsConfig.ShaderInfo si, AssetsConfig.ShaderFeature sf, ref bool featureDirty)
-
         {
             bool hasFeature = si.shaderFeatures.Exists((x) => { return sf.name == x; });
             bool newHasFeature = GUILayout.Toggle(hasFeature, sf.name, GUILayout.MaxWidth(160));

@@ -1,8 +1,6 @@
 #ifndef PBS_INSTANCE_INCLUDE
 #define PBS_INSTANCE_INCLUDE 
 
-// #include "Head.hlsl"
-
 
 #define SUPPORT_COMPUTERBUFFER (SHADER_TARGET>= 45)
 

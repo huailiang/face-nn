@@ -6,18 +6,6 @@ namespace CFEngine
 {
 
     [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public sealed class PostProcessAttribute : Attribute
-    {
-        public readonly string menuItem;
-        public readonly bool isVirtualEffect;
-        internal PostProcessAttribute(Type renderer, string menuItem, bool isVirtualEffect = false)
-        {
-            this.menuItem = menuItem;
-            this.isVirtualEffect = isVirtualEffect;
-        }
-    }
-    [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public sealed class CFDisplayNameAttribute : Attribute
     {
@@ -86,30 +74,7 @@ namespace CFEngine
         }
     }
 
-    [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class CFTooltipAttribute : PropertyAttribute
-    {
-        //
-        // ժҪ:
-        //     ///
-        //     The tooltip text.
-        //     ///
-        public readonly string tooltip;
-        //
-        // ժҪ:
-        //     ///
-        //     Specify a tooltip for a field.
-        //     ///
-        //
-        // ����:
-        //   tooltip:
-        //     The tooltip text.
-        public CFTooltipAttribute(string tooltip)
-        {
-            this.tooltip = tooltip;
-        }
-    }
+
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
@@ -118,17 +83,6 @@ namespace CFEngine
         public readonly float min;
         public readonly float max;
 
-        //
-        //     ///
-        //     Attribute used to make a float or int variable in a script be restricted to a
-        //     specific range.
-        //     ///
-        //
-        //   min:
-        //     The minimum allowed value.
-        //
-        //   max:
-        //     The maximum allowed value.
         public CFRangeAttribute(float min, float max)
         {
             this.min = min;
@@ -159,50 +113,33 @@ namespace CFEngine
     public sealed class CFColorUsageAttribute : PropertyAttribute
     {
         //
-        // ժҪ:
-        //     ///
         //     If false then the alpha bar is hidden in the ColorField and the alpha value is
         //     not shown in the Color Picker.
         //     ///
         public readonly bool showAlpha;
         //
-        // ժҪ:
-        //     ///
         //     If set to true the Color is treated as a HDR color.
         //     ///
         public readonly bool hdr;
         //
-        // ժҪ:
-        //     ///
         //     Minimum allowed HDR color component value when using the Color Picker.
         //     ///
         public readonly float minBrightness;
         //
-        // ժҪ:
-        //     ///
         //     Maximum allowed HDR color component value when using the HDR Color Picker.
         //     ///
         public readonly float maxBrightness;
         //
-        // ժҪ:
-        //     ///
         //     Minimum exposure value allowed in the HDR Color Picker.
         //     ///
         public readonly float minExposureValue;
         //
-        // ժҪ:
-        //     ///
         //     Maximum exposure value allowed in the HDR Color Picker.
         //     ///
         public readonly float maxExposureValue;
 
         //
-        // ժҪ:
-        //     ///
         //     Attribute for Color fields. Used for configuring the GUI for the color.
-        //     ///
-        //
-        // ����:
         //   showAlpha:
         //     If false then the alpha channel info is hidden both in the ColorField and in
         //     the Color Picker.

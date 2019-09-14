@@ -38,13 +38,7 @@ namespace CFEngine
             }
         }
 #endif
-        // public static RenderTargetIdentifier invalidRenderTargetIdentifier
-        // {
-        //     get
-        //     {
-        //         return new RenderTargetIdentifier (-1);
-        //     }
-        // }
+
         #endregion
 
         #region Rendering

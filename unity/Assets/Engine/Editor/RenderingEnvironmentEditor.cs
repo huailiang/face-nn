@@ -23,7 +23,6 @@ namespace CFEngine.Editor
         private SerializedParameter lightmapShadowMask;
         private SerializedParameter shadowIntensity;
         private SerializedProperty fogEnable;
-        private SerializedProperty isBigWorld;
         private SerializedProperty isStreamLoad;
 
 
@@ -49,7 +48,6 @@ namespace CFEngine.Editor
             lightmapShadowMask = FindParameter(x => x.lightmapShadowMask);
             shadowIntensity = FindParameter(x => x.shadowIntensity);
             fogEnable = FindProperty(x => x.fogEnable);
-            isBigWorld = FindProperty(x => x.sceneData.isBigWorld);
             isStreamLoad = FindProperty(x => x.sceneData.isStreamLoad);
         }
 
@@ -109,10 +107,6 @@ namespace CFEngine.Editor
 
                 ToolsUtility.EndFolderGroup();
             }
-
-            // EditorGUILayout.LabelField ("CameraPointLight", EditorStyles.boldLabel);
-            // EditorGUILayout.PropertyField (cameraLightAtten);
-            // EditorGUILayout.PropertyField (cameraLightSqDistance);
 
             if (ToolsUtility.BeginFolderGroup("Fog", ref env.fogFolder))
             {
@@ -178,7 +172,6 @@ namespace CFEngine.Editor
                 ToolsUtility.EndFolderGroup();
             }
 
-            EditorGUILayout.Toggle("Is Big World", isBigWorld.boolValue);
             EditorGUILayout.Toggle("Is Stream Load", isStreamLoad.boolValue);
             if (GUILayout.Button("Sync Game Camera"))
             {
