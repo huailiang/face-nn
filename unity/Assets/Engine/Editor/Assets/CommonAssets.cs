@@ -171,7 +171,6 @@ namespace CFEngine.Editor
             public AssetLoadCallback(string ext, string ext1) : base(ext, ext1) { }
             public virtual void PreProcess(string path)
             {
-
             }
             public virtual bool Process(UnityEngine.Object asset, string path)
             {
@@ -191,13 +190,6 @@ namespace CFEngine.Editor
 
         internal static AssetLoadCallback<GameObject, ModelImporter> enumFbx = new AssetLoadCallback<GameObject, ModelImporter>("*.fbx");
         internal static AssetLoadCallback<Texture2D, TextureImporter> enumTex2D = new AssetLoadCallback<Texture2D, TextureImporter>("*.png", "*.tga", "*.exr");
-
-        internal delegate void EnumPrefabCallback<GameObject>(GameObject prefab, string path);
-        internal delegate void EnumTxtCallback<TextAsset>(TextAsset txt, string path);
-        internal delegate void EnumMaterialCallback<Material>(Material mat, string path);
-        internal delegate void EnumMeshCallback<Mesh>(Mesh mesh, string path);
-        internal delegate void EnumAnimationCallback<AnimationClip>(AnimationClip animClip, string path);
-        internal delegate void EnumBytesCallback<TextAsset>(TextAsset bytes, string path);
 
         internal static AssetLoadCallback<GameObject> enumPrefab = new AssetLoadCallback<GameObject>("*.prefab");
         internal static AssetLoadCallback<TextAsset> enumTxt = new AssetLoadCallback<TextAsset>("*.bytes", "*.txt");
@@ -331,10 +323,6 @@ namespace CFEngine.Editor
                     {
                         EditorUtility.SetDirty(existingAsset);
                     }
-                    // else
-                    // {
-
-                    // }
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh();
                 }
@@ -466,26 +454,5 @@ namespace CFEngine.Editor
             return deltaX == 0 && deltaY == 0 && deltaZ == 0 && deltaW == 0;
         }
 
-
-
-        [MenuItem("Assets/Tool/Config/Assets_Create")]
-        static void CreateConfig()
-        {
-            AssetsConfig ac = ScriptableObject.CreateInstance<AssetsConfig>();
-            CreateAsset<AssetsConfig>("Assets/Editor/EditorResources", "AssetsConfig", ".asset", ac);
-        }
-
-        [MenuItem("Assets/Tool/Config/Script_SetAsEditor")]
-        static void ScriptSetAsEditor()
-        {
-            AssetsConfig ac = ScriptableObject.CreateInstance<AssetsConfig>();
-            CreateAsset<AssetsConfig>("Assets/Editor/EditorResources", "AssetsConfig", ".asset", ac);
-        }
-
-        [MenuItem("Assets/Tool/Test")]
-        public static void Test()
-        {
-
-        }
     }
 }

@@ -233,7 +233,7 @@ namespace CFEngine.Editor
 
         internal static List<ShaderValue> shaderValue = new List<ShaderValue>();
 
-        [MenuItem("Assets/Tool/Material_Clear")]
+        [MenuItem("Assets/Engine/Material_Clear")]
         static void ClearMat()
         {
             CommonAssets.enumMat.cb = (mat, path) =>

@@ -34,7 +34,6 @@ namespace CFEngine.Editor
         private AssetsConfig.DummyMaterialInfo genMat = null;
         private bool multiBlend;
 
-        // private SerializedProperty shaderInfo;
         private int dragType = -1;
         private string dragName = "";
         private int dragIndex = -1;
@@ -74,7 +73,6 @@ namespace CFEngine.Editor
                     fi.Name == "TextureFolders")
                 {
                     //custom editor
-                    // shaderInfo = serializedObject.FindProperty (fi.Name);
                 }
                 else if (fi.FieldType == typeof(System.Array))
                 {

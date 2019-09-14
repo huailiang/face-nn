@@ -6,31 +6,6 @@ using UnityEditor;
 using UnityEngine;
 namespace CFEngine.Editor
 {
-    public abstract class CommonToolTemplate : ScriptableObject
-    {
-        public virtual void OnInit()
-        {
-        }
-        public virtual void OnUninit()
-        {
-        }
-
-        public virtual void DrawGUI()
-        {
-        }
-        public virtual void DrawSceneGUI()
-        {
-
-        }
-        public virtual void DrawGizmos()
-        {
-
-        }
-        public virtual void Update()
-        {
-
-        }
-    }
 
     public class ToolsUtility
     {
@@ -155,7 +130,6 @@ namespace CFEngine.Editor
                 {
                     gridContext.doubleClick = e.clickCount == 2;
                     bool leftMouse = e.button == 0;
-                    // bool rightMouse = e.button == 1;
 
                     if (gridContext.innerRect.Contains(e.mousePosition))
                     {

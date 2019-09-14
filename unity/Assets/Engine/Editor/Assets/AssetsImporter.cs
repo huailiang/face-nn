@@ -17,7 +17,6 @@ namespace CFEngine.Editor
                     modelImporter.isReadable = false;
                 modelImporter.importCameras = false;
                 modelImporter.importLights = false;
-
                 modelImporter.meshCompression = ModelImporterMeshCompression.Low;
             }
         }
@@ -32,7 +31,6 @@ namespace CFEngine.Editor
                     {
                         MeshAssets.MakeMakeReadable(assetPath);
                     }
-
                 }
             }
         }

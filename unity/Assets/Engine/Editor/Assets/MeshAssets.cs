@@ -101,7 +101,6 @@ namespace CFEngine.Editor
         }
         public static void RecalculateNormals(Vector3[] vertices, int[] triangles, Vector3[] normal)
         {
-            //GetSmoothSeamLookup
             List<List<int>> smooth = null;
 
             if (normal != null)

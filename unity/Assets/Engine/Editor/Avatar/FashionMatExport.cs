@@ -20,7 +20,7 @@ namespace XEditor
         const string face_shader = "Custom/PBS/Skin";
 
 
-        [MenuItem(@"Assets/Fashion/Fbx_CreateMaterial")]
+        [MenuItem(@"Assets/Engine/Fbx_CreateMaterial")]
 
         private static void Player_CreateMaterial()
         {
@@ -62,7 +62,7 @@ namespace XEditor
         }
 
 
-        [MenuItem(@"Assets/Fashion/Fbx_AssignMaterial")]
+        [MenuItem(@"Assets/Engine/Fbx_AssignMaterial")]
         private static void Player_AssignMaterial()
         {
             CommonAssets.enumFbx.cb = (fbx, modelImporter, path) =>

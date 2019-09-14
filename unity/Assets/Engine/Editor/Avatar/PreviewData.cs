@@ -102,7 +102,7 @@ namespace XEditor
                 str1 = str1.Substring(0, str1.LastIndexOf("/"));
                 string fuji = str1.Substring(str1.LastIndexOf("/") + 1);
                 houzui = houzui.Replace(".asset", "");
-                if(houzui.Contains("weapon"))
+                if (houzui.Contains("weapon"))
                 {
                     string str2 = houzui.Substring(houzui.LastIndexOf('_') + 1);
                     string str3 = houzui.Substring(0, houzui.LastIndexOf('_'));
@@ -134,9 +134,6 @@ namespace XEditor
                 string name = path.Substring(start, len);
 
                 dict.Add(name, fbxPath);
-                //Debug.Log(path);
-                //Debug.Log(fbxPath);
-                //Debug.Log(name);
             }
             return dict;
         }

@@ -9,18 +9,11 @@ namespace CFEngine.Editor
 {
     internal class FBXAssets
     {
-        public delegate void MeshAutoExport(string path, ModelImporter modelImporter);
-        public static bool export = false;
         public static bool removeUV2 = false;
         public static bool removeColor = false;
         public static bool isNotReadable = true;
 
-        public static MeshAutoExport[] modelAutoExportFun = new MeshAutoExport[]
-        {
-        SceneMeshExport,
-        };
-
-        [MenuItem(@"Assets/Tool/Fbx_CreateMaterial")]
+        [MenuItem(@"Assets/Engine/Fbx_CreateMaterial")]
         private static void Fbx_CreateMaterial()
         {
             CommonAssets.enumFbx.cb = (fbx, modelImporter, path) =>
@@ -59,7 +52,7 @@ namespace CFEngine.Editor
 
         }
 
-        [MenuItem(@"Assets/Tool/Fbx_AssignMaterial")]
+        [MenuItem(@"Assets/Engine/Fbx_AssignMaterial")]
         private static void Fbx_AssignMaterial()
         {
             CommonAssets.enumFbx.cb = (fbx, modelImporter, path) =>
@@ -104,7 +97,7 @@ namespace CFEngine.Editor
 
         }
 
-        [MenuItem("Assets/Tool/Fbx_ExportAnim")]
+        [MenuItem("Assets/Engine/Fbx_ExportAnim")]
         static void Fbx_ExportAnim()
         {
             CommonAssets.enumFbx.cb = (fbx, modelImporter, path) =>
@@ -134,13 +127,7 @@ namespace CFEngine.Editor
                         AnimationClip oClip = o as AnimationClip;
 
                         if (oClip == null || oClip.name.StartsWith("__preview__Take 001")) continue;
-
-                        //if(oClip.name != name) continue;
                         string copyPath = targetPath + "/" + oClip.name + ".anim";
-                        //string staticPath = targetPath + "/" + oClip.name + ".anim";
-                        //if (File.Exists(staticPath))
-                        //    copyPath = staticPath;
-
                         AnimationClip newClip = new AnimationClip();
 
                         EditorUtility.CopySerializedIfDifferent(oClip, newClip);
@@ -152,10 +139,9 @@ namespace CFEngine.Editor
                 return false;
             };
             CommonAssets.EnumAsset<GameObject>(CommonAssets.enumFbx, "ExportAnim");
-
         }
 
-        [MenuItem(@"Assets/Tool/Fbx_ReduceKeyFrame")]
+        [MenuItem(@"Assets/Engine/Fbx_ReduceKeyFrame")]
         private static void ReduceKeyFrame()
         {
             CommonAssets.enumAnimationClip.cb = (animClip, path) =>
@@ -163,7 +149,6 @@ namespace CFEngine.Editor
                 string errorLog = "";
                 int reduceCurveCount = 0;
                 bool isMount = path.Contains("_Mount_");
-                //List<int> removeIndex = ListPool<int>.Get();
                 List<int> removeIndex = new List<int>();
                 EditorCurveBinding[] curveBinding = AnimationUtility.GetCurveBindings(animClip);
                 for (int i = 0; i < curveBinding.Length; ++i)
@@ -259,7 +244,6 @@ namespace CFEngine.Editor
                 {
                     Debug.LogWarning(string.Format("{0} reduceCurveCount/total:{1}/{2}\r\n{3}", path, reduceCurveCount, curveBinding.Length, errorLog));
                 }
-                //ListPool<int>.Release(removeIndex);
             };
             CommonAssets.EnumAsset<AnimationClip>(CommonAssets.enumAnimationClip, "ReduceKeyFrame");
         }
@@ -357,7 +341,7 @@ namespace CFEngine.Editor
 
 
 
-        [MenuItem(@"Assets/Tool/Fbx_ExportAvatar")]
+        [MenuItem(@"Assets/Engine/Fbx_ExportAvatar")]
         private static void Fbx_ExportAvatar()
         {
             CommonAssets.enumFbx.cb = (fbx, modelImporter, path) =>
@@ -406,8 +390,6 @@ namespace CFEngine.Editor
                                 so.ApplyModifiedPropertiesWithoutUndo();
                                 ApplyModfy(path);
                             }
-
-
 
                         }
 
@@ -490,65 +472,6 @@ namespace CFEngine.Editor
             };
             CommonAssets.EnumAsset<GameObject>(CommonAssets.enumFbx, "BindAnimation", dir);
         }
-        // [MenuItem(@"Assets/Tool/Fbx_BindAvatar")]
-        // private static void Fbx_BindAvatar()
-        // {
-        //     CommonAssets.enumFbx.cb = (fbx, modelImporter, path) =>
-        //     {
-        //         SerializedObject so = new SerializedObject(modelImporter);
-        //         SerializedProperty sp = CommonAssets.GetSerializeProperty(so,"m_AnimationType");
-        //         sp.intValue = (int)ModelImporterAnimationType.Human;
-        //         sp = CommonAssets.GetSerializeProperty(so,"m_CopyAvatar");
-        //         sp.boolValue = true;
-        //         sp = CommonAssets.GetSerializeProperty(so, "m_LastHumanDescriptionAvatarSource");
-        //         string avatarPath = string.Format("{0}/Avatar/Player_female_bandposeAvatar.asset", AssetsConfig.GlobalAssetsConfig.Creature_Path);
-        //         sp.objectReferenceValue = AssetDatabase.LoadAssetAtPath<Avatar>(avatarPath);
-        //         so.ApplyModifiedPropertiesWithoutUndo();
-        //         ApplyModfy(path);
-        //         return false;
-        //     };
-        //     CommonAssets.EnumAsset<GameObject>(CommonAssets.enumFbx, "BindAvatar");
-        // }
-
-        // [MenuItem(@"Assets/Tool/Fbx_BindAnimation")]
-        // private static void Fbx_BindAnimation()
-        // {
-        //     CommonAssets.enumFbx.cb = (fbx, modelImporter, path) =>
-        //     {
-        //         SerializedObject so = new SerializedObject(modelImporter);
-        //         SerializedProperty sp = CommonAssets.GetSerializeProperty(so, "m_ClipAnimations");
-        //         if (sp.arraySize == 1)
-        //         {
-        //             SerializedProperty clipSp = sp.GetArrayElementAtIndex(0);
-        //             var subsp = clipSp.FindPropertyRelative("name");
-        //             subsp.stringValue = fbx.name;
-        //             subsp = clipSp.FindPropertyRelative("loopBlendOrientation");
-        //             subsp.boolValue = true;
-        //             subsp = clipSp.FindPropertyRelative("loopBlendPositionY");
-        //             subsp.boolValue = true;
-        //             subsp = clipSp.FindPropertyRelative("loopBlendPositionXZ");
-        //             subsp.boolValue = true;
-        //             subsp = clipSp.FindPropertyRelative("keepOriginalOrientation");
-        //             subsp.boolValue = true;
-        //             subsp = clipSp.FindPropertyRelative("keepOriginalPositionY");
-        //             subsp.boolValue = true;
-        //             subsp = clipSp.FindPropertyRelative("keepOriginalPositionXZ");
-        //             subsp.boolValue = true;
-        //             subsp = clipSp.FindPropertyRelative("heightFromFeet");
-        //             subsp.boolValue = false;
-        //             subsp = clipSp.FindPropertyRelative("maskType");
-        //             subsp.intValue = 1;
-        //             subsp = clipSp.FindPropertyRelative("maskSource");
-        //             string avatarMaskPath = string.Format("{0}/Avatar/Player_female_bandposeAvatar.asset", AssetsConfig.GlobalAssetsConfig.Creature_Path);
-        //             subsp.objectReferenceValue = AssetDatabase.LoadAssetAtPath<AvatarMask>(avatarMaskPath);
-        //             so.ApplyModifiedPropertiesWithoutUndo();
-        //             ApplyModfy(path);
-
-        //         }
-        //         return true;
-        //     };
-        //     CommonAssets.EnumAsset<GameObject>(CommonAssets.enumFbx, "BindAnimation");
-        // }
 
     }
 }

@@ -20,7 +20,7 @@ namespace XEditor
         private string prefix = @"Assets/BundleRes/UI/UISource/ui_faceicon/";
         int swap = 0;
 
-        [MenuItem("Assets/Fashion/FaceData_Create")]
+        [MenuItem("Assets/Engine/FaceData_Create")]
         static void CreateFaceData()
         {
             string path = "Assets/BundleRes/Config/FaceData.asset";
@@ -84,7 +84,7 @@ namespace XEditor
             }
             serializedObject.ApplyModifiedProperties();
         }
-        
+
         private void GUIFacePart<T>(string title, int idx, ref T[] t) where T : FaceBaseData, new()
         {
             folder[idx] = EditorGUILayout.Foldout(folder[idx], title, XEditorUtil.folderStyle);
@@ -138,7 +138,7 @@ namespace XEditor
                             GUIFaceBase(t[i], indx, i);
                             EditorGUILayout.BeginHorizontal();
                             GUILayout.FlexibleSpace();
-                            if (GUILayout.Button("insert",GUILayout.Width(100), GUILayout.Height(14)))
+                            if (GUILayout.Button("insert", GUILayout.Width(100), GUILayout.Height(14)))
                             {
                                 if (swap < t.Length && i != swap)
                                 {
@@ -184,7 +184,7 @@ namespace XEditor
             {
                 EditorGUILayout.HelpBox("name can not be null", MessageType.Warning);
             }
-            
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("icon");
             GUILayout.FlexibleSpace();
