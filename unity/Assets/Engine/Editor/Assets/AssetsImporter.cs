@@ -1,5 +1,7 @@
 ﻿using UnityEditor;
 using CFEngine;
+using UnityEngine;
+
 
 namespace CFEngine.Editor
 {
@@ -18,32 +20,6 @@ namespace CFEngine.Editor
 
                 modelImporter.meshCompression = ModelImporterMeshCompression.Low;
             }
-            for (int i = 0; i < AssetsConfig.GlobalAssetsConfig.MehsAutoExportType.Length; ++i)
-            {
-                string type = AssetsConfig.GlobalAssetsConfig.MehsAutoExportType[i];
-                if (assetPath.StartsWith(type) && i < FBXAssets.modelAutoExportFun.Length)
-                {
-                    FBXAssets.MeshAutoExport fun = FBXAssets.modelAutoExportFun[i];
-                    if (fun != null)
-                    {
-                        fun(assetPath, assetImporter as ModelImporter);
-                    }
-                }
-            }
-
-        }
-
-        public void OnPreprocessTexture()
-        {
-            if (!assetPath.ToLower().Contains("/test"))
-            {
-                if (!skipAutoImport)
-                {
-                    TextureImporter textureImporter = assetImporter as TextureImporter;
-                    //creatures
-                    TextureAssets.SetTextureConfig(assetPath, textureImporter);
-                }
-            }
         }
 
         public void OnPreprocessAsset()
@@ -52,11 +28,7 @@ namespace CFEngine.Editor
             {
                 if (!skipAutoImport)
                 {
-                    if (assetPath.EndsWith(AssetsConfig.GlobalAssetsConfig.SpriteAtlasExt))
-                    {
-                        TextureAssets.SetSpriteAtlasConfig(assetPath);
-                    }
-                    else if (assetPath.EndsWith(AssetsConfig.GlobalAssetsConfig.ReadableMeshSuffix))
+                    if (assetPath.EndsWith(AssetsConfig.GlobalAssetsConfig.ReadableMeshSuffix))
                     {
                         MeshAssets.MakeMakeReadable(assetPath);
                     }

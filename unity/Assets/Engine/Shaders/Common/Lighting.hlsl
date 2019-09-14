@@ -1,4 +1,3 @@
-// Copyright 2018- PWRD, Inc. All Rights Reserved.
 #ifndef PBS_LIGHTING_INCLUDE
 #define PBS_LIGHTING_INCLUDE
 
@@ -6,10 +5,6 @@
 #include "SH.hlsl"
 #include "DebugHead.hlsl"
 #include "AddLighting.hlsl"
-#include "TerrainWater.hlsl"
-
-
-
 
 
 //x light intensity y ambientScale
@@ -26,30 +21,12 @@ TEXTURE2D_SAMPLER2D(_LookupDiffuseSpec);
 // FLOAT4 _CameraPointLight;
 FLOAT4 glstate_lightmodel_ambient;
 
-// #if defined(_PBS_FROM_PARAM)&&(defined(LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON))
-// #define _SIMPLE_LIGHTING
-// #endif
 
 
 FLOAT3 GetAmbient(FFragData FragData, FMaterialData MaterialData)
 {
 	//return glstate_lightmodel_ambient.xyz *2*_AmbientParam.x;
 	return ShadeSHPerPixel(MaterialData.WorldNormal, FragData.Ambient, FragData.WorldPosition)*_AmbientParam.x;
-	// #if defined(_DOUBLE_LIGHTS) ||defined (LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON)
-	// 	IndirectDiffuseLighting = ShadeSHPerPixel(MaterialData.WorldNormal, FragData.Ambient, FragData.WorldPosition)*_AmbientParam.x;
-	// #else
-	// 	#if !defined(LIGHTMAP_ON)&&!defined(_CUSTOM_LIGHTMAP_ON)
-	// 		IndirectDiffuseLighting = ShadeSHPerPixel(MaterialData.WorldNormal, FragData.Ambient, FragData.WorldPosition);
-	// 		#ifndef _STATIC_LIGHT
-	// 			Float ambientAdd = _AmbientParam.y * smoothstep(-0.9, _AmbientParam.x*2, -FixNdotL);
-	// 			//Float ambientAdd = lerp(_AmbientParam.y,_AmbientParam.x,FixNdotL);
-	// 			IndirectDiffuseLighting *= ambientAdd;
-	// 		#endif//_STATIC_LIGHT
-	// 	#endif
-	// #endif
-
-
-	// return IndirectDiffuseLighting;
 }
 
 
@@ -177,71 +154,7 @@ FLOAT CalcSpecular_SSS(FLOAT Roughness, FLOAT NoH, FLOAT3 H, FLOAT3 N)
 #endif
 
 #ifndef _FULL_SSS
-//FLOAT PhongApprox(FLOAT Roughness, FLOAT RdotL)
-//{
-//	FLOAT a = Roughness * Roughness;			// 1 mul
-//											//!! Ronin Hack?
-//	a = max(a, 0.008);						// avoid underflow in FP16, next sqr should be bigger than 6.1e-5
-//	FLOAT a2 = a * a;						// 1 mul
-//	FLOAT rcp_a2 = rcp(a2);					// 1 rcp
-//											//half rcp_a2 = exp2( -6.88886882 * Roughness + 6.88886882 );
-//
-//											// Spherical Gaussian approximation: pow( x, n ) ~= exp( (n + 0.775) * (x - 1) )
-//											// Phong: n = 0.5 / a2 - 0.5
-//											// 0.5 / ln(2), 0.275 / ln(2)
-//	FLOAT c = 0.72134752 * rcp_a2 + 0.39674113;	// 1 mad
-//	FLOAT p = rcp_a2 * exp2(c * RdotL - c);		// 2 mad, 1 exp2, 1 mul
-//												// Total 7 instr
-//	return min(p, rcp_a2);						// Avoid overflow/underflow on Mali GPUs
-//}
 
-
-// FLOAT EnergyNormalization( inout FLOAT a2, FLOAT VoH)
-// {
-// 	// if( AreaLight.SphereSinAlphaSoft > 0 )
-// 	// {
-// 	// 	// Modify Roughness
-// 	// 	a2 = saturate( a2 + Pow2( AreaLight.SphereSinAlphaSoft ) / ( VoH * 3.6 + 0.4 ) );
-// 	// }
-
-// 	FLOAT Sphere_a2 = a2;
-// 	FLOAT Energy = 1;
-// 	// if( AreaLight.SphereSinAlpha > 0 )
-// 	// {
-// 	// 	Sphere_a2 = New_a2( a2, AreaLight.SphereSinAlpha, VoH );
-// 	// 	Energy = a2 / Sphere_a2;
-// 	// }
-
-// 	if( AreaLight.LineCosSubtended < 1 )
-// 	{
-// #if 1
-// 		float LineCosTwoAlpha = AreaLight.LineCosSubtended;
-// 		float LineTanAlpha = sqrt( ( 1.0001 - LineCosTwoAlpha ) / ( 1 + LineCosTwoAlpha ) );
-// 		float Line_a2 = New_a2( Sphere_a2, LineTanAlpha, VoH );
-// 		Energy *= sqrt( Sphere_a2 / Line_a2 );
-// #else
-// 		float LineCosTwoAlpha = AreaLight.LineCosSubtended;
-// 		float LineSinAlpha = sqrt( 0.5 - 0.5 * LineCosTwoAlpha );
-// 		float Line_a2 = New_a2( Sphere_a2, LineSinAlpha, VoH );
-// 		Energy *= Sphere_a2 / Line_a2;
-// #endif
-// 	}
-
-// 	return Energy;
-// }
-
-// FLOAT3 SpecularGGX( FLOAT Roughness, FLOAT3 SpecularColor, FLightingData LightingData )
-// {
-// 	FLOAT a2 = Pow4( Roughness );
-// 	// FLOAT Energy = EnergyNormalization( a2, Context.VoH, AreaLight );
-	
-// 	// Generalized microfacet specular
-// 	FLOAT D = D_GGX( a2, LightingData.NdotH );
-// 	FLOAT Vis = Vis_SmithJointApprox( a2, LightingData.NdotC, LightingData.NdotL );
-// 	FLOAT3 F = F_Schlick( SpecularColor, LightingData.VdotH );
-
-// 	return (D * Vis) * F;
-// }
 
 #if defined(LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON)
 TEXTURE2D_SAMPLER2D(unity_Lightmap);
@@ -263,26 +176,6 @@ inline FLOAT3 DecodeLightmap(FLOAT4 color)
 }
 #endif
 
-// FLOAT3 GetGIMask(FLightingData LightingData)
-// {
-// 	#if defined(LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON)
-// 		return LightingData.gi.w;
-// 	#else
-// 		return 1;
-// 	#endif
-// }
-
-// FLOAT3 GetGI(FLightingData LightingData)
-// {
-// 	#if defined(LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON)
-// 		return LightingData.gi*LightingData.DiffuseColor;//*LightingData.lighting0;
-// 	#else
-// 		return 0;
-// 	#endif
-// }
-
-#include "TreeLighting.hlsl"
-#include "WaterLighting.hlsl"
 
 //Lighting Model Type
 void ShadingMode(FFragData FragData, FMaterialData MaterialData, FLightingData LightingData,inout FLOAT3 DirectDiffuse,inout FLOAT3 DirectSpecular DEBUG_PBS_ARGS)
@@ -320,16 +213,7 @@ void ShadingMode(FFragData FragData, FMaterialData MaterialData, FLightingData L
 					FLOAT specPoint = CalcSpecular(a,CLightNoH, CLightH, MaterialData.WorldNormal,param);
 					DirectSpecular = LightingData.SpecularColor * max(spec0 * LightingData.lighting0*LightingData.gi.w + spec1 * LightingData.lighting1,specPoint*LightingData.NdotC*0.5);
 				#endif//_SCENE_EFFECT
-				
-				// 地形上的水 //
-				#if defined(_TERRAIN_WATER)
-				{
-					TerrainWaterLighting(FragData, MaterialData, DirectDiffuse, DirectSpecular);
-				}
-				#endif
 
-
-					//DirectSpecular = min(5, DirectSpecular);
 				#endif//!_NO_DEFAULT_SPEC
 			#else//!_DOUBLE_LIGHTS
 					FLOAT3 diffuseTerm = Diffuse_Burley( LightingData.DiffuseColor,MaterialData.Roughness,LightingData.NdotC,LightingData.FixNdotL,LightingData.VdotH);
@@ -338,18 +222,12 @@ void ShadingMode(FFragData FragData, FMaterialData MaterialData, FLightingData L
 					DirectDiffuse += LightingData.gi.xyz;
 				#ifndef _NO_DEFAULT_SPEC
 					DirectSpecular = LightingData.SpecularColor * CalcSpecular(MaterialData.Roughness, LightingData.NdotH, LightingData.H, MaterialData.WorldNormal)*LightingData.lighting0*LightingData.gi.w;
-					//DirectSpecular = min(5, DirectSpecular);
 				#endif
 			#endif//_DOUBLE_LIGHTS
 		#endif//_SIMPLE_LIGHTING		
 	#elif defined(_GRASS_LIGHT)
 		DirectDiffuse = LightingData.Shadow * LightingData.DiffuseColor * LightingData.lighting0*LightingData.gi.w;
-		// DirectDiffuse += LightingData.Shadow * LightingData.gi * LightingData.DiffuseColor;
 		DirectDiffuse.rgb = lerp(DirectDiffuse.rgb, 0, (1.0 - FragData.GrassOcc) * _Occ_Scale);
-	#elif defined(_WATER_LIGHT)
-		WaterShadingMode(FragData,MaterialData,LightingData,DirectDiffuse,DirectSpecular DEBUG_PBS_PARAM);
-	#elif defined(_TREE_LIGHT_)
-		TreeShadingMode(FragData,MaterialData,LightingData,DirectDiffuse,DirectSpecular DEBUG_PBS_PARAM);
 	#elif defined(_CUSTOM_LIGHT_)
 		CustomShadingMode(FragData,MaterialData,LightingData,DirectDiffuse,DirectSpecular DEBUG_PBS_PARAM);
 	#endif	

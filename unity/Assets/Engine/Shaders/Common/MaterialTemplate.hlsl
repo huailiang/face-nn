@@ -1,11 +1,8 @@
-// Copyright 2018- PWRD, Inc. All Rights Reserved.
-
 /**
 * MaterialTemplate.hlsl: Filled in by user defined function for each material being compiled.
 */
 #include "PCH.hlsl" 
 #include "../Noise.hlsl"
-#include "TerrainWater.hlsl"
 
 #ifndef PBS_MATERIALTEMPLATE_INCLUDE
 #define PBS_MATERIALTEMPLATE_INCLUDE
@@ -184,7 +181,6 @@ inline FLOAT4 GetBaseColor(in FFragData FragData,inout FMaterialData MaterialDat
 				float4 baseCol = SAMPLE_TEXTURE2D(_BaseTex0, uv0);
 				splat = baseCol;
 
-				// TerrainWaterHeight(blend, MaterialData);
 			#endif
 
 			#ifdef _SPLAT2
@@ -194,16 +190,7 @@ inline FLOAT4 GetBaseColor(in FFragData FragData,inout FMaterialData MaterialDat
 				FLOAT2 uv1 = FragData.WorldPosition.xz*_TerrainScale.y;
 				splat += SAMPLE_TEXTURE2D(_BaseTex0, uv0)*blend.r;
 				splat += SAMPLE_TEXTURE2D(_BaseTex1, uv1)*blend.g;
-				// splat += SAMPLE_TEXTURE2D(_BaseTex2, uv2)*blend.b;
-				// splat += SAMPLE_TEXTURE2D(_BaseTex3, uv3)*blend.a;
-
-				// float4 baseCol0 = SAMPLE_TEXTURE2D(_BaseTex0, uv0);
-				// float4 baseCol1 = SAMPLE_TEXTURE2D(_BaseTex1, uv1);
-
-				// float4 blendFactor = float4(blend.rg,0,0);
-				// splat = BlendTerrainColor(baseCol0, baseCol1, 0, 0, blendFactor);
-
-				// TerrainWaterHeight(blend, MaterialData);
+		
 			#endif
 			
 			#ifdef _SPLAT3
@@ -217,15 +204,6 @@ inline FLOAT4 GetBaseColor(in FFragData FragData,inout FMaterialData MaterialDat
 				splat += SAMPLE_TEXTURE2D(_BaseTex1, uv1)*blend.g;
 				splat += SAMPLE_TEXTURE2D(_BaseTex2, uv2)*blend.b;
 				// splat += SAMPLE_TEXTURE2D(_BaseTex3, uv3)*blend.a;
-
-				// float4 baseCol0 = SAMPLE_TEXTURE2D(_BaseTex0, uv0);
-				// float4 baseCol1 = SAMPLE_TEXTURE2D(_BaseTex1, uv1);
-				// float4 baseCol2 = SAMPLE_TEXTURE2D(_BaseTex2, uv2);
-
-				// float4 blendFactor = float4(blend.rgb, 0);
-				// splat = BlendTerrainColor(baseCol0, baseCol1, baseCol2, 0, blendFactor);
-
-				// TerrainWaterHeight(blend, MaterialData);
 			#endif
 
 			#ifdef _SPLAT4
@@ -241,17 +219,7 @@ inline FLOAT4 GetBaseColor(in FFragData FragData,inout FMaterialData MaterialDat
 				splat += SAMPLE_TEXTURE2D(_BaseTex2, uv2)*blend.b;
 				splat += SAMPLE_TEXTURE2D(_BaseTex3, uv3)*blend.a;
 
-				// float4 baseCol0 = SAMPLE_TEXTURE2D(_BaseTex0, uv0);
-				// float4 baseCol1 = SAMPLE_TEXTURE2D(_BaseTex1, uv1);
-				// float4 baseCol2 = SAMPLE_TEXTURE2D(_BaseTex2, uv2);
-				// float4 baseCol3 = SAMPLE_TEXTURE2D(_BaseTex3, uv3);
-
-				// // 第四张图的权重等于1减去前三张图的权重和 //
-				// float blendAChannel = 1 - blend.r - blend.g - blend.b;
-				// float4 blendFactor = float4(blend.rgb, blendAChannel);
-				// splat = BlendTerrainColor(baseCol0, baseCol1, baseCol2, baseCol3, blendFactor);
-
-				// TerrainWaterHeight(blend, MaterialData);
+	
 			#endif
 
 			return splat;// FLOAT4(0, blend.g, 0, 1);	

@@ -1,5 +1,3 @@
-// Copyright 2018- PWRD, Inc. All Rights Reserved.
-
 #ifndef PBS_LIGHTINGHEAD_INCLUDE
 #define PBS_LIGHTINGHEAD_INCLUDE
 

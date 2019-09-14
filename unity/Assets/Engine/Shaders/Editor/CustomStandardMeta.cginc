@@ -3,9 +3,6 @@
 #ifndef CUSTOM_STANDARD_META_INCLUDED
 #define CUSTOM_STANDARD_META_INCLUDED
 
-// Functionality for Standard shader "meta" pass
-// (extracts albedo/emission for lightmapper etc.)
-
 #include "UnityCG.cginc"
 #include "UnityStandardInput.cginc"
 #include "UnityMetaPass.cginc"

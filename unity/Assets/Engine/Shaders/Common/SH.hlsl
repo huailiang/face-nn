@@ -1,5 +1,3 @@
-// Copyright 2018- PWRD, Inc. All Rights Reserved.
-
 #include "DebugHead.hlsl"
 
 #ifndef PBS_SH_INCLUDE
@@ -127,10 +125,7 @@ FLOAT3 ShadeSHPerPixel(FLOAT3 normal, FLOAT3 ambient, FLOAT3 worldPos)
 	ambient_contrib = SHEvalLinearL0L1(FLOAT4(normal, 1.0));
 
 	ambient = max(_AmbientParam.zzz, ambient + ambient_contrib);
-	//ambient_contrib += SHEvalLinearL2(FLOAT4(normal, 1.0));
-
-	//ambient = max(half3(0, 0, 0), ambient+ambient_contrib); 
-
+	
 #endif
 
 	return ambient;

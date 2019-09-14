@@ -187,10 +187,9 @@ namespace CFEngine.Editor
             public override void SetValue(Material mat)
             {
                 mat.SetTexture(name, value);
-                //mat.SetTextureOffset(name, offset);
-                //mat.SetTextureScale(name, scale);
             }
         }
+
         internal class ShaderKeyWordValue : ShaderValue
         {
             public ShaderKeyWordValue(Material mat) : base("", ShaderUtil.ShaderPropertyType.Float)
@@ -231,6 +230,7 @@ namespace CFEngine.Editor
                 mat.renderQueue = renderQueue;
             }
         }
+
         internal static List<ShaderValue> shaderValue = new List<ShaderValue>();
 
         [MenuItem("Assets/Tool/Material_Clear")]
@@ -257,18 +257,15 @@ namespace CFEngine.Editor
             }
         }
 
-
         internal static void ExtractMaterialsFromAsset(ModelImporter modelImporter, string destinationPath)
         {
             SerializedObject serializedObject = new UnityEditor.SerializedObject(modelImporter);
-            //SerializedProperty externalObjects = serializedObject.FindProperty("m_ExternalObjects");
             SerializedProperty materials = serializedObject.FindProperty("m_Materials");
             for (int i = 0; i < materials.arraySize; ++i)
             {
                 SerializedProperty arrayElementAtIndex = materials.GetArrayElementAtIndex(i);
                 string stringValue = arrayElementAtIndex.FindPropertyRelative("name").stringValue;
                 Material mat = null;
-                //Material matLow = null;
                 for (int j = 0; j < AssetsConfig.GlobalAssetsConfig.MaterialShaderMap.Length; j += 2)
                 {
                     string keys = AssetsConfig.GlobalAssetsConfig.MaterialShaderMap[j];
@@ -333,12 +330,6 @@ namespace CFEngine.Editor
                 string pbsTexPath = string.Format(AssetsConfig.GlobalAssetsConfig.PbsTex_Format_Path, materialFolder, materialName);
                 mat.SetTexture("_PBSTex", AssetDatabase.LoadAssetAtPath<Texture2D>(pbsTexPath));
             }
-
-            //Material lowMat = AssetDatabase.LoadAssetAtPath<Material>(string.Format("{0}/{1}_low.mat", materialFolder, materialName));
-            //if (lowMat != null)
-            //{
-            //    lowMat.SetTexture("_BaseTex", baseTex);
-            //}
         }
 
         internal static bool IsHLSLorCGINC(string path)
@@ -348,20 +339,16 @@ namespace CFEngine.Editor
 
         internal static void ReImportShader()
         {
-            for (int i = 0; i < AssetsConfig.GlobalAssetsConfig.ResourceShaders.Length; ++i)
+            string shaderFolder = "Assets/Engine/Shaders/PBS";
+            DirectoryInfo di = new DirectoryInfo(shaderFolder);
+            FileInfo[] files = di.GetFiles("*.shader", SearchOption.AllDirectories);
+            foreach (FileInfo fi in files)
             {
-                string shaderFolder = AssetsConfig.GlobalAssetsConfig.ResourceShaders[i];
-                DirectoryInfo di = new DirectoryInfo(shaderFolder);
-                FileInfo[] files = di.GetFiles("*.shader", SearchOption.AllDirectories);
-                foreach (FileInfo fi in files)
-                {
-                    string path = fi.FullName.Replace("\\", "/");
-                    int index = path.IndexOf(shaderFolder);
-                    path = path.Substring(index);
-                    AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-                }
+                string path = fi.FullName.Replace("\\", "/");
+                int index = path.IndexOf(shaderFolder);
+                path = path.Substring(index);
+                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
             }
-
         }
 
         public static void SetupMaterialWithBlendMode(Material material, BlendMode blendMode, bool resetRenderQueue = true, int renderQueue = -1)
@@ -420,8 +407,6 @@ namespace CFEngine.Editor
                         else
                             material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
                     }
-                    // if (material.name.EndsWith("_upper"))
-                    //     material.renderQueue = 3000;
                     break;
                 case BlendMode.Transparent:
                     material.SetOverrideTag("RenderType", "Transparent");
@@ -432,7 +417,6 @@ namespace CFEngine.Editor
                     if (material.HasProperty("_ZWrite"))
                         material.SetInt("_ZWrite", 0);
                     material.DisableKeyword("_ALPHA_TEST");
-                    // material.EnableKeyword ("_ALPHA_PREMULT");
                     if (resetRenderQueue)
                     {
                         if (renderQueue != -1)
@@ -463,82 +447,7 @@ namespace CFEngine.Editor
             }
             return BlendMode.Transparent;
         }
-        // internal static bool IsDefaultSceneMat (Material material)
-        // {
-        //     string[] defaultSceneMat = AssetsConfig.GlobalAssetsConfig.DefaultSceneMat;
-        //     for (int i = 0; i < defaultSceneMat.Length; ++i)
-        //     {
-        //         if (material.shader.name == defaultSceneMat[i])
-        //             return true;
-        //     }
-        //     return false;
-        // }
 
-        // internal static void GetDefaultMatProperty (Material material,
-        //     ref MaterialContext context,
-        //     List<ShaderKeyProperty> shaderKeys,
-        //     ref MaterialAnalyzeModify mam)
-        // {
-        //     if (shaderKeys != null)
-        //     {
-        //         for (int i = 0; i < shaderKeys.Count; ++i)
-        //         {
-        //             var skp = shaderKeys[i];
-        //             if (context.shaderIDs.FindIndex ((x) => { return x.shaderID == skp.shaderID; }) < 0)
-        //             {
-        //                 if (material.HasProperty (skp.key))
-        //                 {
-        //                     if (skp.isTex)
-        //                     {
-        //                         Texture tex = material.GetTexture (skp.key);
-        //                         if (tex != null)
-        //                         {
-        //                             ShaderTexPropertyValue stpv = new ShaderTexPropertyValue ()
-        //                             {
-        //                             shaderID = skp.shaderID,
-        //                             value = tex,
-        //                             path = tex.name
-        //                             };
-        //                             context.textureValue.Add (stpv);
-        //                             if (skp.flag != 0)
-        //                             {
-        //                                 mam.flag |= skp.flag;
-        //                             }
-        //                         }
-        //                         // else
-        //                         // {
-        //                         //     return false;
-        //                         // }
-        //                     }
-        //                     else
-        //                     {
-        //                         Vector4 param = material.GetVector (skp.key);
-        //                         if (!skp.hasDefaultValue || skp.hasDefaultValue &&
-        //                             !CommonAssets.IsSameProperty (param, skp.defaultValue))
-        //                         {
-        //                             ShaderPropertyValue spv = new ShaderPropertyValue ()
-        //                             {
-        //                                 shaderID = skp.shaderID,
-        //                                 value = param,
-        //                             };
-        //                             context.shaderIDs.Add (spv);
-        //                             if (skp.flag != 0)
-        //                             {
-        //                                 mam.flag |= skp.flag;
-        //                             }
-        //                         }
-        //                     }
-        //                 }
-        //                 // else
-        //                 // {
-        //                 //     return false;
-        //                 // }
-        //             }
-        //         }
-        //         // return true;
-        //     }
-        //     // return false;
-        // }
         internal static void AddMaterialProperty(
             ref MaterialContext context,
             Texture tex, int shaderID)
@@ -865,19 +774,7 @@ namespace CFEngine.Editor
         KeywordFlags._ALPHA_FROM_COLOR
         };
 
-        // static string[] rolekeyWords = new string[]
-        // {
-        //     "_ETX_EFFECT",
-        //     "_SHADOW_MAP",
-        //     "_ALPHA_FROM_COLOR",
-        // };
 
-        // static EffectKeywordFlags[] roleKeyWordFlag = new EffectKeywordFlags[]
-        // {
-        //     EffectKeywordFlags._ETX_EFFECT,
-        //     EffectKeywordFlags._SHADOW_MAP,
-        //     EffectKeywordFlags._ALPHA_FROM_COLOR,
-        // };
         public static string GetKeyWords(KeywordFlags keyWord)
         {
             string keywordStr = "";
@@ -893,21 +790,7 @@ namespace CFEngine.Editor
             }
             return keywordStr;
         }
-        // public static string GetKeyWords (EffectKeywordFlags keyWord)
-        // {
-        //     string keywordStr = "";
-        //     for (int i = 0; i < roleKeyWordFlag.Length; ++i)
-        //     {
-        //         EffectKeywordFlags flag = roleKeyWordFlag[i];
-        //         if (((uint) (keyWord & flag)) != 0)
-        //         {
-        //             if (!string.IsNullOrEmpty (keywordStr))
-        //                 keywordStr += "|";
-        //             keywordStr += rolekeyWords[i];
-        //         }
-        //     }
-        //     return keywordStr;
-        // }
+
 
         public static Material GetDummyMat(string name)
         {
@@ -949,26 +832,6 @@ namespace CFEngine.Editor
                     AssetsConfig.GlobalAssetsConfig.DummyMatFolder), name, ".mat", mat);
             }
         }
-        // public static void CreateDummyMat (string name, Shader shader, BlendMode blendMode, EffectKeywordFlags keyWord)
-        // {
-        //     if (shader != null)
-        //     {
-        //         Material mat = new Material (shader);
-        //         for (int i = 0; i < roleKeyWordFlag.Length; ++i)
-        //         {
-        //             EffectKeywordFlags flag = roleKeyWordFlag[i];
-        //             if (((uint) (keyWord & flag)) != 0)
-        //             {
-        //                 mat.EnableKeyword (rolekeyWords[i]);
-        //             }
-        //         }
-
-        //         SetupMaterialWithBlendMode (mat, blendMode);
-        //         CommonAssets.CreateAsset<Material> (string.Format ("{0}/{1}",
-        //             AssetsConfig.GlobalAssetsConfig.ResourcePath,
-        //             AssetsConfig.GlobalAssetsConfig.DummyMatFolder), name, ".mat", mat);
-        //     }
-        // }
 
         private static BlendMode GetBlendMode(EBlendType blendType)
         {
@@ -991,22 +854,6 @@ namespace CFEngine.Editor
                 {
                     CreateDummyMat(name + dmi.ext1, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, true, true);
                 }
-                // if (dmi.lightmapMode == ELightMapMode.LightmapMat)
-                // {
-                //     CreateDummyMat(name + dmi.ext1, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, true, false);
-                //     if (dmi.shadowMat)
-                //     {
-                //         CreateDummyMat(name + dmi.ext2, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, false, true);
-                //         CreateDummyMat(name + dmi.ext3, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, true, true);
-                //     }
-                // }
-                // else
-                // {
-                //     if (dmi.shadowMat)
-                //     {
-                //         CreateDummyMat(name + dmi.ext2, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, false, true);
-                //     }
-                // }
             }
         }
         public static void DefaultRefeshMat(AssetsConfig.DummyMaterialInfo dmi)
@@ -1037,33 +884,5 @@ namespace CFEngine.Editor
             }
         }
 
-        // [MenuItem ("Assets/Tool/Material_DummyMat")]
-        // public static void DefaultMat ()
-        // {
-        //     var sceneDummyMaterials = AssetsConfig.GlobalAssetsConfig.sceneDummyMaterials;
-        //     for (ESceneMaterial i = ESceneMaterial.SceneCommon; i < ESceneMaterial.Num; ++i)
-        //     {
-        //         int index = (int) i;
-        //         var sdm = sceneDummyMaterials[index];
-        //         string name = AssetsConfig.sceneMatNames[index * 2];
-        //         if (!string.IsNullOrEmpty (name))
-        //             DefaultMat (sdm, name, AssetsConfig.sceneMatNames[index * 2 + 1]);
-        //     }
-        // }
-
-        // [MenuItem ("Assets/Tool/Material_Test")]
-        // public static void Test ()
-        // {
-        //     string path = "Assets/BundleRes/Scene/Scene_battle_8V8/Scene_battle_8V8.bytes";
-        //     try
-        //     {
-        //         FileStream fs = new FileStream (path, FileMode.Open);
-        //         FileStream fs1 = new FileStream (path, FileMode.Open);
-        //     }
-        //     catch
-        //     {
-        //         XDebug.singleton.AddErrorLog2 ("Load File Error:{0}", path);
-        //     }
-        // }
     }
 }

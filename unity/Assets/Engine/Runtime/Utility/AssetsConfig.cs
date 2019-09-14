@@ -525,29 +525,11 @@ namespace CFEngine
         public string ConfigStr = "_Config";
         public string SceneConfigStr = "_SceneConfig";
 
-        public string SceneChunkStr = "Chunk_";
-        public string TerrainBlockStr = "Block_";
-        public string TerrainBlendTexStr = "_Blend";
-        public string TerrainBlendRTStr = "_BlendRT";
-        public string TerrainSplatTexStr = "_Splat";
-        public string TerrainSplatConfigStr = "_SplatConfig";
-        public string TerrainSplatConfigRefStr = "_SplatConfigRef";
 
-        public string AtlasDirStr = "Assets/Scenes/modlelib/atlas";
-        public string AtlasConfigStr = "_AtlasConfig";
-        public string UIImagePath = "UI/UISource/Background";
         public string SceneCombineObjName = "GameObject";
-
-        public string SpriteAtlasExt = ".spriteatlas";
-
         public string ReadableMeshSuffix = "_readable.asset";
 
         public string EditorSceneRes = "/EditorSceneRes";
-
-        public string[] ResourceShaders = new string[]
-        {
-            "Assets/Engine/Shaders/PBS"
-        };
 
         public string[] MaterialShaderMap = new string[]
         {
@@ -574,11 +556,6 @@ namespace CFEngine
             "Instance",
             "MeshTerrain",
             "UnityTerrain",
-        };
-
-        public string[] MehsAutoExportType = new string[]
-        {
-            "Assets/Scenes",
         };
 
         public LightmapParameters[] LightmapParam;
@@ -811,7 +788,6 @@ namespace CFEngine
             new MatShaderType () { name = "LavaSat", matOffset = ESceneMaterial.LavaSat },
             new MatShaderType () { name = "SceneWater", matOffset = ESceneMaterial.SceneWater },
             new MatShaderType () { name = "IceCave", matOffset = ESceneMaterial.IceCave },
-            // new MatShaderType () { name = "Lava", matOffset = ESceneMaterial.Lava},
         };
 
         private static AssetsConfig g_AssetsConfig;

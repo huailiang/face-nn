@@ -606,8 +606,6 @@ inline FLOAT4 ComputeScreenPos(FLOAT4 pos)
     return o;
 }
 
-// -----------------------------------------------------------------------------
-// Default vertex shaders
 
 struct AttributesDefault
 {
@@ -618,7 +616,6 @@ struct VaryingsDefault
 {
 	FLOAT4 vertex : SV_POSITION;
 	FLOAT2 texcoord : TEXCOORD0;
-	//FLOAT2 texcoordStereo : TEXCOORD1;
 };
 
 VaryingsDefault VertDefault(AttributesDefault v)

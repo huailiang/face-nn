@@ -66,12 +66,6 @@ FLOAT4 fragForwardBase(in FInterpolantsVSToPS Interpolants, in FLOAT4 SvPosition
 #endif//_FULL_SSS
 
 
-
-// #if !defined(LOW_QUALITY)&&!defined(_NO_RIM)
-// 		FLOAT3 RimLight = GetRimLighting(MaterialData, LightingData DEBUG_PBS_PARAM);
-// 		Color += RimLight;
-// #endif//LOW_QUALITY
-
 #ifdef _CUSTOM_EFFECT
 	GetCustomLighting(LightingData, Color, _Color);
 #endif//_CUSTOM_EFFECT 

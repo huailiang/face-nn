@@ -3,7 +3,6 @@
 
 // #include "Head.hlsl"
 
-// #define SUPPORT_INSTANCE (!(SHADER_TARGET < 30 || SHADER_API_GLES))
 
 #define SUPPORT_COMPUTERBUFFER (SHADER_TARGET>= 45)
 
@@ -16,14 +15,7 @@
 		#if SUPPORT_COMPUTERBUFFER
 			StructuredBuffer<FLOAT4> rotationBuffer;
 			StructuredBuffer<FLOAT4> positionBuffer;				
-		// #else//!SUPPORT_COMPUTERBUFFER
-		// 	INSTANCING_BUFFER_START(SharedProps)
-		// 		UNITY_DEFINE_INSTANCED_PROP(FLOAT, rotationBuffer)
-		// 	INSTANCING_BUFFER_END(SharedProps)
 
-		// 	INSTANCING_BUFFER_START(ObjProps)
-		// 		UNITY_DEFINE_INSTANCED_PROP(FLOAT, positionBuffer)
-		// 	INSTANCING_BUFFER_END(ObjProps)
 		FLOAT4 GetPosData(uint offset)
 		{
 			return positionBuffer[offset];
@@ -36,46 +28,16 @@
 		
 		#endif//SUPPORT_COMPUTERBUFFER
 
-		// FLOAT4 GetPosData(uint offset)
-		// {
-		// 	#if SUPPORT_COMPUTERBUFFER
-		// 		return positionBuffer[offset];
-		// 	#else//!SUPPORT_COMPUTERBUFFER
-		// 		return ACCESS_INSTANCED_PROP(ObjProps,positionBuffer)[offset];
-		// 	#endif//SUPPORT_COMPUTERBUFFER
-		// }
-
-		// FLOAT4 GetRotData(uint offset)
-		// {
-		// 	#if SUPPORT_COMPUTERBUFFER
-		// 		return rotationBuffer[offset];
-		// 	#else//!SUPPORT_COMPUTERBUFFER
-		// 		return ACCESS_INSTANCED_PROP(SharedProps,rotationBuffer)[offset];
-		// 	#endif//SUPPORT_COMPUTERBUFFER
-		// }
-
 	#else//!_RANDOM_TRANS
 
 		#if SUPPORT_COMPUTERBUFFER
 			StructuredBuffer<float4x4> obj2WorldMat;
-		// #else//!SUPPORT_COMPUTERBUFFER
-		// 	INSTANCING_BUFFER_START(ObjProps)
-		// 		UNITY_DEFINE_INSTANCED_PROP(float4x4, obj2WorldMat)
-		// 	INSTANCING_BUFFER_END(ObjProps)
+
 		FLOAT4 GetMatrix(uint offset)
 		{
 			return obj2WorldMat[offset];
 		}
 		#endif//SUPPORT_COMPUTERBUFFER
-
-		// FLOAT4 GetMatrix(uint offset)
-		// {
-		// 	#if SUPPORT_COMPUTERBUFFER
-		// 		return obj2WorldMat[offset];
-		// 	#else//!SUPPORT_COMPUTERBUFFER
-		// 		return ACCESS_INSTANCED_PROP(ObjProps,obj2WorldMat)[offset];
-		// 	#endif//SUPPORT_COMPUTERBUFFER
-		// }
 
 	#endif//_RANDOM_TRANS
 

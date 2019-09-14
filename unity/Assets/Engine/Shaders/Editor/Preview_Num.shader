@@ -32,18 +32,11 @@
 				Varyings o;
 				FLOAT4 WorldPosition = mul(unity_ObjectToWorld, v.vertex);
 				o.vertex = mul(unity_MatrixVP, WorldPosition);
-				
-				// o.texcoord = v.texcoord*_uvST.xy+_uvST.zw;
-				
-				// o.color = _Color;
 				return o;
 			}
 
 			half4 Frag(Varyings i) : SV_Target
 			{
-				// float x = fmod(_NumOffset,10)*0.1f;
-				// float y = floor(_NumOffset/10)*0.1f;
-				// float2 uv = frac(i.texcoord)*float2(0.1,0.1)+float2(x,y);
 				half4 color = _Color;
 				// color.a += 0.5f;
 				return color;
