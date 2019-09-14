@@ -20,11 +20,6 @@ namespace CFEngine
         Scene = 0x0002,
         Sun = 0x0004,
     }
-    enum OpType
-    {
-        OpNone,
-        OpCollectLights
-    }
 
     [Serializable]
     public class LightBlockInfo
@@ -37,17 +32,6 @@ namespace CFEngine
         public Vector3 offset;
         public List<Light> lights = new List<Light> ();
     }
-    struct LightDataInfo
-    {
-        public Vector4 lightPos; //xyz:world pos w:range
-        public Vector4 lightColor; //xyz:color w: not use
-    }
-    struct LightHeadIndex
-    {
-        public uint blockStartIndex;
-        public float minY;
-    }
-
     [System.Serializable]
     public class ChunkLightInfo
     {
@@ -124,62 +108,12 @@ namespace CFEngine
         [System.NonSerialized]
         public TransformRotationGUIWrapper roleLight1Rot;
 
-        public Light bakeSceneLight0;
-
-        [System.NonSerialized]
-        public TransformRotationGUIWrapper bakeSceneLight0Rot;
-
-        public Light bakeSceneLight1;
-
-        [System.NonSerialized]
-        public TransformRotationGUIWrapper bakeSceneLight1Rot;
-
-        public Light sceneRuntimeLight0;
-
-        [System.NonSerialized]
-        public TransformRotationGUIWrapper sceneRuntimeLight0Rot;
-
-        public Light sceneRuntimeLight1;
-
-        [System.NonSerialized]
-        public TransformRotationGUIWrapper sceneRuntimeLight1Rot;
-
-        private Light sceneLight0;
-        private TransformRotationGUIWrapper sceneLight0Rot;
-        private Light sceneLight1;
-        private TransformRotationGUIWrapper sceneLight1Rot;
-
-        public Light sunLight;
-        [System.NonSerialized]
-        public TransformRotationGUIWrapper sunLightRot;
-        private GameObject dummyLightGo;
 
 #endregion
 
 #region toggle
         public bool useUnityLighting = false;
 #endregion
-
-#region testObj
-        public Light pointLight;
-        private float cycle = 0.0f;
-        private float sign = 1.0f;
-        public Transform roleDummy;
-        public float interactiveParam;
-        public bool debugEnvArea = false;
-        public static int envObjStart;
-        public static int envObjEnd;
-        public List<EnverinmentArea> envObjects = new List<EnverinmentArea> ();
-        [NonSerialized]
-        public EnverinmentArea lastArea = null;
-        [NonSerialized]
-        public EnverinmentArea currentArea = null;
-        [NonSerialized]
-        public float envLerpTime = -1;
-        [NonSerialized]
-        public bool intoEnvArea = true;
-#endregion
-
 
 #region debugShadow
 
@@ -256,44 +190,12 @@ namespace CFEngine
 
 #endregion
 
-#region voxelLights
-
-        public bool voxelLightFolder = true;
-        public List<ChunkLightBlockInfo> chunkLightBlocks = new List<ChunkLightBlockInfo> ();
-        public List<Light> lights = new List<Light> ();
-        public int minLightCount = 0;
-        public int maxLightCount = 0;
-        public LightLoopContext lightLoopContext = new LightLoopContext ();
-
-        private static EditorCommon.EnumTransform funFindLight = FindLight;
-        private static EditorCommon.EnumTransform funCollectLight = CollectLights;
-        private static EditorCommon.EnumTransform funIntersectLightObjects = IntersectLightObjects;
-        private ComputeBuffer lightInfoBuffer;
-        private ComputeBuffer lightIndexBuffer;
-        private ComputeBuffer verticalBlockIndexBuffer;
-        private ComputeBuffer lightIndexHeadBuffer;
-        public int previewLightCount = 0;
-        private Color[] lightInfoColor = new Color[5]
-        {
-            new Color (1, 1, 1, 0.8f),
-            new Color (0, 0, 1, 0.8f),
-            new Color (0, 1, 1, 0.8f),
-            new Color (1, 1, 0, 0.8f),
-            new Color (1, 0, 0, 0.8f),
-        };
-        private bool isInit = false;
-#endregion
-
-#region lightmap
-#endregion
 
 #region misc
         [NonSerialized]
         public RenderingEnvironment re;
         Camera mainCamera;
         Camera sceneViewCamera;
-        private List<TerrainObject> terrainObjects = new List<TerrainObject> ();
-        private OpType opType = OpType.OpNone;
         public static bool drawSceneBounds = false;
         private static OnDrawGizmoCb m_drawGizmo = null;
 #endregion
@@ -345,53 +247,9 @@ namespace CFEngine
             if (re == null)
                 re = this.GetComponent<RenderingEnvironment> ();
             SyncLightInfo ();
-
-            if (roleDummy != null)
-            {
-                Vector3 pos = roleDummy.position;
-                re.sceneData.currentEntityPos = pos;
-                if (debugEnvArea && envObjects != null)
-                {
-                    EnverinmentArea.TestArea (this, new Vector2 (pos.x, pos.z));
-                }
-                UpdateArea ();
-            }
-
-            if (!isInit)
-            {
-                InitScene ();
-                isInit = true;
-            }
-
-            switch (opType)
-            {
-                case OpType.OpCollectLights:
-                    InnerCollectLights ();
-                    break;
-            }
-            opType = OpType.OpNone;
         
-         
             UpdateShadowCaster ();
             BuildShadowMap ();
-            if (pointLight != null && pointLight.type == LightType.Point)
-            {
-                Vector3 pos = pointLight.transform.position;
-                float range = pointLight.range * pointLight.range;
-                float intensity = pointLight.intensity;
-                cycle += Time.deltaTime * sign;
-                if (Mathf.Abs (cycle) > UnityEngine.Random.Range (5, 8))
-                {
-                    sign = -sign;
-                }
-                intensity += Mathf.Sin (Time.time) * Mathf.PerlinNoise (cycle, Mathf.Cos (Time.time)) * intensity * 0.8f;
-                Vector4 color = new Vector4 (Mathf.Pow (pointLight.color.r * intensity, 2.2f),
-                    Mathf.Pow (pointLight.color.g * intensity, 2.2f),
-                    Mathf.Pow (pointLight.color.b * intensity, 2.2f), range != 0 ? 1 / range : 1);
-                Shader.SetGlobalColor (ShaderManager._ShaderKeyPointLightDir, new Vector4 (pos.x, pos.y, pos.z, range));
-
-                Shader.SetGlobalColor (ShaderManager._ShaderKeyPointLightColor, color);
-            }
             
             if (re != null)
             {
@@ -407,30 +265,29 @@ namespace CFEngine
             SceneData.editorEditChunk = EditChunk;
             SceneData.editorSetRes = SetRes;
 
-                re.sceneData.enableShadow = true;
-                if (shadowMapCb == null)
-                    shadowMapCb = new CommandBuffer { name = "Editor Shadow Map Cb" };
-                if (re.sceneData.ShadowRT == null)
+            re.sceneData.enableShadow = true;
+            if (shadowMapCb == null)
+                shadowMapCb = new CommandBuffer { name = "Editor Shadow Map Cb" };
+            if (re.sceneData.ShadowRT == null)
+            {
+                if (shadowMap == null)
                 {
-                    if (shadowMap == null)
-                    {
                     shadowMap = new RenderTexture (512, 512, 16, RenderTextureFormat.RG16, RenderTextureReadWrite.Linear)
                     {
-                    name = "Shadowmap",
-                    hideFlags = HideFlags.DontSave,
-                    filterMode = FilterMode.Bilinear,
-                    wrapMode = TextureWrapMode.Clamp,
-                    anisoLevel = 0,
-                    autoGenerateMips = false,
-                    useMipMap = false
-                        };
-                        shadowMap.Create ();
-                    }
+                        name = "Shadowmap",
+                        hideFlags = HideFlags.DontSave,
+                        filterMode = FilterMode.Bilinear,
+                        wrapMode = TextureWrapMode.Clamp,
+                        anisoLevel = 0,
+                        autoGenerateMips = false,
+                        useMipMap = false
+                    };
+                    shadowMap.Create ();
                 }
+            }
 
-                shadowMat = AssetsConfig.GlobalAssetsConfig.ShadowCaster;
-                UpdateShadowCaster ();
-            
+            shadowMat = AssetsConfig.GlobalAssetsConfig.ShadowCaster;
+            UpdateShadowCaster ();
         }
         private void GetSceneViewCamera ()
         {
@@ -504,50 +361,13 @@ namespace CFEngine
         }
         public void SyncLightInfo ()
         {
-                useUnityLighting = true;
-
-            if (useUnityLighting)
+            useUnityLighting = true;
+            if (re != null)
             {
-                bool isRuntime =  RenderingEnvironment.isPreview;
-                if (isRuntime)
-                {
-                    sceneLight0 = sceneRuntimeLight0;
-                    sceneLight0Rot = sceneRuntimeLight0Rot;
-                    sceneLight1 = sceneRuntimeLight1;
-                    sceneLight1Rot = sceneRuntimeLight0Rot;
-                }
-                else
-                {
-                    sceneLight0 = bakeSceneLight0;
-                    sceneLight0Rot = bakeSceneLight0Rot;
-                    sceneLight1 = bakeSceneLight1;
-                    sceneLight1Rot = bakeSceneLight1Rot;
-                }
-
-                if (re != null)
-                {
-                    PrepareTransformGui (roleLight0, ref roleLight0Rot);
-                    PrepareTransformGui (roleLight1, ref roleLight1Rot);
-                    PrepareTransformGui (bakeSceneLight0, ref bakeSceneLight0Rot);
-                    PrepareTransformGui (bakeSceneLight1, ref bakeSceneLight1Rot);
-                    PrepareTransformGui (sceneRuntimeLight0, ref sceneRuntimeLight0Rot);
-                    PrepareTransformGui (sceneRuntimeLight1, ref sceneRuntimeLight1Rot);
-                    SyncLightInfo (roleLight0, ref re.lighting.roleLightInfo0, null, ref roleLight0Rot);
-                    SyncLightInfo (roleLight1, ref re.lighting.roleLightInfo1, null, ref roleLight1Rot);
-                    SyncLightInfo (sceneLight0, ref re.lighting.sceneLightInfo0, null, ref sceneLight0Rot);
-                    SyncLightInfo (sceneLight1, ref re.lighting.sceneLightInfo1, null, ref sceneLight1Rot);
-                    if (isRuntime)
-                    {
-                        sceneRuntimeLight0Rot = sceneLight0Rot;
-                        sceneRuntimeLight1Rot = sceneLight1Rot;
-                    }
-                    else
-                    {
-                        bakeSceneLight0Rot = sceneLight0Rot;
-                        bakeSceneLight1Rot = sceneLight1Rot;
-                    }
-                    SyncLightInfo (sunLight, ref sunLightRot, ref re.sunDir);
-                }
+                PrepareTransformGui (roleLight0, ref roleLight0Rot);
+                PrepareTransformGui (roleLight1, ref roleLight1Rot);
+                SyncLightInfo (roleLight0, ref re.lighting.roleLightInfo0, null, ref roleLight0Rot);
+                SyncLightInfo (roleLight1, ref re.lighting.roleLightInfo1, null, ref roleLight1Rot);
             }
         }
 
@@ -559,12 +379,7 @@ namespace CFEngine
             l.type = LightType.Directional;
             l.color = li.lightColor;
             l.intensity = li.lightDir.w;
-            if (dummyLightGo == null)
-            {
-                dummyLightGo = new GameObject ("DummyLights");
-            }
             l.cullingMask = mask;
-            go.transform.parent = dummyLightGo.transform;
             return l;
         }
 
@@ -584,34 +399,11 @@ namespace CFEngine
                 light = go.AddComponent<Light> ();
                 light.transform.rotation = Quaternion.LookRotation (-dir);
                 light.type = LightType.Directional;
-                if (dummyLightGo == null)
-                {
-                    dummyLightGo = new GameObject ("DummyLights");
-                }
                 light.cullingMask = 1 << GameObjectLayerHelper.InVisiblityLayer;
-                go.transform.parent = dummyLightGo.transform;
             }
         }
         public void PrepareLights (LightMask lightMask)
         {
-            if (re != null)
-            {
-                if ((lightMask & LightMask.Role) != 0)
-                {
-                        PrepareLights (ref roleLight0, ref re.lighting.roleLightInfo0, "roleLight0");
-
-                        PrepareLights (ref roleLight1, ref re.lighting.roleLightInfo1, "roleLight1");
-                }
-                if ((lightMask & LightMask.Scene) != 0)
-                {
-                    PrepareLights (ref sceneRuntimeLight0, ref re.lighting.sceneLightInfo0, "runtimeSceneLight0");
-                    PrepareLights (ref sceneRuntimeLight1, ref re.lighting.sceneLightInfo1, "runtimeSceneLight1");
-                }
-                if ((lightMask & LightMask.Sun) != 0)
-                {
-                    PrepareLights (ref sunLight, ref re.sunDir, "sunLight");
-                }
-            }
         }
 
         public void CleanLights ()
@@ -625,21 +417,6 @@ namespace CFEngine
             {
                 GameObject.DestroyImmediate (roleLight1.gameObject);
                 roleLight1Rot = null;
-            }
-            if (sceneRuntimeLight0 != null)
-            {
-                GameObject.DestroyImmediate (sceneRuntimeLight0.gameObject);
-                sceneRuntimeLight0Rot = null;
-            }
-            if (sceneRuntimeLight1 != null)
-            {
-                GameObject.DestroyImmediate (sceneRuntimeLight1.gameObject);
-                sceneRuntimeLight1Rot = null;
-            }
-            if (sunLight != null)
-            {
-                GameObject.DestroyImmediate (sunLight.gameObject);
-                sunLightRot = null;
             }
         }
         private void SyncLightInfo (Light light, ref LightInfo li)
@@ -655,7 +432,6 @@ namespace CFEngine
         public void RefreshLightmap (bool preview)
         {
             RenderingEnvironment.isPreview = preview;
-            EnableShadow (!preview);
 
             if (preview)
             {
@@ -671,149 +447,6 @@ namespace CFEngine
             }
         }
 
-        public void InitScene ()
-        {
-            terrainObjects.Clear ();
-        }
-
-
-        private static void FindLight (Transform trans, object param)
-        {
-            if (trans.gameObject.activeInHierarchy)
-            {
-                Light light = trans.GetComponent<Light> ();
-                if (light != null)
-                {
-                    if (light.enabled)
-                    {
-                        if (light.type == LightType.Point)
-                        {
-                            EnverinmentExtra ee = param as EnverinmentExtra;
-                            ee.lights.Add (light);
-                        }
-                    }
-                }
-                EditorCommon.EnumChildObject (trans, param, funFindLight);
-            }
-        }
-
-
-        public void RefreshVoxelLighting ()
-        {
-            int lineBlockCount = lightLoopContext.chunkWidth / lightLoopContext.lightGridSize * lightLoopContext.widthCount;
-            Shader.SetGlobalInt ("_LineBlockCount", lineBlockCount);
-            Shader.SetGlobalVector ("_WorldChunkOffset", new Vector4 (0, 0, 1.0f / lightLoopContext.lightGridSize, 0));
-            int chunkCount = lightLoopContext.widthCount * lightLoopContext.heightCount;
-            if (lights.Count > 0 && chunkCount > 0)
-            {
-                LightDataInfo[] lightDataInfos = new LightDataInfo[lights.Count];
-                for (int i = 0; i < lights.Count; ++i)
-                {
-                    var light = lights[i];
-                    Vector3 pos = light.transform.position;
-                    lightDataInfos[i] = new LightDataInfo ()
-                    {
-                        lightPos = new Vector4 (
-                        pos.x, pos.y, pos.z,
-                        1 / light.range),
-                        lightColor = new Vector4 (
-                        Mathf.Pow (light.color.r * light.intensity, 2.2f),
-                        Mathf.Pow (light.color.g * light.intensity, 2.2f),
-                        Mathf.Pow (light.color.b * light.intensity, 2.2f),
-                        0),
-                    };
-                }
-
-                LightHeadIndex[] lightIndexHead = new LightHeadIndex[lineBlockCount * lineBlockCount * chunkCount];
-                for (int i = 0; i < lightIndexHead.Length; ++i)
-                {
-                    lightIndexHead[i] = new LightHeadIndex ()
-                    {
-                        minY = 2000f
-                    };
-
-                }
-                List<uint> verticalBlockIndex = new List<uint> ();
-                List<uint> lightIndex = new List<uint> ();
-                for (int i = 0; i < chunkLightBlocks.Count; ++i)
-                {
-                    var clb = chunkLightBlocks[i];
-                    clb.lightIndexs.Sort ((a, b) => { return a.xzIndex - b.xzIndex; });
-
-                    for (int j = 0; j < clb.lightIndexs.Count; ++j)
-                    {
-                        var cli = clb.lightIndexs[j];
-                        lightIndexHead[cli.xzIndex] = new LightHeadIndex ()
-                        {
-                            blockStartIndex = (uint) verticalBlockIndex.Count,
-                            minY = cli.minY
-                        };
-                        if (cli.minYIndex <= cli.maxYIndex)
-                        {
-                            int count = cli.maxYIndex - cli.minYIndex + 1;
-                            int startIndex = verticalBlockIndex.Count;
-                            for (int k = 0; k < count; ++k)
-                            {
-                                verticalBlockIndex.Add (2000000);
-                            }
-
-                            cli.lightVerticalBlock.Sort ((a, b) => { return a.yIndex - b.yIndex; });
-
-                            for (int k = 0; k < cli.lightVerticalBlock.Count; ++k)
-                            {
-                                var clvb = cli.lightVerticalBlock[k];
-                                int offset = clvb.yIndex - cli.minYIndex;
-                                if (offset >= count)
-                                    Debug.LogError ("Y outof range");
-                                verticalBlockIndex[startIndex + offset] = (uint) lightIndex.Count;
-                                lightIndex.Add ((uint) clvb.lightInfos.Count);
-                                for (int ii = 0; ii < clvb.lightInfos.Count; ++ii)
-                                {
-                                    lightIndex.Add ((uint) clvb.lightInfos[ii].index);
-                                }
-                            }
-                        }
-                    }
-                }
-                if (lightInfoBuffer != null)
-                {
-                    lightInfoBuffer.Dispose ();
-                }
-                lightInfoBuffer = new ComputeBuffer (lightDataInfos.Length, Marshal.SizeOf (typeof (LightDataInfo)));
-                lightInfoBuffer.SetData (lightDataInfos);
-
-                Shader.SetGlobalBuffer ("_LightInfos", lightInfoBuffer);
-                if (lightIndexBuffer != null)
-                {
-                    lightIndexBuffer.Dispose ();
-                }
-                lightIndexBuffer = new ComputeBuffer (lightIndex.Count, sizeof (uint));
-                lightIndexBuffer.SetData (lightIndex);
-                Shader.SetGlobalBuffer ("_LightIndex", lightIndexBuffer);
-
-                if (verticalBlockIndexBuffer != null)
-                {
-                    verticalBlockIndexBuffer.Dispose ();
-                }
-                if (verticalBlockIndex.Count > 0)
-                {
-                    verticalBlockIndexBuffer = new ComputeBuffer (verticalBlockIndex.Count, sizeof (uint));
-                    verticalBlockIndexBuffer.SetData (verticalBlockIndex);
-                    Shader.SetGlobalBuffer ("_VerticalBlockIndex", verticalBlockIndexBuffer);
-                }
-
-                if (lightIndexHeadBuffer != null)
-                {
-                    lightIndexHeadBuffer.Dispose ();
-                }
-                if (lightIndexHead.Length > 0)
-                {
-                    lightIndexHeadBuffer = new ComputeBuffer (lightIndexHead.Length, Marshal.SizeOf (typeof (LightHeadIndex)));
-                    lightIndexHeadBuffer.SetData (lightIndexHead);
-                    Shader.SetGlobalBuffer ("_LightIndexHead", lightIndexHeadBuffer);
-                }
-            }
-        }
 
         private static void CollectLights (Transform trans, object param)
         {
@@ -905,7 +538,6 @@ namespace CFEngine
                         }
                     }
                 }
-                EditorCommon.EnumChildObject (trans, param, funCollectLight);
             }
         }
 
@@ -965,220 +597,32 @@ namespace CFEngine
                         {
                             Debug.LogErrorFormat ("mesh not readable:{0}", oc.name);
                         }
-
                     }
                 }
-                EditorCommon.EnumChildObject (trans, param, funIntersectLightObjects);
             }
         }
-        public void CollectLights ()
-        {
-            opType = OpType.OpCollectLights;
-        }
-        private void InnerCollectLights ()
-        {
-            lightLoopContext.lightBlocks.Clear ();
-            lightLoopContext.processMesh.Clear ();
-            chunkLightBlocks.Clear ();
-            lights.Clear ();
-            string path = AssetsConfig.EditorGoPath[0] + "/" + AssetsConfig.EditorGoPath[(int) AssetsConfig.EditorSceneObjectType.Light];
-            EditorCommon.EnumTargetObject (path, funCollectLight, lightLoopContext);
-            path = AssetsConfig.EditorGoPath[0] + "/" + AssetsConfig.EditorGoPath[(int) AssetsConfig.EditorSceneObjectType.StaticPrefab];
-            EditorCommon.EnumTargetObject (path, funIntersectLightObjects, lightLoopContext);
-            path = AssetsConfig.EditorGoPath[0] + "/" + AssetsConfig.EditorGoPath[(int) AssetsConfig.EditorSceneObjectType.Prefab];
-            EditorCommon.EnumTargetObject (path, funIntersectLightObjects, lightLoopContext);
 
-            maxLightCount = 0;
-            minLightCount = 10000;
-            float avg = 0;
-            int blockCount = 0;
-            var it = lightLoopContext.lightBlocks.GetEnumerator ();
-            while (it.MoveNext ())
-            {
-                var value = it.Current.Value;
-                if (value.objCount > 0)
-                {
-                    var chunkLightBlock = chunkLightBlocks.Find ((clb) => { return clb.chunkID == value.chunkID; });
-                    if (chunkLightBlock == null)
-                    {
-                        chunkLightBlock = new ChunkLightBlockInfo ()
-                        {
-                        chunkID = value.chunkID,
-                        };
-                        chunkLightBlocks.Add (chunkLightBlock);
-                    }
-                    for (int i = 0; i < value.lights.Count; ++i)
-                    {
-                        var l = value.lights[i];
-
-                        int lightIndex = lights.IndexOf (l);
-                        if (lightIndex < 0)
-                        {
-                            lightIndex = lights.Count;
-                            lights.Add (l);
-                        }
-                        var chunkLightIndex = chunkLightBlock.lightIndexs.Find ((cli) => { return cli.xzIndex == value.xzIndex; });
-                        if (chunkLightIndex == null)
-                        {
-                            chunkLightIndex = new ChunkLightIndex ()
-                            {
-                            xzIndex = value.xzIndex,
-                            };
-                            chunkLightBlock.lightIndexs.Add (chunkLightIndex);
-                        }
-                        float y = value.yIndex * lightLoopContext.lightGridSize;
-                        if (y < chunkLightIndex.minY)
-                        {
-                            chunkLightIndex.minY = y;
-                        }
-                        if (value.yIndex < chunkLightIndex.minYIndex)
-                        {
-                            chunkLightIndex.minYIndex = value.yIndex;
-                        }
-                        if (value.yIndex > chunkLightIndex.maxYIndex)
-                        {
-                            chunkLightIndex.maxYIndex = value.yIndex;
-                        }
-                        var lightVerticalBlock = chunkLightIndex.lightVerticalBlock.Find ((lvb) => { return lvb.yIndex == value.yIndex; });
-                        if (lightVerticalBlock == null)
-                        {
-                            lightVerticalBlock = new ChunkLightVerticalBlock ()
-                            {
-                            yIndex = value.yIndex,
-                            offset = value.offset
-                            };
-                            chunkLightIndex.lightVerticalBlock.Add (lightVerticalBlock);
-                        }
-                        lightVerticalBlock.lightInfos.Add (new ChunkLightInfo ()
-                        {
-                            light = l,
-                            index = lightIndex,
-                        });
-                    }
-                    if (value.lights.Count > maxLightCount)
-                    {
-                        maxLightCount = value.lights.Count;
-                    }
-                    if (value.lights.Count < minLightCount)
-                    {
-                        minLightCount = value.lights.Count;
-                    }
-                    avg += value.lights.Count;
-                    blockCount++;
-                }
-            }
-            chunkLightBlocks.Sort ((x, y) => { return x.chunkID.CompareTo (y.chunkID); });
-            lightLoopContext.lightBlocks.Clear ();
-            lightLoopContext.processMesh.Clear ();
-            if (blockCount > 0)
-                Debug.LogErrorFormat ("light count max:{0} min:{1} avg:{2}", maxLightCount, minLightCount, avg / blockCount);
-        }
         public void SaveEnvConfig (SceneEnvConfig sec)
         {
             if (re != null)
             {
-                SyncLightInfo (sceneRuntimeLight0, ref re.lighting.sceneLightInfo0, null, ref sceneRuntimeLight0Rot);
-                SyncLightInfo (sceneRuntimeLight1, ref re.lighting.sceneLightInfo1, null, ref sceneRuntimeLight1Rot);
-
                 re.SaveEnvConfig (sec);
             }
         }
 
         public void LoadEnvConfig (SceneEnvConfig sec)
         {
-
             SyncLightInfo (roleLight0, ref sec.lighting.roleLightInfo0);
             SyncLightInfo (roleLight1, ref sec.lighting.roleLightInfo1);
-            SyncLightInfo (sceneRuntimeLight0, ref sec.lighting.sceneLightInfo0);
-            SyncLightInfo (sceneRuntimeLight1, ref sec.lighting.sceneLightInfo1);
             if (re != null)
             {
                 re.LoadEnvConfig (sec);
             }
         }
 
-        public void EnableShadow (bool enable)
-        {
-            if (bakeSceneLight0 != null)
-            {
-                bakeSceneLight0.shadows = enable ? LightShadows.Soft : LightShadows.None;
-            }
-        }
 #endregion
 
-#region testEnvArea
-        public void RefreshEnvArea ()
-        {
-                envObjects.Clear ();
-                string path = AssetsConfig.EditorGoPath[0] + "/" + AssetsConfig.EditorGoPath[(int) AssetsConfig.EditorSceneObjectType.Enverinment];
-                GameObject envGo = GameObject.Find (path);
-                if (envGo != null)
-                {
-                    envGo.transform.GetComponentsInChildren<EnverinmentArea> (true, envObjects);
-                }
-                if (lastArea != null)
-                    lastArea.active = false;
-                lastArea = null;
-                re.lighting.needUpdate = true;
-                re.ambient.needUpdate = true;
-                re.fog.needUpdate = true;
-            
-        }
 
-        private void UpdateArea ()
-        {
-            if (currentArea != null)
-            {
-                if (envLerpTime > -0.5f)
-                {
-                    int state = 0;
-                    if (envLerpTime < 0.001f)
-                    {
-                        state = 1; //start
-                    }
-                    else if (envLerpTime > 1)
-                    {
-                        state = 2;
-                        envLerpTime = 1;
-                    }
-
-                    EnverinmentContext context;
-                    context.env = re;
-                    context.envMgr = RenderingManager.instance;
-                    for (int i = 0; i < currentArea.envModifyList.Length; ++i)
-                    {
-                        var wrapper = currentArea.envModifyList[i];
-                        if (wrapper != null && wrapper.envLerp != null)
-                        {
-                            wrapper.envLerp.Lerp (ref context, envLerpTime, intoEnvArea, state);
-                        }
-                    }
-                    if (state == 2)
-                    {
-                        envLerpTime = -1;
-                    }
-                    else
-                        envLerpTime += Time.deltaTime;
-                }
-                else
-                {
-                    EnverinmentContext context;
-                    context.env = re;
-                    context.envMgr = RenderingManager.instance;
-                    for (int i = 0; i < currentArea.envModifyList.Length; ++i)
-                    {
-                        var wrapper = currentArea.envModifyList[i];
-                        if (wrapper != null && wrapper.envLerp != null)
-                        {
-                            wrapper.Update ();
-                            wrapper.envLerp.Lerp (ref context, 1, intoEnvArea, 2);
-                        }
-                    }
-                }
-
-            }
-        }
-#endregion
 
 
 #region shadow
@@ -1437,185 +881,8 @@ namespace CFEngine
                 {
                     sceneObjects.Clear ();
                 }
-                if (drawLodGrid)
-                {
-                    var nodeList = quadTreeRef.nodeList;
-                    var it = chunks.GetEnumerator ();
-                    while (it.MoveNext ())
-                    {
-                        var chunk = it.Current.Value;
-                        if (chunk.usedChunkStartIndex >= 0)
-                        {
-                            int quadTreeOffset = chunk.usedChunkStartIndex * QuadTree.blockNodeCount;
-
-                            for (int i = 5; i < QuadTree.blockNodeCount; ++i)
-                            {
-                                SceneQuadTreeNode node = nodeList[quadTreeOffset + i];
-                                if (node != null && node.lodLevel == 0)
-                                {
-                                    Gizmos.color = Color.yellow;
-                                    Gizmos.DrawWireCube (node.aabb.center, node.aabb.size);
-                                }
-                            }
-                            if (drawTerrainGrid)
-                            {
-                                var to = chunk.terrainObject;
-                                Gizmos.color = Color.cyan;
-                                SceneQuadTreeNode node0 = nodeList[quadTreeOffset + 1];
-                                if (node0 != null && node0.lodLevel == 0)
-                                    Gizmos.DrawWireCube (to.aabb0.center, to.aabb0.size);
-                                SceneQuadTreeNode node1 = nodeList[quadTreeOffset + 2];
-                                if (node1 != null && node1.lodLevel == 0)
-                                    Gizmos.DrawWireCube (to.aabb1.center, to.aabb1.size);
-                                SceneQuadTreeNode node2 = nodeList[quadTreeOffset + 3];
-                                if (node2 != null && node2.lodLevel == 0)
-                                    Gizmos.DrawWireCube (to.aabb2.center, to.aabb2.size);
-                                SceneQuadTreeNode node3 = nodeList[quadTreeOffset + 4];
-                                if (node3 != null && node3.lodLevel == 0)
-                                    Gizmos.DrawWireCube (to.aabb3.center, to.aabb3.size);
-                            }
-                        }
-                    }
-                }
-
-                if (drawPointLight)
-                {
-                    if (XFxMgr.fxPointLight != null)
-                    {
-                        var point = XFxMgr.fxPointLight;
-                        Gizmos.color = new Color (point.color.x, point.color.y, point.color.z, 1);
-                        Gizmos.DrawWireSphere (new Vector3 (point.pos.x, point.pos.y, point.pos.z), point.pos.w);
-                    }
-                    else if (re.sceneData.scenePointLight != null)
-                    {
-                        var point = re.sceneData.scenePointLight;
-                        Gizmos.color = new Color (point.color.x, point.color.y, point.color.z, 1);
-                        Gizmos.DrawWireSphere (new Vector3 (point.pos.x, point.pos.y, point.pos.z), point.pos.w);
-                    }
-                }
             }
-            if (debugEnvArea)
-            {
-                for (int i = 0; i < envObjects.Count; ++i)
-                {
-                    var envObject = envObjects[i];
-                    Transform t = envObject.transform;
-                    for (int j = 0; j < envObject.areaList.Count; ++j)
-                    {
-                        var areaBox = envObject.areaList[j];
-                        if (envObject == lastArea)
-                        {
-                            Color boxColor = Color.Lerp (new Color (1, 1, 1, 0.2f), Color.white, lastArea.blinkTime);
-                            lastArea.blinkTime += Time.deltaTime;
-                            if (lastArea.blinkTime > 1.0f)
-                            {
-                                lastArea.blinkTime = 0;
-                            }
-                            Gizmos.color = boxColor;
-                        }
-                        else
-                            Gizmos.color = envObject.color;
-
-                        Vector3 worldPos = areaBox.center + t.position;
-                        Quaternion rot = Quaternion.Euler (0, areaBox.rotY, 0);
-                        Gizmos.matrix = Matrix4x4.TRS (worldPos, rot, Vector3.one);
-                        Gizmos.DrawWireCube (Vector3.zero, areaBox.size);
-                        Gizmos.matrix = Matrix4x4.identity;
-                    }
-                }
-            }
-            if (drawTerrainHeight)
-            {
-                int chunkId = re.sceneData.chunkID.y * re.sceneData.xChunkCount + re.sceneData.chunkID.x;
-                SceneChunk sc;
-                if (chunks.TryGetValue (chunkId, out sc))
-                {
-                    if (sc.heights.IsCreated)
-                    {
-                        Gizmos.color = Color.green;
-                        float xOffset = sc.x * re.sceneData.ChunkWidth;
-                        float zOffset = sc.z * re.sceneData.ChunkHeight;
-                        Vector3 v0 = Vector3.zero;
-                        Vector3 v1 = Vector3.zero;
-                        Vector3 v2 = Vector3.zero;
-                        for (int z = 0; z < SceneData.terrainGridCount; ++z)
-                        {
-                            for (int x = 0; x < SceneData.terrainGridCount; ++x)
-                            {
-                                int p0 = z * (SceneData.terrainGridCount + 1) + x;
-                                int p1 = z * (SceneData.terrainGridCount + 1) + x + 1;
-                                int p2 = (z + 1) * (SceneData.terrainGridCount + 1) + x + 1;
-                                int p3 = (z + 1) * (SceneData.terrainGridCount + 1) + x;
-                                float h0 = sc.heights[p0];
-                                float h1 = sc.heights[p1];
-                                float h2 = sc.heights[p2];
-                                float h3 = sc.heights[p3];
-
-                                float x0 = x * SceneData.terrainGridSize + xOffset;
-                                float x1 = (x + 1) * SceneData.terrainGridSize + xOffset;
-                                float z0 = z * SceneData.terrainGridSize + zOffset;
-                                float z1 = (z + 1) * SceneData.terrainGridSize + zOffset;
-                                if (re.sceneData.terrainVertex.w == 1)
-                                {
-                                    if (re.sceneData.terrainVertex.x == p2 &&
-                                        re.sceneData.terrainVertex.y == p0 &&
-                                        re.sceneData.terrainVertex.z == p1)
-                                    {
-                                        v0 = new Vector3 (x0, h0, z0);
-                                        v1 = new Vector3 (x1, h1, z0);
-                                        v2 = new Vector3 (x1, h2, z1);
-                                    }
-                                }
-                                else
-                                {
-                                    if (re.sceneData.terrainVertex.x == p2 &&
-                                        re.sceneData.terrainVertex.y == p3 &&
-                                        re.sceneData.terrainVertex.z == p0)
-                                    {
-                                        v0 = new Vector3 (x0, h0, z0);
-                                        v1 = new Vector3 (x1, h2, z1);
-                                        v2 = new Vector3 (x0, h3, z1);
-                                    }
-                                }
-
-                                Gizmos.DrawLine (new Vector3 (x0, h0, z0), new Vector3 (x1, h2, z1));
-                                Gizmos.DrawLine (new Vector3 (x1, h2, z1), new Vector3 (x0, h3, z1));
-                                Gizmos.DrawLine (new Vector3 (x0, h3, z1), new Vector3 (x0, h0, z0));
-
-                                Gizmos.DrawLine (new Vector3 (x0, h0, z0), new Vector3 (x1, h1, z0));
-                                Gizmos.DrawLine (new Vector3 (x1, h1, z0), new Vector3 (x1, h2, z1));
-                                Gizmos.DrawLine (new Vector3 (x1, h2, z1), new Vector3 (x0, h0, z0));
-                            }
-                        }
-                        Gizmos.color = Color.yellow;
-                        Gizmos.DrawLine (v0, v1);
-                        Gizmos.DrawLine (v1, v2);
-                        Gizmos.DrawLine (v2, v0);
-                    }
-                }
-            }
-            if (drawLightBox)
-            {
-                Vector3 size = new Vector3 (lightLoopContext.lightGridSize / 2.0f, lightLoopContext.lightGridSize / 2.0f, lightLoopContext.lightGridSize / 2.0f);
-                for (int i = 0; i < chunkLightBlocks.Count; ++i)
-                {
-                    var clb = chunkLightBlocks[i];
-                    for (int j = 0; j < clb.lightIndexs.Count; ++j)
-                    {
-                        var cli = clb.lightIndexs[j];
-                        for (int k = 0; k < cli.lightVerticalBlock.Count; ++k)
-                        {
-                            var clvb = cli.lightVerticalBlock[k];
-                            if (previewLightCount == 0 || clvb.lightInfos.Count == previewLightCount)
-                            {
-                                int debugIndex = Mathf.Clamp (clvb.lightInfos.Count / 5, 0, 4);
-                                Gizmos.color = lightInfoColor[debugIndex];
-                                Gizmos.DrawWireCube (clvb.offset + size, size);
-                            }
-                        }
-                    }
-                }
-            }
+            
             if (m_drawGizmo != null && drawSceneBounds)
             {
                 m_drawGizmo ();

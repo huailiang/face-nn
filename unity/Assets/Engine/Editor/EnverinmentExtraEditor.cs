@@ -13,18 +13,7 @@ namespace CFEngine.Editor
         //lighting
         private SerializedProperty roleLight0;
         private SerializedProperty roleLight1;
-        private SerializedProperty baleSceneLight0;
-        private SerializedProperty bakeSceneLight1;
-        private SerializedProperty sceneRuntimeLight0;
-        private SerializedProperty sceneRuntimeLight1;
-
-        private SerializedProperty sunLight;
         private SerializedProperty useUnityLighting;
-
-        private SerializedProperty pointLight;
-        private SerializedProperty roleDummy;
-        private SerializedProperty interactiveParam;
-
 
         //debugShadow
         private SerializedProperty fitWorldSpace;
@@ -32,7 +21,6 @@ namespace CFEngine.Editor
         private SerializedProperty shadowMapLevel;
         private SerializedProperty shadowBound;
         private SerializedProperty drawShadowLighing;
-
 
         private SerializedProperty drawType;
         private SerializedProperty quadIndex;
@@ -44,11 +32,6 @@ namespace CFEngine.Editor
         private SerializedProperty debugDisplayType;
         private SerializedParameter splitAngle;
         private SerializedProperty splitPos;
-
-        private SerializedProperty lightGridSize;
-        private SerializedProperty minLightCount;
-        private SerializedProperty maxLightCount;
-        private SerializedProperty previewLightCount;
         private float splitLeft = -1;
         private float splitRight = 1;
 
@@ -56,26 +39,14 @@ namespace CFEngine.Editor
         {
             roleLight0 = FindProperty(x => x.roleLight0);
             roleLight1 = FindProperty(x => x.roleLight1);
-            baleSceneLight0 = FindProperty(x => x.bakeSceneLight0);
-            bakeSceneLight1 = FindProperty(x => x.bakeSceneLight1);
-            sceneRuntimeLight0 = FindProperty(x => x.sceneRuntimeLight0);
-            sceneRuntimeLight1 = FindProperty(x => x.sceneRuntimeLight1);
-            sunLight = FindProperty(x => x.sunLight);
 
             useUnityLighting = FindProperty(x => x.useUnityLighting);
-            pointLight = FindProperty(x => x.pointLight);
-            roleDummy = FindProperty(x => x.roleDummy);
-            interactiveParam = FindProperty(x => x.interactiveParam);
 
             fitWorldSpace = FindProperty(x => x.fitWorldSpace);
             shadowMapLevel = FindProperty(x => x.shadowMapLevel);
             shadowBound = FindProperty(x => x.shadowBound);
             lookTarget = FindProperty(x => x.lookTarget);
             drawShadowLighing = FindProperty(x => x.drawShadowLighing);
-            lightGridSize = FindProperty(x => x.lightLoopContext.lightGridSize);
-            minLightCount = FindProperty(x => x.minLightCount);
-            maxLightCount = FindProperty(x => x.maxLightCount);
-            previewLightCount = FindProperty(x => x.previewLightCount);
 
             drawType = FindProperty(x => x.drawType);
             quadIndex = FindProperty(x => x.quadIndex);
@@ -149,19 +120,6 @@ namespace CFEngine.Editor
                     LightInstpetorGui(roleLight0, ee.roleLight0Rot, "RoleLight0");
                     LightInstpetorGui(roleLight1, ee.roleLight1Rot, "RoleLight1");
                     ToolsUtility.EndGroup();
-
-                    ToolsUtility.BeginGroup("SceneLight");
-                    LightInstpetorGui(baleSceneLight0, ee.bakeSceneLight0Rot, "SceneLight0");
-                    LightInstpetorGui(bakeSceneLight1, ee.bakeSceneLight1Rot, "SceneLight1");
-                    ToolsUtility.EndGroup();
-
-                    ToolsUtility.BeginGroup("RuntimeSceneLight");
-                    LightInstpetorGui(sceneRuntimeLight0, ee.sceneRuntimeLight0Rot, "RuntimeSceneLight0");
-                    LightInstpetorGui(sceneRuntimeLight1, ee.sceneRuntimeLight1Rot, "RuntimeSceneLight1");
-                    ToolsUtility.EndGroup();
-                    ToolsUtility.BeginGroup("Sun Light");
-                    LightInstpetorGui(sunLight, ee.sunLightRot, "SunLight");
-                    ToolsUtility.EndGroup();
                 }
 
                 if (ToolsUtility.BeginFolderGroup("Shadow", ref ee.shadowFolder))
@@ -196,18 +154,7 @@ namespace CFEngine.Editor
                     EditorGUILayout.PropertyField(drawLightBox);
                     if (drawLightBox.boolValue)
                     {
-                        int size = previewLightCount.intValue;
                         EditorGUI.BeginChangeCheck();
-
-                        int newSize = EditorGUILayout.IntSlider("LightCount", previewLightCount.intValue, 0, ee.maxLightCount);
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            Undo.RecordObject(target, "LightCount");
-                            if (newSize != size)
-                            {
-                                previewLightCount.intValue = newSize;
-                            }
-                        }
                     }
                     EditorGUI.BeginChangeCheck();
                     if (EditorGUI.EndChangeCheck())

@@ -623,72 +623,7 @@ namespace CFEngine
                 }
             }
         }
-        public static void TestArea(EnverinmentExtra extra, Vector2 pos)
-        {
-            bool innerArea = false;
-            EnverinmentArea findArea = null;
-            for (int i = 0; i < extra.envObjects.Count; ++i)
-            {
-                var area = extra.envObjects[i];
-                Transform t = area.transform;
-                for (int j = 0; j < area.areaList.Count; ++j)
-                {
-                    var box = area.areaList[j];
-
-                    Vector2 boxCenter = new Vector2(box.center.x + t.position.x, box.center.z + t.position.z);
-                    Vector2 localpos = pos - boxCenter;
-                    float cosA = Mathf.Cos(box.rotY * Mathf.Deg2Rad);
-                    float sinA = Mathf.Sin(box.rotY * Mathf.Deg2Rad);
-                    Vector2 boxSpacePos = new Vector2(localpos.x * cosA - localpos.y * sinA, localpos.x * sinA + localpos.y * cosA);
-                    Rect rect = new Rect();
-                    rect.min = new Vector2(-box.size.x * 0.5f, -box.size.z * 0.5f);
-                    rect.max = new Vector2(box.size.x * 0.5f, box.size.z * 0.5f);
-                    if (rect.Contains(boxSpacePos))
-                    {
-                        findArea = area;
-                        innerArea = true;
-                        area.active = true;
-                        break;
-                    }
-                }
-                if (findArea != null)
-                {
-                    break;
-                }
-            }
-
-            if (findArea != extra.lastArea)
-            {
-                if (extra.lastArea == null)
-                {
-                    //into
-                    if (innerArea)
-                    {
-                        extra.envLerpTime = 0.0f;
-                        extra.intoEnvArea = true;
-                        UpdateAreaModify(findArea);
-                        extra.currentArea = findArea;
-                        extra.lastArea = findArea;
-                    }
-                }
-                else
-                {
-                    //out of
-                    if (!innerArea)
-                    {
-                        extra.intoEnvArea = false;
-                        extra.envLerpTime = 0.0f;
-                        if (extra.lastArea != null)
-                        {
-                            UpdateAreaModify(extra.lastArea);
-                            extra.currentArea = extra.lastArea;
-                        }
-                        extra.lastArea = null;
-                    }
-                }
-            }
-
-        }
+     
 
         public void Save()
         {

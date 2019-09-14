@@ -857,55 +857,6 @@ public sealed class RenderingManager : IRenderManager
 
     public void LoadEnvData(XBinaryReader reader, ref ListObjectWrapper<ISceneObject> listObject, ref int envObjStart, ref int envObjEnd, byte dynamicSceneId)
     {
-        byte count = reader.ReadByte();
-        if (count > 0)
-        {
-            envObjStart = listObject.Count;
-#if UNITY_EDITOR
-            EnverinmentExtra.envObjStart = envObjStart;
-#endif
-            for (int i = 0; i < count; ++i)
-            {
-                byte sceneId = reader.ReadByte();
-                if (sceneId == 255 || dynamicSceneId == sceneId)
-                {
-                    EnvAreaObj envObj = SharedObjectPool<EnvAreaObj>.Get();
-                    listObject.Add(envObj);
-                }
-            }
-            envObjEnd = listObject.Count;
-#if UNITY_EDITOR
-            EnverinmentExtra.envObjEnd = envObjEnd;
-#endif
-            int j = 0;
-            for (int i = 0; i < count; ++i)
-            {
-                byte sceneId = reader.ReadByte();
-                ushort size = reader.ReadUInt16();
-                if (sceneId == 255 || dynamicSceneId == sceneId)
-                {
-                    EnvAreaObj envObj = listObject.Get<EnvAreaObj>(envObjStart + j);
-                    j++;
-                    envObj.envModifyStart = (short)listObject.Count;
-                    byte modifyCount = reader.ReadByte();
-                    for (int k = 0; k < modifyCount; ++k)
-                    {
-                        byte modifyType = reader.ReadByte();
-                        if (loadEnv[modifyType] != null)
-                        {
-                            ISceneObject modify = loadEnv[modifyType](reader) as ISceneObject;
-                            listObject.Add(modify);
-                        }
-                    }
-                    reader.ReadNavtiveBuffer(ref envObj.areas, true, 4, Unity.Collections.Allocator.Persistent);
-                    envObj.envModifyEnd = (short)listObject.Count;
-                }
-                else
-                {
-                    reader.Seek(size, System.IO.SeekOrigin.Current);
-                }
-            }
-        }
     }
 
     #endregion
