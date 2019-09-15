@@ -29,8 +29,6 @@ GraphicsSettings:
     m_Mode: 1
     m_Shader: {fileID: 102, guid: 0000000000000000f000000000000000, type: 0}
   m_AlwaysIncludedShaders:
-  - {fileID: 4800000, guid: 71d579747e3a56b4fba88a4973308080, type: 3}
-  - {fileID: 4800000, guid: 5bfeb0a461fe0814898d0620de73c52a, type: 3}
   - {fileID: 10770, guid: 0000000000000000f000000000000000, type: 0}
   m_PreloadedShaders: []
   m_SpritesDefaultMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000,

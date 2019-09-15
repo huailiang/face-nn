@@ -28,7 +28,7 @@ namespace XEditor
         private int pre_weapon_index = 0;
         private AnimationClip clip;
         private GameObject go;
-
+        private FacePaint paint;
         private XEntityPresentation.RowData pData;
 
 
@@ -48,6 +48,10 @@ namespace XEditor
             suit_select = 0;
             suit_pre = -1;
             shape = RoleShape.FEMALE;
+            if (paint == null)
+            {
+                paint = new FacePaint();
+            }
         }
 
 
@@ -146,6 +150,7 @@ namespace XEditor
                     DrawSuit();
                     pre_presentid = presentid;
                     pre_weapon_index = weapon_index;
+                    paint.Initial(go, shape);
                 }
                 GUILayout.EndHorizontal();
             }
@@ -159,6 +164,10 @@ namespace XEditor
             {
                 if (isAutoRot) go.transform.Rotate(Vector3.up, 0.1f);
                 PlayAnim();
+                // if (paint != null)
+                // {
+                //     paint.Update();
+                // }
             }
         }
 

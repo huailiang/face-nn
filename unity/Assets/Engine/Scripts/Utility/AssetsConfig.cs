@@ -235,13 +235,13 @@ namespace CFEngine
         public bool folder = false;
         public SpriteSize maxTextureSize = SpriteSize.E1024x1024;
         public TextureImporterFormat format = TextureImporterFormat.RGB24;
-        public TextureImporterFormat alphaFormat = TextureImporterFormat.RGBA32;      
+        public TextureImporterFormat alphaFormat = TextureImporterFormat.RGBA32;
     }
 
     [System.Serializable]
     public class TexCompressConfig
     {
-        public bool folder = false;       
+        public bool folder = false;
         public bool vaild = true;
         public string name = "";
         public int priority = 0;
@@ -249,9 +249,9 @@ namespace CFEngine
         public TextureImporterType importType = TextureImporterType.Default;
         public TextureImporterShape importShape = TextureImporterShape.Texture2D;
         public bool sRGB = true;
-        public bool mipMap = false;        
-        public FilterMode filterMode = FilterMode.Bilinear;  
-        public TextureWrapMode wrapMode = TextureWrapMode.Repeat;  
+        public bool mipMap = false;
+        public FilterMode filterMode = FilterMode.Bilinear;
+        public TextureWrapMode wrapMode = TextureWrapMode.Repeat;
         public int anisoLevel = -1;
         public TexImportSetting iosSetting = new TexImportSetting()
         {
@@ -299,7 +299,7 @@ namespace CFEngine
         public string name;
         public Shader shader;
         public string macro;
-        public List<ShaderProperty> shaderPropertys = new List<ShaderProperty> ();
+        public List<ShaderProperty> shaderPropertys = new List<ShaderProperty>();
         public ESceneMaterial matOffset = ESceneMaterial.SceneCommon;
         public FindPropertyType findPropertyType = FindPropertyType.None;
         public bool hasPbs;
@@ -309,37 +309,37 @@ namespace CFEngine
         public bool hasTransparentCout;
         public uint renderTypeOffset;
         public uint matFlag;
-        public void SetFlag (EMatFlag f, bool add)
+        public void SetFlag(EMatFlag f, bool add)
         {
             if (add)
             {
-                matFlag |= (uint) f;
+                matFlag |= (uint)f;
             }
             else
             {
-                matFlag &= ~((uint) f);
+                matFlag &= ~((uint)f);
             }
         }
 
-        public bool HasFlag (EMatFlag f)
+        public bool HasFlag(EMatFlag f)
         {
-            return (matFlag & (uint) f) != 0;
+            return (matFlag & (uint)f) != 0;
         }
 
-        public void Clone (MatShaderType src)
+        public void Clone(MatShaderType src)
         {
             name = src.name;
             shader = src.shader;
             macro = src.macro;
-            shaderPropertys.Clear ();
+            shaderPropertys.Clear();
             for (int i = 0; i < src.shaderPropertys.Count; ++i)
             {
                 var sp = src.shaderPropertys[i];
-                shaderPropertys.Add (new ShaderProperty ()
+                shaderPropertys.Add(new ShaderProperty()
                 {
                     shaderProperty = sp.shaderProperty,
-                        isTex = sp.isTex,
-                        shaderID = sp.shaderID,
+                    isTex = sp.isTex,
+                    shaderID = sp.shaderID,
                 });
             }
 
@@ -395,17 +395,17 @@ namespace CFEngine
         {
             public bool isNor = false;
             public DependencyType dependencyType = DependencyType.Or;
-            public List<string> dependencyShaderProperty = new List<string> ();
+            public List<string> dependencyShaderProperty = new List<string>();
 
-            public void Clone (ShaderPropertyDependency src)
+            public void Clone(ShaderPropertyDependency src)
             {
                 isNor = src.isNor;
                 dependencyType = src.dependencyType;
-                dependencyShaderProperty.Clear ();
-                dependencyShaderProperty.AddRange (src.dependencyShaderProperty);
+                dependencyShaderProperty.Clear();
+                dependencyShaderProperty.AddRange(src.dependencyShaderProperty);
             }
         }
-       [System.Serializable]
+        [System.Serializable]
         public class ShaderCustomProperty
         {
             public bool folder = false;
@@ -439,7 +439,7 @@ namespace CFEngine
                 new ShaderCustomProperty(),
                 new ShaderCustomProperty(),
             };
-            public ShaderPropertyDependency dependencyPropertys = new ShaderPropertyDependency ();
+            public ShaderPropertyDependency dependencyPropertys = new ShaderPropertyDependency();
             public bool folder = false;
 
             [System.NonSerialized]
@@ -447,14 +447,14 @@ namespace CFEngine
             public Rect SelectRect { get { return rect; } set { rect = value; } }
             public string Name { get { return name; } set { name = value; } }
 
-            public void Clone (ShaderFeature src)
+            public void Clone(ShaderFeature src)
             {
                 hide = src.hide;
                 readOnly = src.readOnly;
                 shaderGroupName = src.shaderGroupName;
                 propertyName = src.propertyName;
                 type = src.type;
-                dependencyPropertys.Clone (src.dependencyPropertys);
+                dependencyPropertys.Clone(src.dependencyPropertys);
 
             }
         }
@@ -464,7 +464,7 @@ namespace CFEngine
         {
             public bool folder = false;
             public Shader shader;
-            public List<string> shaderFeatures = new List<string> ();
+            public List<string> shaderFeatures = new List<string>();
             public bool customGroupDraw = false;
         }
 
@@ -494,9 +494,6 @@ namespace CFEngine
             public string Name { get { return name; } set { name = value; } }
         }
         public string ResourcePath = "Assets/BundleRes";
-        public string SceneLibPath = "Assets/Scenes/Scenelib";
-        public string EditorResourcePath = "Assets/Editor/EditorResources";
-        public string EngineResPath = "Assets/Engine/Editor/EditorResources";
         public string Bandpose_Str = "Bandpose";
         public string Fbx_Ext = ".fbx";
         public string Creature_Path = "Assets/Creatures";
@@ -515,12 +512,6 @@ namespace CFEngine
         public string DummyMatFolder = "MatShader";
         public string Table_Path = "Assets/Table/";
         public string Table_Bytes_Path = "Assets/BundleRes/Table/";
-        public string TerrainDirStr = "Terrain";
-        public string ConfigStr = "_Config";
-        public string SceneConfigStr = "_SceneConfig";
-
-
-        public string SceneCombineObjName = "GameObject";
         public string ReadableMeshSuffix = "_readable.asset";
 
         public string EditorSceneRes = "/EditorSceneRes";
@@ -537,7 +528,7 @@ namespace CFEngine
             "Custom/PBS/Entity"
         };
 
-        public static string[] EditorGoPath = new string[(int) EditorSceneObjectType.Num]
+        public static string[] EditorGoPath = new string[(int)EditorSceneObjectType.Num]
         {
             "EditorScene",
             "Light",
@@ -551,15 +542,6 @@ namespace CFEngine
             "MeshTerrain",
             "UnityTerrain",
         };
-
-        public LightmapParameters[] LightmapParam;
-        public Material TerrainEditMat;
-        public Material TerrainMergeMat;
-        public Material TerrainMeshMat;
-        public Material TerrainBakeBaseMap;
-        public Material PreviewMat;
-        public Material[] TerrainPreviewMat;
-        public Material Outline;
 
         public Material ShadowCaster;
         public Material CombineNormal;
@@ -577,7 +559,7 @@ namespace CFEngine
         public List<TexCompressConfig> texCompressConfig = new List<TexCompressConfig>();
         [HideInInspector]
         public bool groupFolder = false;
-        public List<string> ShaderGroupInfo = new List<string> ()
+        public List<string> ShaderGroupInfo = new List<string>()
         {
             "Default",
             "Base",
@@ -668,30 +650,26 @@ namespace CFEngine
         [HideInInspector]
         public bool shaderInfoFolder = false;
 
-        public List<ShaderInfo> ShaderInfos = new List<ShaderInfo> ();
+        public List<ShaderInfo> ShaderInfos = new List<ShaderInfo>();
         [HideInInspector]
         public bool dummyMaterialsFolder = false;
         [HideInInspector]
-        public List<DummyMaterialInfo> sceneDummyMaterials = new List<DummyMaterialInfo> (64);
+        public List<DummyMaterialInfo> sceneDummyMaterials = new List<DummyMaterialInfo>(64);
+
+        public List<DummyMaterialInfo> roleMaterials = new List<DummyMaterialInfo>();
 
         [HideInInspector]
-        public bool roleMatFolder = false;
-        [HideInInspector]
-        public bool specialMatFolder = false;
-        public List<DummyMaterialInfo> roleMaterials = new List<DummyMaterialInfo> ();
-
-        [HideInInspector]
-        public List<DummyMaterialInfo> effectMaterials = new List<DummyMaterialInfo> ();
+        public List<DummyMaterialInfo> effectMaterials = new List<DummyMaterialInfo>();
         [HideInInspector]
         public bool sceneMatInfoFolder;
 
         [HideInInspector]
-        public List<DummyMaterialInfo> customMaterials = new List<DummyMaterialInfo> ();
+        public List<DummyMaterialInfo> customMaterials = new List<DummyMaterialInfo>();
         [HideInInspector]
         public bool customMatInfoFolder;
 
         [HideInInspector]
-        public List<ShaderProperty> commonShaderProperty = new List<ShaderProperty> ()
+        public List<ShaderProperty> commonShaderProperty = new List<ShaderProperty>()
         {
             //tex
             new ShaderProperty () { shaderProperty = "_MainTex", isTex = true, shaderID = (int) EShaderKeyID.BaseTex },
@@ -701,7 +679,7 @@ namespace CFEngine
         };
 
         [HideInInspector]
-        public List<ShaderProperty> shaderPropertyKey = new List<ShaderProperty> ()
+        public List<ShaderProperty> shaderPropertyKey = new List<ShaderProperty>()
         {
             //tex
             new ShaderProperty () { shaderProperty = "_BaseTex", isTex = true, shaderID = (int) EShaderKeyID.BaseTex },
@@ -709,7 +687,7 @@ namespace CFEngine
         };
 
         [HideInInspector]
-        public List<MatShaderType> matShaderType = new List<MatShaderType> ()
+        public List<MatShaderType> matShaderType = new List<MatShaderType>()
         {
             new MatShaderType ()
             {
@@ -758,19 +736,19 @@ namespace CFEngine
             {
                 if (g_AssetsConfig == null)
                 {
-                    g_AssetsConfig = AssetDatabase.LoadAssetAtPath<AssetsConfig> ("Assets/Engine/Editor/EditorResources/AssetsConfig.asset");
+                    g_AssetsConfig = AssetDatabase.LoadAssetAtPath<AssetsConfig>("Assets/Engine/Editor/EditorResources/AssetsConfig.asset");
                 }
                 if (g_AssetsConfig == null)
                 {
-                    g_AssetsConfig = ScriptableObject.CreateInstance<AssetsConfig> ();
+                    g_AssetsConfig = ScriptableObject.CreateInstance<AssetsConfig>();
                 }
                 return g_AssetsConfig;
             }
         }
 
-        public static Dictionary<string, ShaderFeature> GetShaderFeatureList ()
+        public static Dictionary<string, ShaderFeature> GetShaderFeatureList()
         {
-            Dictionary<string, ShaderFeature> shaderFeatures = new Dictionary<string, ShaderFeature> ();
+            Dictionary<string, ShaderFeature> shaderFeatures = new Dictionary<string, ShaderFeature>();
 
             for (int i = 0; i < GlobalAssetsConfig.ShaderFeatures.Count; ++i)
             {
@@ -780,19 +758,19 @@ namespace CFEngine
             return shaderFeatures;
         }
 
-        public static void GetGroupedShaderFeatureList (Dictionary<string, List<ShaderFeature>> groupedShaderFeatures)
+        public static void GetGroupedShaderFeatureList(Dictionary<string, List<ShaderFeature>> groupedShaderFeatures)
         {
-            groupedShaderFeatures.Clear ();
+            groupedShaderFeatures.Clear();
             for (int i = 0; i < GlobalAssetsConfig.ShaderFeatures.Count; ++i)
             {
                 ShaderFeature sf = GlobalAssetsConfig.ShaderFeatures[i];
                 List<ShaderFeature> sfList;
-                if (!groupedShaderFeatures.TryGetValue (sf.shaderGroupName, out sfList))
+                if (!groupedShaderFeatures.TryGetValue(sf.shaderGroupName, out sfList))
                 {
-                    sfList = new List<ShaderFeature> ();
+                    sfList = new List<ShaderFeature>();
                     groupedShaderFeatures[sf.shaderGroupName] = sfList;
                 }
-                sfList.Add (sf);
+                sfList.Add(sf);
             }
         }
         public TextAsset debugFile;
