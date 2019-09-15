@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.IO;
-using CFEngine;
 
 namespace CFEngine.Editor
 {

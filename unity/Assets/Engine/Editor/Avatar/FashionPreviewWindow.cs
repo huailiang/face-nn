@@ -155,6 +155,11 @@ namespace XEditor
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
+
+            if (paint != null)
+            {
+                paint.OnGui();
+            }
         }
 
 
@@ -164,10 +169,10 @@ namespace XEditor
             {
                 if (isAutoRot) go.transform.Rotate(Vector3.up, 0.1f);
                 PlayAnim();
-                // if (paint != null)
-                // {
-                //     paint.Update();
-                // }
+                if (paint != null)
+                {
+                    paint.Update();
+                }
             }
         }
 

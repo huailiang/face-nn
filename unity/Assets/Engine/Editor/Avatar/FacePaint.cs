@@ -2,12 +2,19 @@
 using UnityEditor;
 using UnityEngine;
 using CFEngine;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+
+/*
+ *  捏脸-妆容
+ */
 
 public class FacePaint
 {
 
     FaceData data;
-
+    RoleShape roleShape;
     public Texture2D mainTex;
     public Texture2D tex1;
     public Vector2 offset1 = new Vector2(256, 256);
@@ -72,15 +79,115 @@ public class FacePaint
         var skr = face.gameObject.GetComponent<SkinnedMeshRenderer>();
         outputMat = skr.sharedMaterial;
         mainTex = outputMat.GetTexture(ShaderIDs.BaseTex) as Texture2D;
-        tex1 = GetPaintTex(data.paintData[0].texture, shape);
-        tex2 = GetPaintTex(data.paintData[3].texture, shape);
-        tex3 = GetPaintTex(data.paintData[6].texture, shape);
-        tex4 = GetPaintTex(data.paintData[9].texture, shape);
-        tex5 = GetPaintTex(data.paintData[13].texture, shape);
+        roleShape = shape;
         CreateRT();
         Update();
+        EditorSceneManager.sceneClosed += OnSceneClose;
     }
 
+    int[] ibrows, ieyes, inoses, imouths, iears;
+    string[] brows, eyes, noses, mouths, ears;
+    int iBrow, iEye, iNose, iMouth, iEar;
+
+
+    private void AnlyData()
+    {
+        if (brows == null && data != null)
+        {
+            Dictionary<string, int> bwdic = new Dictionary<string, int>();
+            Dictionary<string, int> eydic = new Dictionary<string, int>();
+            Dictionary<string, int> nsdic = new Dictionary<string, int>();
+            Dictionary<string, int> mtdic = new Dictionary<string, int>();
+            Dictionary<string, int> eadic = new Dictionary<string, int>();
+            for (int i = 0; i < data.paintData.Length; i++)
+            {
+                PaintData it = data.paintData[i];
+                if (it.type == PaintSubType.BROW)
+                {
+                    bwdic.Add(it.name, i);
+                }
+                else if (it.type == PaintSubType.EYE)
+                {
+                    eydic.Add(it.name, i);
+                }
+                else if (it.type == PaintSubType.FACE)
+                {
+                    nsdic.Add(it.name, i);
+                }
+                else if (it.type == PaintSubType.MOUTH)
+                {
+                    mtdic.Add(it.name, i);
+                }
+                else if (it.type == PaintSubType.Pupil)
+                {
+                    eadic.Add(it.name, i);
+                }
+            }
+            brows = new string[bwdic.Count];
+            ibrows = new int[bwdic.Count];
+            bwdic.Keys.CopyTo(brows, 0);
+            bwdic.Values.CopyTo(ibrows, 0);
+            eyes = new string[eydic.Count];
+            ieyes = new int[eydic.Count];
+            eydic.Keys.CopyTo(eyes, 0);
+            eydic.Values.CopyTo(ieyes, 0);
+            noses = new string[nsdic.Count];
+            inoses = new int[nsdic.Count];
+            nsdic.Keys.CopyTo(noses, 0);
+            nsdic.Values.CopyTo(inoses, 0);
+            mouths = new string[mtdic.Count];
+            imouths = new int[mtdic.Count];
+            mtdic.Keys.CopyTo(mouths, 0);
+            mtdic.Values.CopyTo(imouths, 0);
+            ears = new string[eadic.Count];
+            iears = new int[eadic.Count];
+            eadic.Keys.CopyTo(ears, 0);
+            eadic.Values.CopyTo(iears, 0);
+        }
+    }
+
+    public void OnGui()
+    {
+        AnlyData();
+        GUILayout.BeginVertical();
+        GUILayout.Space(16);
+        GUILayout.Label("Face Paint");
+        GuiItem("brew", brows, ref iBrow);
+        GuiItem("eye", eyes, ref iEye);
+        GuiItem("face", noses, ref iNose);
+        GuiItem("mouth", mouths, ref iMouth);
+        GuiItem("pupil", ears, ref iEar);
+        GUILayout.EndVertical();
+        UpdatePainTex();
+    }
+
+
+    private void GuiItem(string name, string[] ctx, ref int idx)
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(name);
+        GUILayout.FlexibleSpace();
+        idx = EditorGUILayout.Popup(idx, ctx);
+        GUILayout.EndHorizontal();
+    }
+
+    private void UpdatePainTex()
+    {
+        tex1 = GetPaintTex(data.paintData[ibrows[iBrow]].texture, roleShape);
+        tex2 = GetPaintTex(data.paintData[ieyes[iEye]].texture, roleShape);
+        tex3 = GetPaintTex(data.paintData[inoses[iNose]].texture, roleShape);
+        tex4 = GetPaintTex(data.paintData[imouths[iMouth]].texture, roleShape);
+        tex5 = GetPaintTex(data.paintData[iears[iEar]].texture, roleShape);
+    }
+
+    private void OnSceneClose(Scene scene)
+    {
+        Debug.Log("close scene:" + scene.name);
+        if (outputMat)
+        {
+            outputMat.SetTexture(ShaderIDs.BaseTex, mainTex);
+        }
+    }
 
     private void CreateRT()
     {
@@ -137,8 +244,7 @@ public class FacePaint
         Shader.SetGlobalVector("_Part5_HSB", new Vector3(hue5, saturate5, heavy5));
 
         Graphics.Blit(mainTex, mainRt, mat);
-        outputMat.SetTexture(ShaderIDs.BaseTex, mainRt);
-
+        if (outputMat) outputMat.SetTexture(ShaderIDs.BaseTex, mainRt);
     }
 
 }
