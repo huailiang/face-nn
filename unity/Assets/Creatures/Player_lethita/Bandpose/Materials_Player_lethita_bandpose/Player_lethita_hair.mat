@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Player_lethita_hair
+  m_Shader: {fileID: 4800000, guid: bcf1c9a0aa118fe4f97a7b0444a4ed5a, type: 3}
+  m_ShaderKeywords: _PBS_FROM_COLOR
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseTex:
+        m_Texture: {fileID: 2800000, guid: 960e65876526a434d951990cb4ad4556, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 960e65876526a434d951990cb4ad4556, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PBSTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ShiftTex:
+        m_Texture: {fileID: 2800000, guid: 86e6389da7389fc4889f0c8d3ada880a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecTex:
+        m_Texture: {fileID: 2800000, guid: 4090b23bb32af1b4baffb30f62eebdbc, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _DebugMode: 0
+    - _DstBlend: 0
+    - _ShiftInte: 1
+    - _SrcBlend: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _HairColor: {r: 1, g: 1, b: 1, a: 1}
+    - _HairRootColor: {r: 0.80784315, g: 0.6117647, b: 0.6117647, a: 1}
+    - _Parameter: {r: 0.5, g: 4.82, b: 9.94, a: 6}
+    - _Parameter01: {r: 1, g: 1, b: 1, a: 1}
+    - _PbsColor: {r: 0.75, g: 0.75, b: 1, a: 0}
+    - _Rim: {r: 0, g: 0, b: 0, a: 1}
+    - _RimColor: {r: 0.7794118, g: 0.7564879, b: 0.7564879, a: 1}
+    - _SpecColor: {r: 0.75735295, g: 0.6682526, b: 0.6682526, a: 0.991}

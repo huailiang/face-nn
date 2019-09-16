@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Player_vella_weapon
+  m_Shader: {fileID: 4800000, guid: e4de0a982a4beda47ac898d08662d621, type: 3}
+  m_ShaderKeywords: _NORMALMAP
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseTex:
+        m_Texture: {fileID: 2800000, guid: 7377185325b79c646b0654cedb54f9ab, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PBSTex:
+        m_Texture: {fileID: 2800000, guid: 0af03138dd060694b88b2838f3cc6301, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _DebugMode: 0
+    - _DstBlend: 0
+    - _SrcBlend: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _Color: {r: 0.5882353, g: 0.5882353, b: 0.5882353, a: 1}
+    - _ColorB: {r: 0.5588235, g: 0.28762972, b: 0.28762972, a: 0.072}
+    - _ColorG: {r: 0.7867647, g: 0.76234794, b: 0.6826341, a: 0.172}
+    - _ColorR: {r: 0.73745674, g: 0.8252118, b: 0.9117647, a: 0.178}
+    - _PbsColor: {r: 0.5, g: 0.5, b: 1, a: 0}
+    - _Rim: {r: 0, g: 0, b: 0, a: 1}
+    - _SkinSpecularScatter: {r: 0.9, g: 1, b: 0.7, a: 0}
+    - _SkinTranslucency: {r: 0, g: 1, b: 1, a: 0}

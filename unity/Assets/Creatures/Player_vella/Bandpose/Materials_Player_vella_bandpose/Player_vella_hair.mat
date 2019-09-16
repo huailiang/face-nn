@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Player_vella_hair
+  m_Shader: {fileID: 4800000, guid: bcf1c9a0aa118fe4f97a7b0444a4ed5a, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 9afd1ba79547dc249a722f5920245f39, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ShiftTex:
+        m_Texture: {fileID: 2800000, guid: 86e6389da7389fc4889f0c8d3ada880a, type: 3}
+        m_Scale: {x: 10, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecTex:
+        m_Texture: {fileID: 2800000, guid: 4090b23bb32af1b4baffb30f62eebdbc, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _ShiftInte: 1
+    m_Colors:
+    - _HairColor: {r: 0.5588235, g: 0.045198902, b: 0.045198902, a: 0.101960786}
+    - _HairRootColor: {r: 0.09999994, g: 0.09999994, b: 0.09999994, a: 1}
+    - _Parameter: {r: 1.16, g: 0.97, b: 2.11, a: 10}
+    - _Parameter01: {r: 2.17, g: 0.49, b: 1.54, a: 0}
+    - _RimColor: {r: 0.38823527, g: 0.24705878, b: 0.24705878, a: 1}
+    - _SmoothStep: {r: -2.52, g: 2, b: 2.24, a: 0.21}
+    - _SpecColor: {r: 0.7058823, g: 0.33737022, b: 0.5889749, a: 0.5}
