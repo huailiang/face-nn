@@ -16,9 +16,9 @@ namespace XEngine
         public float hdrScale = 4.6f;
         public float hdrPow = 0.1f;
         public float hdrAlpha = 0.5f;
-        [CFRange(0, 1)]
+        [XEngine.RangeAttribute(0, 1)]
         public float lightmapShadowMask = 0.25f;
-        [CFRange(0, 1)]
+        [XEngine.RangeAttribute(0, 1)]
         public float shadowIntensity = 0.1f;
         //Lighting
         public LightingModify lighting = null;
@@ -35,9 +35,8 @@ namespace XEngine
         public float shadowPower = 2f;
         public FogModify fog = null;
         public bool fogEnable = true;
-        [CFNoSerialized]
+        [NoSerialized]
         public SceneData sceneData = null;
-
 
         private ResHandle EnveriomentCube;
         private ResHandle SkyBoxMat;
@@ -62,7 +61,6 @@ namespace XEngine
         public float shadowOrthoSize;
         [System.NonSerialized]
         public bool saveingFile = false;
-
 #endif
 
         void Awake()
@@ -216,7 +214,6 @@ namespace XEngine
         public void LoadRes(bool loadEnvCube = true, bool loadSkyBox = true)
         {
             ProcessLoadCb processResCb = ProcessResCb;
-
             if (loadEnvCube && !string.IsNullOrEmpty(EnveriomentCubePath))
             {
                 string suffix = EnveriomentCubePath.EndsWith("HDR") ? ".exr" : ".tga";
@@ -259,13 +256,9 @@ namespace XEngine
 
 #if UNITY_EDITOR
 
-            EnverinmentExtra ee = GetComponent<EnverinmentExtra> ();
-            if (ee != null)
-            {
-                ee.Init ();
-            }
+            EnverinmentExtra ee = GetComponent<EnverinmentExtra>();
+            if (ee != null) ee.Init();
 #endif
-
         }
 
         public void Uninit()
@@ -291,6 +284,7 @@ namespace XEngine
                 }
             }
         }
+
         public void UpdateEnv()
         {
             //IBL
@@ -318,16 +312,16 @@ namespace XEngine
 
 
 #if UNITY_EDITOR
-         if (lighting.needUpdate)
+            if (lighting.needUpdate)
 #endif
             {
                 SetLightInfo(ref lighting.roleLightInfo0, ShaderIDs.Env_DirectionalLightDir, ShaderIDs.Env_DirectionalLightColor);
                 SetLightInfo(ref lighting.roleLightInfo1, ShaderIDs.Env_DirectionalLightDir1, ShaderIDs.Env_DirectionalLightColor1);
             }
 #if UNITY_EDITOR
-                if (ambient.needUpdate)
+            if (ambient.needUpdate)
 #endif
-            Shader.SetGlobalColor(ShaderIDs.Env_AmbientParam, new Vector4(ambient.AmbientMax, 0, 0, 0));
+                Shader.SetGlobalColor(ShaderIDs.Env_AmbientParam, new Vector4(ambient.AmbientMax, 0, 0, 0));
 
 
 #if UNITY_EDITOR
@@ -462,7 +456,7 @@ namespace XEngine
 #if UNITY_EDITOR
             if (sceneData.CameraRef == null)
             {
-                InitRender (this.GetComponent<Camera> ());
+                InitRender(this.GetComponent<Camera>());
             }
 #endif
             UpdateCameraInternal();
@@ -476,7 +470,7 @@ namespace XEngine
         {
             if (!saveingFile)
             {
-                if (lighting != null && fog != null )
+                if (lighting != null && fog != null)
                 {
                     UpdateEnv();
                     bool hasFog = fogEnable;
@@ -489,10 +483,9 @@ namespace XEngine
                 }
                 ManualUpdate();
             }
-
         }
 
-        public void SyncGameCamera ()
+        public void SyncGameCamera()
         {
             if (SceneView.lastActiveSceneView != null && SceneView.lastActiveSceneView.camera != null &&
                 sceneData.CameraTransCache != null)
@@ -504,7 +497,7 @@ namespace XEngine
             }
         }
 
-        public void SyncLight (Light l, ref LightInfo li)
+        public void SyncLight(Light l, ref LightInfo li)
         {
             li.lightDir = l.transform.rotation * -Vector3.forward;
             li.lightColor = l.color;
@@ -512,5 +505,7 @@ namespace XEngine
         }
 
 #endif
+
     }
+
 }

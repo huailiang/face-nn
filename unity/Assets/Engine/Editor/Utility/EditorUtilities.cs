@@ -59,14 +59,14 @@ namespace XEngine.Editor
             var types = RuntimeUtilities.GetAllAssemblyTypes()
                             .Where(
                                 t => t.IsSubclassOf(typeof(AttributeDecorator))
-                                  && t.IsDefined(typeof(CFDecoratorAttribute), false)
+                                  && t.IsDefined(typeof(DecoratorAttribute), false)
                                   && !t.IsAbstract
                             );
 
             // Store them
             foreach (var type in types)
             {
-                var attr = type.GetAttribute<CFDecoratorAttribute>();
+                var attr = type.GetAttribute<DecoratorAttribute>();
                 var decorator = (AttributeDecorator)Activator.CreateInstance(type);
                 s_AttributeDecorators.Add(attr.attributeType, decorator);
             }

@@ -37,7 +37,7 @@ namespace XEngine.Editor
         protected void PropertyField(SerializedParameter property, GUIContent title)
         {
             // Check for DisplayNameAttribute first
-            var displayNameAttr = property.GetAttribute<CFDisplayNameAttribute>();
+            var displayNameAttr = property.GetAttribute<DisplayNameAttribute>();
             if (displayNameAttr != null)
                 title.text = displayNameAttr.displayName;
 
@@ -86,14 +86,11 @@ namespace XEngine.Editor
                 if (decorator.OnGUI(property, title, attribute))
                     return;
 
-                // Attribute is invalid for the specified property; use default unity field instead
                 invalidProp = true;
             }
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                // Property
-                // using (new EditorGUI.DisabledScope(!property.overrideState.boolValue))
                 {
                     if (decorator != null && !invalidProp)
                     {
@@ -116,5 +113,7 @@ namespace XEngine.Editor
                 }
             }
         }
+
     }
+
 }

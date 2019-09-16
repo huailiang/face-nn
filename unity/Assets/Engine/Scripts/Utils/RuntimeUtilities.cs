@@ -269,16 +269,6 @@ namespace XEngine
 
         #endregion
 
-        #region Maths
-
-        public static float Exp2(float x)
-        {
-            return Mathf.Exp(x * 0.69314718055994530941723212145818f);
-        }
-
-
-        #endregion
-
         #region Reflection
 
 #if UNITY_EDITOR

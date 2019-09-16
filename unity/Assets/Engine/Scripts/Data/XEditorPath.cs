@@ -1,10 +1,9 @@
 ﻿#if UNITY_EDITOR
-using System;
 using UnityEditor;
 
 namespace XEditor
 {
-	public class XEditorPath
+    public class XEditorPath
 	{
         private static readonly string _root = "Assets/BundleRes";
         private static readonly string _editor_root = "Assets/Editor";

@@ -1,17 +1,17 @@
-// #if UNITY_EDITOR
 using System;
 using System.Diagnostics;
 using UnityEngine;
+
 namespace XEngine
 {
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class CFDisplayNameAttribute : Attribute
+    public sealed class DisplayNameAttribute : Attribute
     {
         public readonly string displayName;
 
-        public CFDisplayNameAttribute(string displayName)
+        public DisplayNameAttribute(string displayName)
         {
             this.displayName = displayName;
         }
@@ -19,11 +19,11 @@ namespace XEngine
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class CFMaxAttribute : Attribute
+    public sealed class MaxAttribute : Attribute
     {
         public readonly float max;
 
-        public CFMaxAttribute(float max)
+        public MaxAttribute(float max)
         {
             this.max = max;
         }
@@ -31,11 +31,11 @@ namespace XEngine
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class CFMinAttribute : Attribute
+    public sealed class MinAttribute : Attribute
     {
         public readonly float min;
 
-        public CFMinAttribute(float min)
+        public MinAttribute(float min)
         {
             this.min = min;
         }
@@ -43,12 +43,12 @@ namespace XEngine
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class CFMinMaxAttribute : Attribute
+    public sealed class MinMaxAttribute : Attribute
     {
         public readonly float min;
         public readonly float max;
 
-        public CFMinMaxAttribute(float min, float max)
+        public MinMaxAttribute(float min, float max)
         {
             this.min = min;
             this.max = max;
@@ -56,7 +56,7 @@ namespace XEngine
     }
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class CFTrackballAttribute : Attribute
+    public sealed class TrackballAttribute : Attribute
     {
         public enum Mode
         {
@@ -68,7 +68,7 @@ namespace XEngine
 
         public readonly Mode mode;
 
-        public CFTrackballAttribute(Mode mode)
+        public TrackballAttribute(Mode mode)
         {
             this.mode = mode;
         }
@@ -78,12 +78,12 @@ namespace XEngine
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class CFRangeAttribute : PropertyAttribute
+    public class RangeAttribute : PropertyAttribute
     {
         public readonly float min;
         public readonly float max;
 
-        public CFRangeAttribute(float min, float max)
+        public RangeAttribute(float min, float max)
         {
             this.min = min;
             this.max = max;
@@ -93,13 +93,13 @@ namespace XEngine
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class CFResPathAttribute : PropertyAttribute
+    public class ResPathAttribute : PropertyAttribute
     {
         public readonly Type type;
         public readonly string buttonName;
         public readonly string buttonName2;
         public readonly string buttonName3;
-        public CFResPathAttribute(Type type, string buttonName, string buttonName2, string buttonName3)
+        public ResPathAttribute(Type type, string buttonName, string buttonName2, string buttonName3)
         {
             this.type = type;
             this.buttonName = buttonName;
@@ -110,7 +110,7 @@ namespace XEngine
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class CFColorUsageAttribute : PropertyAttribute
+    public sealed class ColorUsageAttribute: PropertyAttribute
     {
         //
         //     If false then the alpha bar is hidden in the ColorField and the alpha value is
@@ -161,18 +161,16 @@ namespace XEngine
         //
         //   maxExposureValue:
         //     Maximum exposure value allowed in the HDR Color Picker (default value: 3).
-        public CFColorUsageAttribute(bool showAlpha)
+        public ColorUsageAttribute(bool showAlpha)
         {
             this.showAlpha = showAlpha;
         }
 
         //
-        // ժҪ:
         //     ///
         //     Attribute for Color fields. Used for configuring the GUI for the color.
         //     ///
         //
-        // ����:
         //   showAlpha:
         //     If false then the alpha channel info is hidden both in the ColorField and in
         //     the Color Picker.
@@ -194,7 +192,7 @@ namespace XEngine
         //
         //   maxExposureValue:
         //     Maximum exposure value allowed in the HDR Color Picker (default value: 3).
-        public CFColorUsageAttribute(bool showAlpha, bool hdr, float minBrightness, float maxBrightness, float minExposureValue, float maxExposureValue)
+        public ColorUsageAttribute(bool showAlpha, bool hdr, float minBrightness, float maxBrightness, float minExposureValue, float maxExposureValue)
         {
             this.showAlpha = showAlpha;
 
@@ -212,11 +210,10 @@ namespace XEngine
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class CFNoSerializedAttribute : Attribute
+    public sealed class NoSerializedAttribute : Attribute
     {
-        internal CFNoSerializedAttribute()
+        internal NoSerializedAttribute()
         {
         }
     }
 }
-// #endif

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using CFUtilPoolLib;
 using UnityEditor;
 using UnityEngine;
 
@@ -23,8 +19,6 @@ namespace XEngine.Editor
         private SerializedProperty drawType;
         private SerializedProperty quadIndex;
         private SerializedProperty showObjects;
-        private SerializedProperty drawLightBox;
-        private SerializedProperty isDebugLayer;
 
         private SerializedProperty debugMode;
         private SerializedProperty debugDisplayType;
@@ -47,9 +41,7 @@ namespace XEngine.Editor
             drawType = FindProperty(x => x.drawType);
             quadIndex = FindProperty(x => x.quadIndex);
             showObjects = FindProperty(x => x.showObjects);
-            drawLightBox = FindProperty(x => x.drawLightBox);
-
-            isDebugLayer = FindProperty(x => x.isDebugLayer);
+            
             debugMode = FindProperty(x => x.debugContext.debugMode);
             debugDisplayType = FindProperty(x => x.debugContext.debugDisplayType);
             splitAngle = FindParameter(x => x.debugContext.splitAngle);
@@ -140,29 +132,9 @@ namespace XEngine.Editor
                 if (ToolsUtility.BeginFolderGroup("Debug", ref ee.debugFolder))
                 {
                     EditorGUILayout.PropertyField(drawType);
-                    EditorGUILayout.PropertyField(drawLightBox);
-                    if (drawLightBox.boolValue)
-                    {
-                        EditorGUI.BeginChangeCheck();
-                    }
-                    EditorGUI.BeginChangeCheck();
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        debugMode.intValue = 0;
-                        debugDisplayType.intValue = 0;
-                        splitAngle.value.floatValue = 0;
-                        splitPos.floatValue = 0;
-                    }
-                    string[] debugNames = null;
-                    bool refreshDebug = false;
 
-                    if (GUILayout.Button("Refresh"))
-                    {
-                        refreshDebug = true;
-                    }
-                    debugNames = AssetsConfig.shaderDebugNames;
+                    string[] debugNames = AssetsConfig.shaderDebugNames;
                     ee.debugContext.shaderID = EnverinmentExtra.debugShaderIDS;
-
 
                     if (debugNames != null)
                     {
@@ -200,16 +172,11 @@ namespace XEngine.Editor
 
                     }
                     ToolsUtility.EndFolderGroup();
-                    if (refreshDebug)
-                    {
-                        AssetsConfig.RefreshShaderDebugNames();
-                    }
                 }
             }
             serializedObject.ApplyModifiedProperties();
         }
 
-
-
     }
+
 }

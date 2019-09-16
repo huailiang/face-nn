@@ -13,7 +13,7 @@ namespace XEngine
         Opaque,
         Cutout,
         CutoutTransparent,
-        Transparent, // Physically plausible transparency mode, implemented as alpha pre-multiply
+        Transparent,
     }
     public enum SpriteSize
     {
@@ -93,7 +93,7 @@ namespace XEngine
         public DebugDisplayType debugDisplayType = DebugDisplayType.Split;
         public float splitLeft = -1;
         public float splitRight = 1;
-        [CFRange(-45, 45)]
+        [XEngine.RangeAttribute(-45, 45)]
         public float splitAngle = 0;
         public float splitPos = 0;
         [NonSerialized]
@@ -158,13 +158,6 @@ namespace XEngine
         }
     }
 
-    [System.Serializable]
-    public struct SceneLoadInfo
-    {
-        public string name;
-        public int count;
-    }
-
     public enum ESceneMaterial : int
     {
         SceneCommon = 0,
@@ -224,7 +217,6 @@ namespace XEngine
     public class TexCompressFilter
     {
         public TexFilterType type = TexFilterType.Or;
-        // public bool isNor = false;
         public string str;
     }
 
@@ -670,7 +662,6 @@ namespace XEngine
         [HideInInspector]
         public List<ShaderProperty> commonShaderProperty = new List<ShaderProperty>()
         {
-            //tex
             new ShaderProperty () { shaderProperty = "_MainTex", isTex = true, shaderID = (int) EShaderKeyID.BaseTex },
             new ShaderProperty () { shaderProperty = "_MainColor", shaderID = (int) EShaderKeyID.MainColor },
             new ShaderProperty () { shaderProperty = "_MagicParam", shaderID = (int) EShaderKeyID.MagicParam },
@@ -680,7 +671,6 @@ namespace XEngine
         [HideInInspector]
         public List<ShaderProperty> shaderPropertyKey = new List<ShaderProperty>()
         {
-            //tex
             new ShaderProperty () { shaderProperty = "_BaseTex", isTex = true, shaderID = (int) EShaderKeyID.BaseTex },
             new ShaderProperty () { shaderProperty = "_PBSTex", isTex = true, shaderID = (int) EShaderKeyID.PBSTex },
         };
@@ -777,55 +767,48 @@ namespace XEngine
         {
             if (shaderDebugNames == null || force)
             {
-                try
+                if (GlobalAssetsConfig.debugFile != null)
                 {
-                    if (AssetsConfig.GlobalAssetsConfig.debugFile != null)
+                    string path = AssetDatabase.GetAssetPath(GlobalAssetsConfig.debugFile);
+                    bool parse = false;
+                    using (FileStream fs = new FileStream(path, FileMode.Open))
                     {
-                        string path = AssetDatabase.GetAssetPath(AssetsConfig.GlobalAssetsConfig.debugFile);
-                        bool parse = false;
-                        using (FileStream fs = new FileStream(path, FileMode.Open))
+                        List<string> debugTypeStr = new List<string>();
+                        StreamReader sr = new StreamReader(fs);
+                        while (!sr.EndOfStream)
                         {
-                            List<string> debugTypeStr = new List<string>();
-                            StreamReader sr = new StreamReader(fs);
-                            while (!sr.EndOfStream)
+                            string line = sr.ReadLine();
+                            if (parse)
                             {
-                                string line = sr.ReadLine();
-                                if (parse)
+                                if (line.StartsWith("//DEBUG_END"))
                                 {
-                                    if (line.StartsWith("//DEBUG_END"))
-                                    {
-                                        parse = false;
-                                    }
-                                    else
-                                    {
-                                        string[] str = line.Split(' ');
-                                        if (str.Length >= 3 && str[0] == "#define")
-                                        {
-                                            string debugStr = str[1];
-                                            debugStr = debugStr.Replace("Debug_", "");
-                                            debugTypeStr.Add(debugStr);
-                                        }
-                                    }
+                                    parse = false;
                                 }
                                 else
                                 {
-                                    if (line.StartsWith("//DEBUG_START"))
+                                    string[] str = line.Split(' ');
+                                    if (str.Length >= 3 && str[0] == "#define")
                                     {
-                                        parse = true;
+                                        string debugStr = str[1];
+                                        debugStr = debugStr.Replace("Debug_", "");
+                                        debugTypeStr.Add(debugStr);
                                     }
                                 }
                             }
-                            shaderDebugNames = debugTypeStr.ToArray();
+                            else
+                            {
+                                if (line.StartsWith("//DEBUG_START"))
+                                {
+                                    parse = true;
+                                }
+                            }
                         }
+                        shaderDebugNames = debugTypeStr.ToArray();
                     }
                 }
-                catch (Exception)
-                {
-
-                }
             }
-
         }
     }
 }
+
 #endif

@@ -157,7 +157,7 @@ namespace XEngine
                         var attr = fi.GetCustomAttributes(typeof(NonSerializedAttribute), false).FirstOrDefault();
                         if (attr == null)
                         {
-                            attr = fi.GetCustomAttributes(typeof(CFNoSerializedAttribute), false).FirstOrDefault();
+                            attr = fi.GetCustomAttributes(typeof(NoSerializedAttribute), false).FirstOrDefault();
                             if (attr == null)
                                 Debug.LogError(string.Format("Field {0} not find.", fi.Name));
                         }

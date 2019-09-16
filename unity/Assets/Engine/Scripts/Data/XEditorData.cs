@@ -1,13 +1,8 @@
 ﻿#if UNITY_EDITOR
-using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-
 using CFUtilPoolLib;
-
-using System.IO;
+using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine;
 
 namespace XEditor
 {
