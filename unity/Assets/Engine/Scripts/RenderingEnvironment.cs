@@ -57,12 +57,6 @@ namespace XEngine
         public bool fitWorldSpace = true;
 
 #if UNITY_EDITOR
-        [System.NonSerialized]
-        public bool textureFolder = true;
-        [System.NonSerialized]
-        public bool envLighingFolder = true;
-        [System.NonSerialized]
-        public bool fogFolder = true;
         public static bool isPreview = false;
         [System.NonSerialized]
         public float shadowOrthoSize;

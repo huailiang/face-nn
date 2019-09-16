@@ -25,6 +25,9 @@ namespace XEngine.Editor
         private SerializedProperty fogEnable;
         private SerializedProperty isStreamLoad;
 
+        bool textureFolder = true;
+        bool envLighingFolder = true;
+        bool fogFolder = true;
 
         public void OnEnable()
         {
@@ -57,8 +60,8 @@ namespace XEngine.Editor
             EditorGUI.BeginChangeCheck();
 
             RenderingEnvironment env = target as RenderingEnvironment;
-
-            if (ToolsUtility.BeginFolderGroup("Texture", ref env.textureFolder))
+            textureFolder = EditorGUILayout.Foldout(textureFolder, "Texture");
+            if (textureFolder)
             {
                 Cubemap cube = EditorGUILayout.ObjectField(envCube, typeof(Cubemap), false) as Cubemap;
                 if (cube != envCube)
@@ -93,10 +96,9 @@ namespace XEngine.Editor
                         env.LoadRes(false, true);
                     }
                 }
-                ToolsUtility.EndFolderGroup();
             }
-
-            if (ToolsUtility.BeginFolderGroup("EnvLighting", ref env.envLighingFolder))
+            envLighingFolder = EditorGUILayout.Foldout(envLighingFolder, "EnvLighting");
+            if (envLighingFolder)
             {
                 EditorGUILayout.PropertyField(hdrScale);
                 EditorGUILayout.PropertyField(hdrPow);
@@ -104,11 +106,9 @@ namespace XEngine.Editor
                 EditorGUILayout.PropertyField(ambientMax);
                 PropertyField(lightmapShadowMask);
                 PropertyField(shadowIntensity);
-
-                ToolsUtility.EndFolderGroup();
             }
-
-            if (ToolsUtility.BeginFolderGroup("Fog", ref env.fogFolder))
+            fogFolder = EditorGUILayout.Foldout(fogFolder, "Fog");
+            if (fogFolder)
             {
                 EditorGUILayout.PropertyField(fogEnable);
 
@@ -169,7 +169,6 @@ namespace XEngine.Editor
                         fogParam.Color2 = fogColor2;
                     }
                 }
-                ToolsUtility.EndFolderGroup();
             }
 
             EditorGUILayout.Toggle("Is Stream Load", isStreamLoad.boolValue);

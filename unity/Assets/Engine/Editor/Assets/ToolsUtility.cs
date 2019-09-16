@@ -212,7 +212,7 @@ namespace XEngine.Editor
 
         public static void BeginGroup(string name, bool beginHorizontal = true)
         {
-            BeginGroup(name, new Vector4Int(0, 0, 1000, 200), beginHorizontal);
+            BeginGroup(name, new Vector4Int(0, 0, 1000, 120), beginHorizontal);
         }
 
         public static void BeginGroup(string name, Vector4Int minMax, bool beginHorizontal)
