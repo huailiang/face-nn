@@ -54,17 +54,7 @@ namespace XEditor
             GUILayout.BeginVertical();
             GUILayout.Label(XEditorUtil.Config.suit_shape, XEditorUtil.titleLableStyle);
             GUILayout.Space(8);
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("TALL")) Export(RoleShape.TALL);
-            GUILayout.EndHorizontal();
-            GUILayout.Space(4);
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("GIANT")) Export(RoleShape.GIANT);
-            GUILayout.EndHorizontal();
-            GUILayout.Space(4);
-
+            
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("MALE")) Export(RoleShape.MALE);
             GUILayout.EndHorizontal();
@@ -83,8 +73,6 @@ namespace XEditor
                     XDebug.singleton.AddLog("start export, wait patient");
                     Export(RoleShape.FEMALE);
                     Export(RoleShape.MALE);
-                    Export(RoleShape.GIANT);
-                    Export(RoleShape.TALL);
                     XDebug.singleton.AddGreenLog("all shape export finished");
                 }
                 else

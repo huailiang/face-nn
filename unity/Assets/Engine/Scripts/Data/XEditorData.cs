@@ -132,24 +132,16 @@ namespace XEditor
     public class XItemLibrary
     {
         private static ItemList _item = new ItemList();
-        private static GatherGoodsTable _gather = new GatherGoodsTable();
 
         static XItemLibrary()
         {
             XTableReader.ReadFile(@"Table/ItemList", _item);
-            XTableReader.ReadFile(@"Table/GatherGoods", _gather);
         }
 
         public static ItemList.RowData GetItemInfo(uint itemID)
         {
             return _item.GetByID(itemID);
         }
-
-        public static GatherGoodsTable.RowData GetGatherInfo(int goodsID)
-        {
-            return _gather.GetByGoodsID(goodsID);
-        }
-
     }
 
     public class XDestructionLibrary
@@ -229,12 +221,10 @@ namespace XEditor
     public class XAnimationLibrary
     {
         private static XEntityPresentation _presentations = new XEntityPresentation();
-        private static BeHitTable _beHitDatas = new BeHitTable();
         public static XEntityPresentation Presentations { get { return _presentations; } }
         static XAnimationLibrary()
         {
             XTableReader.ReadFile(@"Table/XEntityPresentation", _presentations);
-            XTableReader.ReadFile(@"Table/BeHit", _beHitDatas);
         }
 
         public static XEntityPresentation.RowData AssociatedAnimations(uint presentid)
@@ -258,30 +248,7 @@ namespace XEditor
             return null;
         }
 
-        public static List<BeHitTable.RowData> FindBeHitTableDatas(uint presentid)
-        {
-            List<BeHitTable.RowData> ret_datas = new List<BeHitTable.RowData>();
-            foreach(var item in _beHitDatas.Table)
-            {
-                if (item.PresentID == presentid)
-                {
-                    ret_datas.Add(item);
-                }
-            }
-            return ret_datas;
-        }
 
-        public static BeHitTable.RowData FindBeHitData(uint presentid, int beHitType)
-        {
-            foreach (var item in _beHitDatas.Table)
-            {
-                if (item.PresentID == presentid && item.HitID == beHitType)
-                {
-                    return item;
-                }
-            }
-            return null;
-        }
 
         public static GameObject GetDummy(uint presentid)
         {

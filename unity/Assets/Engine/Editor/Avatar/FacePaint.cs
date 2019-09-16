@@ -38,7 +38,7 @@ public class FacePaint
     GameObject helmet;
     Camera camera;
     Vector3 cam1 = new Vector3(0, 1, -10);
-    Vector3 cam2 = new Vector3(0, 2, -9);
+    Vector3 cam2 = new Vector3(0, 1.7f, -9);
     bool focusFace;
 
     public void Initial(GameObject go, RoleShape shape)
