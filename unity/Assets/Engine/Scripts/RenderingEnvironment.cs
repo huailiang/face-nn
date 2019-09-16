@@ -1,15 +1,11 @@
-﻿using System.Collections.Generic;
-using CFUtilPoolLib;
+﻿using CFUtilPoolLib;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 #if UNITY_EDITOR
-using System;
-using System.Reflection;
 using UnityEditor;
 #endif
 
-namespace CFEngine
+namespace XEngine
 {
     [DisallowMultipleComponent, ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]

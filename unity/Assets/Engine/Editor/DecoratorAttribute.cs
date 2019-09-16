@@ -1,5 +1,5 @@
 using System;
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

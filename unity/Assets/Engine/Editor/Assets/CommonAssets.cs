@@ -4,9 +4,9 @@ using System.IO;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using CFEngine;
+using XEngine;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     internal class CommonAssets
     {

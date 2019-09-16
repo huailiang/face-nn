@@ -1,7 +1,7 @@
 //#if UNITY_EDITOR
 using UnityEngine;
 
-namespace CFEngine
+namespace XEngine
 {
     public static class ColorUtilities
     {

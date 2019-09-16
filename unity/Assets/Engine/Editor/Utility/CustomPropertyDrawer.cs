@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     public class CustomPropertyDrawer
     {

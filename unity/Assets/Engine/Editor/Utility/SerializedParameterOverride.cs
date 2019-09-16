@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using UnityEditor;
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     public class SerializedParameter
     {

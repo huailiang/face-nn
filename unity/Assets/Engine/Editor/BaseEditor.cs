@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngineEditor = UnityEditor.Editor;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     public class BaseEditor<T> : UnityEngineEditor
         where T : UnityEngine.Object

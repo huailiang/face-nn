@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.IO;
-using CFEngine;
+using XEngine;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     internal class TableAssets
     {

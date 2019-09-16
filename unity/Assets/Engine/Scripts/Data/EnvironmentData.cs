@@ -8,7 +8,7 @@ using System.IO;
 using UnityEditor;
 #endif
 
-namespace CFEngine
+namespace XEngine
 {
     public struct EnverinmentContext
     {

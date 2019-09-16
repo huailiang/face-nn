@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using CFEngine;
+using XEngine;
 using CFUtilPoolLib;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -98,12 +98,9 @@ public sealed class RenderingManager : IRenderManager
     public bool settingsUpdateNeeded = true;
     public bool alwaysEnablePostproecss = false;
     private List<ParameterOverride> m_CachedRuntimeParam;
-    // private CommandBuffer afterAlphaCb = null;
     private List<RenderBatch> afterAlphaBatchesRef = null;
-
     public Vector4 sunForward = new Vector4(0, -1, 0, 0);
-
-    // public Vector3 sunColor = new Vector3(1, 1, 1);
+    
     public float rtScale = 1;
     public int width = 1136;
     public int height = 640;
@@ -121,8 +118,6 @@ public sealed class RenderingManager : IRenderManager
     private RenderTexture halfQuarterRT1; // 1/8 0.04375mb
     private RenderTexture hexRWRT0; // 1/16 
     private RenderTexture hexRWRT1; // 1/16
-    private RenderTexture bgBlurRT; //half size & format as frame buffer 2.8mb
-    private RenderTexture uiBlurRT; //half size & format as frame buffer 2.8mb
     private RenderTexture shadowRT;
     private RenderTexture shadowMapProjectRT;
 
@@ -158,14 +153,11 @@ public sealed class RenderingManager : IRenderManager
         createRT[(int)ERTType.EQquarterRT0] = GetQuarterRT0;
         createRT[(int)ERTType.EQquarterRT1] = GetQuarterRT1;
         createRT[(int)ERTType.EHalfQuarterRT0] = GetHalfQuarterRT0;
-        createRT[(int)ERTType.EBgBlurRT] = GetBgBlurRT;
-        createRT[(int)ERTType.EUIBlurRT] = GetUIBlurRT;
         createRT[(int)ERTType.EShadowRT] = GetShadowRT;
         createRT[(int)ERTType.EShadowMapProjectRT] = GetShadowProjectRT;
 
         loadEnv[(int)EnverimentModifyType.Lighting] = LightingModify.Load;
         loadEnv[(int)EnverimentModifyType.Ambient] = AmbientModify.Load;
-        // loadEnv[(int) EnverimentModifyType.Weather] = LoadLighting;
         loadEnv[(int)EnverimentModifyType.Fog] = FogModify.Load;
         loadEnv[(int)EnverimentModifyType.PPBloom] = BloomModify.Load;
         loadEnv[(int)EnverimentModifyType.PPLut] = LutModify.Load;
@@ -208,7 +200,6 @@ public sealed class RenderingManager : IRenderManager
             renderingEnvironment.Uninit();
         }
         afterAlphaBatchesRef = null;
-
     }
     public void SetEnable(bool enable)
     {
@@ -221,10 +212,6 @@ public sealed class RenderingManager : IRenderManager
 
 
     public void EnableEffect(int effectType, bool enable)
-    {
-    }
-
-    public void TriggerEffect(int effectType, bool effectEnable, EPostffectsFlag flag, bool enable)
     {
     }
 
@@ -241,15 +228,6 @@ public sealed class RenderingManager : IRenderManager
     }
     public void DirtyEffect(int effectType)
     {
-    }
-    public bool SetSceneBlur(GameObject go)
-    {
-        return true;
-    }
-
-    public bool SetUIBgBlur(GameObject go)
-    {
-        return true;
     }
 
     public void InitRender(UnityEngine.Camera camera)
@@ -268,9 +246,6 @@ public sealed class RenderingManager : IRenderManager
         }
     }
 
-    public void OpenUI(bool open, string uiPath, Transform trans)
-    {
-    }
     public bool HasPostAlphaCommand()
     {
         return afterAlphaBatchesRef != null && afterAlphaBatchesRef.Count > 0;
@@ -278,7 +253,6 @@ public sealed class RenderingManager : IRenderManager
 
     public void SetPostAlphaCommand(List<RenderBatch> batches)
     {
-        // afterAlphaCb = cb;
         afterAlphaBatchesRef = batches;
     }
 
@@ -521,45 +495,6 @@ public sealed class RenderingManager : IRenderManager
         return halfQuarterRT1;
     }
 
-    public RenderTexture GetBgBlurRT()
-    {
-        if (bgBlurRT == null)
-        {
-            bgBlurRT = new RenderTexture(width / 2, height / 2, 0, format, RenderTextureReadWrite.Linear)
-            {
-                name = "_BgBlurRT",
-                hideFlags = HideFlags.DontSave,
-                filterMode = FilterMode.Bilinear,
-                wrapMode = TextureWrapMode.Clamp,
-                anisoLevel = 0,
-                autoGenerateMips = false,
-                useMipMap = false
-            };
-            bgBlurRT.Create();
-            rtSize += width * height;
-        }
-        return bgBlurRT;
-    }
-    public RenderTexture GetUIBlurRT()
-    {
-        if (uiBlurRT == null)
-        {
-            uiBlurRT = new RenderTexture(width / 2, height / 2, 0, format, RenderTextureReadWrite.Linear)
-            {
-                name = "_UIBlurRT",
-                hideFlags = HideFlags.DontSave,
-                filterMode = FilterMode.Bilinear,
-                wrapMode = TextureWrapMode.Clamp,
-                anisoLevel = 0,
-                autoGenerateMips = false,
-                useMipMap = false
-            };
-            uiBlurRT.Create();
-            rtSize += width * height;
-        }
-        return uiBlurRT;
-    }
-
     public RenderTexture GetShadowRT()
     {
         if (shadowRT == null)
@@ -787,16 +722,6 @@ public sealed class RenderingManager : IRenderManager
         {
             RuntimeUtilities.Destroy(hexRWRT1);
             hexRWRT1 = null;
-        }
-        if (bgBlurRT != null)
-        {
-            RuntimeUtilities.Destroy(bgBlurRT);
-            bgBlurRT = null;
-        }
-        if (uiBlurRT != null)
-        {
-            RuntimeUtilities.Destroy(uiBlurRT);
-            uiBlurRT = null;
         }
         if (shadowRT != null)
         {

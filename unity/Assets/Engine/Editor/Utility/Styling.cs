@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     public static class Styling
     {

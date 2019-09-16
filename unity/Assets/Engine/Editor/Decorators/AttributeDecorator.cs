@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     public abstract class AttributeDecorator
     {

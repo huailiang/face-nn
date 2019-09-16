@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     [CFDecorator (typeof (CFRangeAttribute))]
     public sealed class RangeDecorator : AttributeDecorator

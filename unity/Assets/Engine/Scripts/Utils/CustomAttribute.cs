@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 using UnityEngine;
-namespace CFEngine
+namespace XEngine
 {
 
     [Conditional("UNITY_EDITOR")]

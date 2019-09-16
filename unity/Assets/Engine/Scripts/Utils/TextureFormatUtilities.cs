@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.Assertions;
 using UnityEngine;
 
-namespace CFEngine
+namespace XEngine
 {
     public static class TextureFormatUtilities
     {

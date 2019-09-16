@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEditor;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     public static class EditorUtilities
     {

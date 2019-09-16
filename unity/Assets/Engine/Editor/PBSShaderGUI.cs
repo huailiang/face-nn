@@ -4,7 +4,7 @@ using CFUtilPoolLib;
 using UnityEditor;
 using UnityEngine;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     internal class PBSShaderGUI : ShaderGUI
     {

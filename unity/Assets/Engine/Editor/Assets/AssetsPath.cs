@@ -2,7 +2,7 @@
 using UnityEditor;
 using System.IO;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     public class AssetsPath
     {

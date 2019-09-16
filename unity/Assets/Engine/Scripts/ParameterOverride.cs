@@ -2,7 +2,7 @@ using System;
 using CFUtilPoolLib;
 using UnityEngine;
 
-namespace CFEngine
+namespace XEngine
 {
     public abstract class ParameterOverride : IParameterOverride
     {
@@ -17,8 +17,7 @@ namespace CFEngine
 
         protected internal virtual void OnEnable()
         { }
-
-        // Here for consistency reasons (cf. OnEnable)
+        
         protected internal virtual void OnDisable()
         { }
 
@@ -102,8 +101,7 @@ namespace CFEngine
             return prop.value;
         }
     }
-
-    // Bypassing the limited unity serialization system...
+    
     [Serializable]
     public sealed class FloatParameter : ParameterOverride<float>
     {

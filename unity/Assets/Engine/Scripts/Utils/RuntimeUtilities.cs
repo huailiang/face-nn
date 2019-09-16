@@ -12,7 +12,7 @@ using System.Reflection;
 using UnityEditor;
 #endif
 
-namespace CFEngine
+namespace XEngine
 {
     using UnityEngine.SceneManagement;
     using UnityObject = UnityEngine.Object;

@@ -6,7 +6,7 @@ using UnityEngine;
 
 using UnityEngineEditor = UnityEditor.Editor;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     [CustomEditor(typeof(RenderingEnvironment))]
     public class RenderingEnvironmentEditor : BaseEditor<RenderingEnvironment>

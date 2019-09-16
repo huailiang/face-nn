@@ -1,9 +1,7 @@
 ﻿#if UNITY_EDITOR
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Rendering;
 using CFUtilPoolLib;
-namespace CFEngine
+using UnityEngine;
+namespace XEngine
 {
     public interface IQuadTreeObject
     {
@@ -35,16 +33,13 @@ namespace CFEngine
         public string fileID = "";
         public Texture lightmap;
         public Vector4 lightmapUVST;
-
-        // public int lightmapIndex = -1;
+        
         //static batch
         public int batchMeshIndex = -1;
         public short subMeshIndex = -1;
         public short staticBatchGameObjectIndex = -1;
         public int priority = 0;
-
-        // public List<Light> lights = new List<Light>();
-
+        
         [System.NonSerialized]
         public MaterialPropertyBlock mpb = null;
         [System.NonSerialized]

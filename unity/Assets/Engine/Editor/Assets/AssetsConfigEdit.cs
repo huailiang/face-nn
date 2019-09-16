@@ -2,12 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using CFEngine;
+using XEngine;
 using CFUtilPoolLib;
 using UnityEditor;
 using UnityEngine;
 
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     [CustomEditor(typeof(AssetsConfig))]
     public class AssetsConfigEdit : BaseEditor<AssetsConfigEdit>

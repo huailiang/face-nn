@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace CFEngine.Editor
+namespace XEngine.Editor
 {
     public struct RndVec3 : System.IEquatable<RndVec3>
     {

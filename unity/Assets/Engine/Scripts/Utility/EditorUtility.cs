@@ -9,14 +9,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 
-namespace CFEngine
+namespace XEngine
 {
     public class TransformRotationGUIWrapper
     {
         public Transform t;
         public System.Object guiObj;
         public MethodInfo mi;
-        // public 
+
         public void OnGUI()
         {
             if (guiObj != null && mi != null)
