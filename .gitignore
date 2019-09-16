@@ -3,7 +3,7 @@ unity/*.sln
 unity/obj
 unity/Library
 unity/Temp
-unity/Assets/Creatures*
+**/*.FBX*
 unity/Assets/Table*
 **/.vscode
 **/.vs
