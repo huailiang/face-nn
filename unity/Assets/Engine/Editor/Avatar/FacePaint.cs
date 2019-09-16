@@ -17,58 +17,29 @@ public class FacePaint
     RoleShape roleShape;
     public Texture2D mainTex;
     public Texture2D tex1;
-    public Vector2 offset1 = new Vector2(256, 256);
-    public Vector3 rotScale1 = new Vector3(0, 1, 1);
-    [Range(0, 1)]
-    public float hue1 = 0.5f;
-    [Range(0, 1)]
-    public float saturate1 = 0.5f;
-    [Range(0, 1)]
-    public float heavy1 = 0.5f;
-
     public Texture2D tex2;
-    public Vector2 offset2 = new Vector2(256, 256);
-    public Vector3 rotScale2 = new Vector3(0, 1, 1);
-
-    [Range(0, 1)]
-    public float hue2 = 0.5f;
-    [Range(0, 1)]
-    public float saturate2 = 0.5f;
-    [Range(0, 1)]
-    public float heavy2 = 0.5f;
-
     public Texture2D tex3;
-    public Vector2 offset3 = new Vector2(256, 256);
-    public Vector3 rotScale3 = new Vector3(0, 1, 1);
-    [Range(0, 1)]
-    public float hue3 = 0.5f;
-    [Range(0, 1)]
-    public float saturate3 = 0.5f;
-    [Range(0, 1)]
-    public float heavy3 = 0.5f;
-
     public Texture2D tex4;
-    public Vector2 offset4 = new Vector2(256, 256);
-    public Vector3 rotScale4 = new Vector3(0, 1, 1);
-    [Range(0, 1)]
-    public float hue4 = 0.5f;
-    [Range(0, 1)]
-    public float saturate4 = 0.5f;
-    [Range(0, 1)]
-    public float heavy4 = 0.5f;
-
     public Texture2D tex5;
-    public Vector2 offset5 = new Vector2(256, 256);
-    public Vector3 rotScale5 = new Vector3(0, 1, 1);
-    [Range(0, 1)]
-    public float hue5 = 0.5f;
-    [Range(0, 1)]
-    public float saturate5 = 0.5f;
-    [Range(0, 1)]
-    public float heavy5 = 0.5f;
-    public RenderTexture mainRt;
-    public Material mat;
-    public Material outputMat;
+    Color color1 = Color.gray;
+    Color color2 = Color.black;
+    Color color3 = Color.gray;
+    Color color4 = Color.gray;
+    Color color5 = Color.gray;
+
+    Vector3 hsv1, hsv2, hsv3, hsv4, hsv5;
+
+    Vector2 offset = new Vector2(256, 256);
+    Vector3 rotScale = new Vector3(0, 1, 1);
+
+    RenderTexture mainRt;
+    Material mat, outputMat;
+
+    GameObject helmet;
+    Camera camera;
+    Vector3 cam1 = new Vector3(0, 1, -10);
+    Vector3 cam2 = new Vector3(0, 2, -9);
+    bool focusFace;
 
     public void Initial(GameObject go, RoleShape shape)
     {
@@ -77,16 +48,32 @@ public class FacePaint
         string child = "Player_" + shape.ToString().ToLower() + "_face";
         Transform face = go.transform.Find(child);
         var skr = face.gameObject.GetComponent<SkinnedMeshRenderer>();
+        child = "Player_" + shape.ToString().ToLower() + "_helmet";
+        helmet = go.transform.Find(child).gameObject;
+        camera = GameObject.FindObjectOfType<Camera>();
         outputMat = skr.sharedMaterial;
-        mainTex = outputMat.GetTexture(ShaderIDs.BaseTex) as Texture2D;
         roleShape = shape;
+        FecthMainTex();
         CreateRT();
         Update();
         EditorSceneManager.sceneClosed += OnSceneClose;
     }
 
-    int[] ibrows, ieyes, inoses, imouths, iears;
-    string[] brows, eyes, noses, mouths, ears;
+
+    private void FecthMainTex()
+    {
+        mainTex = outputMat.GetTexture(ShaderIDs.BaseTex) as Texture2D;
+        if (mainTex == null)
+        {
+            var pbs = outputMat.GetTexture(ShaderIDs.PBSTex);
+            string path = AssetDatabase.GetAssetPath(pbs);
+            path = path.Replace("_pbs", "_b");
+            mainTex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+    }
+
+    int[] ibrows, ieyes, iface, imouths, ipupil;
+    string[] brows, eyes, faces, mouths, pupils;
     int iBrow, iEye, iNose, iMouth, iEar;
 
 
@@ -98,7 +85,7 @@ public class FacePaint
             Dictionary<string, int> eydic = new Dictionary<string, int>();
             Dictionary<string, int> nsdic = new Dictionary<string, int>();
             Dictionary<string, int> mtdic = new Dictionary<string, int>();
-            Dictionary<string, int> eadic = new Dictionary<string, int>();
+            Dictionary<string, int> pupdic = new Dictionary<string, int>();
             for (int i = 0; i < data.paintData.Length; i++)
             {
                 PaintData it = data.paintData[i];
@@ -120,7 +107,7 @@ public class FacePaint
                 }
                 else if (it.type == PaintSubType.Pupil)
                 {
-                    eadic.Add(it.name, i);
+                    pupdic.Add(it.name, i);
                 }
             }
             brows = new string[bwdic.Count];
@@ -131,18 +118,18 @@ public class FacePaint
             ieyes = new int[eydic.Count];
             eydic.Keys.CopyTo(eyes, 0);
             eydic.Values.CopyTo(ieyes, 0);
-            noses = new string[nsdic.Count];
-            inoses = new int[nsdic.Count];
-            nsdic.Keys.CopyTo(noses, 0);
-            nsdic.Values.CopyTo(inoses, 0);
+            faces = new string[nsdic.Count];
+            iface = new int[nsdic.Count];
+            nsdic.Keys.CopyTo(faces, 0);
+            nsdic.Values.CopyTo(iface, 0);
             mouths = new string[mtdic.Count];
             imouths = new int[mtdic.Count];
             mtdic.Keys.CopyTo(mouths, 0);
             mtdic.Values.CopyTo(imouths, 0);
-            ears = new string[eadic.Count];
-            iears = new int[eadic.Count];
-            eadic.Keys.CopyTo(ears, 0);
-            eadic.Values.CopyTo(iears, 0);
+            pupils = new string[pupdic.Count];
+            ipupil = new int[pupdic.Count];
+            pupdic.Keys.CopyTo(pupils, 0);
+            pupdic.Values.CopyTo(ipupil, 0);
         }
     }
 
@@ -152,22 +139,27 @@ public class FacePaint
         GUILayout.BeginVertical();
         GUILayout.Space(16);
         GUILayout.Label("Face Paint");
-        GuiItem("brew", brows, ref iBrow);
-        GuiItem("eye", eyes, ref iEye);
-        GuiItem("face", noses, ref iNose);
-        GuiItem("mouth", mouths, ref iMouth);
-        GuiItem("pupil", ears, ref iEar);
+        focusFace = GUILayout.Toggle(focusFace, "\tfoces face");
+        GuiItem("brew ", brows, ref iBrow, ref color1);
+        GuiItem("eye  ", eyes, ref iEye, ref color2);
+        GuiItem("face ", faces, ref iNose, ref color3);
+        GuiItem("mouth", mouths, ref iMouth, ref color4);
+        GuiItem("pupil", pupils, ref iEar, ref color5);
         GUILayout.EndVertical();
         UpdatePainTex();
+        UpdateHsv();
+        FocusFace();
     }
 
 
-    private void GuiItem(string name, string[] ctx, ref int idx)
+    private void GuiItem(string name, string[] ctx, ref int idx, ref Color color)
     {
         GUILayout.BeginHorizontal();
-        GUILayout.Label(name);
+        GUILayout.Label(name, GUILayout.Width(60));
         GUILayout.FlexibleSpace();
-        idx = EditorGUILayout.Popup(idx, ctx);
+        idx = EditorGUILayout.Popup(idx, ctx, GUILayout.Width(140));
+        GUILayout.FlexibleSpace();
+        color = EditorGUILayout.ColorField(color, GUILayout.Width(75));
         GUILayout.EndHorizontal();
     }
 
@@ -175,14 +167,34 @@ public class FacePaint
     {
         tex1 = GetPaintTex(data.paintData[ibrows[iBrow]].texture, roleShape);
         tex2 = GetPaintTex(data.paintData[ieyes[iEye]].texture, roleShape);
-        tex3 = GetPaintTex(data.paintData[inoses[iNose]].texture, roleShape);
+        tex3 = GetPaintTex(data.paintData[iface[iNose]].texture, roleShape);
         tex4 = GetPaintTex(data.paintData[imouths[iMouth]].texture, roleShape);
-        tex5 = GetPaintTex(data.paintData[iears[iEar]].texture, roleShape);
+        tex5 = GetPaintTex(data.paintData[ipupil[iEar]].texture, roleShape);
+    }
+
+    private void UpdateHsv()
+    {
+        float h, s, v;
+        Color.RGBToHSV(color1, out h, out s, out v);
+        hsv1 = new Vector3(h, s, v);
+        Color.RGBToHSV(color2, out h, out s, out v);
+        hsv2 = new Vector3(h, s, v);
+        Color.RGBToHSV(color3, out h, out s, out v);
+        hsv3 = new Vector3(h, s, v);
+        Color.RGBToHSV(color4, out h, out s, out v);
+        hsv4 = new Vector3(h, s, v);
+        Color.RGBToHSV(color5, out h, out s, out v);
+        hsv5 = new Vector3(h, s, v);
+    }
+
+    private void FocusFace()
+    {
+        helmet.SetActive(!focusFace);
+        camera.transform.position = focusFace ? cam2 : cam1;
     }
 
     private void OnSceneClose(Scene scene)
     {
-        Debug.Log("close scene:" + scene.name);
         if (outputMat)
         {
             outputMat.SetTexture(ShaderIDs.BaseTex, mainTex);
@@ -219,29 +231,29 @@ public class FacePaint
     public void Update()
     {
         Shader.SetGlobalTexture("_Part1_Tex", tex1);
-        Shader.SetGlobalVector("_Part1_Offset", offset1);
-        Shader.SetGlobalVector("_Part1_RotScale", rotScale1);
-        Shader.SetGlobalVector("_Part1_HSB", new Vector3(hue1, saturate1, heavy1));
+        Shader.SetGlobalVector("_Part1_Offset", offset);
+        Shader.SetGlobalVector("_Part1_RotScale", rotScale);
+        Shader.SetGlobalVector("_Part1_HSB", hsv1);
 
         Shader.SetGlobalTexture("_Part2_Tex", tex2);
-        Shader.SetGlobalVector("_Part2_Offset", offset2);
-        Shader.SetGlobalVector("_Part2_RotScale", rotScale2);
-        Shader.SetGlobalVector("_Part2_HSB", new Vector3(hue2, saturate2, heavy2));
+        Shader.SetGlobalVector("_Part2_Offset", offset);
+        Shader.SetGlobalVector("_Part2_RotScale", rotScale);
+        Shader.SetGlobalVector("_Part2_HSB", hsv2);
 
         Shader.SetGlobalTexture("_Part3_Tex", tex3);
-        Shader.SetGlobalVector("_Part3_Offset", offset3);
-        Shader.SetGlobalVector("_Part3_RotScale", rotScale3);
-        Shader.SetGlobalVector("_Part3_HSB", new Vector3(hue3, saturate3, heavy3));
+        Shader.SetGlobalVector("_Part3_Offset", offset);
+        Shader.SetGlobalVector("_Part3_RotScale", rotScale);
+        Shader.SetGlobalVector("_Part3_HSB", hsv3);
 
         Shader.SetGlobalTexture("_Part4_Tex", tex4);
-        Shader.SetGlobalVector("_Part4_Offset", offset4);
-        Shader.SetGlobalVector("_Part4_RotScale", rotScale4);
-        Shader.SetGlobalVector("_Part4_HSB", new Vector3(hue4, saturate4, heavy4));
+        Shader.SetGlobalVector("_Part4_Offset", offset);
+        Shader.SetGlobalVector("_Part4_RotScale", rotScale);
+        Shader.SetGlobalVector("_Part4_HSB", hsv4);
 
         Shader.SetGlobalTexture("_Part5_Tex", tex5);
-        Shader.SetGlobalVector("_Part5_Offset", offset5);
-        Shader.SetGlobalVector("_Part5_RotScale", rotScale5);
-        Shader.SetGlobalVector("_Part5_HSB", new Vector3(hue5, saturate5, heavy5));
+        Shader.SetGlobalVector("_Part5_Offset", offset);
+        Shader.SetGlobalVector("_Part5_RotScale", rotScale);
+        Shader.SetGlobalVector("_Part5_HSB", hsv5);
 
         Graphics.Blit(mainTex, mainRt, mat);
         if (outputMat) outputMat.SetTexture(ShaderIDs.BaseTex, mainRt);

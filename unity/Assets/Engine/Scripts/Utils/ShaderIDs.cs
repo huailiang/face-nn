@@ -7,6 +7,7 @@ namespace CFEngine
         //common
         public static readonly int MainTex = Shader.PropertyToID("_MainTex");
         public static readonly int BaseTex = Shader.PropertyToID("_BaseTex");
+        public static readonly int PBSTex = Shader.PropertyToID("_PBSTex");
         public static readonly int SceneDepthTex = Shader.PropertyToID("_SceneDepthRT");
         public static readonly int CameraDepthTex = Shader.PropertyToID("_CameraDepthRT");
         public static readonly int PostCameraDepthTex = Shader.PropertyToID("_PostCameraDepthRT");
