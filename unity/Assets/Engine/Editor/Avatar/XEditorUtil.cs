@@ -29,9 +29,6 @@ namespace XEditor
         public string skill_exp;
         public string select_exp;
         public string delete;
-        public string buildTool;
-        public string buildTitle;
-        public string buildSure;
         public string tl_wait;
         public string tl_lerp;
         public string tl_anim;
@@ -40,10 +37,6 @@ namespace XEditor
         public string eff_tired;
         public string suit_pre;
         public string suit_shape;
-        public string bone_fx;
-        public string tip_fx;
-        public string nil_fx;
-        public string tip_part;
     }
 
 
@@ -65,7 +58,7 @@ namespace XEditor
 
         private static void ReadConfig()
         {
-            string path = Application.dataPath + "/Engine/Editor/Avatar/config.txt";
+            string path = Application.dataPath + "/Engine/Editor/EditorResources/config.txt";
             using (FileStream fs = new FileStream(path, FileMode.Open))
             {
                 _config = new XEditorConfig();
@@ -87,9 +80,6 @@ namespace XEditor
                 _config.skill_exp = reader.ReadLine();
                 _config.select_exp = reader.ReadLine();
                 _config.delete = reader.ReadLine();
-                _config.buildTool = reader.ReadLine();
-                _config.buildTitle = reader.ReadLine();
-                _config.buildSure = reader.ReadLine();
                 _config.tl_wait = reader.ReadLine();
                 _config.tl_lerp = reader.ReadLine();
                 _config.tl_anim = reader.ReadLine();
@@ -98,10 +88,6 @@ namespace XEditor
                 _config.eff_tired = reader.ReadLine();
                 _config.suit_pre = reader.ReadLine();
                 _config.suit_shape = reader.ReadLine();
-                _config.bone_fx = reader.ReadLine();
-                _config.tip_fx = reader.ReadLine();
-                _config.nil_fx = reader.ReadLine();
-                _config.tip_part = reader.ReadLine();
                 reader.Close();
             }
         }
