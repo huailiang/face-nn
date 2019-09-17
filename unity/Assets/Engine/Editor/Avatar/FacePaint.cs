@@ -190,6 +190,7 @@ public class FacePaint
     {
         helmet.SetActive(!focusFace);
         camera.transform.position = focusFace ? cam2 : cam1;
+        camera.fieldOfView = focusFace ? 30 : 60;
     }
 
     private void OnSceneClose(Scene scene)
