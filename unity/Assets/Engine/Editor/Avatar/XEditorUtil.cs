@@ -3,6 +3,7 @@ using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using CFUtilPoolLib;
 using XEngine;
 
 namespace XEditor
@@ -13,30 +14,10 @@ namespace XEditor
     /// </summary>
     public class XEditorConfig
     {
-        public string title;
-        public string tip;
-        public string selected;
-        public string make;
-        public string part;
-        public string destruct;
-        public string show;
-        public string config;
-        public string anim;
-        public string anim_select;
-        public string preview;
-        public string clip_info;
-        public string bone_info;
-        public string skill_exp;
-        public string select_exp;
-        public string delete;
-        public string tl_wait;
-        public string tl_lerp;
-        public string tl_anim;
-        public string tl_end;
-        public string eff_angry;
-        public string eff_tired;
         public string suit_pre;
         public string suit_shape;
+        public string[] faceType;
+        public string[] facev2Type;
     }
 
 
@@ -63,35 +44,23 @@ namespace XEditor
             {
                 _config = new XEditorConfig();
                 StreamReader reader = new StreamReader(fs, Encoding.UTF8);
-                reader.ReadLine();
-                _config.title = reader.ReadLine();
-                _config.tip = reader.ReadLine();
-                _config.selected = reader.ReadLine();
-                _config.make = reader.ReadLine();
-                _config.part = reader.ReadLine();
-                _config.destruct = reader.ReadLine();
-                _config.show = reader.ReadLine();
-                _config.config = reader.ReadLine();
-                _config.anim = reader.ReadLine();
-                _config.anim_select = reader.ReadLine();
-                _config.preview = reader.ReadLine();
-                _config.clip_info = reader.ReadLine();
-                _config.bone_info = reader.ReadLine();
-                _config.skill_exp = reader.ReadLine();
-                _config.select_exp = reader.ReadLine();
-                _config.delete = reader.ReadLine();
-                _config.tl_wait = reader.ReadLine();
-                _config.tl_lerp = reader.ReadLine();
-                _config.tl_anim = reader.ReadLine();
-                _config.tl_end = reader.ReadLine();
-                _config.eff_angry = reader.ReadLine();
-                _config.eff_tired = reader.ReadLine();
                 _config.suit_pre = reader.ReadLine();
                 _config.suit_shape = reader.ReadLine();
+                int cnt = (int)FaceValueType.None;
+                _config.faceType = new string[cnt];
+                for (int i = 0; i < cnt; i++)
+                {
+                    _config.faceType[i] = reader.ReadLine();
+                }
+                cnt = (int)FaceV2Type.None;
+                _config.facev2Type = new string[cnt];
+                for (int i = 0; i < cnt; i++)
+                {
+                    _config.facev2Type[i] = reader.ReadLine();
+                }
                 reader.Close();
             }
         }
-
 
         public static bool MakeNewScene()
         {

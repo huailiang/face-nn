@@ -29,7 +29,9 @@ namespace XEditor
         private AnimationClip clip;
         private GameObject go;
         private FacePaint paint;
+        private FaceBone bone;
         private XEntityPresentation.RowData pData;
+        FaceData data;
 
 
         [MenuItem("Tools/FashionPreview")]
@@ -37,7 +39,7 @@ namespace XEditor
         {
             if (XEditorUtil.MakeNewScene())
             {
-                EditorWindow.GetWindowWithRect(typeof(FashionPreviewWindow), new Rect(0, 0, 440, 500), true, "FashionPreview");
+                EditorWindow.GetWindowWithRect(typeof(FashionPreviewWindow), new Rect(0, 0, 440, 640), true, "FashionPreview");
             }
         }
 
@@ -48,9 +50,17 @@ namespace XEditor
             suit_select = 0;
             suit_pre = -1;
             shape = RoleShape.FEMALE;
+            if (data == null)
+            {
+                data = AssetDatabase.LoadAssetAtPath<FaceData>("Assets/BundleRes/Config/FaceData.asset");
+            }
             if (paint == null)
             {
-                paint = new FacePaint();
+                paint = new FacePaint(data);
+            }
+            if (bone == null)
+            {
+                bone = new FaceBone(data);
             }
         }
 
@@ -159,6 +169,10 @@ namespace XEditor
             if (paint != null)
             {
                 paint.OnGui();
+            }
+            if (bone != null)
+            {
+                bone.OnGui();
             }
         }
 

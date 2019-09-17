@@ -1,6 +1,7 @@
 ﻿using CFUtilPoolLib;
 using System.Collections.Generic;
 using System.IO;
+using XEditor;
 using UnityEngine;
 using UnityEditor;
 
@@ -110,7 +111,6 @@ public class BoneData
     }
 }
 
-
 public class BaseTransform
 {
     public BoneData Bone;
@@ -219,10 +219,18 @@ public class BoneTransform : BaseTransform
 
 public class FaceBone
 {
-    
+
     public XRoleParts RoleParts;
     private List<List<BaseTransform>> controlGroups = null;
     private Dictionary<Transform, List<BoneData>> tfKneadFace = new Dictionary<Transform, List<BoneData>>();
+    private FaceData data;
+    private Vector2 rect;
+
+    public FaceBone(FaceData dt)
+    {
+        data = dt;
+        Bind();
+    }
 
     public void Load(GameObject go, RoleShape shape)
     {
@@ -263,7 +271,6 @@ public class FaceBone
                 string name = fdata.BoneDatas[i].name;
                 FaceModifyType type = fdata.BoneDatas[i].type;
                 BoneData data = new BoneData(name);
-
                 BaseTransform bt;
                 if (type == FaceModifyType.Rotation)
                 {
@@ -307,6 +314,128 @@ public class FaceBone
                     controls.Add(bones[controlId]);
                 }
                 controlGroups.Add(controls);
+            }
+        }
+    }
+
+    private bool[] folds;
+    private Object[] icons;
+    private float[] args;
+    string prefix = @"Assets/BundleRes/Faceicon/";
+
+    private void Bind()
+    {
+        int cnt = 0;
+        for (int i = 0; i < data.headData.Length; i++)
+        {
+            cnt += BindItem(data.headData[i]);
+        }
+        for (int i = 0; i < data.senseData.Length; i++)
+        {
+            cnt += BindItem(data.senseData[i]);
+        }
+        args = new float[cnt];
+        for (int i = 0; i < cnt; i++) args[i] = 0.5f;
+    }
+
+    private int BindItem(FaceBaseData data)
+    {
+        int cnt = 0;
+        if (data.v2Type != FaceV2Type.None) cnt += 2;
+        if (data.values != null) cnt += data.values.Length;
+        return cnt;
+    }
+
+    public void OnGui()
+    {
+        GUILayout.Space(16);
+        int cnt = data.headData.Length + data.senseData.Length;
+        if (folds == null) folds = new bool[cnt];
+        if (icons == null) icons = new Object[cnt];
+        rect = GUILayout.BeginScrollView(rect);
+        int j = 0;
+        for (int i = 0; i < data.headData.Length; i++)
+        {
+            GuiItem(data.headData[i], i, ref j);
+        }
+        for (int i = 0; i < data.senseData.Length; i++)
+        {
+            GuiItem(data.senseData[i], i + data.headData.Length, ref j);
+        }
+        GUILayout.EndScrollView();
+    }
+
+
+
+    private void GuiItem(FaceBaseData data, int ix, ref int jx)
+    {
+        folds[ix] = EditorGUILayout.Foldout(folds[ix], data.name);
+        if (folds[ix])
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical();
+            if (data.v2Type != FaceV2Type.None)
+            {
+                int idx = (int)data.v2Type;
+                string name = XEditorUtil.Config.facev2Type[idx];
+                GuiSlider(name + "X", ref jx);
+                GuiSlider(name + "Y", ref jx);
+            }
+            else if (data.values != null)
+            {
+                for (int i = 0; i < data.values.Length; i++)
+                {
+                    FaceValueType type = data.values[i];
+                    string name = XEditorUtil.Config.faceType[(int)type];
+                    float v = 0.5f;
+                    GuiSlider(name, ref jx);
+                }
+            }
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.Space();
+            if (!string.IsNullOrEmpty(data.icon) && icons[ix] == null)
+                icons[ix] = AssetDatabase.LoadAssetAtPath<Texture>(prefix + data.icon + ".png");
+            EditorGUILayout.ObjectField(icons[ix], typeof(Texture), true, GUILayout.Width(56), GUILayout.Height(56));
+            EditorGUILayout.EndHorizontal();
+        }
+    }
+
+    private void GuiSlider(string name, ref int ix)
+    {
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("    " + name);
+        args[ix] = EditorGUILayout.Slider(args[ix], 0, 1);
+        EditorGUILayout.Space();
+        EditorGUILayout.EndHorizontal();
+        ix++;
+    }
+
+    private void ProcessKneadBone(int groupId, float weight)
+    {
+        if (controlGroups == null || groupId >= controlGroups.Count) return;
+        var controls = controlGroups[groupId];
+        for (int i = 0, count = controls.Count; i < count; ++i)
+        {
+            controls[i].UpdateWeight(weight);
+            SyncSameTfControlsData(controls[i].Bone);
+        }
+        for (int i = 0, count = controls.Count; i < count; ++i)
+        {
+            controls[i].Bone.UpdateToTransfrom();
+        }
+    }
+
+
+    private void SyncSameTfControlsData(BoneData bone)
+    {
+        Transform tf = bone.Trans;
+        if (tfKneadFace.Count <= 0 || !tfKneadFace.ContainsKey(tf)) return;
+        var list = tfKneadFace[tf];
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i] != bone)
+            {
+                list[i].SyncData(bone);
             }
         }
     }

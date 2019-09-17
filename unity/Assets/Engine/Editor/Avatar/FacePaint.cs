@@ -41,9 +41,13 @@ public class FacePaint
     Vector3 cam2 = new Vector3(0, 1.7f, -9);
     bool focusFace;
 
+    public FacePaint(FaceData dt)
+    {
+        data = dt;
+    }
+
     public void Initial(GameObject go, RoleShape shape)
     {
-        data = AssetDatabase.LoadAssetAtPath<FaceData>("Assets/BundleRes/Config/FaceData.asset");
         mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/BundleRes/MatShader/FaceMakeup.mat");
         string child = "Player_" + shape.ToString().ToLower() + "_face";
         Transform face = go.transform.Find(child);
@@ -139,7 +143,7 @@ public class FacePaint
         GUILayout.BeginVertical();
         GUILayout.Space(16);
         GUILayout.Label("Face Paint");
-        focusFace = GUILayout.Toggle(focusFace, "\tfoces face");
+        focusFace = GUILayout.Toggle(focusFace, " foces face");
         GuiItem("brew ", brows, ref iBrow, ref color1);
         GuiItem("eye  ", eyes, ref iEye, ref color2);
         GuiItem("face ", faces, ref iNose, ref color3);

@@ -17,7 +17,7 @@ namespace XEditor
         private const int max = 64;
         private const int maxv1 = 4;
         private int maxid = 0;
-        private string prefix = @"Assets/BundleRes/UI/UISource/ui_faceicon/";
+        private string prefix = @"Assets/BundleRes/Faceicon/";
         int swap = 0;
 
         [MenuItem("Assets/Engine/FaceData_Create")]
