@@ -38,7 +38,7 @@ public class FacePaint
     GameObject helmet;
     Camera camera;
     Vector3 cam1 = new Vector3(0, 1.0f, -10.0f);
-    Vector3 cam2 = new Vector3(0, 1.7f, -8.4f);
+    Vector3 cam2 = new Vector3(0, 1.7f, -8.8f);
     bool focusFace;
 
     public FacePaint(FaceData dt)
