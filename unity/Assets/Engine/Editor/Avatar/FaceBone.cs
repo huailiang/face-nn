@@ -196,7 +196,6 @@ public class BoneTransform : BaseTransform
         float absWeight = Mathf.Abs(weight);
         int id = weight < 0 ? (int)TransformRange.MinValue : (int)TransformRange.MaxValue;
         var CurrentData = Mathf.Lerp(TransformData[(int)TransformRange.DefaultValue], TransformData[id], absWeight);
-        //XDebug.singleton.AddGreenLog("min: " + TransformData[(int)TransformRange.DefaultValue] + " max: " + TransformData[id]+ " weight: " + absWeight + " curr: " + CurrentData + " tf: " + Bone.Trans.name + " type: " + Type);
         switch (Type)
         {
             case FaceModifyType.PositionX:
@@ -245,8 +244,9 @@ public class FaceBone
         if (ta != null)
         {
             MemoryStream ms = new MemoryStream(ta.bytes);
-            FaceBoneDatas fdata = new FaceBoneDatas(ms);
-            MakeControlGroups(fdata);
+            var fbData = new FaceBoneDatas(ms);
+            CleanData();
+            MakeControlGroups(fbData);
             ms.Close();
         }
     }
@@ -265,27 +265,27 @@ public class FaceBone
     }
 
 
-    private void MakeControlGroups(FaceBoneDatas fdata)
+    private void MakeControlGroups(FaceBoneDatas fbData)
     {
         if (controlGroups == null)
         {
-            int len = fdata.BoneDatas.Length;
+            int len = fbData.BoneDatas.Length;
             var bones = new BaseTransform[len];
             for (var i = 0; i < len; i++)
             {
-                string name = fdata.BoneDatas[i].name;
-                FaceModifyType type = fdata.BoneDatas[i].type;
+                string name = fbData.BoneDatas[i].name;
+                FaceModifyType type = fbData.BoneDatas[i].type;
                 BoneData data = new BoneData(name);
                 BaseTransform bt;
                 if (type == FaceModifyType.Rotation)
                 {
                     bt = new BoneRotationTransform() { Bone = data, Type = type };
-                    (bt as BoneRotationTransform).LoadData(ref fdata.BoneDatas[i].minRot, ref fdata.BoneDatas[i].maxRot);
+                    (bt as BoneRotationTransform).LoadData(ref fbData.BoneDatas[i].minRot, ref fbData.BoneDatas[i].maxRot);
                 }
                 else
                 {
                     bt = new BoneTransform() { Bone = data, Type = type };
-                    (bt as BoneTransform).LoadData(fdata.BoneDatas[i].minValue, fdata.BoneDatas[i].maxValue);
+                    (bt as BoneTransform).LoadData(fbData.BoneDatas[i].minValue, fbData.BoneDatas[i].maxValue);
                 }
                 int find = SearchKnead(name);
                 if (find >= 0)
@@ -307,15 +307,15 @@ public class FaceBone
                 else XDebug.singleton.AddErrorLog("not found tranf: ", name);
                 bones[i] = bt;
             }
-            var groupCount = fdata.Groups.Length;
+            var groupCount = fbData.Groups.Length;
             controlGroups = new List<List<BaseTransform>>(groupCount);
             for (var k = 0; k < groupCount; k++)
             {
-                var controlCount = fdata.Groups[k].controlCount;
+                var controlCount = fbData.Groups[k].controlCount;
                 var controls = new List<BaseTransform>(controlCount);
                 for (var i = 0; i < controlCount; i++)
                 {
-                    short controlId = fdata.Groups[k].controlIds[i];
+                    short controlId = fbData.Groups[k].controlIds[i];
                     controls.Add(bones[controlId]);
                 }
                 controlGroups.Add(controls);
@@ -346,6 +346,17 @@ public class FaceBone
         }
         args = new float[cnt];
         for (int i = 0; i < cnt; i++) args[i] = 0.5f;
+    }
+
+
+    private void CleanData()
+    {
+        if (args != null)
+        {
+            for (int i = 0; i < args.Length; i++) args[i] = 0.5f;
+        }
+        controlGroups = null;
+        tfKneadFace.Clear();
     }
 
     private int BindItem(FaceBaseData data)
@@ -389,7 +400,7 @@ public class FaceBone
             {
                 int idx = (int)data.v2Type;
                 string name = XEditorUtil.Config.facev2Type[idx];
-                GuiSlider(name + "X",data.v2ID, ref jx);
+                GuiSlider(name + "X", data.v2ID, ref jx);
                 GuiSlider(name + "Y", data.v2ID2, ref jx);
             }
             else if (data.values != null)

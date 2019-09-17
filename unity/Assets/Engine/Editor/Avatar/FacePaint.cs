@@ -66,14 +66,10 @@ public class FacePaint
 
     private void FecthMainTex()
     {
-        mainTex = outputMat.GetTexture(ShaderIDs.BaseTex) as Texture2D;
-        if (mainTex == null)
-        {
-            var pbs = outputMat.GetTexture(ShaderIDs.PBSTex);
-            string path = AssetDatabase.GetAssetPath(pbs);
-            path = path.Replace("_pbs", "_b");
-            mainTex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-        }
+        var pbs = outputMat.GetTexture(ShaderIDs.PBSTex);
+        string path = AssetDatabase.GetAssetPath(pbs);
+        path = path.Replace("_pbs", "_b");
+        mainTex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
     }
 
     int[] ibrows, ieyes, iface, imouths, ipupil;
@@ -143,7 +139,7 @@ public class FacePaint
         GUILayout.BeginVertical();
         GUILayout.Space(16);
         GUILayout.Label("Face Paint");
-        focusFace = GUILayout.Toggle(focusFace, " foces face");
+        focusFace = GUILayout.Toggle(focusFace, " focus face");
         GuiItem("brew ", brows, ref iBrow, ref color1);
         GuiItem("eye  ", eyes, ref iEye, ref color2);
         GuiItem("face ", faces, ref iNose, ref color3);
@@ -234,33 +230,36 @@ public class FacePaint
 
     public void Update()
     {
-        Shader.SetGlobalTexture("_Part1_Tex", tex1);
-        Shader.SetGlobalVector("_Part1_Offset", offset);
-        Shader.SetGlobalVector("_Part1_RotScale", rotScale);
-        Shader.SetGlobalVector("_Part1_HSB", hsv1);
+        if (mat && outputMat)
+        {
+            Shader.SetGlobalTexture("_Part1_Tex", tex1);
+            Shader.SetGlobalVector("_Part1_Offset", offset);
+            Shader.SetGlobalVector("_Part1_RotScale", rotScale);
+            Shader.SetGlobalVector("_Part1_HSB", hsv1);
 
-        Shader.SetGlobalTexture("_Part2_Tex", tex2);
-        Shader.SetGlobalVector("_Part2_Offset", offset);
-        Shader.SetGlobalVector("_Part2_RotScale", rotScale);
-        Shader.SetGlobalVector("_Part2_HSB", hsv2);
+            Shader.SetGlobalTexture("_Part2_Tex", tex2);
+            Shader.SetGlobalVector("_Part2_Offset", offset);
+            Shader.SetGlobalVector("_Part2_RotScale", rotScale);
+            Shader.SetGlobalVector("_Part2_HSB", hsv2);
 
-        Shader.SetGlobalTexture("_Part3_Tex", tex3);
-        Shader.SetGlobalVector("_Part3_Offset", offset);
-        Shader.SetGlobalVector("_Part3_RotScale", rotScale);
-        Shader.SetGlobalVector("_Part3_HSB", hsv3);
+            Shader.SetGlobalTexture("_Part3_Tex", tex3);
+            Shader.SetGlobalVector("_Part3_Offset", offset);
+            Shader.SetGlobalVector("_Part3_RotScale", rotScale);
+            Shader.SetGlobalVector("_Part3_HSB", hsv3);
 
-        Shader.SetGlobalTexture("_Part4_Tex", tex4);
-        Shader.SetGlobalVector("_Part4_Offset", offset);
-        Shader.SetGlobalVector("_Part4_RotScale", rotScale);
-        Shader.SetGlobalVector("_Part4_HSB", hsv4);
+            Shader.SetGlobalTexture("_Part4_Tex", tex4);
+            Shader.SetGlobalVector("_Part4_Offset", offset);
+            Shader.SetGlobalVector("_Part4_RotScale", rotScale);
+            Shader.SetGlobalVector("_Part4_HSB", hsv4);
 
-        Shader.SetGlobalTexture("_Part5_Tex", tex5);
-        Shader.SetGlobalVector("_Part5_Offset", offset);
-        Shader.SetGlobalVector("_Part5_RotScale", rotScale);
-        Shader.SetGlobalVector("_Part5_HSB", hsv5);
-
-        Graphics.Blit(mainTex, mainRt, mat);
-        if (outputMat) outputMat.SetTexture(ShaderIDs.BaseTex, mainRt);
+            Shader.SetGlobalTexture("_Part5_Tex", tex5);
+            Shader.SetGlobalVector("_Part5_Offset", offset);
+            Shader.SetGlobalVector("_Part5_RotScale", rotScale);
+            Shader.SetGlobalVector("_Part5_HSB", hsv5);
+            
+            Graphics.Blit(mainTex, mainRt, mat);
+            outputMat.SetTexture(ShaderIDs.BaseTex, mainRt);
+        }
     }
 
 }
