@@ -17,7 +17,6 @@ namespace XEditor
         private const int max = 64;
         private const int maxv1 = 4;
         private int maxid = 0;
-        private string prefix = @"Assets/BundleRes/Faceicon/";
         int swap = 0;
 
         [MenuItem("Assets/Engine/FaceData_Create")]
@@ -190,7 +189,7 @@ namespace XEditor
             GUILayout.FlexibleSpace();
             GUILayout.BeginVertical();
             if (!string.IsNullOrEmpty(data.icon))
-                icons[indx] = AssetDatabase.LoadAssetAtPath<Texture>(prefix + data.icon + ".png");
+                icons[indx] = AssetDatabase.LoadAssetAtPath<Texture>(XEditorUtil.uiFace + data.icon + ".png");
             icons[indx] = EditorGUILayout.ObjectField(icons[indx], typeof(Texture), true, GUILayout.Width(64), GUILayout.Height(64));
             if (icons[indx] != null)
             {

@@ -13,7 +13,6 @@ namespace XEditor
 {
     public class FashionPreviewWindow : EditorWindow
     {
-        private bool isAutoRot = true;
         private float clipTime = 0f;
         private int suit_select = 0;
         private int suit_pre = -1;
@@ -46,7 +45,6 @@ namespace XEditor
 
         private void OnEnable()
         {
-            isAutoRot = true;
             suit_select = 0;
             suit_pre = -1;
             shape = RoleShape.FEMALE;
@@ -70,9 +68,7 @@ namespace XEditor
             GUILayout.BeginVertical();
             GUILayout.Label(XEditorUtil.Config.suit_pre, XEditorUtil.titleLableStyle);
             GUILayout.Space(8);
-
-            isAutoRot = EditorGUILayout.Toggle("Auto Rot    ", isAutoRot);
-            GUILayout.Space(4);
+            
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Role Shape");
@@ -133,7 +129,7 @@ namespace XEditor
                     go.transform.SetParent(root.transform);
                     go.name = shape.ToString();
                     go.transform.localScale = Vector3.one;
-                    go.transform.rotation = Quaternion.identity;
+                    go.transform.rotation = Quaternion.Euler(0, 180, 0);
                     go.transform.localPosition = Vector3.zero;
                     Selection.activeGameObject = go;
                     fashionInfo = XFashionLibrary.GetFashionsInfo(shape);
@@ -161,11 +157,11 @@ namespace XEditor
                     pre_presentid = presentid;
                     pre_weapon_index = weapon_index;
                     paint.Initial(go, shape);
+                    bone.Initial(go, shape);
                 }
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
-
             if (paint != null)
             {
                 paint.OnGui();
@@ -181,7 +177,6 @@ namespace XEditor
         {
             if (go != null)
             {
-                if (isAutoRot) go.transform.Rotate(Vector3.up, 0.1f);
                 PlayAnim();
                 if (paint != null)
                 {

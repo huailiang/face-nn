@@ -1,21 +1,10 @@
-﻿using UnityEngine;
+﻿using System.IO;
 using UnityEditor;
-using System.IO;
 
 namespace XEngine.Editor
 {
     public class AssetsPath
     {
-        public enum EFolderType
-        {
-            ECreatures,
-            ELut,
-            ESkinLookup,
-            EEnvCube,
-            EUI,
-            ECommon
-        }
-
 
         public static string GetCreatureBandposePath(string bandposeName)
         {
@@ -99,6 +88,7 @@ namespace XEngine.Editor
             }
             return false;
         }
+
         public static string GetAssetRelativePath(UnityEngine.Object obj)
         {
             if (obj != null)

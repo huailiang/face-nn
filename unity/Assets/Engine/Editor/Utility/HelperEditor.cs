@@ -1,8 +1,3 @@
-//
-// EditorHelper.cs
-// Created by huailiang.peng on 2016/03/18 11:20:38
-//
-
 using UnityEngine;
 using UnityEditor;
 using System.IO;

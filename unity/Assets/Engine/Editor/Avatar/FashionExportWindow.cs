@@ -288,7 +288,8 @@ namespace XEditor
             MakeKnead(shape, xparts);
 
             //8. save to disk
-            PrefabUtility.CreatePrefab("Assets/BundleRes/Prefabs/" + go.name.Replace("_bandpose", ".prefab"), go);
+            PrefabUtility.SaveAsPrefabAsset(go, "Assets/BundleRes/Prefabs/" + go.name.Replace("_bandpose", ".prefab"));
+
         }
 
         public static void MakeKnead(RoleShape shape, XRoleParts root)
@@ -392,7 +393,7 @@ namespace XEditor
                 }
 
                 //6. save to disk
-                PrefabUtility.CreatePrefab(dest, go);
+                PrefabUtility.SaveAsPrefabAsset(go, dest);
             }
         }
 

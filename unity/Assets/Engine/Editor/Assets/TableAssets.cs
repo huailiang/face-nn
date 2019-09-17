@@ -1,7 +1,6 @@
-﻿using UnityEngine;
+﻿using System.IO;
 using UnityEditor;
-using System.IO;
-using XEngine;
+using UnityEngine;
 
 namespace XEngine.Editor
 {

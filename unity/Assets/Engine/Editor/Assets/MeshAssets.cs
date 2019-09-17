@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using XEngine;
 
 namespace XEngine.Editor
 {
@@ -48,12 +46,6 @@ namespace XEngine.Editor
                 new Vector3 (3f, -1f, 0f)
             });
                 s_FullscreenTriangle.SetIndices(new[] { 0, 1, 2 }, MeshTopology.Triangles, 0, false);
-                //s_FullscreenTriangle.SetUVs(0, new List<Vector2>
-                //    {
-                //        new Vector2(0, 0),
-                //        new Vector2(0, 1),
-                //        new Vector2(1, 1),
-                //    });
                 s_FullscreenTriangle.UploadMeshData(true);
 
                 return s_FullscreenTriangle;

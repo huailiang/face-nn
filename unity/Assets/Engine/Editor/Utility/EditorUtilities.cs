@@ -54,16 +54,14 @@ namespace XEngine.Editor
         static void ReloadDecoratorTypes()
         {
             s_AttributeDecorators.Clear();
-
-            // Look for all the valid attribute decorators
+            
             var types = RuntimeUtilities.GetAllAssemblyTypes()
                             .Where(
                                 t => t.IsSubclassOf(typeof(AttributeDecorator))
                                   && t.IsDefined(typeof(DecoratorAttribute), false)
                                   && !t.IsAbstract
                             );
-
-            // Store them
+            
             foreach (var type in types)
             {
                 var attr = type.GetAttribute<DecoratorAttribute>();
@@ -101,30 +99,12 @@ namespace XEngine.Editor
             return content;
         }
 
-        public static void DrawFixMeBox(string text, Action action)
-        {
-            Assert.IsNotNull(action);
 
-            EditorGUILayout.HelpBox(text, MessageType.Warning);
-
-            GUILayout.Space(-32);
-            using (new EditorGUILayout.HorizontalScope())
-            {
-                GUILayout.FlexibleSpace();
-
-                if (GUILayout.Button("Fix", GUILayout.Width(60)))
-                    action();
-
-                GUILayout.Space(8);
-            }
-            GUILayout.Space(11);
-        }
 
         public static void DrawSplitter()
         {
             var rect = GUILayoutUtility.GetRect(1f, 1f);
-
-            // Splitter rect should be full-width
+            
             rect.xMin = 0f;
             rect.width += 4f;
 
@@ -206,12 +186,10 @@ namespace XEngine.Editor
                 : Styling.paneOptionsIconLight;
 
             var menuRect = new Rect(labelRect.xMax + 4f, labelRect.y + 4f, menuIcon.width, menuIcon.height);
-
-            // Background rect should be full-width
+            
             backgroundRect.xMin = 0f;
             backgroundRect.width += 4f;
-
-            // Background
+            
             float backgroundTint = EditorGUIUtility.isProSkin ? 0.1f : 1f;
             EditorGUI.DrawRect(backgroundRect, new Color(backgroundTint, backgroundTint, backgroundTint, 0.2f));
 

@@ -8,10 +8,7 @@ using XEngine;
 
 namespace XEditor
 {
-    /// <summary>
-    /// config配置数据
-    /// 只在editor里使用
-    /// </summary>
+
     public class XEditorConfig
     {
         public string suit_pre;
@@ -24,6 +21,7 @@ namespace XEditor
     public class XEditorUtil
     {
         public static XEditorConfig _config;
+        public readonly static string uiFace = @"Assets/BundleRes/Faceicon/";
 
         public static XEditorConfig Config
         {
@@ -224,9 +222,7 @@ namespace XEditor
             newMesh.colors = null;
             newMesh.colors32 = null;
         }
-
-
-
+        
     }
 
 }

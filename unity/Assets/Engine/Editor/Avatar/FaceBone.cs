@@ -5,6 +5,11 @@ using XEditor;
 using UnityEngine;
 using UnityEditor;
 
+
+/*
+ *  捏脸-骨骼
+ */
+
 public enum TransformRange
 {
     MinValue,
@@ -232,7 +237,7 @@ public class FaceBone
         Bind();
     }
 
-    public void Load(GameObject go, RoleShape shape)
+    public void Initial(GameObject go, RoleShape shape)
     {
         RoleParts = go.GetComponent<XRoleParts>();
         string path = "Assets/BundleRes/Config/" + shape.ToString().ToLower();
@@ -321,17 +326,22 @@ public class FaceBone
     private bool[] folds;
     private Object[] icons;
     private float[] args;
-    string prefix = @"Assets/BundleRes/Faceicon/";
+    private int[] startIndx;
 
     private void Bind()
     {
         int cnt = 0;
-        for (int i = 0; i < data.headData.Length; i++)
+        int len1 = data.headData.Length;
+        int len2 = data.senseData.Length;
+        startIndx = new int[len1 + len2];
+        for (int i = 0; i < len1; i++)
         {
+            startIndx[i] = cnt;
             cnt += BindItem(data.headData[i]);
         }
-        for (int i = 0; i < data.senseData.Length; i++)
+        for (int i = 0; i < len2; i++)
         {
+            startIndx[i + len1] = cnt;
             cnt += BindItem(data.senseData[i]);
         }
         args = new float[cnt];
@@ -349,37 +359,38 @@ public class FaceBone
     public void OnGui()
     {
         GUILayout.Space(16);
-        int cnt = data.headData.Length + data.senseData.Length;
+        int len1 = data.headData.Length;
+        int len2 = data.senseData.Length;
+        int cnt = len1 + len2;
         if (folds == null) folds = new bool[cnt];
         if (icons == null) icons = new Object[cnt];
         rect = GUILayout.BeginScrollView(rect);
-        int j = 0;
-        for (int i = 0; i < data.headData.Length; i++)
+        for (int i = 0; i < len1; i++)
         {
-            GuiItem(data.headData[i], i, ref j);
+            GuiItem(data.headData[i], i);
         }
-        for (int i = 0; i < data.senseData.Length; i++)
+        for (int i = 0; i < len2; i++)
         {
-            GuiItem(data.senseData[i], i + data.headData.Length, ref j);
+            GuiItem(data.senseData[i], i + len1);
         }
         GUILayout.EndScrollView();
     }
 
 
-
-    private void GuiItem(FaceBaseData data, int ix, ref int jx)
+    private void GuiItem(FaceBaseData data, int ix)
     {
         folds[ix] = EditorGUILayout.Foldout(folds[ix], data.name);
         if (folds[ix])
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.BeginVertical();
+            int jx = startIndx[ix];
             if (data.v2Type != FaceV2Type.None)
             {
                 int idx = (int)data.v2Type;
                 string name = XEditorUtil.Config.facev2Type[idx];
-                GuiSlider(name + "X", ref jx);
-                GuiSlider(name + "Y", ref jx);
+                GuiSlider(name + "X",data.v2ID, ref jx);
+                GuiSlider(name + "Y", data.v2ID2, ref jx);
             }
             else if (data.values != null)
             {
@@ -387,24 +398,25 @@ public class FaceBone
                 {
                     FaceValueType type = data.values[i];
                     string name = XEditorUtil.Config.faceType[(int)type];
-                    float v = 0.5f;
-                    GuiSlider(name, ref jx);
+                    GuiSlider(name, data.properities[i], ref jx);
                 }
             }
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space();
             if (!string.IsNullOrEmpty(data.icon) && icons[ix] == null)
-                icons[ix] = AssetDatabase.LoadAssetAtPath<Texture>(prefix + data.icon + ".png");
+                icons[ix] = AssetDatabase.LoadAssetAtPath<Texture>(XEditorUtil.uiFace + data.icon + ".png");
             EditorGUILayout.ObjectField(icons[ix], typeof(Texture), true, GUILayout.Width(56), GUILayout.Height(56));
             EditorGUILayout.EndHorizontal();
         }
     }
 
-    private void GuiSlider(string name, ref int ix)
+    private void GuiSlider(string name, int id, ref int ix)
     {
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("    " + name);
         args[ix] = EditorGUILayout.Slider(args[ix], 0, 1);
+        float v = args[ix] * 2 - 1;
+        ProcessKneadBone(id, v);
         EditorGUILayout.Space();
         EditorGUILayout.EndHorizontal();
         ix++;

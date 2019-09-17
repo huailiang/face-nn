@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using XEngine;
-using CFUtilPoolLib;
 using UnityEditor;
 using UnityEngine;
 
@@ -15,9 +13,6 @@ namespace XEngine.Editor
         public enum OpType
         {
             None,
-            OpGenAllSceneMat,
-            OpRefreshAllSceneMat,
-            OpSaveAllSceneMat,
             OpGenMat,
             OpGenEffectMat,
             OpRefreshMat,
@@ -43,7 +38,7 @@ namespace XEngine.Editor
         private Rect dummyMaterialsRect;
         private OpType opType = OpType.None;
         private int shaderFeatureCopyIndex = -1;
-        private int matInfoCopyIndex = -1;
+
         private void OnEnable()
         {
             constPropertyList = new List<SerializedProperty>();
@@ -300,6 +295,7 @@ namespace XEngine.Editor
                 tis.alphaFormat = (TextureImporterFormat)EditorGUILayout.EnumPopup("Format_A", tis.alphaFormat, GUILayout.MaxWidth(300));
             }
         }
+
         private void TextureProcessGUI(AssetsConfig ac)
         {
             ac.texCompressConfigFolder = EditorGUILayout.Foldout(ac.texCompressConfigFolder, "Texture Compress");
@@ -375,41 +371,6 @@ namespace XEngine.Editor
             }
         }
 
-        private void SceneDummyMatGUI(AssetsConfig.DummyMaterialInfo dummyMaterialInfo, int i, string name)
-        {
-            ToolsUtility.BeginGroup("");
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(string.Format("{0}.{1}", i.ToString(), name), GUILayout.MaxWidth(250));
-            if (GUILayout.Button("Reset", GUILayout.MaxWidth(80)))
-            {
-                dummyMaterialInfo.enumIndex = -1;
-                dummyMaterialInfo.mat = null;
-                dummyMaterialInfo.mat1 = null;
-                dummyMaterialInfo.mat2 = null;
-            }
-            if (GUILayout.Button("Gen", GUILayout.MaxWidth(80)))
-            {
-                opType = OpType.OpGenMat;
-                genMat = dummyMaterialInfo;
-            }
-            if (GUILayout.Button("Refresh", GUILayout.MaxWidth(80)))
-            {
-                opType = OpType.OpRefreshMat;
-                genMat = dummyMaterialInfo;
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.Space();
-            EditorGUI.indentLevel++;
-            EditorGUILayout.BeginHorizontal();
-            dummyMaterialInfo.name = EditorGUILayout.TextField(dummyMaterialInfo.name, GUILayout.MaxWidth(300));
-            dummyMaterialInfo.shader = EditorGUILayout.ObjectField(dummyMaterialInfo.shader, typeof(Shader), false, GUILayout.MaxWidth(300)) as Shader;
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUI.indentLevel--;
-            ToolsUtility.EndGroup();
-        }
-
         private void RoleDummyMatGUI(AssetsConfig.DummyMaterialInfo dummyMaterialInfo, int i, string name, bool multiBlendType)
         {
             ToolsUtility.BeginGroup("");
@@ -482,117 +443,8 @@ namespace XEngine.Editor
             EditorGUI.indentLevel--;
             ToolsUtility.EndGroup();
         }
-        private void SpecialDummyMatGUI(AssetsConfig.DummyMaterialInfo dummyMaterialInfo, int i, string name)
-        {
-            ToolsUtility.BeginGroup("");
 
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(string.Format("{0}.{1}", i.ToString(), name), GUILayout.MaxWidth(200));
-            if (GUILayout.Button("Reset", GUILayout.MaxWidth(80)))
-            {
-                dummyMaterialInfo.enumIndex = -1;
-            }
-            if (GUILayout.Button("Gen", GUILayout.MaxWidth(80)))
-            {
-                MaterialShaderAssets.DefaultEffectMat(dummyMaterialInfo, false);
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.Space();
-            EditorGUI.indentLevel++;
-            EditorGUILayout.BeginHorizontal();
-            dummyMaterialInfo.name = EditorGUILayout.TextField(dummyMaterialInfo.name, GUILayout.MaxWidth(300));
-            dummyMaterialInfo.shader = EditorGUILayout.ObjectField(dummyMaterialInfo.shader, typeof(Shader), false, GUILayout.MaxWidth(300)) as Shader;
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            dummyMaterialInfo.blendType = (EBlendType)EditorGUILayout.EnumPopup("", dummyMaterialInfo.blendType, GUILayout.MaxWidth(100));
-            KeywordFlags e = (KeywordFlags)EditorGUILayout.EnumFlagsField((KeywordFlags)dummyMaterialInfo.flag, GUILayout.MaxWidth(200));
-            dummyMaterialInfo.flag = (uint)e;
-            EditorGUILayout.LabelField(MaterialShaderAssets.GetKeyWords(e));
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.ObjectField(dummyMaterialInfo.mat, typeof(Material), false, GUILayout.MaxWidth(300));
-            EditorGUILayout.EndHorizontal();
-            EditorGUI.indentLevel--;
-            ToolsUtility.EndGroup();
-        }
-
-        private static void InitMatNames(List<AssetsConfig.DummyMaterialInfo> materials, int matCount, ref List<string> matNames, Type enumType)
-        {
-            if (materials.Count < matCount)
-            {
-                for (int i = 0; i < matCount - materials.Count; ++i)
-                {
-                    materials.Add(new AssetsConfig.DummyMaterialInfo());
-                }
-            }
-            if (matNames == null)
-            {
-                string[] names = Enum.GetNames(enumType);
-                matNames = new List<string>(names);
-            }
-
-            for (int i = 0; i < matCount; ++i)
-            {
-                var dummyMaterialInfo = materials[i];
-                if (dummyMaterialInfo.enumIndex == -1 && !string.IsNullOrEmpty(dummyMaterialInfo.name))
-                {
-                    dummyMaterialInfo.enumIndex = matNames.FindIndex((x) => { return x == dummyMaterialInfo.name; });
-                }
-                if (i != dummyMaterialInfo.enumIndex && dummyMaterialInfo.enumIndex >= 0)
-                {
-                    var tmp = materials[dummyMaterialInfo.enumIndex];
-                    materials[dummyMaterialInfo.enumIndex] = dummyMaterialInfo;
-                    materials[i] = tmp;
-                }
-                if (dummyMaterialInfo.shader != null && dummyMaterialInfo.enumIndex >= 0)
-                {
-                    if (dummyMaterialInfo.mat == null)
-                    {
-                        dummyMaterialInfo.mat = MaterialShaderAssets.GetDummyMat(dummyMaterialInfo.name);
-                    }
-                    if (dummyMaterialInfo.mat1 == null && !string.IsNullOrEmpty(dummyMaterialInfo.ext1))
-                    {
-                        dummyMaterialInfo.mat1 = MaterialShaderAssets.GetDummyMat(dummyMaterialInfo.name + dummyMaterialInfo.ext1);
-                    }
-                    if (dummyMaterialInfo.mat2 == null && !string.IsNullOrEmpty(dummyMaterialInfo.ext2))
-                    {
-                        dummyMaterialInfo.mat2 = MaterialShaderAssets.GetDummyMat(dummyMaterialInfo.name + dummyMaterialInfo.ext2);
-                    }
-                    if (dummyMaterialInfo.mat3 == null && !string.IsNullOrEmpty(dummyMaterialInfo.ext3))
-                    {
-                        dummyMaterialInfo.mat3 = MaterialShaderAssets.GetDummyMat(dummyMaterialInfo.name + dummyMaterialInfo.ext3);
-                    }
-                }
-            }
-        }
-        private void DummyMatGUI(AssetsConfig ac)
-        {
-            ac.dummyMaterialsFolder = EditorGUILayout.Foldout(ac.dummyMaterialsFolder, "Dummy Materials");
-            if (ac.dummyMaterialsFolder)
-            {
-                if (GUILayout.Button("SaveAll", GUILayout.MaxWidth(80)))
-                {
-                    opType = OpType.OpSaveAllSceneMat;
-                }
-                CustomMatGUI(ac);
-            }
-        }
-        private void CustomMatGUI(AssetsConfig ac)
-        {
-            EditorGUI.indentLevel++;
-            ac.customMatInfoFolder = EditorGUILayout.Foldout(ac.customMatInfoFolder, "Custom Materials");
-            if (ac.customMatInfoFolder)
-            {
-                EditorGUILayout.LabelField("Custom");
-                for (int i = 0; i < ac.customMaterials.Count; ++i)
-                {
-                    var dummyMaterialInfo = ac.customMaterials[i];
-                    RoleDummyMatGUI(dummyMaterialInfo, i, ((ECharMaterial)dummyMaterialInfo.enumIndex).ToString(), true);
-                }
-            }
-            EditorGUI.indentLevel--;
-        }
+     
 
         private void ShaderGroupGUI(AssetsConfig ac)
         {
@@ -903,207 +755,24 @@ namespace XEngine.Editor
                 }
             }
         }
-
-        private void ShaderPropertyFeature(ShaderProperty sp, ref bool remove)
-        {
-            EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(400));
-            EditorGUILayout.LabelField(sp.shaderProperty, GUILayout.MaxWidth(150));
-            if (GUILayout.Button("Edit", GUILayout.MaxWidth(80)))
-            {
-                sp.folder = !sp.folder;
-            }
-
-            if (GUILayout.Button("Delete", GUILayout.MaxWidth(80)))
-            {
-                remove = true;
-            }
-            EditorGUILayout.EndHorizontal();
-            if (sp.folder)
-            {
-                sp.shaderProperty = EditorGUILayout.TextField("PropertyName", sp.shaderProperty);
-                sp.isTex = EditorGUILayout.Toggle("IsTex", sp.isTex);
-                sp.shaderID = (int)(EShaderKeyID)EditorGUILayout.EnumPopup("", (EShaderKeyID)sp.shaderID, GUILayout.MaxWidth(200));
-            }
-        }
-        private void SceneMatShaderTypeGUI(AssetsConfig ac)
-        {
-            ac.sceneMatInfoFolder = EditorGUILayout.Foldout(ac.sceneMatInfoFolder, "Mat Shader Type");
-            if (ac.sceneMatInfoFolder)
-            {
-                EditorGUI.indentLevel++;
-                GUILayout.Label("MatShaderMap", EditorStyles.boldLabel);
-                if (GUILayout.Button("Add", GUILayout.MaxWidth(80)))
-                {
-                    ac.matShaderType.Add(new MatShaderType());
-                }
-                int removeIndex = -1;
-                for (int i = 0; i < ac.matShaderType.Count; ++i)
-                {
-                    var mst = ac.matShaderType[i];
-                    EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(400));
-                    EditorGUILayout.LabelField(mst.name, GUILayout.MaxWidth(150));
-                    if (GUILayout.Button("Edit", GUILayout.MaxWidth(80)))
-                    {
-                        mst.folder = !mst.folder;
-                    }
-
-                    if (GUILayout.Button("Delete", GUILayout.MaxWidth(80)))
-                    {
-                        removeIndex = i;
-                        matInfoCopyIndex = -1;
-                    }
-                    if (matInfoCopyIndex == -1 || matInfoCopyIndex == i)
-                    {
-                        if (GUILayout.Button("Copy", GUILayout.MaxWidth(80)))
-                        {
-                            if (matInfoCopyIndex == -1)
-                                matInfoCopyIndex = i;
-                            else
-                                matInfoCopyIndex = -1;
-                        }
-                    }
-                    else
-                    {
-                        if (GUILayout.Button("Paste", GUILayout.MaxWidth(80)))
-                        {
-                            var src = ac.matShaderType[matInfoCopyIndex];
-                            mst.Clone(src);
-                        }
-                    }
-
-                    EditorGUILayout.EndHorizontal();
-                    if (mst.folder)
-                    {
-                        mst.name = EditorGUILayout.TextField("Feature", mst.name);
-                        mst.shader = EditorGUILayout.ObjectField("Shader", mst.shader, typeof(Shader), false) as Shader;
-                        mst.macro = EditorGUILayout.TextField("Macro", mst.macro);
-                        mst.matOffset = (ESceneMaterial)EditorGUILayout.EnumPopup("", (ESceneMaterial)mst.matOffset, GUILayout.MaxWidth(260));
-                        mst.findPropertyType = (FindPropertyType)EditorGUILayout.EnumPopup("", mst.findPropertyType, GUILayout.MaxWidth(260));
-                        mst.hasPbs = EditorGUILayout.Toggle("HasPbs", mst.hasPbs);
-                        if (mst.hasPbs)
-                            mst.pbsOffset = (uint)EditorGUILayout.IntSlider("PbsOffset", (int)mst.pbsOffset, 0, 1);
-                        mst.hasCutout = EditorGUILayout.Toggle("HasCutout", mst.hasCutout);
-                        mst.hasTransparent = EditorGUILayout.Toggle("HasTransparent", mst.hasTransparent);
-                        mst.hasTransparentCout = EditorGUILayout.Toggle("HasTransparentCout", mst.hasTransparentCout);
-                        if (mst.hasCutout || mst.hasTransparent || mst.hasTransparentCout)
-                            mst.renderTypeOffset = (uint)EditorGUILayout.IntSlider("RenderTypeOffset", (int)mst.renderTypeOffset, 0, 2);
-                        bool isPostprocess = mst.HasFlag(EMatFlag.IsPostProcess);
-                        bool postProcess = EditorGUILayout.Toggle("IsPostProcess", isPostprocess);
-                        if (postProcess != isPostprocess)
-                        {
-                            mst.SetFlag(EMatFlag.IsPostProcess, postProcess);
-                        }
-
-                        EditorGUI.indentLevel++;
-                        if (GUILayout.Button("Add", GUILayout.MaxWidth(80)))
-                        {
-                            mst.shaderPropertys.Add(new ShaderProperty());
-                        }
-                        int subRemoveIndex = -1;
-                        for (int j = 0; j < mst.shaderPropertys.Count; ++j)
-                        {
-                            var sp = mst.shaderPropertys[j];
-                            bool remove = false;
-                            ShaderPropertyFeature(sp, ref remove);
-                            if (remove)
-                            {
-                                subRemoveIndex = j;
-                            }
-                        }
-                        if (subRemoveIndex >= 0)
-                        {
-                            mst.shaderPropertys.RemoveAt(subRemoveIndex);
-                        }
-                        EditorGUI.indentLevel--;
-                    }
-                }
-                if (removeIndex >= 0)
-                {
-                    ac.matShaderType.RemoveAt(removeIndex);
-                }
-
-                GUILayout.Label("CommonProperty", EditorStyles.boldLabel);
-
-                if (GUILayout.Button("Add", GUILayout.MaxWidth(80)))
-                {
-                    ac.commonShaderProperty.Add(new ShaderProperty());
-                }
-
-                removeIndex = -1;
-                for (int i = 0; i < ac.commonShaderProperty.Count; ++i)
-                {
-                    var sp = ac.commonShaderProperty[i];
-                    bool remove = false;
-                    ShaderPropertyFeature(sp, ref remove);
-                    if (remove)
-                    {
-                        removeIndex = i;
-                    }
-                }
-                if (removeIndex >= 0)
-                {
-                    ac.commonShaderProperty.RemoveAt(removeIndex);
-                }
-
-                GUILayout.Label("PropertyMap", EditorStyles.boldLabel);
-                if (GUILayout.Button("Add", GUILayout.MaxWidth(80)))
-                {
-                    ac.shaderPropertyKey.Add(new ShaderProperty());
-                }
-
-                removeIndex = -1;
-                for (int i = 0; i < ac.shaderPropertyKey.Count; ++i)
-                {
-                    var sp = ac.shaderPropertyKey[i];
-                    bool remove = false;
-                    ShaderPropertyFeature(sp, ref remove);
-                    if (remove)
-                    {
-                        removeIndex = i;
-                    }
-                }
-                if (removeIndex >= 0)
-                {
-                    ac.shaderPropertyKey.RemoveAt(removeIndex);
-                }
-
-                EditorGUI.indentLevel--;
-            }
-        }
-
+        
         public override void OnInspectorGUI()
         {
-
             AssetsConfig ac = target as AssetsConfig;
             if (ac != null)
             {
                 ConstValuesGUI(ac);
                 TextureProcessGUI(ac);
-                DummyMatGUI(ac);
                 ShaderGroupGUI(ac);
                 AssetsConfig.GetGroupedShaderFeatureList(groupedShaderFeatures);
                 ShaderFeatureGUI(ac);
                 ShaderInfoGUI(ac);
-                SceneMatShaderTypeGUI(ac);
-                if (GUILayout.Button("Save", GUILayout.MaxWidth(100)))
-                {
-                    CommonAssets.SaveAsset(ac);
-                }
                 OnEventProcessGUI(ac);
             }
 
             serializedObject.ApplyModifiedProperties();
             switch (opType)
             {
-                case OpType.OpGenAllSceneMat:
-                    GenAllSceneMat();
-                    break;
-                case OpType.OpRefreshAllSceneMat:
-                    RefreshAllSceneMat();
-                    break;
-                case OpType.OpSaveAllSceneMat:
-                    SaveAllSceneMat();
-                    break;
                 case OpType.OpGenMat:
                     GenMat();
                     break;
@@ -1141,91 +810,6 @@ namespace XEngine.Editor
                 genMat = null;
             }
         }
-        private void GenAllSceneMat()
-        {
-            AssetsConfig ac = target as AssetsConfig;
-            if (ac != null)
-            {
-                int matCount = (int)ESceneMaterial.Num;
-                for (int i = 0; i < matCount; ++i)
-                {
-                    var dummyMaterialInfo = ac.sceneDummyMaterials[i];
-                    EditorUtility.DisplayProgressBar(string.Format("{0}-{1}/{2}", "GenMat", i, matCount), dummyMaterialInfo.name, (float)i / matCount);
 
-                    MaterialShaderAssets.DefaultMat(dummyMaterialInfo);
-                }
-                EditorUtility.ClearProgressBar();
-            }
-        }
-
-        private void RefreshAllSceneMat()
-        {
-            AssetsConfig ac = target as AssetsConfig;
-            if (ac != null)
-            {
-                int matCount = (int)ESceneMaterial.Num;
-                for (int i = 0; i < matCount; ++i)
-                {
-                    var dummyMaterialInfo = ac.sceneDummyMaterials[i];
-                    EditorUtility.DisplayProgressBar(string.Format("{0}-{1}/{2}", "RefreshMat", i, matCount), dummyMaterialInfo.name, (float)i / matCount);
-
-                    MaterialShaderAssets.DefaultRefeshMat(dummyMaterialInfo);
-                }
-                EditorUtility.ClearProgressBar();
-            }
-        }
-        private void SaveAllSceneMat()
-        {
-            AssetsConfig ac = target as AssetsConfig;
-            if (ac != null)
-            {
-                string path = "Assets/BundleRes/Config/EffectData.asset";
-                EffectData ed = AssetDatabase.LoadAssetAtPath<EffectData>(path);
-                if (ed != null)
-                {
-                    ed.terrainOffset = (int)ESceneMaterial.TerrainChunk0;
-                    List<Material> materials = new List<Material>();
-                    int matCount = (int)ESceneMaterial.Num;
-                    ed.matCount = matCount;
-                    for (int i = 0; i < matCount; ++i)
-                    {
-                        var dummyMaterialInfo = ac.sceneDummyMaterials[i];
-                        materials.Add(dummyMaterialInfo.mat);
-                    }
-                    for (int i = 0; i < matCount; ++i)
-                    {
-                        var dummyMaterialInfo = ac.sceneDummyMaterials[i];
-                        materials.Add(dummyMaterialInfo.mat1);
-                    }
-                    ed.sceneMats = materials.ToArray();
-
-                    materials.Clear();
-                    matCount = (int)ECharMaterial.Num;
-                    for (int i = 0; i < matCount; ++i)
-                    {
-                        var dummyMaterialInfo = ac.roleMaterials[i];
-                        if ((dummyMaterialInfo.blendType & EBlendType.Opaque) != 0)
-                            materials.Add(dummyMaterialInfo.mat);
-                        if ((dummyMaterialInfo.blendType & EBlendType.Cutout) != 0)
-                            materials.Add(dummyMaterialInfo.mat1);
-                        if ((dummyMaterialInfo.blendType & EBlendType.CutoutTransparent) != 0)
-                            materials.Add(dummyMaterialInfo.mat2);
-                    }
-                    ed.charMats = materials.ToArray();
-
-                    materials.Clear();
-                    matCount = (int)EEffectMaterial.Num;
-                    for (int i = 0; i < matCount; ++i)
-                    {
-                        var dummyMaterialInfo = ac.effectMaterials[i];
-                        materials.Add(dummyMaterialInfo.mat);
-                    }
-                    ed.effectMats = materials.ToArray();
-
-                    CommonAssets.SaveAsset(ed);
-                }
-            }
-
-        }
     }
 }

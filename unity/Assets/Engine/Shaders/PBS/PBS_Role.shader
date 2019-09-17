@@ -68,5 +68,5 @@
 			ENDHLSL
 		}
 	}
-	CustomEditor "CFEngine.Editor.PBSShaderGUI"
+	CustomEditor "XEngine.Editor.PBSShaderGUI"
 }

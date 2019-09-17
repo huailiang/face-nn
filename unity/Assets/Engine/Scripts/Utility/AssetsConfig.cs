@@ -177,27 +177,7 @@ namespace XEngine
 
         SceneBoxReflect,
         SceneBoxReflectPbs,
-
-        SceneTree,
-
-        TerrainChunk0,
-        TerrainChunk1,
-        TerrainChunk2,
-        TerrainChunk3,
-
-        SceneMassive,
-        SceneMassiveTransparent,
-
-        SceneTransparent,
-        SceneMetallic,
-        SceneMetallicCutout,
         ScenePOM,
-        LavaSat,
-        SceneWater,
-        IceCave,
-        Lava,
-        SceneCommonPbs2,
-        SceneCommonPbsCutout2,
         Num,
         CustomMat = 0xFF,
     }
@@ -343,7 +323,6 @@ namespace XEngine
             hasTransparentCout = src.hasTransparentCout;
             renderTypeOffset = src.renderTypeOffset;
             matFlag = src.matFlag;
-
         }
     }
 
@@ -360,8 +339,6 @@ namespace XEngine
             Prefab,
             StaticPrefab,
             Instance,
-            MeshTerrain,
-            UnityTerrain,
             Num,
         }
         public enum ShaderPropertyType
@@ -375,6 +352,7 @@ namespace XEngine
             CustomGroup,
             RenderQueue,
         }
+
         public enum DependencyType
         {
             Or,
@@ -396,6 +374,7 @@ namespace XEngine
                 dependencyShaderProperty.AddRange(src.dependencyShaderProperty);
             }
         }
+
         [System.Serializable]
         public class ShaderCustomProperty
         {
@@ -446,7 +425,6 @@ namespace XEngine
                 propertyName = src.propertyName;
                 type = src.type;
                 dependencyPropertys.Clone(src.dependencyPropertys);
-
             }
         }
 
@@ -530,8 +508,6 @@ namespace XEngine
             "Prefabs",
             "StaticPrefabs",
             "Instance",
-            "MeshTerrain",
-            "UnityTerrain",
         };
 
         public Material ShadowCaster;

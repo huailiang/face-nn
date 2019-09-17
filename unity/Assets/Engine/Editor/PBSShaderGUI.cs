@@ -416,7 +416,6 @@ namespace XEngine.Editor
             }
             else
             {
-
                 EditorGUI.BeginChangeCheck();
                 bool enable = EditorGUILayout.Toggle(context.spi.shaderFeature.name, isEnable);
                 if (EditorGUI.EndChangeCheck())
@@ -547,7 +546,6 @@ namespace XEngine.Editor
                     MaterialShaderAssets.SetupMaterialWithBlendMode(m_Material, mode);
                 }
             }
-
         }
 
         protected void DoDebugArea(ref DrawPropertyContext context)
@@ -611,4 +609,4 @@ namespace XEngine.Editor
                 m.DisableKeyword(keyword);
         }
     }
-} // namespace UnityEditor
+} 
