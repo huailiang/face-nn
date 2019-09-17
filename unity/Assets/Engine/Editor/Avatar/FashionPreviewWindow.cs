@@ -22,9 +22,7 @@ namespace XEditor
         private int[] presentids = { 101 };
         private string[] spids = { "101" };
         private int presentid = 101;
-        private int weapon_index = 1;
         private int pre_presentid = 0;
-        private int pre_weapon_index = 0;
         private AnimationClip clip;
         private GameObject go;
         private FacePaint paint;
@@ -79,7 +77,6 @@ namespace XEditor
             GUILayout.Label("Presentid: ");
             presentid = EditorGUILayout.IntPopup(presentid, spids, presentids);
             GUILayout.EndHorizontal();
-            weapon_index = EditorGUILayout.IntField("weaponIndex", weapon_index);
             GUILayout.Space(8);
 
             GUILayout.BeginHorizontal();
@@ -151,11 +148,10 @@ namespace XEditor
                     DrawSuit();
                     suit_pre = suit_select;
                 }
-                if (presentid != pre_presentid || weapon_index != pre_weapon_index)
+                if (presentid != pre_presentid)
                 {
                     DrawSuit();
                     pre_presentid = presentid;
-                    pre_weapon_index = weapon_index;
                     paint.Initial(go, shape);
                     bone.Initial(go, shape);
                 }
@@ -190,7 +186,7 @@ namespace XEditor
         {
             if (fashionInfo.Length <= suit_select) suit_select = 0;
             FashionSuit.RowData rowData = fashionInfo[suit_select];
-            FashionUtil.DrawSuit(go, rowData, (uint)presentid, weapon_index);
+            FashionUtil.DrawSuit(go, rowData, (uint)presentid, 1);
         }
 
         private void PlayAnim()

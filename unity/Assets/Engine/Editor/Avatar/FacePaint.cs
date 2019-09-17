@@ -12,15 +12,14 @@ using System.Collections.Generic;
 
 public class FacePaint
 {
-
     FaceData data;
     RoleShape roleShape;
-    public Texture2D mainTex;
-    public Texture2D tex1;
-    public Texture2D tex2;
-    public Texture2D tex3;
-    public Texture2D tex4;
-    public Texture2D tex5;
+    Texture2D mainTex;
+    Texture2D tex1;
+    Texture2D tex2;
+    Texture2D tex3;
+    Texture2D tex4;
+    Texture2D tex5;
     Color color1 = Color.gray;
     Color color2 = Color.black;
     Color color3 = Color.gray;
@@ -256,7 +255,7 @@ public class FacePaint
             Shader.SetGlobalVector("_Part5_Offset", offset);
             Shader.SetGlobalVector("_Part5_RotScale", rotScale);
             Shader.SetGlobalVector("_Part5_HSB", hsv5);
-            
+
             Graphics.Blit(mainTex, mainRt, mat);
             outputMat.SetTexture(ShaderIDs.BaseTex, mainRt);
         }
