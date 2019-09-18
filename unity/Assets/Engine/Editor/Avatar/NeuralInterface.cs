@@ -35,7 +35,13 @@ public class NeuralInterface
         camera.targetTexture = rt;
         camera.Render();
         SaveRenderTex(rt);
+        Clear();
+    }
+
+    private static void Clear()
+    {
         camera.targetTexture = null;
+        RenderTexture.active = null;
         rt.Release();
     }
 

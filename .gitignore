@@ -9,3 +9,4 @@ unity/Assets/Table*
 **/.vs
 export/
 *.DS_Store
+*Animation.meta
