@@ -7,4 +7,5 @@ unity/Temp
 unity/Assets/Table*
 **/.vscode
 **/.vs
-
+export/
+*.DS_Store
