@@ -21,7 +21,7 @@ public class FacePaint
     Texture2D tex4;
     Texture2D tex5;
     Color color1 = Color.gray;
-    Color color2 = Color.black;
+    Color color2 = Color.gray;
     Color color3 = Color.gray;
     Color color4 = Color.gray;
     Color color5 = Color.gray;
@@ -43,6 +43,7 @@ public class FacePaint
     public FacePaint(FaceData dt)
     {
         data = dt;
+        focusFace = true;
     }
 
     public void Initial(GameObject go, RoleShape shape)

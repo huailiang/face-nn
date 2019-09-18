@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using System;
+using System.Linq;
 
-
-/// <summary>
-/// 时装预览工具
-/// 使用前需要确保资源导出和fashionsuit表格配好
-/// </summary>
 
 namespace XEditor
 {
@@ -19,15 +16,14 @@ namespace XEditor
         private FashionSuit.RowData[] fashionInfo;
         private string[] fashionDesInfo;
         private RoleShape shape = RoleShape.FEMALE;
-        private int[] presentids = { 101 };
-        private string[] spids = { "101" };
-        private int presentid = 101;
-        private int pre_presentid = 0;
+        private RoleShape shape_pre = RoleShape.FEMALE;
+        private uint presentid = 101;
         private AnimationClip clip;
         private GameObject go;
         private FacePaint paint;
         private FaceBone bone;
         private XEntityPresentation.RowData pData;
+        private Action callback;
         FaceData data;
 
 
@@ -40,6 +36,15 @@ namespace XEditor
             }
         }
 
+        public void NeuralProcess(float[] boneArgs, RoleShape shape, Action cb)
+        {
+            this.shape = shape;
+            this.callback = cb;
+            if (bone != null && boneArgs != null)
+            {
+                bone.NeuralProcess(boneArgs);
+            }
+        }
 
         private void OnEnable()
         {
@@ -66,18 +71,12 @@ namespace XEditor
             GUILayout.BeginVertical();
             GUILayout.Label(XEditorUtil.Config.suit_pre, XEditorUtil.titleLableStyle);
             GUILayout.Space(8);
-            
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Role Shape");
             shape = (RoleShape)EditorGUILayout.EnumPopup(shape);
             GUILayout.EndHorizontal();
             GUILayout.Space(4);
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Presentid: ");
-            presentid = EditorGUILayout.IntPopup(presentid, spids, presentids);
-            GUILayout.EndHorizontal();
-            GUILayout.Space(8);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Select Clip");
@@ -91,27 +90,7 @@ namespace XEditor
 
                 List<int> list = new List<int>();
                 var table = XFashionLibrary._profession.Table;
-                for (int i = 0; i < table.Length; i++)
-                {
-                    if (table[i].Shape == (int)shape)
-                    {
-                        list.Add((int)table[i].PresentID);
-                        if (table[i].SecondaryPresentID != 0)
-                        {
-                            list.Add((int)table[i].SecondaryPresentID);
-                        }
-                    }
-                }
-                list.Sort();
-                presentids = list.ToArray();
-                if (presentids == null || presentids.Length <= 0) return;
-                presentid = presentids[0];
-                spids = new string[presentids.Length];
-                for (int i = 0; i < presentids.Length; i++)
-                {
-                    spids[i] = presentids[i].ToString();
-                }
-
+                presentid = table.Where(x => x.Shape == (int)shape).Select(x => x.PresentID).First();
                 string path = "Assets/BundleRes/Prefabs/Player_" + shape.ToString().ToLower() + ".prefab";
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
                 if (prefab != null)
@@ -143,29 +122,19 @@ namespace XEditor
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Select Suit");
                 suit_select = EditorGUILayout.Popup(suit_select, fashionDesInfo);
-                if (suit_pre != suit_select)
+                if (suit_pre != suit_select || shape != shape_pre)
                 {
                     DrawSuit();
                     suit_pre = suit_select;
-                }
-                if (presentid != pre_presentid)
-                {
-                    DrawSuit();
-                    pre_presentid = presentid;
+                    shape_pre = shape;
                     paint.Initial(go, shape);
                     bone.Initial(go, shape);
                 }
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
-            if (paint != null)
-            {
-                paint.OnGui();
-            }
-            if (bone != null)
-            {
-                bone.OnGui();
-            }
+            paint.OnGui();
+            bone.OnGui();
         }
 
 
@@ -180,7 +149,6 @@ namespace XEditor
                 }
             }
         }
-
 
         private void DrawSuit()
         {
@@ -201,4 +169,5 @@ namespace XEditor
 
 
     }
+
 }

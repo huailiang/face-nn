@@ -348,6 +348,12 @@ public class FaceBone
         for (int i = 0; i < cnt; i++) args[i] = 0.5f;
     }
 
+    public void NeuralProcess(float[] boneArgs)
+    {
+        CleanData();
+        args = boneArgs;
+    }
+
 
     private void CleanData()
     {
