@@ -23,8 +23,8 @@ namespace XEditor
         private FacePaint paint;
         private FaceBone bone;
         private XEntityPresentation.RowData pData;
-        private Action callback;
-        FaceData data;
+        private FaceData fData;
+        private NeuralData nData;
 
 
         [MenuItem("Tools/FashionPreview")]
@@ -36,14 +36,10 @@ namespace XEditor
             }
         }
 
-        public void NeuralProcess(float[] boneArgs, RoleShape shape, Action cb)
+        public void NeuralProcess(NeuralData data)
         {
-            this.shape = shape;
-            this.callback = cb;
-            if (bone != null && boneArgs != null)
-            {
-                bone.NeuralProcess(boneArgs);
-            }
+            this.shape = data.shape;
+            this.nData = data;
         }
 
         private void OnEnable()
@@ -51,17 +47,17 @@ namespace XEditor
             suit_select = 0;
             suit_pre = -1;
             shape = RoleShape.FEMALE;
-            if (data == null)
+            if (fData == null)
             {
-                data = AssetDatabase.LoadAssetAtPath<FaceData>("Assets/BundleRes/Config/FaceData.asset");
+                fData = AssetDatabase.LoadAssetAtPath<FaceData>("Assets/BundleRes/Config/FaceData.asset");
             }
             if (paint == null)
             {
-                paint = new FacePaint(data);
+                paint = new FacePaint(fData);
             }
             if (bone == null)
             {
-                bone = new FaceBone(data);
+                bone = new FaceBone(fData);
             }
         }
 
@@ -135,6 +131,18 @@ namespace XEditor
             GUILayout.EndVertical();
             paint.OnGui();
             bone.OnGui();
+            HandleNeural();
+        }
+
+        private void HandleNeural()
+        {
+            if (nData != null)
+            {
+                paint.Update();
+                bone.NeuralProcess(nData.boneArgs);
+                nData.callback();
+                nData = null;
+            }
         }
 
 

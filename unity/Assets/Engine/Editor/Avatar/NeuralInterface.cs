@@ -1,9 +1,18 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using System.IO;
+using System;
 
 namespace XEditor
 {
+
+    public class NeuralData
+    {
+        public float[] boneArgs;
+        public Action callback;
+        public RoleShape shape;
+    }
+
 
     public class NeuralInterface
     {
@@ -20,16 +29,14 @@ namespace XEditor
             win.Show();
             FashionPreviewWindow prev = win as FashionPreviewWindow;
             float[] ar = new float[95];
-            for (int i = 0; i < ar.Length; i++) ar[i] = 0.2f;
-            prev.NeuralProcess(ar, RoleShape.MALE, Capture);
-        }
-
-
-        private static void NeuralProcess(float[] arr, RoleShape shape)
-        {
-            var win = EditorWindow.GetWindowWithRect(typeof(FashionPreviewWindow), new Rect(0, 0, 440, 640), true, "FashionPreview");
-            win.Show();
-            Capture();
+            for (int i = 0; i < ar.Length; i++) ar[i] = 0.5f;
+            NeuralData data = new NeuralData
+            {
+                callback = Capture,
+                boneArgs = ar,
+                shape = RoleShape.MALE
+            };
+            prev.NeuralProcess(data);
         }
 
 
@@ -79,7 +86,7 @@ namespace XEditor
                     {
                         Directory.CreateDirectory(export);
                     }
-                    File.WriteAllBytes(export + "sample.jpg", bytes);
+                    File.WriteAllBytes(export + "export.jpg", bytes);
                     Debug.Log("save success");
                     HelperEditor.Open(export);
                 }

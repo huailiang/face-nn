@@ -228,6 +228,7 @@ public class FaceBone
     private List<List<BaseTransform>> controlGroups = null;
     private Dictionary<Transform, List<BoneData>> tfKneadFace = new Dictionary<Transform, List<BoneData>>();
     private FaceData data;
+    private FaceBoneDatas fbData;
     private Vector2 rect;
 
     public FaceBone(FaceData dt)
@@ -244,9 +245,9 @@ public class FaceBone
         if (ta != null)
         {
             MemoryStream ms = new MemoryStream(ta.bytes);
-            var fbData = new FaceBoneDatas(ms);
+            fbData = new FaceBoneDatas(ms);
             CleanData();
-            MakeControlGroups(fbData);
+            MakeControlGroups();
             ms.Close();
         }
     }
@@ -265,7 +266,7 @@ public class FaceBone
     }
 
 
-    private void MakeControlGroups(FaceBoneDatas fbData)
+    private void MakeControlGroups()
     {
         if (controlGroups == null)
         {
@@ -350,8 +351,35 @@ public class FaceBone
 
     public void NeuralProcess(float[] boneArgs)
     {
-        CleanData();
         args = boneArgs;
+        int ix = 0;
+        for (int i = 0; i < data.headData.Length; i++)
+        {
+            NeuralItem(boneArgs, data.headData[i], ref ix);
+        }
+        for (int i = 0; i < data.senseData.Length; i++)
+        {
+            NeuralItem(boneArgs, data.senseData[i], ref ix);
+        }
+    }
+
+    private void NeuralItem(float[] boneArgs, FaceBaseData data, ref int ix)
+    {
+        if (data.v2Type != FaceV2Type.None)
+        {
+            float v = boneArgs[ix++];
+            ProcessKneadBone(data.v2ID, 2 * v - 1);
+            v = boneArgs[ix++];
+            ProcessKneadBone(data.v2ID2, 2 * v - 1);
+        }
+        if (data.properities != null)
+        {
+            for (int i = 0; i < data.properities.Length; i++)
+            {
+                float v = boneArgs[ix++];
+                ProcessKneadBone(data.properities[i], 2 * v - 1);
+            }
+        }
     }
 
 
@@ -372,7 +400,7 @@ public class FaceBone
         if (data.values != null) cnt += data.values.Length;
         return cnt;
     }
-
+    
     public void OnGui()
     {
         GUILayout.Space(16);
@@ -453,8 +481,7 @@ public class FaceBone
             controls[i].Bone.UpdateToTransfrom();
         }
     }
-
-
+    
     private void SyncSameTfControlsData(BoneData bone)
     {
         Transform tf = bone.Trans;
