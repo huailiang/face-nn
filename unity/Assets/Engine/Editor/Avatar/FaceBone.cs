@@ -292,7 +292,7 @@ public class FaceBone
                 if (find >= 0)
                 {
                     Transform tf = RoleParts.knead[find];
-                    if (tf == null) XDebug.singleton.AddErrorLog("face bone is null ", name);
+                    if (tf == null) Debug.LogError("face bone is null " + name);
                     bt.LoadData(tf);
                     if (tfKneadFace.ContainsKey(tf))
                     {
@@ -305,7 +305,7 @@ public class FaceBone
                         tfKneadFace[tf] = list;
                     }
                 }
-                else XDebug.singleton.AddErrorLog("not found tranf: ", name);
+                else Debug.LogError("not found tranf: " + name);
                 bones[i] = bt;
             }
             var groupCount = fbData.Groups.Length;

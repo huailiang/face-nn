@@ -25,9 +25,9 @@ namespace XEditor
         [MenuItem("Tools/Neural")]
         public static void NeuralInput()
         {
-            var win = EditorWindow.GetWindowWithRect(typeof(FashionPreviewWindow), new Rect(0, 0, 440, 640), true, "FashionPreview");
+            var win = EditorWindow.GetWindowWithRect(typeof(FashionPreview), new Rect(0, 0, 440, 640), true, "FashionPreview");
             win.Show();
-            FashionPreviewWindow prev = win as FashionPreviewWindow;
+            FashionPreview prev = win as FashionPreview;
             float[] ar = new float[95];
             for (int i = 0; i < ar.Length; i++) ar[i] = 0.5f;
             NeuralData data = new NeuralData

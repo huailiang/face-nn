@@ -6,33 +6,6 @@ using UnityEngine;
 
 namespace XEditor
 {
-    public class XParse
-    {
-        public static readonly char[] ListSeparator = new char[] { '|' };
-        private static bool inited = false;
-        public static float Parse(string str)
-        {
-            if (!inited)
-            {
-                System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                inited = true;
-            }
-            float value = 0.0f;
-            float.TryParse(str, out value);
-            return value;
-        }
-
-        public static string[] ParseStrs(string str)
-        {
-            if (!inited)
-            {
-                System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-                inited = true;
-            }
-            return str.Split(ListSeparator);
-        }
-    }
-
 
     public class XFashionLibrary
     {
@@ -97,22 +70,7 @@ namespace XEditor
         }
 
     }
-
-
-    public class XItemLibrary
-    {
-        private static ItemList _item = new ItemList();
-
-        static XItemLibrary()
-        {
-            XTableReader.ReadFile(@"Table/ItemList", _item);
-        }
-
-        public static ItemList.RowData GetItemInfo(uint itemID)
-        {
-            return _item.GetByID(itemID);
-        }
-    }
+    
 
     public class XDestructionLibrary
     {
@@ -168,7 +126,7 @@ namespace XEditor
                 for (int i = 0; i < dData.Length; i++)
                 {
                     var t = go.transform.Find(dData[i].PerfectPart);
-                    if (t == null) { XDebug.singleton.AddErrorLog("DestructionPart config error: " + presentid + " perfectpart: " + dData[i].PerfectPart); continue; }
+                    if (t == null) { Debug.LogError("DestructionPart config error: " + presentid + " perfectpart: " + dData[i].PerfectPart); continue; }
                     renders[i] = t.GetComponent<SkinnedMeshRenderer>();
                 }
                 InitWithPerfectPart(dData, "Assets/BundleRes/FBXRawData/" + present.Prefab + "/", renders, xpart);

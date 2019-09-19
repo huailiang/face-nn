@@ -107,13 +107,6 @@ namespace XEditor
             }
         }
 
-        public string[] GetSelects()
-        {
-            list.Clear();
-            AddSelect();
-            return list.ToArray();
-        }
-
         public void AddSelect()
         {
             if (select) list.Add(name);

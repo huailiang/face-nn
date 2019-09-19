@@ -28,7 +28,6 @@ namespace XEngine.Editor
         private SerializedProperty drawShadowLighing;
 
         private SerializedProperty drawType;
-        private SerializedProperty quadIndex;
         private SerializedProperty showObjects;
 
         private SerializedProperty debugMode;
@@ -74,7 +73,6 @@ namespace XEngine.Editor
             drawShadowLighing = FindProperty(x => x.drawShadowLighing);
 
             drawType = FindProperty(x => x.drawType);
-            quadIndex = FindProperty(x => x.quadIndex);
             showObjects = FindProperty(x => x.showObjects);
 
             debugMode = FindProperty(x => x.debugContext.debugMode);

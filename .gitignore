@@ -3,6 +3,7 @@ unity/*.sln
 unity/obj
 unity/Library
 unity/Temp
+libproj/
 **/*.FBX*
 unity/Assets/Table*
 **/.vscode
