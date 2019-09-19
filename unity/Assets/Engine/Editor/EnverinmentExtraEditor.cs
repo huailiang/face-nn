@@ -10,7 +10,6 @@ namespace XEngine.Editor
         private SerializedProperty roleLight0;
         private SerializedProperty roleLight1;
         //debugShadow
-        private SerializedProperty fitWorldSpace;
         private SerializedProperty lookTarget;
         private SerializedProperty shadowMapLevel;
         private SerializedProperty shadowBound;
@@ -31,8 +30,7 @@ namespace XEngine.Editor
         {
             roleLight0 = FindProperty(x => x.roleLight0);
             roleLight1 = FindProperty(x => x.roleLight1);
-
-            fitWorldSpace = FindProperty(x => x.fitWorldSpace);
+            
             shadowMapLevel = FindProperty(x => x.shadowMapLevel);
             shadowBound = FindProperty(x => x.shadowBound);
             lookTarget = FindProperty(x => x.lookTarget);
@@ -124,7 +122,6 @@ namespace XEngine.Editor
                     }
                     EditorGUILayout.PropertyField(shadowBound);
                     EditorGUILayout.PropertyField(lookTarget);
-                    EditorGUILayout.PropertyField(fitWorldSpace);
                     EditorGUILayout.PropertyField(drawShadowLighing);
                     ToolsUtility.EndFolderGroup();
                 }

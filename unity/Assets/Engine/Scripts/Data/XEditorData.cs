@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 using CFUtilPoolLib;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,7 +12,7 @@ namespace XEditor
         private static bool inited = false;
         public static float Parse(string str)
         {
-            if(!inited)
+            if (!inited)
             {
                 System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
                 inited = true;
@@ -60,48 +60,23 @@ namespace XEditor
 
         public static FashionSuit.RowData[] GetFashionsInfo(RoleShape shape)
         {
-            List<FashionSuit.RowData> list = new List<FashionSuit.RowData>();
-            foreach (var item in _suit.Table)
-            {
-                if (item.shape == (int)shape)
-                {
-                    list.Add(item);
-                }
-            }
-            return list.ToArray();
+            return _suit.Table.Where(x => x.shape == (int)shape).ToArray();
         }
 
         public static FashionSuit.RowData GetFashionsInfo(uint suitID)
         {
-            foreach(var item in _suit.Table)
-            {
-                if (item.id == suitID)
-                    return item;
-            }
-            return null;
+            return _suit.Table.Where(x => x.id == suitID).First();
         }
 
         public static FashionSuit.RowData GetFashionsInfo(string suitName)
         {
-            foreach (var item in _suit.Table)
-            {
-                if (item.dir == suitName)
-                    return item;
-            }
-            return null;
+            return _suit.Table.Where(x => x.dir == suitName).First();
         }
 
         public static ProfessionTable.RowData FindRole(uint presentid)
         {
             var ptable = _profession.Table;
-            for (int i = 0; i < ptable.Length; i++)
-            {
-                if (ptable[i].PresentID == presentid || ptable[i].SecondaryPresentID == presentid)
-                {
-                    return ptable[i];
-                }
-            }
-            return null;
+            return ptable.Where(x => x.PresentID == presentid).First();
         }
 
 
@@ -150,15 +125,7 @@ namespace XEditor
 
         public static DestructionPart.RowData[] GetPartsInfo(uint presentid)
         {
-            List<DestructionPart.RowData> list = new List<DestructionPart.RowData>();
-            foreach (var item in PartTable.Table)
-            {
-                if (item.PresentID == presentid)
-                {
-                    list.Add(item);
-                }
-            }
-            return list.ToArray();
+            return PartTable.Table.Where(x => x.PresentID == presentid).ToArray();
         }
 
         public static void InitWithPerfectPart(DestructionPart.RowData[] dData, string suff, SkinnedMeshRenderer[] renders, XParts xpart)
@@ -249,7 +216,7 @@ namespace XEditor
         {
             XEntityPresentation.RowData raw_data = AssociatedAnimations(presentid);
             if (raw_data == null) return null;
-            
+
             return GetDummy(raw_data.Prefab);
         }
 
@@ -288,48 +255,6 @@ namespace XEditor
         }
     }
 
-    public class XSceneLibrary
-    {
-        private static SceneTable _table = new SceneTable();
-
-        static XSceneLibrary()
-        {
-            XTableReader.ReadFile(@"Table/SceneList", _table);
-        }
-
-        public static SceneTable.RowData AssociatedData(uint id)
-        {
-            return _table.GetBySceneID((int)id);
-        }
-
-        public static string GetDynamicString(string levelConfig)
-        {
-            for (int i = 0; i < _table.Table.Length; i++)
-            {
-                if (_table.Table[i].configFile == levelConfig)
-                    return _table.Table[i].DynamicScene;
-            }
-
-            return "";
-        }
-    }
-
-    public class XColliderLibrary
-    {
-        private static ColliderTable _table = new ColliderTable();
-
-        static XColliderLibrary()
-        {
-            XTableReader.ReadFile(@"Table/ColliderTable", _table);
-        }
-
-        public static ColliderTable.RowData AssociatedData(uint id)
-        {
-            return _table.GetByColliderID(id);
-        }
-    }
-
-
-
 }
+
 #endif

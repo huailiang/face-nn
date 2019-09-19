@@ -14,7 +14,6 @@ namespace XEngine.Editor
         {
             None,
             OpGenMat,
-            OpGenEffectMat,
             OpRefreshMat,
         }
 
@@ -371,80 +370,6 @@ namespace XEngine.Editor
             }
         }
 
-        private void RoleDummyMatGUI(AssetsConfig.DummyMaterialInfo dummyMaterialInfo, int i, string name, bool multiBlendType)
-        {
-            ToolsUtility.BeginGroup("");
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(string.Format("{0}.{1}", i.ToString(), name), GUILayout.MaxWidth(200));
-            if (GUILayout.Button("Reset", GUILayout.MaxWidth(80)))
-            {
-                dummyMaterialInfo.enumIndex = -1;
-            }
-            if (GUILayout.Button("Gen", GUILayout.MaxWidth(80)))
-            {
-                opType = OpType.OpGenEffectMat;
-                genMat = dummyMaterialInfo;
-                multiBlend = multiBlendType;
-            }
-
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.Space();
-            EditorGUI.indentLevel++;
-            EditorGUILayout.BeginHorizontal();
-            dummyMaterialInfo.name = EditorGUILayout.TextField(dummyMaterialInfo.name, GUILayout.MaxWidth(300));
-            dummyMaterialInfo.shader = EditorGUILayout.ObjectField(dummyMaterialInfo.shader, typeof(Shader), false, GUILayout.MaxWidth(300)) as Shader;
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            if (multiBlendType)
-                dummyMaterialInfo.blendType = (EBlendType)EditorGUILayout.EnumFlagsField("", dummyMaterialInfo.blendType, GUILayout.MaxWidth(100));
-            else
-                dummyMaterialInfo.blendType = (EBlendType)EditorGUILayout.EnumPopup("", dummyMaterialInfo.blendType, GUILayout.MaxWidth(100));
-            KeywordFlags e = (KeywordFlags)EditorGUILayout.EnumFlagsField((KeywordFlags)dummyMaterialInfo.flag, GUILayout.MaxWidth(200));
-            dummyMaterialInfo.flag = (uint)e;
-            EditorGUILayout.LabelField(MaterialShaderAssets.GetKeyWords(e));
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            if (multiBlendType)
-            {
-                if ((dummyMaterialInfo.blendType & EBlendType.Opaque) != 0)
-                    EditorGUILayout.ObjectField(dummyMaterialInfo.mat, typeof(Material), false, GUILayout.MaxWidth(300));
-                if ((dummyMaterialInfo.blendType & EBlendType.Cutout) != 0)
-                {
-                    if (dummyMaterialInfo.ext1 != "Cutout")
-                        dummyMaterialInfo.ext1 = "Cutout";
-                    EditorGUILayout.ObjectField(dummyMaterialInfo.mat1, typeof(Material), false, GUILayout.MaxWidth(300));
-                }
-                else
-                {
-                    if (dummyMaterialInfo.ext1 != "")
-                        dummyMaterialInfo.ext1 = "";
-                }
-                if ((dummyMaterialInfo.blendType & EBlendType.CutoutTransparent) != 0)
-                {
-                    if (dummyMaterialInfo.ext2 != "CutoutBlend")
-                        dummyMaterialInfo.ext2 = "CutoutBlend";
-                    EditorGUILayout.ObjectField(dummyMaterialInfo.mat2, typeof(Material), false, GUILayout.MaxWidth(300));
-                }
-                else
-                {
-                    if (dummyMaterialInfo.ext2 != "")
-                        dummyMaterialInfo.ext2 = "";
-                }
-            }
-            else
-            {
-                EditorGUILayout.ObjectField(dummyMaterialInfo.mat, typeof(Material), false, GUILayout.MaxWidth(300));
-            }
-
-            EditorGUILayout.EndHorizontal();
-            EditorGUI.indentLevel--;
-            ToolsUtility.EndGroup();
-        }
-
-     
 
         private void ShaderGroupGUI(AssetsConfig ac)
         {
@@ -464,7 +389,6 @@ namespace XEngine.Editor
                         }
                     }
                 }
-
                 for (int i = 0; i < ac.ShaderGroupInfo.Count; ++i)
                 {
                     string name = ac.ShaderGroupInfo[i];
@@ -755,7 +679,7 @@ namespace XEngine.Editor
                 }
             }
         }
-        
+
         public override void OnInspectorGUI()
         {
             AssetsConfig ac = target as AssetsConfig;
@@ -769,15 +693,11 @@ namespace XEngine.Editor
                 ShaderInfoGUI(ac);
                 OnEventProcessGUI(ac);
             }
-
             serializedObject.ApplyModifiedProperties();
             switch (opType)
             {
                 case OpType.OpGenMat:
                     GenMat();
-                    break;
-                case OpType.OpGenEffectMat:
-                    GenEffectMat();
                     break;
                 case OpType.OpRefreshMat:
                     RefreshMat();
@@ -798,15 +718,6 @@ namespace XEngine.Editor
             if (genMat != null)
             {
                 MaterialShaderAssets.DefaultRefeshMat(genMat);
-                genMat = null;
-            }
-        }
-
-        private void GenEffectMat()
-        {
-            if (genMat != null)
-            {
-                MaterialShaderAssets.DefaultEffectMat(genMat, multiBlend);
                 genMat = null;
             }
         }

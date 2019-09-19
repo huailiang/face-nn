@@ -1,9 +1,8 @@
 ﻿using CFUtilPoolLib;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using System;
-using System.Linq;
 
 
 namespace XEditor
@@ -174,8 +173,7 @@ namespace XEditor
                 clip.SampleAnimation(go, clipTime);
             }
         }
-
-
+        
     }
 
 }

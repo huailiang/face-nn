@@ -1,6 +1,4 @@
 ﻿using UnityEditor;
-using XEngine;
-using UnityEngine;
 
 
 namespace XEngine.Editor

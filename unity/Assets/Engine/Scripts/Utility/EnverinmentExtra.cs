@@ -30,7 +30,6 @@ namespace XEngine
 
 
         public bool shadowFolder = true;
-        public bool fitWorldSpace = true;
         public float shadowMapLevel = 0.25f;
         public bool shadowBound = false;
         public GameObject shadowCasterProxy = null;
@@ -69,8 +68,7 @@ namespace XEngine
         [NonSerialized]
         private CommandBuffer[] commandBuffer = null;
         private CommandBuffer editorCommandBuffer;
-
-
+        
         [NonSerialized]
         public RenderingEnvironment re;
         Camera mainCamera;
@@ -129,11 +127,6 @@ namespace XEngine
 
             UpdateShadowCaster();
             BuildShadowMap();
-
-            if (re != null)
-            {
-                re.fitWorldSpace = fitWorldSpace;
-            }
             debugContext.Refresh();
         }
 
@@ -145,7 +138,6 @@ namespace XEngine
             SceneData.editorSetRes = SetRes;
             if (shadowMapCb == null)
                 shadowMapCb = new CommandBuffer { name = "Editor Shadow Map Cb" };
-
 
             shadowMat = AssetsConfig.GlobalAssetsConfig.ShadowCaster;
             UpdateShadowCaster();
@@ -208,7 +200,6 @@ namespace XEngine
         public void RefreshLightmap(bool preview)
         {
             RenderingEnvironment.isPreview = preview;
-
             if (preview)
             {
                 Shader.EnableKeyword("LIGHTMAP_ON");
@@ -315,7 +306,6 @@ namespace XEngine
             }
         }
 
-
         void OnDrawGizmos()
         {
             Color color = Gizmos.color;
@@ -350,7 +340,6 @@ namespace XEngine
             {
                 Gizmos.DrawWireCube(re.sceneData.shadowBound.center, re.sceneData.shadowBound.size);
             }
-
             if (m_drawGizmo != null)
             {
                 m_drawGizmo();
