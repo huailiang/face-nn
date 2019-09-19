@@ -1,9 +1,7 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
-using UnityEditor;
-using System.Collections;
 using CFUtilPoolLib;
 using System.IO;
+using UnityEditor;
 
 public class XTableReader
 {

@@ -1,7 +1,8 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using System;
 using System.IO;
-using System;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
 
 namespace XEditor
 {
@@ -9,14 +10,14 @@ namespace XEditor
     public class NeuralData
     {
         public float[] boneArgs;
-        public Action callback;
+        public Action<string> callback;
         public RoleShape shape;
+        public string name;
     }
 
 
     public class NeuralInterface
     {
-
         static RenderTexture rt;
         static Camera camera;
         static string export;
@@ -52,16 +53,36 @@ namespace XEditor
             }
         }
 
+
         [MenuItem("Tools/Select")]
         public static void Select()
         {
-            string dep = "models";
-            string file = EditorUtility.OpenFilePanel("Select model file", dep, "bytes");
-            string _scene = string.Empty;
-            if (file.Length != 0)
+            string file = EditorUtility.OpenFilePanel("Select model file", MODEL, "bytes");
+            FileInfo info = new FileInfo(file);
+            ProcessFile(info);
+            HelperEditor.Open(EXPORT);
+        }
+
+
+        [MenuItem("Tools/Batch")]
+        public static void Batch()
+        {
+            DirectoryInfo dir = new DirectoryInfo(MODEL);
+            var files = dir.GetFiles("*.bytes");
+            for (int i = 0; i < files.Length; i++)
             {
-                Debug.Log(file);
-                FileStream fs = new FileStream(MODEL + "test.bytes", FileMode.Open, FileAccess.Read);
+                ProcessFile(files[i]);
+            }
+            HelperEditor.Open(EXPORT);
+        }
+
+
+        private static void ProcessFile(FileInfo info)
+        {
+            if (info != null)
+            {
+                string file = info.FullName;
+                FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);
                 float[] args = new float[CNT];
                 BinaryReader br = new BinaryReader(fs);
                 RoleShape shape = (RoleShape)br.ReadInt32();
@@ -73,39 +94,41 @@ namespace XEditor
                 {
                     callback = Capture,
                     boneArgs = args,
-                    shape = shape
+                    shape = shape,
+                    name = info.Name.Replace(".bytes", "")
                 };
                 NeuralInput(data);
                 br.Close();
                 fs.Close();
             }
         }
-
-        [MenuItem("Tools/Neural")]
-        public static void NeuralInput()
-        {
-            float[] ar = new float[CNT];
-            for (int i = 0; i < ar.Length; i++) ar[i] = 0.5f;
-            NeuralData data = new NeuralData
-            {
-                callback = Capture,
-                boneArgs = ar,
-                shape = RoleShape.MALE
-            };
-            NeuralInput(data);
-        }
+      
 
         private static void NeuralInput(NeuralData data)
         {
-            var win = EditorWindow.GetWindowWithRect(typeof(FashionPreview), new Rect(0, 0, 440, 640), true, "FashionPreview");
-            win.Show();
-            FashionPreview prev = win as FashionPreview;
+            var prev = ScriptableObject.CreateInstance<FashionPreview>();
             prev.NeuralProcess(data);
         }
 
 
-        [MenuItem("Tools/Capture")]
-        private static void Capture()
+        [MenuItem("Tools/SetupEnv")]
+        private static void SetupEnv()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects);
+            GameObject oldCamera = GameObject.Find(@"Main Camera");
+            GameObject.DestroyImmediate(oldCamera);
+            GameObject cam = AssetDatabase.LoadAssetAtPath("Assets/Engine/Editor/EditorResources/Main Camera.prefab", typeof(GameObject)) as GameObject;
+            cam = GameObject.Instantiate<GameObject>(cam, null);
+            cam.transform.position = new Vector3(0, 1, -10);
+            Light light = GameObject.Find("Directional Light").GetComponent<Light>();
+            light.transform.parent = cam.transform;
+            var env = cam.GetComponent<XEngine.Environment>();
+            env.roleLight0 = light;
+            env.Update();
+        }
+
+
+        private static void Capture(string name)
         {
             if (camera == null)
                 camera = GameObject.FindObjectOfType<Camera>();
@@ -117,9 +140,10 @@ namespace XEditor
 
             camera.targetTexture = rt;
             camera.Render();
-            SaveRenderTex(rt);
+            SaveRenderTex(rt, name);
             Clear();
         }
+
 
         private static void Clear()
         {
@@ -129,7 +153,7 @@ namespace XEditor
         }
 
 
-        private static void SaveRenderTex(RenderTexture rt)
+        private static void SaveRenderTex(RenderTexture rt, string name)
         {
             RenderTexture.active = rt;
             Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.RGBA32, false);
@@ -144,9 +168,7 @@ namespace XEditor
                     {
                         Directory.CreateDirectory(EXPORT);
                     }
-                    File.WriteAllBytes(EXPORT + "export.jpg", bytes);
-                    Debug.Log("save success");
-                    HelperEditor.Open(EXPORT);
+                    File.WriteAllBytes(EXPORT + name + ".jpg", bytes);
                 }
                 catch (IOException ex)
                 {

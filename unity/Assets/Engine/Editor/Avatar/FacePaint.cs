@@ -151,7 +151,6 @@ public class FacePaint
         FocusFace();
     }
 
-
     private void GuiItem(string name, string[] ctx, ref int idx, ref Color color)
     {
         GUILayout.BeginHorizontal();
@@ -161,6 +160,15 @@ public class FacePaint
         GUILayout.FlexibleSpace();
         color = EditorGUILayout.ColorField(color, GUILayout.Width(75));
         GUILayout.EndHorizontal();
+    }
+
+    public void NeuralProcess()
+    {
+        AnlyData();
+        UpdatePainTex();
+        UpdateHsv();
+        FocusFace();
+        Update();
     }
 
     private void UpdatePainTex()

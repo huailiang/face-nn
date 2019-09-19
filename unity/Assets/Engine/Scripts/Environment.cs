@@ -64,8 +64,6 @@ namespace XEngine
 #if UNITY_EDITOR
         [System.NonSerialized]
         public float shadowOrthoSize;
-        [System.NonSerialized]
-        public bool saveingFile = false;
 
         public bool lightingFolder = true;
         public Light roleLight0;
@@ -127,30 +125,27 @@ namespace XEngine
             Shader.SetGlobalFloat("_GlobalDebugMode", 0);
         }
 
-        void Update()
+        public void Update()
         {
-            if (!saveingFile)
+            if (lighting != null && fog != null)
             {
-                if (lighting != null && fog != null)
+                UpdateEnv();
+                bool hasFog = fogEnable;
+                if (SceneView.lastActiveSceneView != null)
                 {
-                    UpdateEnv();
-                    bool hasFog = fogEnable;
-                    if (SceneView.lastActiveSceneView != null)
-                    {
-                        var sceneViewState = SceneView.lastActiveSceneView.sceneViewState;
-                        hasFog &= sceneViewState.showFog;
-                    }
-                    Shader.SetGlobalFloat(ShaderIDs.Env_FogDisable, !hasFog ? 1.0f : 0.0f);
+                    var sceneViewState = SceneView.lastActiveSceneView.sceneViewState;
+                    hasFog &= sceneViewState.showFog;
                 }
-                if (sceneData.CameraRef == null)
-                {
-                    InitRender(this.GetComponent<Camera>());
-                }
-                if (sceneData.CameraRef != null)
-                {
-                    GeometryUtility.CalculateFrustumPlanes(sceneData.CameraRef, SceneData.frustumPlanes);
-                    Shader.SetGlobalVector(ShaderIDs.Env_GameViewCameraPos, sceneData.cameraPos);
-                }
+                Shader.SetGlobalFloat(ShaderIDs.Env_FogDisable, !hasFog ? 1.0f : 0.0f);
+            }
+            if (sceneData.CameraRef == null)
+            {
+                InitRender(this.GetComponent<Camera>());
+            }
+            if (sceneData.CameraRef != null)
+            {
+                GeometryUtility.CalculateFrustumPlanes(sceneData.CameraRef, SceneData.frustumPlanes);
+                Shader.SetGlobalVector(ShaderIDs.Env_GameViewCameraPos, sceneData.cameraPos);
             }
             SyncLightInfo();
             UpdateShadowCaster();
@@ -547,7 +542,6 @@ namespace XEngine
                 Shader.SetGlobalVector(ShaderIDs.Env_HeighFogColorParameter2, fog.Color2.linear);
             }
         }
-
 
         public void SyncLight(Light l, ref LightInfo li)
         {

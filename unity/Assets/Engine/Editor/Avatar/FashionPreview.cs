@@ -23,7 +23,6 @@ namespace XEditor
         private FaceBone bone;
         private XEntityPresentation.RowData pData;
         private FaceData fData;
-        private NeuralData nData;
 
 
         [MenuItem("Tools/Preview")]
@@ -37,8 +36,14 @@ namespace XEditor
 
         public void NeuralProcess(NeuralData data)
         {
+            OnEnable();
             this.shape = data.shape;
-            this.nData = data;
+            CreateAvatar();
+            DrawSuit();
+            Update();
+            bone.NeuralProcess(data.boneArgs);
+            paint.NeuralProcess();
+            data.callback(data.name);
         }
 
         private void OnEnable()
@@ -81,37 +86,8 @@ namespace XEditor
 
             if (go == null || (go != null && go.name != shape.ToString()) || shape.ToString() != go.name)
             {
-                XEditorUtil.ClearCreatures();
-
-                List<int> list = new List<int>();
-                var table = XFashionLibrary._profession.Table;
-                presentid = table.Where(x => x.Shape == (int)shape).Select(x => x.PresentID).First();
-                string path = "Assets/BundleRes/Prefabs/Player_" + shape.ToString().ToLower() + ".prefab";
-                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                if (prefab != null)
-                {
-                    GameObject root = GameObject.Find("Player");
-                    if (root == null)
-                    {
-                        root = new GameObject("Player");
-                        root.transform.position = new Vector3(0f, 0f, -8f);
-                    }
-                    go = Instantiate(prefab);
-                    go.transform.SetParent(root.transform);
-                    go.name = shape.ToString();
-                    go.transform.localScale = Vector3.one;
-                    go.transform.rotation = Quaternion.Euler(0, 180, 0);
-                    go.transform.localPosition = Vector3.zero;
-                    Selection.activeGameObject = go;
-                    fashionInfo = XFashionLibrary.GetFashionsInfo(shape);
-                    fashionDesInfo = new string[fashionInfo.Length];
-                    for (int i = 0; i < fashionInfo.Length; i++)
-                    {
-                        fashionDesInfo[i] = fashionInfo[i].name;
-                    }
-                }
+                CreateAvatar();
             }
-
             if (fashionInfo != null)
             {
                 GUILayout.BeginHorizontal();
@@ -122,28 +98,47 @@ namespace XEditor
                     DrawSuit();
                     suit_pre = suit_select;
                     shape_pre = shape;
-                    paint.Initial(go, shape);
-                    bone.Initial(go, shape);
                 }
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
             paint.OnGui();
             bone.OnGui();
-            HandleNeural();
         }
 
-        private void HandleNeural()
+        private void CreateAvatar()
         {
-            if (nData != null)
+            XEditorUtil.ClearCreatures();
+
+            List<int> list = new List<int>();
+            var table = XFashionLibrary._profession.Table;
+            presentid = table.Where(x => x.Shape == (int)shape).Select(x => x.PresentID).First();
+            string path = "Assets/BundleRes/Prefabs/Player_" + shape.ToString().ToLower() + ".prefab";
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (prefab != null)
             {
-                paint.Update();
-                bone.NeuralProcess(nData.boneArgs);
-                nData.callback();
-                nData = null;
+                GameObject root = GameObject.Find("Player");
+                if (root == null)
+                {
+                    root = new GameObject("Player");
+                    root.transform.position = new Vector3(0f, 0f, -8f);
+                }
+                go = Instantiate(prefab);
+                go.transform.SetParent(root.transform);
+                go.name = shape.ToString();
+                go.transform.localScale = Vector3.one;
+                go.transform.rotation = Quaternion.Euler(0, 180, 0);
+                go.transform.localPosition = Vector3.zero;
+                Selection.activeGameObject = go;
+                fashionInfo = XFashionLibrary.GetFashionsInfo(shape);
+                fashionDesInfo = new string[fashionInfo.Length];
+                for (int i = 0; i < fashionInfo.Length; i++)
+                {
+                    fashionDesInfo[i] = fashionInfo[i].name;
+                }
             }
         }
-
+        
 
         private void Update()
         {
@@ -162,6 +157,8 @@ namespace XEditor
             if (fashionInfo.Length <= suit_select) suit_select = 0;
             FashionSuit.RowData rowData = fashionInfo[suit_select];
             FashionUtil.DrawSuit(go, rowData, (uint)presentid, 1);
+            paint.Initial(go, shape);
+            bone.Initial(go, shape);
         }
 
         private void PlayAnim()
