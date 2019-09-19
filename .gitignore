@@ -8,6 +8,11 @@ libproj/
 unity/Assets/Table*
 **/.vscode
 **/.vs
+**/*.pyc
+neural/input/
+neural/output/
+neural/models/
+neural/venv/
 export/
 *.DS_Store
 *Animation.meta
