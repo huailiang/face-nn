@@ -18,8 +18,6 @@ namespace XEngine.Editor
         private SerializedParameter lightmapShadowMask;
         private SerializedParameter shadowIntensity;
         private SerializedProperty fogEnable;
-        private SerializedProperty isStreamLoad;
-
         //lighting
         private SerializedProperty roleLight0;
         private SerializedProperty roleLight1;
@@ -66,7 +64,6 @@ namespace XEngine.Editor
             lightmapShadowMask = FindParameter(x => x.lightmapShadowMask);
             shadowIntensity = FindParameter(x => x.shadowIntensity);
             fogEnable = FindProperty(x => x.fogEnable);
-            isStreamLoad = FindProperty(x => x.sceneData.isStreamLoad);
 
             roleLight0 = FindProperty(x => x.roleLight0);
             roleLight1 = FindProperty(x => x.roleLight1);
@@ -203,11 +200,7 @@ namespace XEngine.Editor
                         fogParam.Color2 = fogColor2;
                     }
                 }
-
-
             }
-
-            EditorGUILayout.Toggle("Is Stream Load", isStreamLoad.boolValue);
             if (EditorGUI.EndChangeCheck())
             {
                 if (env != null)

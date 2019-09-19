@@ -3,7 +3,6 @@ using UnityEngine;
 using System;
 using UnityEngine.Rendering;
 #if UNITY_EDITOR
-using System.IO;
 using UnityEditor;
 #endif
 
@@ -33,10 +32,6 @@ namespace XEngine
         };
     }
 
-    delegate IEnverimnentModify LoadEnv(XBinaryReader reader);
-#if UNITY_EDITOR
-    public delegate void SaveEnv(BinaryWriter bw, IEnverimnentModify modify);
-#endif
     [Serializable]
     public class LightingModify : IEnverimnentModify, IEnverimnentLerp
     {
@@ -46,9 +41,6 @@ namespace XEngine
         public EnverimentModifyType GetEnvType()
         {
             return EnverimentModifyType.Lighting;
-        }
-        public static void OnTrigger(bool into)
-        {
         }
         public LightingModify()
         {
@@ -82,17 +74,14 @@ namespace XEngine
                 }
                 Shader.SetGlobalVector(colorKey, lightColorIntensity0);
             }
-
         }
 
         public void Lerp(ref EnverinmentContext context, float percent, bool into, int state)
         {
-#if UNITY_EDITOR
             if (into)
                 context.env.lighting.needUpdate = false;
             else if (state == 2)
                 context.env.lighting.needUpdate = true;
-#endif
             if (into)
             {
                 if (roleLightInfo0.lightDir.w > 0)
@@ -139,9 +128,6 @@ namespace XEngine
             valid = false;
             SkyBox = null;
             LoadMgr.singleton.Destroy(ref SkyBoxMat, false);
-        }
-        public static void OnTrigger(bool into)
-        {
         }
         private void UpdateSkyBox(Material mat)
         {
@@ -239,9 +225,6 @@ namespace XEngine
         {
             return EnverimentModifyType.Fog;
         }
-        public static void OnTrigger(bool into)
-        {
-        }
         public FogModify()
         {
             needUpdate = true;
@@ -292,4 +275,5 @@ namespace XEngine
         }
 
     }
+
 }
