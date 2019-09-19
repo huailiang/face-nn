@@ -77,8 +77,8 @@ namespace XEditor
                 camera.transform.position = new Vector3(0, 1, -10);
                 Light light = GameObject.Find("Directional Light").GetComponent<Light>();
                 light.transform.parent = camera.transform;
-                EnverinmentExtra ee = camera.GetComponent<EnverinmentExtra>();
-                ee.roleLight0 = light;
+                Environment env = camera.GetComponent<Environment>();
+                env.roleLight0 = light;
 
                 GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
                 plane.name = "Ground";

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4655698466676312}
   - component: {fileID: 20834530920592684}
   - component: {fileID: 114378991352120448}
-  - component: {fileID: 114027545882557808}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: Untagged
@@ -101,12 +100,6 @@ MonoBehaviour:
     roleLightInfo1:
       lightDir: {x: 0, y: -0.99999994, z: 0.000000059604645, w: 0}
       lightColor: {r: 0, g: 0, b: 0, a: 1}
-    sceneLightInfo0:
-      lightDir: {x: 0, y: -0.99999994, z: 0.000000059604645, w: 0}
-      lightColor: {r: 0, g: 0, b: 0, a: 1}
-    sceneLightInfo1:
-      lightDir: {x: 0, y: -0.99999994, z: 0.000000059604645, w: 0}
-      lightColor: {r: 0, g: 0, b: 0, a: 1}
   SkyboxMatPath: 
   sunDir: {x: 0, y: -1, z: 0}
   ambient:
@@ -151,37 +144,19 @@ MonoBehaviour:
     headLength: 0
     ChunkStreamOffset: 
     ChunkInfo: 
---- !u!114 &114027545882557808
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1032575304116774}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4076a5d7c9eb6444386616022ad71d6e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
   lightingFolder: 1
   roleLight0: {fileID: 0}
   roleLight1: {fileID: 0}
   shadowFolder: 1
-  fitWorldSpace: 1
   shadowMapLevel: 0.25
   shadowBound: 0
   shadowCasterProxy: {fileID: 0}
   lookTarget: {fileID: 0}
   drawShadowLighing: 0
   debugFolder: 1
-  drawLodGrid: 0
-  drawTerrainGrid: 0
   quadIndex: -1
   drawType: 0
   showObjects: 0
-  drawPointLight: 0
-  drawTerrainHeight: 0
-  drawLightBox: 0
   debugContext:
     debugMode: 0
     debugDisplayType: 0
@@ -189,4 +164,3 @@ MonoBehaviour:
     splitRight: 1
     splitAngle: 0
     splitPos: 0
-  isDebugLayer: 0

@@ -11,7 +11,7 @@ namespace XEngine
 {
     public struct EnverinmentContext
     {
-        public RenderingEnvironment env;
+        public Environment env;
     }
 
     public interface IEnverimnentLerp
