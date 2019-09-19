@@ -26,7 +26,7 @@ namespace XEditor
         private NeuralData nData;
 
 
-        [MenuItem("Tools/FashionPreview")]
+        [MenuItem("Tools/Preview")]
         static void AnimExportTool()
         {
             if (XEditorUtil.MakeNewScene())

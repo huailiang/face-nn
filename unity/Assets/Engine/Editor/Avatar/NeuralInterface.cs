@@ -20,15 +20,71 @@ namespace XEditor
         static RenderTexture rt;
         static Camera camera;
         static string export;
+        static string model;
+        const int CNT = 95;
 
+        static string EXPORT
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(export))
+                {
+                    export = Application.dataPath;
+                    int i = export.IndexOf("unity/Assets");
+                    export = export.Substring(0, i) + "export/";
+                }
+                return export;
+            }
+        }
+
+        static string MODEL
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(model))
+                {
+                    model = Application.dataPath;
+                    int idx = model.IndexOf("/Assets");
+                    model = model.Substring(0, idx);
+                    model = model + "/models/";
+                }
+                return model;
+            }
+        }
+
+        [MenuItem("Tools/Select")]
+        public static void Select()
+        {
+            string dep = "models";
+            string file = EditorUtility.OpenFilePanel("Select model file", dep, "bytes");
+            string _scene = string.Empty;
+            if (file.Length != 0)
+            {
+                Debug.Log(file);
+                FileStream fs = new FileStream(MODEL + "test.bytes", FileMode.Open, FileAccess.Read);
+                float[] args = new float[CNT];
+                BinaryReader br = new BinaryReader(fs);
+                RoleShape shape = (RoleShape)br.ReadInt32();
+                for (int i = 0; i < CNT; i++)
+                {
+                    args[i] = br.ReadSingle();
+                }
+                NeuralData data = new NeuralData
+                {
+                    callback = Capture,
+                    boneArgs = args,
+                    shape = shape
+                };
+                NeuralInput(data);
+                br.Close();
+                fs.Close();
+            }
+        }
 
         [MenuItem("Tools/Neural")]
         public static void NeuralInput()
         {
-            var win = EditorWindow.GetWindowWithRect(typeof(FashionPreview), new Rect(0, 0, 440, 640), true, "FashionPreview");
-            win.Show();
-            FashionPreview prev = win as FashionPreview;
-            float[] ar = new float[95];
+            float[] ar = new float[CNT];
             for (int i = 0; i < ar.Length; i++) ar[i] = 0.5f;
             NeuralData data = new NeuralData
             {
@@ -36,6 +92,14 @@ namespace XEditor
                 boneArgs = ar,
                 shape = RoleShape.MALE
             };
+            NeuralInput(data);
+        }
+
+        private static void NeuralInput(NeuralData data)
+        {
+            var win = EditorWindow.GetWindowWithRect(typeof(FashionPreview), new Rect(0, 0, 440, 640), true, "FashionPreview");
+            win.Show();
+            FashionPreview prev = win as FashionPreview;
             prev.NeuralProcess(data);
         }
 
@@ -49,12 +113,6 @@ namespace XEditor
             {
                 string path = "Assets/BundleRes/Config/CameraOuput.renderTexture";
                 rt = AssetDatabase.LoadAssetAtPath<RenderTexture>(path);
-            }
-            if (string.IsNullOrEmpty(export))
-            {
-                export = Application.dataPath;
-                int i = export.IndexOf("unity/Assets");
-                export = export.Substring(0, i) + "export/";
             }
 
             camera.targetTexture = rt;
@@ -82,13 +140,13 @@ namespace XEditor
             {
                 try
                 {
-                    if (!Directory.Exists(export))
+                    if (!Directory.Exists(EXPORT))
                     {
-                        Directory.CreateDirectory(export);
+                        Directory.CreateDirectory(EXPORT);
                     }
-                    File.WriteAllBytes(export + "export.jpg", bytes);
+                    File.WriteAllBytes(EXPORT + "export.jpg", bytes);
                     Debug.Log("save success");
-                    HelperEditor.Open(export);
+                    HelperEditor.Open(EXPORT);
                 }
                 catch (IOException ex)
                 {
