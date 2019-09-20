@@ -47,14 +47,14 @@ namespace XEngine.Editor
                     {
                         TableAssets.tableNames += TableAssets.GetTableName(path);
                     }
-                    else if (MaterialShaderAssets.IsHLSLorCGINC(path))
+                    else if (ShaderAssets.IsHLSLorCGINC(path))
                     {
                         dealShader = true;
                     }
                 }
                 if (dealShader)
                 {
-                    MaterialShaderAssets.ReImportShader();
+                    ShaderAssets.ReImportShader();
                     deal = true;
                 }
                 if (TableAssets.tableNames != "")

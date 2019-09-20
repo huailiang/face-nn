@@ -15,10 +15,8 @@ namespace XEngine.Editor
         {
             get { return baseProperty.displayName; }
         }
-        internal SerializedParameter()
-        {
+        internal SerializedParameter() { }
 
-        }
         internal SerializedParameter(SerializedProperty property, Attribute[] attributes)
         {
             baseProperty = property.Copy();

@@ -195,21 +195,6 @@ namespace XEngine.Editor
             return null;
         }
 
-
-        public static void CheckDBNil(string[] str, Transform[] tfs)
-        {
-            if (str != null && tfs != null)
-            {
-                for (int i = 0; i < str.Length; i++)
-                {
-                    if (tfs[i] != null)
-                    {
-                        str[i] = string.Empty;
-                    }
-                }
-            }
-        }
-
         public static void ClearMesh(Mesh newMesh)
         {
             //newMesh.uv2 = null;

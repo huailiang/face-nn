@@ -382,8 +382,7 @@ namespace XEngine.Editor
                 }
             }
         }
-
-
+        
         private void CleanData()
         {
             if (args != null)

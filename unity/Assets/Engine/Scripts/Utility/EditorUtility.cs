@@ -25,6 +25,7 @@ namespace XEngine
             }
         }
     }
+
     public class ReflectFun
     {
         public MethodInfo fun;
@@ -74,7 +75,7 @@ namespace XEngine
         public static ReflectFun GetInternalFunction(Type type, string function, bool isStatic, bool isPrivate, bool isInstance, bool baseType, bool all = false)
         {
             System.Reflection.BindingFlags flag = System.Reflection.BindingFlags.Default;
-            if(all)
+            if (all)
             {
                 flag = BindingFlags.NonPublic |
                         BindingFlags.Public |
@@ -184,61 +185,6 @@ namespace XEngine
             return sceneObjectPath;
         }
 
-        public static void WriteMatrix(BinaryWriter bw, Matrix4x4 mat)
-        {
-            for (int m = 0; m < 16; ++m)
-            {
-                bw.Write(mat[m]);
-            }
-        }
-        public static void WriteVector(BinaryWriter bw, Vector4 vec)
-        {
-            bw.Write(vec.x);
-            bw.Write(vec.y);
-            bw.Write(vec.z);
-            bw.Write(vec.w);
-        }
-
-        public static void WriteVector(BinaryWriter bw, Vector3 vec)
-        {
-            bw.Write(vec.x);
-            bw.Write(vec.y);
-            bw.Write(vec.z);
-        }
-
-        public static void WriteVector(BinaryWriter bw, Vector2 vec)
-        {
-            bw.Write(vec.x);
-            bw.Write(vec.y);
-        }
-
-        public static Vector2 ReadVector2(BinaryReader br)
-        {
-            Vector2 vector;
-            vector.x = br.ReadSingle();
-            vector.y = br.ReadSingle();
-            return vector;
-        }
-
-        public static Vector3 ReadVector3(BinaryReader br)
-        {
-            Vector3 vector;
-            vector.x = br.ReadSingle();
-            vector.y = br.ReadSingle();
-            vector.z = br.ReadSingle();
-            return vector;
-        }
-
-        public static Vector4 ReadVector4(BinaryReader br)
-        {
-            Vector4 vector;
-            vector.x = br.ReadSingle();
-            vector.y = br.ReadSingle();
-            vector.z = br.ReadSingle();
-            vector.w = br.ReadSingle();
-            return vector;
-        }
-
         public static void CreateDir(string dir)
         {
             if (!AssetDatabase.IsValidFolder(dir))
@@ -260,6 +206,7 @@ namespace XEngine
                 cb(t, param);
             }
         }
+
         public static void EnumTargetObject(string goPath, EnumTransform cb, object param = null)
         {
             GameObject go = GameObject.Find(goPath);
@@ -273,6 +220,7 @@ namespace XEngine
                 }
             }
         }
+
         public static void EnumChildObject(Transform t, object param, EnumTransform fun)
         {
             for (int i = 0; i < t.childCount; ++i)
@@ -312,29 +260,31 @@ namespace XEngine
             return str;
         }
 
-        
+
         public static int GetSize(this SpriteSize size)
         {
             int powerof2 = (int)size;
             return 1 << powerof2;
         }
-        public static bool HasFlag(uint flag,TexFlag f)
+
+        public static bool HasFlag(uint flag, TexFlag f)
         {
-            return (flag&(uint)f)!=0;
+            return (flag & (uint)f) != 0;
         }
 
         public static void SetFlag(ref uint flag, TexFlag f, bool add)
         {
             if (add)
             {
-                flag |= (uint) f;
+                flag |= (uint)f;
             }
             else
             {
-                flag &= ~((uint) f);
+                flag &= ~((uint)f);
             }
         }
 
     }
 }
+
 #endif

@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using CFUtilPoolLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +14,7 @@ namespace XEngine
         CutoutTransparent,
         Transparent,
     }
+
     public enum SpriteSize
     {
         E1x1,
@@ -67,18 +67,11 @@ namespace XEngine
         CutoutTransparent = 0x0004,
         Transparent = 0x0008,
     }
+
     public interface IRectSelect
     {
         Rect SelectRect { get; set; }
         string Name { get; set; }
-    }
-    public enum PPDebugMode
-    {
-        None,
-        Depth,
-        Lut,
-        Bloom,
-        GodRay,
     }
 
     public enum DebugDisplayType
@@ -86,6 +79,7 @@ namespace XEngine
         Split,
         Full
     }
+
     [System.Serializable]
     public class ShaderDebugContext
     {
@@ -158,29 +152,6 @@ namespace XEngine
         }
     }
 
-    public enum ESceneMaterial : int
-    {
-        SceneCommon = 0,
-        SceneCommonPbs,
-        SceneCommonCutout,
-        SceneCommonPbsCutout,
-
-        SceneOverlay,
-        SceneOverlayPbs,
-        SceneOverlayCutout,
-        SceneOverlayPbsCutout,
-
-        SceneEmission,
-        SceneEmissionPbs,
-        SceneEmissionCutout,
-        SceneEmissionPbsCutout,
-
-        SceneBoxReflect,
-        SceneBoxReflectPbs,
-        ScenePOM,
-        Num,
-        CustomMat = 0xFF,
-    }
     public enum TexFilterType
     {
         Or,
@@ -244,7 +215,6 @@ namespace XEngine
         {
             return name;
         }
-
     }
 
     [System.Serializable]
@@ -256,91 +226,8 @@ namespace XEngine
         public int shaderID;
     }
 
-    public enum FindPropertyType
-    {
-        None,
-        CommonProperty,
-        FindAll
-    }
-
-    [System.Serializable]
-    public class MatShaderType
-    {
-        public bool folder;
-        public string name;
-        public Shader shader;
-        public string macro;
-        public List<ShaderProperty> shaderPropertys = new List<ShaderProperty>();
-        public ESceneMaterial matOffset = ESceneMaterial.SceneCommon;
-        public FindPropertyType findPropertyType = FindPropertyType.None;
-        public bool hasPbs;
-        public uint pbsOffset;
-        public bool hasCutout;
-        public bool hasTransparent;
-        public bool hasTransparentCout;
-        public uint renderTypeOffset;
-        public uint matFlag;
-        public void SetFlag(EMatFlag f, bool add)
-        {
-            if (add)
-            {
-                matFlag |= (uint)f;
-            }
-            else
-            {
-                matFlag &= ~((uint)f);
-            }
-        }
-
-        public bool HasFlag(EMatFlag f)
-        {
-            return (matFlag & (uint)f) != 0;
-        }
-
-        public void Clone(MatShaderType src)
-        {
-            name = src.name;
-            shader = src.shader;
-            macro = src.macro;
-            shaderPropertys.Clear();
-            for (int i = 0; i < src.shaderPropertys.Count; ++i)
-            {
-                var sp = src.shaderPropertys[i];
-                shaderPropertys.Add(new ShaderProperty()
-                {
-                    shaderProperty = sp.shaderProperty,
-                    isTex = sp.isTex,
-                    shaderID = sp.shaderID,
-                });
-            }
-
-            matOffset = src.matOffset;
-            findPropertyType = src.findPropertyType;
-            pbsOffset = src.pbsOffset;
-            renderTypeOffset = src.renderTypeOffset;
-            hasCutout = src.hasCutout;
-            hasTransparent = src.hasTransparent;
-            hasTransparentCout = src.hasTransparentCout;
-            renderTypeOffset = src.renderTypeOffset;
-            matFlag = src.matFlag;
-        }
-    }
-
     public class AssetsConfig : ScriptableObject
     {
-        public enum EditorSceneObjectType
-        {
-            EditorScene,
-            Light,
-            Collider,
-            Enverinment,
-            Effect,
-            DynamicObject,
-            Prefab,
-            StaticPrefab,
-            Instance,
-            Num,
-        }
         public enum ShaderPropertyType
         {
             CustomFun = 0,
@@ -471,19 +358,12 @@ namespace XEngine
         public string Creature_Material_Format_Path = "{0}/{1}/Bandpose/Materials_{2}";
         public string Creature_SharedMaterial_Format_Path = "{0}/{1}/Bandpose/{2}/Materials";
         public string Creature_Material_Format_Folder = "Materials_{0}";
-        public string Creature_Aniamtion_Format_Path = "{0}/{1}/Animation/";
-        public string ResourceAnimationPath = "Assets/BundleRes/Animation";
-        public string ResourceAnimation = "Animation";
         public string BaseTex_Format_Path = "{0}/{1}_base.tga";
         public string PbsTex_Format_Path = "{0}/{1}_pbs.tga";
-        public string BaseTex_Suffix = "_base";
-        public string PbsTex_Suffix = "_pbs";
         public string DummyMatFolder = "MatShader";
         public string Table_Path = "Assets/Table/";
         public string Table_Bytes_Path = "Assets/BundleRes/Table/";
         public string ReadableMeshSuffix = "_readable.asset";
-
-        public string EditorSceneRes = "/EditorSceneRes";
 
         public string[] MaterialShaderMap = new string[]
         {
@@ -497,26 +377,9 @@ namespace XEngine
             "Custom/PBS/Entity"
         };
 
-        public static string[] EditorGoPath = new string[(int)EditorSceneObjectType.Num]
-        {
-            "EditorScene",
-            "Light",
-            "Collider",
-            "Enverinment",
-            "Effects",
-            "DynamicObjects",
-            "Prefabs",
-            "StaticPrefabs",
-            "Instance",
-        };
-
         public Material ShadowCaster;
-        public Material CombineNormal;
-
-        public Material PreveiwTransparent;
 
         public static string[] shaderDebugNames = null;
-        public static string[] shaderPPDebugNames = Enum.GetNames(typeof(PPDebugMode));
         [HideInInspector]
         public bool commonFolder = false;
         public Shader ScenePreview;
@@ -543,18 +406,23 @@ namespace XEngine
         {
             new ShaderFeature () { name = "BlendMode", shaderGroupName = "Default", type = ShaderPropertyType.CustomFun, propertyName = "" },
             new ShaderFeature () { name = "Debug", shaderGroupName = "Debug", propertyName = "_DebugMode", type = ShaderPropertyType.CustomFun },
-
             new ShaderFeature () { name = "BaseTex", shaderGroupName = "Base", propertyName = "_BaseTex", type = ShaderPropertyType.Tex },
             new ShaderFeature () { name = "BaseFromColor", shaderGroupName = "Base", propertyName = "_BASE_FROM_COLOR", type = ShaderPropertyType.Keyword },
             new ShaderFeature () { name = "AlphaFromColor", shaderGroupName = "Base", propertyName = "_ALPHA_FROM_COLOR", type = ShaderPropertyType.Keyword },
+            new ShaderFeature () { name = "ColorBlend", shaderGroupName = "Base", propertyName = "_ColorR", type = ShaderPropertyType.Color },
+            new ShaderFeature () { name = "PbsFromParam", shaderGroupName = "Pbs", propertyName = "_PBS_FROM_PARAM", type = ShaderPropertyType.Keyword },
+            new ShaderFeature () { name = "MagicParam", shaderGroupName = "Pbs", propertyName = "_MagicParam", type = ShaderPropertyType.Custom },
+            new ShaderFeature () { name = "PbsNoEnv", shaderGroupName = "Pbs", propertyName = "_PBS_NO_IBL", type = ShaderPropertyType.Keyword },
+            new ShaderFeature () { name = "UVST", shaderGroupName = "Scene", propertyName = "_uvST", type = ShaderPropertyType.Vector },
+            new ShaderFeature () { readOnly = true, name = "AtlasUVST", shaderGroupName = "Scene", propertyName = "_AtlasUVST", type = ShaderPropertyType.Vector },
+            new ShaderFeature () { name = "MainColor", shaderGroupName = "Scene", propertyName = "_MainColor", type = ShaderPropertyType.Color },
+            new ShaderFeature () { name = "Emission", shaderGroupName = "Custom", propertyName = "_EMISSION", type = ShaderPropertyType.Keyword },
+            new ShaderFeature () { name = "Skin", shaderGroupName = "Custom", propertyName = "_SkinSpecularScatter", type = ShaderPropertyType.Custom },
             new ShaderFeature ()
             {
             name = "Color", shaderGroupName = "Base", propertyName = "_Color", type = ShaderPropertyType.Color,
             dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "BaseFromColor", "AlphaFromColor" } }
             },
-            new ShaderFeature () { name = "ColorBlend", shaderGroupName = "Base", propertyName = "_ColorR", type = ShaderPropertyType.Color },
-
-            new ShaderFeature () { name = "PbsFromParam", shaderGroupName = "Pbs", propertyName = "_PBS_FROM_PARAM", type = ShaderPropertyType.Keyword },
             new ShaderFeature ()
             {
             name = "PbsTex", shaderGroupName = "Pbs", propertyName = "_PBSTex", type = ShaderPropertyType.Tex,
@@ -570,22 +438,6 @@ namespace XEngine
             name = "PbsParam", shaderGroupName = "Pbs", propertyName = "_PbsParam", type = ShaderPropertyType.Custom,
             dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "PbsFromColor", "PbsHalfFromColor" } }
             },
-            new ShaderFeature () { name = "MagicParam", shaderGroupName = "Pbs", propertyName = "_MagicParam", type = ShaderPropertyType.Custom },
-            new ShaderFeature () { name = "PbsNoEnv", shaderGroupName = "Pbs", propertyName = "_PBS_NO_IBL", type = ShaderPropertyType.Keyword },
-
-            new ShaderFeature () { hide = true, name = "OneLayer", shaderGroupName = "Scene", propertyName = "_SPLAT1", type = ShaderPropertyType.Keyword },
-            new ShaderFeature () { hide = true, name = "TwoLayer", shaderGroupName = "Scene", propertyName = "_SPLAT2", type = ShaderPropertyType.Keyword },
-            new ShaderFeature () { hide = true, name = "ThreeLayer", shaderGroupName = "Scene", propertyName = "_SPLAT3", type = ShaderPropertyType.Keyword },
-            new ShaderFeature () { hide = true, name = "FourLayer", shaderGroupName = "Scene", propertyName = "_SPLAT4", type = ShaderPropertyType.Keyword },
-            new ShaderFeature ()
-            {
-            name = "BlendTex", shaderGroupName = "Scene", propertyName = "_BlendTex", type = ShaderPropertyType.Tex,
-            dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "_SPLAT2", "_SPLAT3", "_SPLAT4" } }
-            },
-            new ShaderFeature () { name = "UVST", shaderGroupName = "Scene", propertyName = "_uvST", type = ShaderPropertyType.Vector },
-            new ShaderFeature () { readOnly = true, name = "AtlasUVST", shaderGroupName = "Scene", propertyName = "_AtlasUVST", type = ShaderPropertyType.Vector },
-            new ShaderFeature () { name = "MainColor", shaderGroupName = "Scene", propertyName = "_MainColor", type = ShaderPropertyType.Color },
-            new ShaderFeature () { name = "Emission", shaderGroupName = "Custom", propertyName = "_EMISSION", type = ShaderPropertyType.Keyword },
             new ShaderFeature ()
             {
             name = "EmissionTex", shaderGroupName = "Custom", propertyName = "_EffectTex", type = ShaderPropertyType.Tex,
@@ -599,11 +451,6 @@ namespace XEngine
             new ShaderFeature () { name = "Overlay", shaderGroupName = "Custom", propertyName = "_OVERLAY", type = ShaderPropertyType.Keyword },
             new ShaderFeature ()
             {
-            name = "OverlayTex", shaderGroupName = "Custom", propertyName = "_EffectTex", type = ShaderPropertyType.Tex,
-            dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "Overlay" } }
-            },
-            new ShaderFeature ()
-            {
             name = "OverLayParam", shaderGroupName = "Custom", propertyName = "_OverLayParam", type = ShaderPropertyType.Vector,
             dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "Overlay" } }
             },
@@ -612,87 +459,14 @@ namespace XEngine
             name = "OverlayColor", shaderGroupName = "Custom", propertyName = "_OverlayColor", type = ShaderPropertyType.Color,
             dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "Overlay" } }
             },
-            new ShaderFeature () { name = "Skin", shaderGroupName = "Custom", propertyName = "_SkinSpecularScatter", type = ShaderPropertyType.Custom },
         };
+
         [HideInInspector]
         public bool shaderInfoFolder = false;
 
         public List<ShaderInfo> ShaderInfos = new List<ShaderInfo>();
-        [HideInInspector]
-        public bool dummyMaterialsFolder = false;
-        [HideInInspector]
-        public List<DummyMaterialInfo> sceneDummyMaterials = new List<DummyMaterialInfo>(64);
 
         public List<DummyMaterialInfo> roleMaterials = new List<DummyMaterialInfo>();
-
-        [HideInInspector]
-        public List<DummyMaterialInfo> effectMaterials = new List<DummyMaterialInfo>();
-        [HideInInspector]
-        public bool sceneMatInfoFolder;
-
-        [HideInInspector]
-        public List<DummyMaterialInfo> customMaterials = new List<DummyMaterialInfo>();
-        [HideInInspector]
-        public bool customMatInfoFolder;
-
-        [HideInInspector]
-        public List<ShaderProperty> commonShaderProperty = new List<ShaderProperty>()
-        {
-            new ShaderProperty () { shaderProperty = "_MainTex", isTex = true, shaderID = (int) EShaderKeyID.BaseTex },
-            new ShaderProperty () { shaderProperty = "_MainColor", shaderID = (int) EShaderKeyID.MainColor },
-            new ShaderProperty () { shaderProperty = "_MagicParam", shaderID = (int) EShaderKeyID.MagicParam },
-            new ShaderProperty () { shaderProperty = "_uvST", shaderID = (int) EShaderKeyID.uvST },
-        };
-
-        [HideInInspector]
-        public List<ShaderProperty> shaderPropertyKey = new List<ShaderProperty>()
-        {
-            new ShaderProperty () { shaderProperty = "_BaseTex", isTex = true, shaderID = (int) EShaderKeyID.BaseTex },
-            new ShaderProperty () { shaderProperty = "_PBSTex", isTex = true, shaderID = (int) EShaderKeyID.PBSTex },
-        };
-
-        [HideInInspector]
-        public List<MatShaderType> matShaderType = new List<MatShaderType>()
-        {
-            new MatShaderType ()
-            {
-            name = "Overlay", macro = "_OVERLAY", matOffset = ESceneMaterial.SceneOverlay, hasPbs = true, hasCutout = true, findPropertyType = FindPropertyType.CommonProperty,
-            shaderPropertys = new List<ShaderProperty> ()
-            {
-            new ShaderProperty () { shaderProperty = "_OverLayParam", shaderID = (int) EShaderKeyID.OverLayParam },
-            new ShaderProperty () { shaderProperty = "_OverlayColor", shaderID = (int) EShaderKeyID.OverlayColor },
-            new ShaderProperty () { shaderProperty = "_EffectTex", isTex = true, shaderID = (int) EShaderKeyID.EffectTex },
-            }
-            },
-            new MatShaderType ()
-            {
-            name = "Emission", macro = "_ETX_EFFECT", matOffset = ESceneMaterial.SceneEmission, hasPbs = true, hasCutout = true, findPropertyType = FindPropertyType.CommonProperty,
-            shaderPropertys = new List<ShaderProperty> ()
-            {
-            new ShaderProperty () { shaderProperty = "_EmissionAOColor", shaderID = (int) EShaderKeyID.EmissionAOColor },
-            new ShaderProperty () { shaderProperty = "_EffectTex", isTex = true, shaderID = (int) EShaderKeyID.EffectTex },
-            }
-            },
-            new MatShaderType ()
-            {
-            name = "BoxReflect", macro = "_NEED_BOX_PROJECT_REFLECT", matOffset = ESceneMaterial.SceneBoxReflect, hasPbs = true, findPropertyType = FindPropertyType.CommonProperty,
-            shaderPropertys = new List<ShaderProperty> ()
-            {
-            new ShaderProperty () { shaderProperty = "_BoxCenter", shaderID = (int) EShaderKeyID.ReflBoxCenter },
-            new ShaderProperty () { shaderProperty = "_BoxSize", shaderID = (int) EShaderKeyID.ReflBoxSize },
-            new ShaderProperty () { shaderProperty = "_EnvReflectTex", isTex = true, shaderID = (int) EShaderKeyID.EnvReflectTex },
-            }
-            },
-            new MatShaderType ()
-            {
-            name = "Parallax", macro = "_PARALLAX_EFFECT", matOffset = ESceneMaterial.ScenePOM, findPropertyType = FindPropertyType.CommonProperty,
-            shaderPropertys = new List<ShaderProperty> ()
-            {
-            new ShaderProperty () { shaderProperty = "_Param0", shaderID = (int) EShaderKeyID.Param0 },
-            new ShaderProperty () { shaderProperty = "_EffectTex", isTex = true, shaderID = (int) EShaderKeyID.EffectTex },
-            }
-            },
-        };
 
         private static AssetsConfig g_AssetsConfig;
         public static AssetsConfig GlobalAssetsConfig
@@ -738,6 +512,7 @@ namespace XEngine
                 sfList.Add(sf);
             }
         }
+
         public TextAsset debugFile;
         public static void RefreshShaderDebugNames(bool force = false)
         {

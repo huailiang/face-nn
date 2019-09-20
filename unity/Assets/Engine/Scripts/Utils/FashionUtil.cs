@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 
-using System.IO;
 using CFUtilPoolLib;
 using UnityEditor;
 using UnityEngine;
@@ -76,7 +75,7 @@ namespace XEngine.Editor
             if (root.childCount > 0) return;
             string path = "Assets/BundleRes/Prefabs/Wing/Player_common_" + dir + "_wing.prefab";
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-            if (prefab != null) 
+            if (prefab != null)
             {
                 go = GameObject.Instantiate(prefab);
                 go.transform.SetParent(root);
@@ -121,7 +120,7 @@ namespace XEngine.Editor
             string sshape = shape.ToString().ToLower();
             Transform transf = go.transform.Find("Player_" + sshape + "_" + TCConst.FACE);
             string shape_dir = "Player_" + sshape;
-            var row =  XFashionLibrary.FindRole(presentid);
+            var row = XFashionLibrary.FindRole(presentid);
             if (row != null)
             {
                 string cname = "Player_" + sshape + "_common_" + TCConst.FACE + "_" + row.ID;
@@ -199,64 +198,6 @@ namespace XEngine.Editor
             }
         }
 
-        //preview tools by pyc.
-        #region preview tools
-        public static void ClearPart(GameObject go, string sshape, string suffix)
-        {
-            Transform tranf = go.transform.Find("Player_" + sshape + "_" + suffix);
-            if (tranf != null)
-            {
-                SkinnedMeshRenderer smr = tranf.gameObject.GetComponent<SkinnedMeshRenderer>();
-                smr.sharedMesh = null;
-                smr.sharedMaterial = null;
-                smr.bones = null;
-            }
-        }
-
-        public static void ClearWing(GameObject go)
-        {
-            XRoleParts parts = go.GetComponent<XRoleParts>();
-            Transform root = parts.wingRoot;
-            int cnt = root.childCount;
-            for (int i = cnt - 1; i >= 0; i--)
-                GameObject.DestroyImmediate(root.GetChild(i).gameObject);
-        }
-
-        public static void DrawWeaponForce(GameObject go, RoleShape shape, uint presentid, int weapon_index, string suitName)
-        {
-            string sshape = shape.ToString().ToLower();
-            Transform transf = go.transform.Find("Player_" + sshape + "_" + TCConst.WEAPON);
-            string shape_dir = "Player_" + sshape;
-
-            XRoleParts xpart = go.GetComponent<XRoleParts>();
-            if (xpart != null)
-            {
-                for (int i = 0; i < xpart.parts.Count; i++)
-                {
-                    for(int j = 0; j < xpart.parts[i].weapon.Length; j++)
-                    {
-                        XRoleWeapon wp = xpart.parts[i].weapon[j];
-                        if (wp.presentid == presentid)
-                        {
-                            FashionSuit.RowData rowData = XFashionLibrary.GetFashionsInfo(xpart.parts[i].suitid);
-                            if (rowData.dir != suitName)
-                                continue;
-                            FashionList.RowData row = SearchPart(rowData.id, weapon_index == 1 ? (uint)FPart.WEAPON : 5);
-                            string cname = "Player_" + sshape + "_" + rowData.dir + "_" + TCConst.WEAPON + "_" + presentid + "_" + weapon_index;
-                            string asset = "Assets/BundleRes/FBXRawData/" + shape_dir + "/" + shape_dir + "_" + rowData.dir + "/" + cname;
-                            if (weapon_index == 1)
-                                DrawPart(transf, asset, wp.weapon1, wp.sweapon1, row);
-                            else
-                                DrawPart(transf, asset, wp.weapon2, wp.sweapon2, row);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
-
         private static Transform SearchChild(Transform[] childs, Transform parent, string name)
         {
             if (parent.name == name) return parent;
@@ -287,27 +228,7 @@ namespace XEngine.Editor
             return null;
         }
 
-        [MenuItem("Help/ResetUnity")]
-        private static void RestartUnity()
-        {
-#if UNITY_EDITOR_WIN
-            string install = Path.GetDirectoryName(EditorApplication.applicationContentsPath);
-            string path = Path.Combine(install, "Unity.exe");
-            string[] args = path.Split('\\');
-            System.Diagnostics.Process po = new System.Diagnostics.Process();
-            Debug.Log("install: " + install + " path: " + path);
-            po.StartInfo.FileName = path;
-            po.Start();
-
-            System.Diagnostics.Process[] pro = System.Diagnostics.Process.GetProcessesByName(args[args.Length - 1].Split('.')[0]);//Unity
-            foreach (var item in pro)
-            {
-                item.Kill();
-            }
-#endif
-        }
-
     }
-
 }
+
 #endif

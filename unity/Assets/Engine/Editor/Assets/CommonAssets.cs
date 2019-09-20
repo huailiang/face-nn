@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using XEngine;
 
 namespace XEngine.Editor
 {
@@ -266,8 +264,6 @@ namespace XEngine.Editor
                     byte[] png = tex.EncodeToPNG();
                     File.WriteAllBytes(assetPath, png);
                 }
-
-                // AssetDatabase.CreateAsset(asset, assetPath);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
                 existingAsset = AssetDatabase.LoadAssetAtPath<T>(assetPath);

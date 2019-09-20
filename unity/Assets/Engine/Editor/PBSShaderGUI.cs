@@ -211,7 +211,7 @@ namespace XEngine.Editor
 
             if (oldShader == null || !oldShader.name.Contains("Legacy Shaders/"))
             {
-                MaterialShaderAssets.SetupMaterialWithBlendMode(material, MaterialShaderAssets.GetBlendMode(material));
+                ShaderAssets.SetupMaterialWithBlendMode(material, ShaderAssets.GetBlendMode(material));
                 return;
             }
 
@@ -322,7 +322,6 @@ namespace XEngine.Editor
                                     drawList.Add(context);
                                 }
                             }
-
                             if (j == sgi.spiList.Count - 1 && hasBeginFun)
                             {
                                 DrawPropertyContext context = new DrawPropertyContext();
@@ -535,7 +534,7 @@ namespace XEngine.Editor
 
         protected void BlendModePopup(ref DrawPropertyContext context)
         {
-            BlendMode blendMode = MaterialShaderAssets.GetBlendMode(m_Material);
+            BlendMode blendMode = ShaderAssets.GetBlendMode(m_Material);
 
             EditorGUI.BeginChangeCheck();
             var mode = (BlendMode)EditorGUILayout.Popup(Styles.renderingMode, (int)blendMode, Styles.blendNames);
@@ -543,7 +542,7 @@ namespace XEngine.Editor
             {
                 if (mode != blendMode)
                 {
-                    MaterialShaderAssets.SetupMaterialWithBlendMode(m_Material, mode);
+                    ShaderAssets.SetupMaterialWithBlendMode(m_Material, mode);
                 }
             }
         }
@@ -596,7 +595,7 @@ namespace XEngine.Editor
 
         protected void MaterialChanged(Material material)
         {
-            MaterialShaderAssets.SetupMaterialWithBlendMode(material, MaterialShaderAssets.GetBlendMode(material), false);
+            ShaderAssets.SetupMaterialWithBlendMode(material, ShaderAssets.GetBlendMode(material), false);
             if (material.HasProperty("_DebugMode"))
                 SetupMaterialWithDebugMode(material, material.GetFloat("_DebugMode"));
         }

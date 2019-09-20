@@ -40,6 +40,27 @@ public class HelperEditor : MonoBehaviour
         Open(EditorApplication.applicationContentsPath);
     }
 
+
+    [MenuItem("Help/RestartUnity")]
+    private static void RestartUnity()
+    {
+#if UNITY_EDITOR_WIN
+        string install = Path.GetDirectoryName(EditorApplication.applicationContentsPath);
+        string path = Path.Combine(install, "Unity.exe");
+        string[] args = path.Split('\\');
+        System.Diagnostics.Process po = new System.Diagnostics.Process();
+        Debug.Log("install: " + install + " path: " + path);
+        po.StartInfo.FileName = path;
+        po.Start();
+
+        System.Diagnostics.Process[] pro = System.Diagnostics.Process.GetProcessesByName(args[args.Length - 1].Split('.')[0]);//Unity
+        foreach (var item in pro)
+        {
+            item.Kill();
+        }
+#endif
+    }
+
     public static void Open(string path)
     {
         if (File.Exists(path))

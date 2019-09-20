@@ -10,7 +10,6 @@ public class XTableReader
         CVSReader.Init();
         XBinaryReader.Init();
         XInterfaceMgr.singleton.AttachInterface<IResourceHelp>(XCommon.singleton.XHash("XResourceHelper"), XResources.singleton);
-
         return XResourceLoaderMgr.singleton.ReadFile(location, reader);
     }
 }
@@ -33,7 +32,6 @@ public class XTableWriter
 
             if (i < colname.Length - 1) s += '\t';
         }
-
         sw.WriteLine(s);
     }
 

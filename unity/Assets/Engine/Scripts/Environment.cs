@@ -57,11 +57,9 @@ namespace XEngine
         public Vector3 lightProjectForward;
         [System.NonSerialized]
         public Vector3 translatePos;
-
-#if UNITY_EDITOR
+        
         [System.NonSerialized]
         public float shadowOrthoSize;
-
         public bool lightingFolder = true;
         public Light roleLight0;
         [System.NonSerialized]
@@ -99,8 +97,7 @@ namespace XEngine
             Shader.PropertyToID ("_SplitAngle"),
             Shader.PropertyToID ("_SplitPos"),
         };
-
-#endif
+        
 
         void Awake()
         {
@@ -150,7 +147,6 @@ namespace XEngine
             }
         }
 
-        
 
         private void ProcessResCb(ref ResHandle resHandle, ref Vector4Int param)
         {
@@ -227,7 +223,7 @@ namespace XEngine
             }
         }
 
-        
+
         private void UpdateShadowCaster()
         {
             if (lookTarget == null)
@@ -437,4 +433,5 @@ namespace XEngine
         }
 
     }
+
 }

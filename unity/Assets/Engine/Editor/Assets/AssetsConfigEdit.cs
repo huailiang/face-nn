@@ -709,7 +709,7 @@ namespace XEngine.Editor
         {
             if (genMat != null)
             {
-                MaterialShaderAssets.DefaultMat(genMat);
+                ShaderAssets.DefaultMat(genMat);
                 genMat = null;
             }
         }
@@ -717,7 +717,7 @@ namespace XEngine.Editor
         {
             if (genMat != null)
             {
-                MaterialShaderAssets.DefaultRefeshMat(genMat);
+                ShaderAssets.DefaultRefeshMat(genMat);
                 genMat = null;
             }
         }
