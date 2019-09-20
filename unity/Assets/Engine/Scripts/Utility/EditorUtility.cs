@@ -115,7 +115,7 @@ namespace XEngine
             {
                 if (unityEditorAssembly == null)
                 {
-                    unityEditorAssembly = System.Reflection.Assembly.GetAssembly(typeof(Editor));
+                    unityEditorAssembly = System.Reflection.Assembly.GetAssembly(typeof(UnityEditor.Editor));
                 }
                 if (unityEditorAssembly != null)
                 {

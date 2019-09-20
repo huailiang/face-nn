@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace XEditor
+namespace XEngine.Editor
 {
     public class XBoneTree
     {

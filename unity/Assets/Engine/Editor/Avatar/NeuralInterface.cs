@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace XEditor
+namespace XEngine.Editor
 {
 
     public class NeuralData
@@ -57,6 +57,7 @@ namespace XEditor
         [MenuItem("Tools/Select")]
         public static void Select()
         {
+            SetupEnv();
             string file = EditorUtility.OpenFilePanel("Select model file", MODEL, "bytes");
             FileInfo info = new FileInfo(file);
             ProcessFile(info);

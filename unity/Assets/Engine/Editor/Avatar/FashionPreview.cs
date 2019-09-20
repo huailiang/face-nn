@@ -4,8 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-
-namespace XEditor
+namespace XEngine.Editor
 {
     public class FashionPreview : EditorWindow
     {

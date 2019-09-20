@@ -1,9 +1,8 @@
 ﻿using CFUtilPoolLib;
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using System.Collections.Generic;
-using System;
-using UnityEditor;
 
 namespace XEngine
 {
@@ -32,8 +31,6 @@ namespace XEngine
         public LightingModify lighting = null;
         public string SkyboxMatPath;
         public Vector3 sunDir = new Vector3(0, -1, 0);
-
-        public AmbientModify ambient = null;
         //Shadow
         public float shadowDepthBias = -0.03f;
         public float shadowNormalBias = 2.5f;
@@ -102,26 +99,12 @@ namespace XEngine
             Shader.PropertyToID ("_SplitAngle"),
             Shader.PropertyToID ("_SplitPos"),
         };
-        public static int[] ppDebugShaderIDS = new int[]
-        {
-            Shader.PropertyToID ("_PPDebugMode"),
-            Shader.PropertyToID ("_PPDebugDisplayType"),
-            Shader.PropertyToID ("_PPSplitAngle"),
-            Shader.PropertyToID ("_PPSplitPos"),
-        };
 
-        [NonSerialized]
-        private CommandBuffer[] commandBuffer = null;
-        private CommandBuffer editorCommandBuffer;
-
-        Camera mainCamera;
-        Camera sceneViewCamera;
 #endif
 
         void Awake()
         {
             SceneData.GlobalSceneData = sceneData;
-            GetSceneViewCamera();
             Shader.SetGlobalFloat("_GlobalDebugMode", 0);
         }
 
@@ -155,24 +138,6 @@ namespace XEngine
 
         void OnDestroy()
         {
-            if (commandBuffer != null)
-            {
-                if (SceneView.lastActiveSceneView != null && SceneView.lastActiveSceneView.camera != null)
-                {
-                    SceneView.lastActiveSceneView.camera.RemoveAllCommandBuffers();
-                }
-                foreach (CommandBuffer cb in commandBuffer)
-                {
-                    cb.Release();
-                }
-                commandBuffer = null;
-            }
-            RefreshLightmap(false);
-            if (editorCommandBuffer != null)
-            {
-                editorCommandBuffer.Release();
-                editorCommandBuffer = null;
-            }
             if (shadowMapCb != null)
             {
                 shadowMapCb.Release();
@@ -185,19 +150,7 @@ namespace XEngine
             }
         }
 
-        private void SetLightInfo(ref LightInfo li, int dirKey, int colorKey, bool setLightColor = true)
-        {
-            Shader.SetGlobalVector(dirKey, li.lightDir);
-            if (setLightColor)
-            {
-                Vector4 lightColorIntensity;
-                lightColorIntensity = new Vector4(
-                    Mathf.Pow(li.lightColor.r * li.lightDir.w, 2.2f),
-                    Mathf.Pow(li.lightColor.g * li.lightDir.w, 2.2f),
-                    Mathf.Pow(li.lightColor.b * li.lightDir.w, 2.2f), shadowIntensity);
-                Shader.SetGlobalVector(colorKey, lightColorIntensity);
-            }
-        }
+        
 
         private void ProcessResCb(ref ResHandle resHandle, ref Vector4Int param)
         {
@@ -237,16 +190,8 @@ namespace XEngine
         {
             sceneData.CameraRef = camera;
             sceneData.CameraTransCache = camera.transform;
-            if (lighting == null)
-                lighting = new LightingModify();
-            if (ambient == null)
-                ambient = new AmbientModify();
-            if (fog == null)
-                fog = new FogModify();
-
-            lighting.needUpdate = true;
-            ambient.needUpdate = true;
-            fog.needUpdate = true;
+            if (lighting == null) lighting = new LightingModify();
+            if (fog == null) fog = new FogModify();
 
             RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_ThunderKeyWord, false);
             RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_RainbowKeyWord, false);
@@ -258,7 +203,6 @@ namespace XEngine
             LoadRes();
             UpdateEnv();
 
-            SceneData.updateSceneView = SceneView_Update;
             SceneData.editorSetRes = SetRes;
             if (shadowMapCb == null)
                 shadowMapCb = new CommandBuffer { name = "Editor Shadow Map Cb" };
@@ -275,44 +219,6 @@ namespace XEngine
             }
         }
 
-        public void RefreshLightmap(bool preview)
-        {
-            if (preview)
-            {
-                Shader.EnableKeyword("LIGHTMAP_ON");
-                Shader.EnableKeyword("_CUSTOM_LIGHTMAP_ON");
-                Shader.SetGlobalVector(ShaderManager._ShaderKeyLightMapEnable, Vector4.one);
-            }
-            else
-            {
-                Shader.DisableKeyword("LIGHTMAP_ON");
-                Shader.DisableKeyword("_CUSTOM_LIGHTMAP_ON");
-                Shader.SetGlobalVector(ShaderManager._ShaderKeyLightMapEnable, Vector4.zero);
-            }
-        }
-
-        private void GetSceneViewCamera()
-        {
-            if (sceneViewCamera == null)
-            {
-                commandBuffer = new CommandBuffer[3];
-                CommandBuffer commandBufferBeforeOpaque = new CommandBuffer { name = "SceneView Before Opaque" };
-                commandBuffer[(int)ECommandBufferType.BeforeOpaque] = commandBufferBeforeOpaque;
-                CommandBuffer commandBufferAfterOpaque = new CommandBuffer { name = "SceneView After Opaque" };
-                commandBuffer[(int)ECommandBufferType.AfterOpaque] = commandBufferAfterOpaque;
-                CommandBuffer commandBufferAfterTransparent = new CommandBuffer { name = "SceneView After Transparent" };
-                commandBuffer[(int)ECommandBufferType.AfterForwardAlpha] = commandBufferAfterTransparent;
-                if (SceneView.lastActiveSceneView != null && SceneView.lastActiveSceneView.camera != null)
-                {
-                    sceneViewCamera = SceneView.lastActiveSceneView.camera;
-                    sceneViewCamera.RemoveAllCommandBuffers();
-                    sceneViewCamera.AddCommandBuffer(CameraEvent.BeforeForwardOpaque, commandBufferBeforeOpaque);
-                    sceneViewCamera.AddCommandBuffer(CameraEvent.AfterForwardOpaque, commandBufferAfterOpaque);
-                    sceneViewCamera.AddCommandBuffer(CameraEvent.AfterForwardAlpha, commandBufferAfterTransparent);
-                }
-            }
-        }
-
         private void PrepareTransformGui(Light light, ref TransformRotationGUIWrapper wrapper)
         {
             if (light != null && (wrapper == null || wrapper.t != light.transform))
@@ -321,26 +227,7 @@ namespace XEngine
             }
         }
 
-        private void SyncLightInfo(Light light, ref LightInfo li, Light inversLight, ref TransformRotationGUIWrapper wrapper)
-        {
-            if (light != null)
-            {
-                SyncLight(light, ref li);
-                if (inversLight != null)
-                {
-                    li.lightDir = inversLight.transform.rotation * Vector3.forward;
-                }
-            }
-        }
-
-        public void SyncLightInfo()
-        {
-            PrepareTransformGui(roleLight0, ref roleLight0Rot);
-            PrepareTransformGui(roleLight1, ref roleLight1Rot);
-            SyncLightInfo(roleLight0, ref lighting.roleLightInfo0, null, ref roleLight0Rot);
-            SyncLightInfo(roleLight1, ref lighting.roleLightInfo1, null, ref roleLight1Rot);
-        }
-
+        
         private void UpdateShadowCaster()
         {
             if (lookTarget == null)
@@ -426,8 +313,6 @@ namespace XEngine
         void OnDrawGizmos()
         {
             Color color = Gizmos.color;
-            if (mainCamera == null)
-                mainCamera = GetComponent<Camera>();
             if (drawShadowLighing)
             {
                 Gizmos.color = Color.yellow;
@@ -458,19 +343,6 @@ namespace XEngine
                 Gizmos.DrawWireCube(sceneData.shadowBound.center, sceneData.shadowBound.size);
             }
             Gizmos.color = color;
-        }
-
-        public void SceneView_Update()
-        {
-            GetSceneViewCamera();
-            if (commandBuffer != null)
-            {
-                for (int i = 0; i < commandBuffer.Length; ++i)
-                {
-                    CommandBuffer cb = commandBuffer[i];
-                    cb.Clear();
-                }
-            }
         }
 
         public void UpdateSkyBox()
@@ -507,17 +379,12 @@ namespace XEngine
             Shader.SetGlobalVector(ShaderIDs.Env_CubemapParam, new Vector4(hdrScale, hdrPow, hdrAlpha, maxMipmap));
             Shader.SetGlobalVector(ShaderIDs.Env_LightmapScale, new Vector4(1.0f / lightmapShadowMask, lightmapShadowMask, shadowIntensity, 0));
 
-            if (ambient.needUpdate)
-            {
-                UpdateSkyBox();
-            }
-            if (lighting.needUpdate)
-            {
-                SetLightInfo(ref lighting.roleLightInfo0, ShaderIDs.Env_DirectionalLightDir, ShaderIDs.Env_DirectionalLightColor);
-                SetLightInfo(ref lighting.roleLightInfo1, ShaderIDs.Env_DirectionalLightDir1, ShaderIDs.Env_DirectionalLightColor1);
-            }
-            if (ambient.needUpdate)
-                Shader.SetGlobalColor(ShaderIDs.Env_AmbientParam, new Vector4(ambient.AmbientMax, 0, 0, 0));
+            UpdateSkyBox();
+
+            SetLightInfo(ref lighting.roleLightInfo0, ShaderIDs.Env_DirectionalLightDir, ShaderIDs.Env_DirectionalLightColor);
+            SetLightInfo(ref lighting.roleLightInfo1, ShaderIDs.Env_DirectionalLightDir1, ShaderIDs.Env_DirectionalLightColor1);
+
+            Shader.SetGlobalColor(ShaderIDs.Env_AmbientParam, new Vector4(1.0f, 0, 0, 0));
             //Shadow
             Shader.SetGlobalVector(ShaderIDs.Env_ShadowBias, new Vector4(shadowDepthBias, shadowNormalBias, 0, 0));
             Shader.SetGlobalVector(ShaderIDs.Env_ShadowSmooth, new Vector4(shadowSmoothMin * -0.0001f, shadowSmoothMax * 0.0001f, shadowSampleSize, shadowPower));
@@ -528,28 +395,46 @@ namespace XEngine
                 Shader.SetGlobalTexture(ShaderIDs.Env_ShadowMapTex, sceneData.ShadowRT);
             }
             //Fog
-            if (fog.needUpdate)
-            {
-                Vector4 HeightFogParameters = new Vector4();
-                HeightFogParameters.x = fog.Density;
-                HeightFogParameters.y = fog.SkyboxHeight;
-                HeightFogParameters.z = fog.EndHeight;
-                HeightFogParameters.w = fog.StartDistance;
+            Vector4 HeightFogParameters = new Vector4();
+            HeightFogParameters.x = fog.Density;
+            HeightFogParameters.y = fog.SkyboxHeight;
+            HeightFogParameters.z = fog.EndHeight;
+            HeightFogParameters.w = fog.StartDistance;
 
-                Shader.SetGlobalVector(ShaderIDs.Env_HeightFogParameters, HeightFogParameters);
-                Shader.SetGlobalVector(ShaderIDs.Env_HeighFogColorParameter0, fog.Color0.linear);
-                Shader.SetGlobalVector(ShaderIDs.Env_HeighFogColorParameter1, fog.Color1.linear);
-                Shader.SetGlobalVector(ShaderIDs.Env_HeighFogColorParameter2, fog.Color2.linear);
-            }
+            Shader.SetGlobalVector(ShaderIDs.Env_HeightFogParameters, HeightFogParameters);
+            Shader.SetGlobalVector(ShaderIDs.Env_HeighFogColorParameter0, fog.Color0.linear);
+            Shader.SetGlobalVector(ShaderIDs.Env_HeighFogColorParameter1, fog.Color1.linear);
+            Shader.SetGlobalVector(ShaderIDs.Env_HeighFogColorParameter2, fog.Color2.linear);
+        }
+
+        private void SetLightInfo(ref LightInfo li, int dirKey, int colorKey)
+        {
+            Shader.SetGlobalVector(dirKey, li.lightDir);
+            Vector4 lightColorIntensity;
+            lightColorIntensity = new Vector4(
+                Mathf.Pow(li.lightColor.r * li.lightDir.w, 2.2f),
+                Mathf.Pow(li.lightColor.g * li.lightDir.w, 2.2f),
+                Mathf.Pow(li.lightColor.b * li.lightDir.w, 2.2f), shadowIntensity);
+            Shader.SetGlobalVector(colorKey, lightColorIntensity);
+        }
+
+        public void SyncLightInfo()
+        {
+            PrepareTransformGui(roleLight0, ref roleLight0Rot);
+            PrepareTransformGui(roleLight1, ref roleLight1Rot);
+            SyncLight(roleLight0, ref lighting.roleLightInfo0);
+            SyncLight(roleLight1, ref lighting.roleLightInfo1);
         }
 
         public void SyncLight(Light l, ref LightInfo li)
         {
-            li.lightDir = l.transform.rotation * -Vector3.forward;
-            li.lightColor = l.color;
-            li.lightDir.w = (l.enabled && l.gameObject.activeInHierarchy) ? l.intensity : 0;
+            if (l != null)
+            {
+                li.lightDir = l.transform.rotation * -Vector3.forward;
+                li.lightColor = l.color;
+                li.lightDir.w = (l.enabled && l.gameObject.activeInHierarchy) ? l.intensity : 0;
+            }
         }
 
     }
-
 }

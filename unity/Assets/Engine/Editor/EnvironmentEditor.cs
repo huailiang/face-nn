@@ -14,7 +14,6 @@ namespace XEngine.Editor
         private SerializedProperty hdrScale;
         private SerializedProperty hdrPow;
         private SerializedProperty hdrAlpha;
-        private SerializedProperty ambientMax;
         private SerializedParameter lightmapShadowMask;
         private SerializedParameter shadowIntensity;
         private SerializedProperty fogEnable;
@@ -59,7 +58,6 @@ namespace XEngine.Editor
             hdrScale = FindProperty(x => x.hdrScale);
             hdrPow = FindProperty(x => x.hdrPow);
             hdrAlpha = FindProperty(x => x.hdrAlpha);
-            ambientMax = FindProperty(x => x.ambient.AmbientMax);
             lightmapShadowMask = FindParameter(x => x.lightmapShadowMask);
             shadowIntensity = FindParameter(x => x.shadowIntensity);
             fogEnable = FindProperty(x => x.fogEnable);
@@ -132,7 +130,6 @@ namespace XEngine.Editor
                 EditorGUILayout.PropertyField(hdrScale);
                 EditorGUILayout.PropertyField(hdrPow);
                 EditorGUILayout.PropertyField(hdrAlpha);
-                EditorGUILayout.PropertyField(ambientMax);
                 PropertyField(lightmapShadowMask);
                 PropertyField(shadowIntensity);
             }

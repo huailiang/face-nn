@@ -2,9 +2,8 @@
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using XEngine.Editor;
 
-namespace XEditor
+namespace XEngine.Editor
 {
     [CustomEditor(typeof(FaceData))]
     public class FaceDataEdit : BaseEditor<FaceDataEdit>

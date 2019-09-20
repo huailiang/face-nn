@@ -1,12 +1,11 @@
-﻿using System.IO;
+﻿using CFUtilPoolLib;
+using System.IO;
 using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using CFUtilPoolLib;
-using XEngine;
 
-namespace XEditor
+namespace XEngine.Editor
 {
 
     public class XEditorConfig

@@ -170,16 +170,7 @@ namespace XEngine
             get { return GraphicsSettings.renderPipelineAsset != null; } // 5.6+ only
         }
 
-#if UNITY_EDITOR
-        public static bool isSinglePassStereoSelected
-        {
-            get
-            {
-                return UnityEditor.PlayerSettings.virtualRealitySupported &&
-                    UnityEditor.PlayerSettings.stereoRenderingPath == UnityEditor.StereoRenderingPath.SinglePass;
-            }
-        }
-#endif
+        
 
 
         public static RenderTextureFormat defaultHDRRenderTextureFormat

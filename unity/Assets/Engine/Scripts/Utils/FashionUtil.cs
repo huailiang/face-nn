@@ -5,7 +5,7 @@ using CFUtilPoolLib;
 using UnityEditor;
 using UnityEngine;
 
-namespace XEditor
+namespace XEngine.Editor
 {
 
     public static class FashionUtil
