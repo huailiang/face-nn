@@ -93,11 +93,6 @@ FLightingData GetLighting(FFragData FragData,FMaterialData MaterialData DEBUG_PB
 		LightingData.DiffuseColor = MaterialData.BlendColor;
 	#endif//_FULL_SSS
 	
-	#if !defined(LIGHTMAP_ON)&&!defined(_CUSTOM_LIGHTMAP_ON)
-		#ifdef _VOXEL_LIGHT
-			LightingData.pointLighting += GetVoxelLighting(FragData,MaterialData,LightingData);
-		#endif//_VOXEL_LIGHT
-	#endif// !(LIGHTMAP_ON)&&!(_CUSTOM_LIGHTMAP_ON)
 
 #else//!_UN_LIGHT
 	LightingData.DiffuseColor = MaterialData.BlendColor;

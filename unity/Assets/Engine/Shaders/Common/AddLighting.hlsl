@@ -174,63 +174,7 @@ FLOAT GetAddShadow(FFragData FragData)
 #endif//DEBUG_APP
 	return 1;
 }
-#ifdef _VOXEL_LIGHT
-//now only point lights
-struct LightInfo
-{
-	FLOAT4 lightPos;//xyz:world pos w:range
-	FLOAT4 lightColor;//xyz:color w: not use
-};
-struct LightHeadIndex
-{
-	uint blockStartIndex;
-	FLOAT minY;
-};
-StructuredBuffer<LightInfo> _LightInfos;
-StructuredBuffer<uint> _LightIndex;//count+index0,index1...
-StructuredBuffer<uint> _VerticalBlockIndex;
-StructuredBuffer<LightHeadIndex> _LightIndexHead;
-uint _LineBlockCount;//default 20
-FLOAT3 _WorldChunkOffset;
 
-FLOAT3 GetVoxelLighting(FFragData FragData,FMaterialData MaterialData,FLightingData LightingData)
-{
-	FLOAT3 color = 0;
-	FLOAT2 pos = FragData.WorldPosition.xz - _WorldChunkOffset.xy;
-	uint2 xzIndex = floor(pos*_WorldChunkOffset.zz);
-	uint headIndexOffset = xzIndex.x + xzIndex.y * _LineBlockCount;
-	LightHeadIndex headIndex = _LightIndexHead[headIndexOffset];
-	UNITY_BRANCH
-	if(headIndex.minY < 1000)
-	{
-		uint verticalBlockIndex = floor((max(0,FragData.WorldPosition.y - headIndex.minY))*_WorldChunkOffset.z);
-		uint blockOffset = _VerticalBlockIndex[headIndex.blockStartIndex + verticalBlockIndex];
-		UNITY_BRANCH
-		if(blockOffset < 1000000)
-		{
 
-			uint lightCount = _LightIndex[blockOffset];
-			UNITY_LOOP
-			for (uint i = 0; i < lightCount; i++)
-			{
-				uint lightIndex =  _LightIndex[blockOffset+i+1];
-				LightInfo li = _LightInfos[lightIndex];
 
-				FLOAT3 dir =  li.lightPos.xyz - FragData.WorldPosition.xyz;
-				FLOAT3 ndir = normalize(dir);
-				FLOAT3 ndotl = saturate(dot(MaterialData.WorldNormal, ndir));
-				FLOAT distanceSqr = dot(dir,dir);
-				FLOAT lightRadiusMask = distanceSqr * li.lightPos.w * li.lightPos.w;
-				lightRadiusMask = saturate(1 - lightRadiusMask*lightRadiusMask);
-				// lightRadiusMask *= lightRadiusMask;		
-				FLOAT3 lighting = li.lightColor.xyz*ndotl*rcp(1+distanceSqr)*16*lightRadiusMask;
-				color += Diffuse_Burley( LightingData.DiffuseColor,MaterialData.Roughness,LightingData.NdotC,ndotl,LightingData.VdotH)*lighting;
-
-			}
-		}
-	}
-	return color;
-}
-
-#endif//_VOXEL_LIGHT
 #endif //PBS_ADDLIGHTING_INCLUDE

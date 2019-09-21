@@ -197,7 +197,6 @@ inline FLOAT4 GetBaseColor(in FFragData FragData,inout FMaterialData MaterialDat
 				splat += SAMPLE_TEXTURE2D(_BaseTex0, uv0)*blend.r;
 				splat += SAMPLE_TEXTURE2D(_BaseTex1, uv1)*blend.g;
 				splat += SAMPLE_TEXTURE2D(_BaseTex2, uv2)*blend.b;
-				// splat += SAMPLE_TEXTURE2D(_BaseTex3, uv3)*blend.a;
 			#endif
 
 			#ifdef _SPLAT4
@@ -315,11 +314,6 @@ inline FLOAT4 GetPBSColor(FFragData FragData, in FMaterialData MaterialData)
 				pbs.w = BlendRoughness(float4(roughness0, roughness1, roughness2, roughness3), blend);
 				#endif		// _SPLAT4 //
 			}
-			#else
-			{
-				// FLOAT2 uv0 = FragData.WorldPosition.xz*_TerrainScale[0];
-				// pbs = SAMPLE_TEXTURE2D(_PBSTex, uv0);
-			}
 			#endif		// _TERRAIN_PBS //
 
 		#else
@@ -331,7 +325,6 @@ inline FLOAT4 GetPBSColor(FFragData FragData, in FMaterialData MaterialData)
 
 				splat += (SAMPLE_TEXTURE2D(_PBSTex, GET_FRAG_UV)*2-1)*blend.r;
 				splat += (SAMPLE_TEXTURE2D(_PBSTex1, GET_FRAG_UV2)*2-1)*blend.g;
-				//return lerp(SAMPLE_TEXTURE2D(_PBSTex, GET_FRAG_UV),SAMPLE_TEXTURE2D(_PBSTex1, GET_FRAG_UV2),blend.r);
 				return splat*0.5+0.5;
 			#else
 				pbs = SAMPLE_TEXTURE2D(_PBSTex, GET_FRAG_UV2);

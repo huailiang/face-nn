@@ -89,9 +89,7 @@ FLOAT4 fragForwardBase(in FInterpolantsVSToPS Interpolants, in FLOAT4 SvPosition
 
 
 #ifdef _VERTEX_FOG	
-	
 	OutColor.rgb = ApplyFog2(OutColor.rgb,FragData.VertexFog, FragData.WorldPosition);
-
 #endif//_VERTEX_FOG
 
 #ifndef _UN_LIGHT	

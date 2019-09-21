@@ -1,6 +1,3 @@
-/**
-* Common.cginc: Common fun and paramaters.
-*/
 #include "../StdLib.hlsl"
 #include "../Colors.hlsl"
 #ifndef PBS_COMMON_INCLUDE

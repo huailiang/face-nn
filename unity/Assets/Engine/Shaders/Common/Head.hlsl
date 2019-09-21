@@ -99,10 +99,6 @@ struct FInterpolantsVSToPS
 	FLOAT4	VertexGI : TEXCOORD2;
 #endif//_VERTEX_GI
 
-// #ifdef _VERTEX_FOG
-// 	FLOAT4 VertexFog : TEXCOORD3;
-// #endif//_VERTEX_FOG
-
 	FLOAT4 WorldPosition : TEXCOORD4; // xyz = world position, w = clip z
 #ifdef _SCREEN_POS
 	FLOAT4 ScreenPosition : TEXCOORD5;

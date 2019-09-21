@@ -37,10 +37,8 @@
 #define Debug_SpecularScale (Debug_DiffuseColor+1)
 #define Debug_SpecularColor (Debug_SpecularScale+1)
 #define Debug_AmbientDiffuse (Debug_SpecularColor+1)
-//#define Debug_IndirectIrradiance (Debug_AmbientDiffuse+1)
 #define Debug_NdotL (Debug_AmbientDiffuse+1)
 #define Debug_FixNdotL (Debug_NdotL+1)
-//#define Debug_RdotL (Debug_NdotL+1)
 #define Debug_NdotC (Debug_FixNdotL+1)
 #define Debug_VdotH (Debug_NdotC+1)
 #define Debug_Shadow (Debug_VdotH+1)
@@ -252,7 +250,6 @@ FLOAT4 DebugOutputColor(FLOAT4 OutColor,FFragData FragData,FMaterialData Materia
 	}
 	else if (debugMode < Debug_CubeMipmap)
 	{
-		//debugColor = FLOAT4(Debug_CubeMipmap.x*0.1,0,0, 1);
 		if (CustomData.CubeMipmap < 1)
 		{
 			debugColor = FLOAT4(0, 0, 0, 1);//black

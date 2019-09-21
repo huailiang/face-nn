@@ -49,8 +49,6 @@
 
 			uint rotIndex = (uint)data.w;
 			FLOAT4 rot = GetRotData(rotIndex);
-			// FLOAT4 localPosition = mul(obj2World, localpos);
-			//rot.x = sinx;rot.y = cosx
 			localpos.xz = FLOAT2(localpos.x * rot.y - localpos.z * rot.x, localpos.x * rot.x + localpos.z * rot.y);
 			
 			localpos.xyz *= rot.z;			

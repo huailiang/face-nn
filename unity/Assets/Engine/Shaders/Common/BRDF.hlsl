@@ -13,7 +13,6 @@
 // Microfacet specular = D*G*F / (4*NoL*NoV) = D*Vis*F
 // Vis = G / (4*NoL*NoV)
 
-
 float3 Diffuse_Lambert( float3 DiffuseColor )
 {
 	return DiffuseColor * (1 / PI);
@@ -315,7 +314,6 @@ FLOAT3 Diffuse_Burley(FLOAT Roughness, FLOAT NoL, FLOAT VoH,FLOAT forawrdCalc )
 FLOAT3 SpecularGGX( FLOAT Roughness, FLightingData LightingData, FLOAT NoL)
 {
 	FLOAT a2 = Square(Roughness);//Pow4( Roughness );
-	// FLOAT Energy = EnergyNormalization( a2, Context.VoH, AreaLight );
 	a2 = max(a2, FLOAT(0.002));
 	// Generalized microfacet specular
 	FLOAT D = D_GGX( a2, LightingData.NdotH );

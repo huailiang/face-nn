@@ -411,7 +411,7 @@ namespace XEngine
                 Mathf.Pow(li.lightColor.r * li.lightDir.w, 2.2f),
                 Mathf.Pow(li.lightColor.g * li.lightDir.w, 2.2f),
                 Mathf.Pow(li.lightColor.b * li.lightDir.w, 2.2f), shadowIntensity);
-            Shader.SetGlobalVector(colorKey, lightColorIntensity);
+            // Shader.SetGlobalVector(colorKey, lightColorIntensity);
         }
 
         public void SyncLightInfo()

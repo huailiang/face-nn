@@ -46,7 +46,6 @@ inline FLOAT3 ObjectToWorldNormal(in FLOAT3 norm)
 #ifdef UNITY_ASSUME_UNIFORM_SCALING
 	return ObjectToWorldDir(norm);
 #else
-	// mul(IT_M, norm) => mul(norm, I_M) => {dot(norm, I_M.col0), dot(norm, I_M.col1), dot(norm, I_M.col2)}
 	return normalize(mul(norm, (FLOAT3x3)_worldToObject));
 #endif
 }
@@ -83,14 +82,10 @@ FInterpolantsVSToPS GetInterpolantsVSToPS(FVertexInput Input, FLOAT4 WorldPositi
 	TangentToWorld[1].xyz = 0;
 	TangentToWorld[2].xyz = WorldNormal;
 #endif//_PBS_FROM_PARAM
-
 	Interpolants.TangentToWorld0 = FLOAT4(TangentToWorld[0],0);
 	Interpolants.TangentToWorld2 = FLOAT4(TangentToWorld[2], TangentSign);
 
 #if defined(_OUTPUT_VERTEX_COLOR)
-	// #ifdef _RANDOM_COLOR
-	// 	Interpolants.Color = lerp(_Color0, _Color1, frac(WorldPosition.x));
-	// #endif//_RANDOM_COLOR
 	#ifdef _VERTEX_COLOR
 		Interpolants.Color = Input.Color;
 	#endif//_VERTEX_COLOR
@@ -98,14 +93,7 @@ FInterpolantsVSToPS GetInterpolantsVSToPS(FVertexInput Input, FLOAT4 WorldPositi
 
 #ifdef _VERTEX_GI
 	Interpolants.VertexGI.xyz = VertexGI(WorldPosition.xyz,WorldNormal);
-	// #ifndef _NO_VERTEX_POINTLIGHT
-	// Interpolants.VertexPL = VertexPointLight(WorldPosition.xyz,WorldNormal);
-	// #endif//_NO_VERTEX_POINTLIGHT
 #endif//_VERTEX_GI
-
-// #ifdef _VERTEX_FOG
-// 	//Interpolants.VertexFog = CalculateHeightFog(WorldPosition.xyz);
-// #endif //_VERTEX_FOG
 
 #ifdef _GRASS_LIGHT
 	FLOAT occ = saturate(Input.Position.y * _Occ_Height);
@@ -125,7 +113,5 @@ FInterpolantsVSToPS GetInterpolantsVSToPS(FVertexInput Input, FLOAT4 WorldPositi
 
 	return Interpolants;
 }
-
-
 
 #endif //PBS_INTERPOLANTSVSTOPS_INCLUDE

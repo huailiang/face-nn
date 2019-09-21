@@ -2,7 +2,7 @@
 #define PBS_LIGHTINGHEAD_INCLUDE
 
 FLOAT3 _DirectionalLightDir0;
-FLOAT4 _DirectionalLightColor0 = FLOAT4(1.0,0.9,0.7,1.0);
+FLOAT4 _DirectionalLightColor0;
 
 FLOAT4 _PointLightPos0;
 FLOAT4 _PointLightColor0;
@@ -22,7 +22,8 @@ FLOAT3 GetLightColor0()
         return _LightColor0.xyz;
     #endif//LIGHTMAP_ON    
 #else//!_ADDLIGHTING
-    return _DirectionalLightColor0.xyz;
+    // return _DirectionalLightColor0.xyz;
+    return FLOAT3(1.0,0.9,0.7);
 #endif//_ADDLIGHTING
 }
 

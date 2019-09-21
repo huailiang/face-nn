@@ -47,7 +47,6 @@ FLOAT4 unity_4LightPosY0;
 FLOAT4 unity_4LightPosZ0;
 FLOAT4 unity_4LightAtten0;
 FLOAT4 unity_LightColor[4];
-// #endif//_VERTEX_POINT_LIGHT
 
 inline FLOAT3 Shade4PointLights(
 	FLOAT4 lightPosX, FLOAT4 lightPosY, FLOAT4 lightPosZ,

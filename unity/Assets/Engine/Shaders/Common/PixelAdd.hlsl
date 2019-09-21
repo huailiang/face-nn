@@ -8,7 +8,7 @@
 
 FLOAT4 fragAdd(FInterpolantsVSToPS Interpolants, in FLOAT4 SvPosition : SV_Position) : SV_Target
 {
-	#if defined(_VOXEL_LIGHT)||defined(LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON)||defined(DIRECTIONAL)
+	#if defined(LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON)||defined(DIRECTIONAL)
 		return FLOAT4(0,0,0,0);
 	#else
 		DEBUG_PBS_CUSTOMDATA
