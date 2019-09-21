@@ -12,6 +12,7 @@ FLOAT4 _PointLightColor0;
     FLOAT4 _DirectionalLightColor1;
 #endif
 
+#define _USE_INNER_TLIGHT 1
 
 FLOAT3 GetLightColor0()
 {
@@ -22,8 +23,11 @@ FLOAT3 GetLightColor0()
         return _LightColor0.xyz;
     #endif//LIGHTMAP_ON    
 #else//!_ADDLIGHTING
-    // return _DirectionalLightColor0.xyz;
-    return FLOAT3(1.0,0.9,0.7);
+    #ifdef _USE_INNER_TLIGHT
+    return _LightColor0.rgb;
+    #else
+    return _DirectionalLightColor0.xyz;
+    #endif
 #endif//_ADDLIGHTING
 }
 
@@ -42,9 +46,9 @@ FLOAT3 GetLightColor1()
 
 FLOAT3 GetLightDir0()
 {
-#ifdef _ADDLIGHTING
+#if defined(_ADDLIGHTING) || defined(_USE_INNER_TLIGHT)
     return _WorldSpaceLightPos0.xyz;
-#else//!_ADDLIGHTING
+#else
     return _DirectionalLightDir0.xyz;
 #endif//_ADDLIGHTING
 }

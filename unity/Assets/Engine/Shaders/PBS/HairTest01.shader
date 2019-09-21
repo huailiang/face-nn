@@ -1,22 +1,15 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
-Shader "Custom/Hair/HairTest01"
+﻿Shader "Custom/Hair/HairTest01"
 {
 
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
-		//_BumpTex ("Normal Map", 2D) = "bump" {}
 		_SpecTex ("SpecTexture", 2D) = "black" {}
-		//_LightDir("LightDir",Vector)=(0,1,0)
 		_HairColor("HairColor",Color)=(0.1,0.1,0.1,0.1)
 		_HairRootColor("HairRootColor",Color)=(0.1,0.1,0.1,1)
 		_SpecColor("xyz:SpecColor  w:SpecIntensity",Color)=(1,1,1,0.5)
 		_RimColor("RimColor",Color)=(0.5,0.5,0.5,1)
 		_SmoothStep("NdotL SmoothStep x:Min,y:Max,z:Brightness",Vector) = (-0.6,1.6,0.8,0)
-		//_TranInte("TransparentIntensity",float)=2
 		_Parameter("x:SpeShift y:SpeShift1 z:SpecInte w:RimPow",Vector)=(0,1,2,6)
 		_Parameter01("specDot",Vector)=(1,0,1,0)
 	}
@@ -27,8 +20,6 @@ Shader "Custom/Hair/HairTest01"
 
 		Pass
 		{
-		//ColorMask 0
-		//Cull Off
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
@@ -38,6 +29,9 @@ Shader "Custom/Hair/HairTest01"
 			#include "UnityCG.cginc"
 
 			fixed _Cutoff;
+			sampler2D _MainTex;
+			float4 _MainTex_ST;
+
 			struct appdata
 			{
 				float4 vertex : POSITION;
@@ -49,31 +43,20 @@ Shader "Custom/Hair/HairTest01"
 				float2 uv : TEXCOORD0;
 				//UNITY_FOG_COORDS(1)
 				float4 vertex : SV_POSITION;
-
 			};
-
-			sampler2D _MainTex;
-			float4 _MainTex_ST;
-			
-			//float _Offset;
 			
 			v2f vert (appdata v)
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-
-				//UNITY_TRANSFER_FOG(o,o.vertex);
 				return o;
 			}
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				// sample the texture
 				fixed4 col = tex2D(_MainTex, i.uv);
-
 				clip (col.a-0.5);
-				//UNITY_APPLY_FOG(i.fogCoord, col);
 				return 0;
 			}
 			ENDCG
@@ -81,11 +64,10 @@ Shader "Custom/Hair/HairTest01"
 
 		Pass
 		{
-		Tags{"LightMode"="ForwardBase"}
-		Blend   SrcAlpha  OneMinusSrcAlpha
-		ZWrite off
+			Tags{"LightMode"="ForwardBase"}
+			Blend   SrcAlpha  OneMinusSrcAlpha
+			ZWrite off
 
-		//Cull Off
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
@@ -94,6 +76,8 @@ Shader "Custom/Hair/HairTest01"
 			
 			#include "UnityCG.cginc"
 			#include "AutoLight.cginc"
+			// #include "../StdLib.hlsl"
+			// #include "../Common/LightingHead.hlsl"
 
 			struct appdata
 			{
@@ -110,21 +94,13 @@ Shader "Custom/Hair/HairTest01"
 				float2 uv1 : TEXCOORD1;
 				UNITY_FOG_COORDS(6)
 				float4 pos :SV_POSITION;
-
 				float3 tsLightDir : TEXCOORD2;
 				float3 tsViewDir  : TEXCOORD3;
-				
-				// float3 bitangentDir :TEXCOORD2;
-				// float4 WSPosition :TEXCOORD3;
-				// float3 tangentDir :TEXCOORD4;
-				// float3 normalDir :TEXCOORD5;
 			};
 
 			sampler2D _MainTex;
-			//sampler2D _BumpTex;
 			sampler2D _SpecTex;
 			float _TranInte;
-			//float3 _LightDir;
 			fixed4 _HairColor;
 			fixed4 _HairRootColor;
 			fixed4 _SpecColor;
@@ -132,12 +108,9 @@ Shader "Custom/Hair/HairTest01"
 			half4 _Parameter;
 			half4 _Parameter01;
 			half4 _SmoothStep;
-			fixed4 _EffectParameter;
 
 			uniform float4 _LightColor0;
 			uniform float4 _SpecTex_ST;
-
-			//float4 _DirectionalLightDir0;
 			float4 _DirectionalLightColor0;
 			
 
@@ -162,22 +135,17 @@ Shader "Custom/Hair/HairTest01"
 			v2f vert (appdata v)
 			{
 				v2f o;
-				
 				o.uv=v.uv;
 				o.uv1=v.uv1;
 
 				float3 tangentDir = UnityObjectToWorldDir(v.tangent);
 				float3 normalDir = UnityObjectToWorldNormal(v.normal);
 				float3 bitangentDir = normalize(cross(normalDir,tangentDir)*v.tangent.w * unity_WorldTransformParams.w);
-				
 				float3x3 tangentTransform = float3x3(tangentDir,bitangentDir,normalDir);
-
 				float4 wsPosition = mul(unity_ObjectToWorld,float4(v.vertex.xyz,1));
 				o.pos = mul(UNITY_MATRIX_VP,wsPosition);
-
 				o.tsLightDir = mul(tangentTransform,normalize(float3(0,1,0)));
 				o.tsViewDir = mul(tangentTransform,normalize(UnityWorldSpaceViewDir(wsPosition)));
-				
 				UNITY_TRANSFER_FOG(o,o.pos);
 				TRANSFER_VERTEX_TO_FRAGMENT(o);
 				return o;
@@ -191,7 +159,7 @@ Shader "Custom/Hair/HairTest01"
 			    float3 TSnormalDir = float3(0,0,1);
 			    float3 TSView=i.tsViewDir;
 			    float3 TSLightDir0=i.tsLightDir;
-				float3 DLight=_DirectionalLightColor0.rgb;
+				float3 DLight= _LightColor0.rgb;//  _DirectionalLightColor0.rgb;
 			    //fixed bug: The specular glow will cross for each other.
 				float3 TSHalf=normalize(TSView+TSLightDir0*0.6);
 				fixed3 HairC=lerp(_HairRootColor,_HairColor,texColor.g);
@@ -220,10 +188,8 @@ Shader "Custom/Hair/HairTest01"
 
 				fixed4 finalCol=float4((diffuse+specular+fresnel)*DLight,min(texColor.a*2,1));
 
-				UNITY_APPLY_FOG(i.fogCoord, finalCol);
-				finalCol.rgb =lerp(Luminance(finalCol.rgb),finalCol.rgb,_EffectParameter.a)*_EffectParameter.rgb;
+				// UNITY_APPLY_FOG(i.fogCoord, finalCol);
 				return finalCol;
-
 			}
 			ENDCG
 		}

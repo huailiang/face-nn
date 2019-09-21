@@ -5,7 +5,8 @@ Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Player_male_common_hair_bob
   m_Shader: {fileID: 4800000, guid: bcf1c9a0aa118fe4f97a7b0444a4ed5a, type: 3}
   m_ShaderKeywords: 
@@ -103,7 +104,7 @@ Material:
     - _EmissionAOColor: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HairColor: {r: 0.99746317, g: 1, b: 0.94811314, a: 0.627451}
-    - _HairRootColor: {r: 0.09999997, g: 0.09999997, b: 0.09999997, a: 1}
+    - _HairRootColor: {r: 0.9811321, g: 0.9811321, b: 0.9811321, a: 1}
     - _MagicParam: {r: 0.25, g: 1, b: 0, a: 1}
     - _Parameter: {r: 0.9, g: 1, b: 2, a: 6}
     - _Parameter01: {r: 1.6, g: 0.46, b: 0.9, a: 0}
