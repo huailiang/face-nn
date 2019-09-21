@@ -80,12 +80,7 @@ FLightingData GetLighting(FFragData FragData,FMaterialData MaterialData DEBUG_PB
 	FLOAT distMask = saturate(distDelta)*(distDelta+1-distDelta*0.5);
 	FLOAT3 pointDirNormal = normalize(pointDir);
 	FLOAT pointNdotL =  saturate(dot(MaterialData.WorldNormal, pointDirNormal));
-
-	#ifdef _SCENE_EFFECT
-		LightingData.pointLighting = _PointLightColor0.xyz*pointNdotL*distMask*0.8f;
-	#else//!_SCENE_EFFECT
-		LightingData.pointLighting = _PointLightColor0.xyz*pointNdotL*distMask;
-	#endif//_SCENE_EFFECT
+	LightingData.pointLighting = _PointLightColor0.xyz*pointNdotL*distMask;
 
 	#ifndef _FULL_SSS
 		LightingData.DiffuseColor = MaterialData.BlendColor - MaterialData.BlendColor * MaterialData.Metallic;	// 1 mad
@@ -176,14 +171,10 @@ void ShadingMode(FFragData FragData, FMaterialData MaterialData, FLightingData L
 					FLOAT spec1 = CalcSpecular(a,LightingData.NdotH1, LightingData.H1, MaterialData.WorldNormal,param);
 					DirectSpecular = LightingData.SpecularColor * (spec0 * LightingData.lighting0*LightingData.gi.w + spec1 * LightingData.lighting1);
 
-				#ifdef _SCENE_EFFECT
-					DirectSpecular = LightingData.SpecularColor * (spec0 * LightingData.lighting0*LightingData.gi.w + spec1 * LightingData.lighting1);	
-				#else
 					FLOAT3 CLightH = SafeNormalize(FragData.CameraVector);
 					FLOAT CLightNoH = saturate(dot(MaterialData.WorldNormal, CLightH));
 					FLOAT specPoint = CalcSpecular(a,CLightNoH, CLightH, MaterialData.WorldNormal,param);
 					DirectSpecular = LightingData.SpecularColor * max(spec0 * LightingData.lighting0*LightingData.gi.w + spec1 * LightingData.lighting1,specPoint*LightingData.NdotC*0.5);
-				#endif//_SCENE_EFFECT
 
 				#endif//!_NO_DEFAULT_SPEC
 			#else//!_DOUBLE_LIGHTS
@@ -241,7 +232,7 @@ FLOAT3 GetDirectLighting(FFragData FragData, FMaterialData MaterialData, FLighti
 			color += DirectSpecular;
 			DEBUG_PBS_CUSTOMDATA_PARAM(DirectLightingColor, color)
 
-		#if defined(_ETX_EFFECT)&&!defined(_SCENE_EFFECT)
+		#if defined(_ETX_EFFECT)
 			color *= saturate(AOMultiBounce(MaterialData.BlendColor,MaterialData.EmissiveAO.a,_Emi_Color.w)); 
 		#endif //_ETX_EFFECT
 	#endif//_UN_LIGHT
@@ -264,7 +255,7 @@ FLOAT3 GetImageBasedReflectionLighting(FFragData FragData,FMaterialData Material
 	FLOAT3 lighting = surfaceReduction * SpecularIBL * FresnelLerp(LightingData.SpecularColor, grazingTerm, LightingData.NdotC)*_IBLScale;
 	DEBUG_PBS_CUSTOMDATA_PARAM(ImageBasedReflectionLighting, lighting)
 
-#if defined(_ETX_EFFECT)&&!defined(_SCENE_EFFECT)
+#if defined(_ETX_EFFECT)
 	lighting *= saturate( AOMultiBounce(FLOAT3(1,1,1), MaterialData.EmissiveAO.a,_Emi_Color.w));
 #endif //_ETX_EFFECT
 

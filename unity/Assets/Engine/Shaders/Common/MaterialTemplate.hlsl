@@ -130,11 +130,7 @@ FFragData GetFragData(FInterpolantsVSToPS Interpolants, FLOAT4 SvPosition)
 
 void MaterialAlphaTest(FMaterialData MaterialData)
 {
-#ifdef _SCENE_EFFECT
-	clip(MaterialData.BaseColor.a - 0.5f);
-#else//!_SCENE_EFFECT
 	clip(MaterialData.BaseColor.a - _RoleCutout);
-#endif//_SCENE_EFFECT
 }
 
 FLOAT4 GetDefaultBaseColor(in FFragData FragData)
@@ -355,13 +351,8 @@ inline FLOAT4 GetPBSColor(FFragData FragData, in FMaterialData MaterialData)
 inline FLOAT4 GetEmissionAOColor(FLOAT2 uv,FLOAT4 color)
 {
 	FLOAT4 emi = FLOAT4(0,0,0,0);
-	#ifdef _SCENE_EFFECT
-		FLOAT4 effectTex = color*color.a;	
-		effectTex.a = 1;
-	#else//!_SCENE_EFFECT
-		FLOAT4 effectTex = SAMPLE_TEXTURE2D(_EffectTex, uv);
-		effectTex.xyz = effectTex.x*color.xyz;		
-	#endif//_SCENE_EFFECT
+	FLOAT4 effectTex = SAMPLE_TEXTURE2D(_EffectTex, uv);
+	effectTex.xyz = effectTex.x*color.xyz;		
 
 	FLOAT a = abs(frac((uv.y+_Time.x*3)*3)-0.5); 	
 	a = a * a;
@@ -388,9 +379,6 @@ inline FLOAT GetShadow(in FFragData FragData,in FMaterialData MaterialData)
 {
 #ifdef _SHADOW_MAP
 	FLOAT ndotl = 1;
-#ifdef _SCENE_EFFECT
-	ndotl = saturate(dot(MaterialData.WorldNormal,_DirectionalSceneLightDir0.xyz));
-#endif
 	FLOAT camera2shadow = dot(FragData.WorldPosition_CamRelative,FragData.WorldPosition_CamRelative);
 	UNITY_BRANCH
 	if(ndotl>=0&&camera2shadow<400)

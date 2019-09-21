@@ -6,46 +6,51 @@
 import tensorflow as tf
 from parse import parser
 from model import Artgan
+from net import Net
+
+import logging
+logger = logging.getLogger("nn-face")
 
 
 tf.set_random_seed(228)
 
 
 def main(_):
-    args = parser.parse_args()
-    tfconfig = tf.ConfigProto(allow_soft_placement=False)
-    tfconfig.gpu_options.allow_growth = True
-    with tf.Session(config=tfconfig) as sess:
-        model = Artgan(sess, args)
+    net = Net(5006)
 
-        if args.phase == 'train':
-            print("Train.")
-            model.train(args, ckpt_nmbr=args.ckpt_nmbr)
-        if args.phase == 'inference' or args.phase == 'test':
-            print("Inference.")
-            model.inference(args, args.inference_images_dir,
-                            resize_to_original=False,
-                            to_save_dir=args.save_dir,
-                            ckpt_nmbr=args.ckpt_nmbr)
+    while (True):
+        input = raw_input("command: \n")
+        if input == "s":
+            pass
+        elif input == "q":
+            net.onlySend(bytes([0x01, 0x02]))
+            break
+        else:
+            logger.info("unknown code, quit")
+            break
 
-        if args.phase == 'inference_on_frames' or args.phase == 'test_on_frames':
-            print("Inference on frames sequence.")
-            model.inference_video(args, path_to_folder=args.inference_images_dir[0],
-                                  resize_to_original=False,
-                                  to_save_dir=args.save_dir,
-                                  ckpt_nmbr=args.ckpt_nmbr)
+    # args = parser.parse_args()
+    # tfconfig = tf.ConfigProto(allow_soft_placement=False)
+    # tfconfig.gpu_options.allow_growth = True
+    # with tf.Session(config=tfconfig) as sess:
+    #     model = Artgan(sess, args)
 
-        if args.phase == "export_layers":
-            print("export_layers.")
-            model.export_layers(args.inference_images_dir,
-                                to_save_dir=args.save_dir,
-                                ckpt_nmbr=args.ckpt_nmbr)
+    #     if args.phase == 'train':
+    #         print("Train.")
+    #         model.train(args, ckpt_nmbr=args.ckpt_nmbr)
+    #     if args.phase == 'inference' or args.phase == 'test':
+    #         print("Inference.")
+    #         model.inference(args, args.inference_images_dir,
+    #                         resize_to_original=False,
+    #                         to_save_dir=args.save_dir,
+    #                         ckpt_nmbr=args.ckpt_nmbr)
+    #     if args.phase == "export_layers":
+    #         print("export_layers.")
+    #         model.export_layers(args.inference_images_dir,
+    #                             to_save_dir=args.save_dir,
+    #                             ckpt_nmbr=args.ckpt_nmbr)
+    #     sess.close()
 
-        if args.phase == "export_arg":
-            print("export_arg.")
-            model.export_arg(args.ckpt_name)
-
-        sess.close()
 
 
 if __name__ == '__main__':

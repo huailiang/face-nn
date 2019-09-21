@@ -57,7 +57,7 @@ namespace XEngine
         public Vector3 lightProjectForward;
         [System.NonSerialized]
         public Vector3 translatePos;
-        
+
         [System.NonSerialized]
         public float shadowOrthoSize;
         public bool lightingFolder = true;
@@ -97,7 +97,7 @@ namespace XEngine
             Shader.PropertyToID ("_SplitAngle"),
             Shader.PropertyToID ("_SplitPos"),
         };
-        
+
 
         void Awake()
         {

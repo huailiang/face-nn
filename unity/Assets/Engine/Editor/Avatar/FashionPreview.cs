@@ -23,13 +23,20 @@ namespace XEngine.Editor
         private XEntityPresentation.RowData pData;
         private FaceData fData;
 
+        public static FashionPreview preview;
 
-        [MenuItem("Tools/Preview")]
+        [MenuItem("Tools/Preview", priority = 1)]
         static void AnimExportTool()
         {
             if (XEditorUtil.MakeNewScene())
             {
-                EditorWindow.GetWindowWithRect(typeof(FashionPreview), new Rect(0, 0, 440, 640), true, "FashionPreview");
+                if (preview != null)
+                {
+                    ScriptableObject.DestroyImmediate(preview);
+                }
+                var window = EditorWindow.GetWindowWithRect(typeof(FashionPreview), new Rect(0, 0, 440, 640), true, "Preview");
+                preview = window as FashionPreview;
+                preview.Show();
             }
         }
 
@@ -137,7 +144,7 @@ namespace XEngine.Editor
                 }
             }
         }
-        
+
 
         private void Update()
         {
@@ -169,7 +176,7 @@ namespace XEngine.Editor
                 clip.SampleAnimation(go, clipTime);
             }
         }
-        
+
     }
 
 }

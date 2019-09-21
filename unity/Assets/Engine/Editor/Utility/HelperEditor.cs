@@ -73,7 +73,6 @@ public class HelperEditor : MonoBehaviour
         }
 #if UNITY_EDITOR_OSX
         string shell = basepath + "/Shell/open.sh";
-        //		Debug.Log("shell: "+shell+" exist: "+System.IO.File.Exists(shell));
         string arg = path;
         string ex = shell + " " + arg;
         System.Diagnostics.Process.Start("/bin/bash", ex);

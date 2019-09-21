@@ -199,9 +199,12 @@ namespace XEngine.Editor
 
         private void FocusFace()
         {
-            helmet.SetActive(!focusFace);
-            camera.transform.position = focusFace ? cam2 : cam1;
-            camera.fieldOfView = focusFace ? 30 : 60;
+            if (helmet != null && camera != null)
+            {
+                helmet.SetActive(!focusFace);
+                camera.transform.position = focusFace ? cam2 : cam1;
+                camera.fieldOfView = focusFace ? 30 : 60;
+            }
         }
 
         private void OnSceneClose(Scene scene)

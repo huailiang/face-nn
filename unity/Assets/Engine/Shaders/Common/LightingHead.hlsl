@@ -2,7 +2,7 @@
 #define PBS_LIGHTINGHEAD_INCLUDE
 
 FLOAT3 _DirectionalLightDir0;
-FLOAT4 _DirectionalLightColor0;
+FLOAT4 _DirectionalLightColor0 = FLOAT4(1.0,0.9,0.7,1.0);
 
 FLOAT4 _PointLightPos0;
 FLOAT4 _PointLightColor0;
@@ -12,15 +12,6 @@ FLOAT4 _PointLightColor0;
     FLOAT4 _DirectionalLightColor1;
 #endif
 
-#ifdef _SCENE_EFFECT
-    FLOAT3 _DirectionalSceneLightDir0;
-    FLOAT4 _DirectionalSceneLightColor0;
-
-    #ifdef _DOUBLE_LIGHTS
-        FLOAT3 _DirectionalSceneLightDir1;
-        FLOAT4 _DirectionalSceneLightColor1;
-    #endif
-#endif
 
 FLOAT3 GetLightColor0()
 {
@@ -31,12 +22,7 @@ FLOAT3 GetLightColor0()
         return _LightColor0.xyz;
     #endif//LIGHTMAP_ON    
 #else//!_ADDLIGHTING
-    #ifdef _SCENE_EFFECT
-        return _DirectionalSceneLightColor0.xyz;
-    #else//!_SCENE_EFFECT
-        return _DirectionalLightColor0.xyz;
-    #endif//_SCENE_EFFECT
-
+    return _DirectionalLightColor0.xyz;
 #endif//_ADDLIGHTING
 }
 
@@ -46,11 +32,7 @@ FLOAT3 GetLightColor1()
     return FLOAT3(0,0,0);
 #else//!_ADDLIGHTING
      #ifdef _DOUBLE_LIGHTS
-        #ifdef _SCENE_EFFECT
-            return _DirectionalSceneLightColor1.xyz;
-        #else//!_SCENE_EFFECT
-            return _DirectionalLightColor1.xyz;
-        #endif//_SCENE_EFFECT
+        return _DirectionalLightColor1.xyz;
      #else//!_DOUBLE_LIGHTS
         return FLOAT3(0,0,0);
     #endif//_DOUBLE_LIGHTS
@@ -62,13 +44,7 @@ FLOAT3 GetLightDir0()
 #ifdef _ADDLIGHTING
     return _WorldSpaceLightPos0.xyz;
 #else//!_ADDLIGHTING
-
-    #ifdef _SCENE_EFFECT
-        return  _DirectionalSceneLightDir0.xyz;
-    #else//!_SCENE_EFFECT
-        return _DirectionalLightDir0.xyz;
-    #endif//_SCENE_EFFECT
-
+    return _DirectionalLightDir0.xyz;
 #endif//_ADDLIGHTING
 }
 
@@ -78,11 +54,7 @@ FLOAT3 GetLightDir1()
     return FLOAT3(0,0,0);
 #else//!_ADDLIGHTING
      #ifdef _DOUBLE_LIGHTS
-        #ifdef _SCENE_EFFECT
-            return _DirectionalSceneLightDir1.xyz;
-        #else//!_SCENE_EFFECT
             return _DirectionalLightDir1.xyz;
-        #endif//_SCENE_EFFECT
      #else//!_DOUBLE_LIGHTS
         return FLOAT3(0,0,0);
     #endif//_DOUBLE_LIGHTS

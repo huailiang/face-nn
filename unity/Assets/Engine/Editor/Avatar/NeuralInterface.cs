@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
+
 
 namespace XEngine.Editor
 {
@@ -23,7 +23,7 @@ namespace XEngine.Editor
         static string export;
         static string model;
         const int CNT = 95;
-
+        static Connect connect;
         static string EXPORT
         {
             get
@@ -103,29 +103,46 @@ namespace XEngine.Editor
                 fs.Close();
             }
         }
-      
+
 
         private static void NeuralInput(NeuralData data)
         {
             var prev = ScriptableObject.CreateInstance<FashionPreview>();
             prev.NeuralProcess(data);
+            FashionPreview.preview = prev;
         }
 
 
         [MenuItem("Tools/SetupEnv")]
         private static void SetupEnv()
         {
-            EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects);
-            GameObject oldCamera = GameObject.Find(@"Main Camera");
-            GameObject.DestroyImmediate(oldCamera);
-            GameObject cam = AssetDatabase.LoadAssetAtPath("Assets/Engine/Editor/EditorResources/Main Camera.prefab", typeof(GameObject)) as GameObject;
-            cam = GameObject.Instantiate<GameObject>(cam, null);
-            cam.transform.position = new Vector3(0, 1, -10);
-            Light light = GameObject.Find("Directional Light").GetComponent<Light>();
-            light.transform.parent = cam.transform;
-            var env = cam.GetComponent<XEngine.Environment>();
-            env.roleLight0 = light;
-            env.Update();
+            XEditorUtil.SetupEnv();
+
+        }
+
+        [MenuItem("Tools/Connect")]
+        private static void Connect()
+        {
+            if (connect == null)
+            {
+                connect = new Connect();
+                connect.Initial(5006);
+                EditorApplication.update += connect.Receive;
+            }
+        }
+
+        [MenuItem("Tools/CloseEnv")]
+        private static void Quit()
+        {
+            if (FashionPreview.preview != null)
+            {
+                ScriptableObject.DestroyImmediate(FashionPreview.preview);
+            }
+            if (connect != null)
+            {
+                EditorApplication.update -= connect.Receive;
+                connect.Quit();
+            }
         }
 
 

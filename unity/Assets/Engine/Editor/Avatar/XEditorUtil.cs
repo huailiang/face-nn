@@ -67,17 +67,7 @@ namespace XEngine.Editor
             }
             else
             {
-                EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects);
-
-                GameObject oldCamera = GameObject.Find(@"Main Camera");
-                GameObject.DestroyImmediate(oldCamera);
-                GameObject camera = AssetDatabase.LoadAssetAtPath("Assets/Engine/Editor/EditorResources/Main Camera.prefab", typeof(GameObject)) as GameObject;
-                camera = GameObject.Instantiate<GameObject>(camera, null);
-                camera.transform.position = new Vector3(0, 1, -10);
-                Light light = GameObject.Find("Directional Light").GetComponent<Light>();
-                light.transform.parent = camera.transform;
-                Environment env = camera.GetComponent<Environment>();
-                env.roleLight0 = light;
+                SetupEnv();
 
                 GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
                 plane.name = "Ground";
@@ -88,6 +78,21 @@ namespace XEngine.Editor
                 plane.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(90 / 255.0f, 90 / 255.0f, 90 / 255.0f));
                 return true;
             }
+        }
+
+
+        public static void SetupEnv()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects);
+            GameObject oldCamera = GameObject.Find(@"Main Camera");
+            GameObject.DestroyImmediate(oldCamera);
+            GameObject cam = AssetDatabase.LoadAssetAtPath("Assets/Engine/Editor/EditorResources/Main Camera.prefab", typeof(GameObject)) as GameObject;
+            cam = GameObject.Instantiate<GameObject>(cam, null);
+            cam.transform.position = new Vector3(0, 1, -10);
+            Light light = GameObject.Find("Directional Light").GetComponent<Light>();
+            light.transform.parent = cam.transform;
+            var env = cam.GetComponent<XEngine.Environment>();
+            env.roleLight0 = light;
         }
 
         public static void ClearCreatures()
@@ -206,7 +211,7 @@ namespace XEngine.Editor
             newMesh.colors = null;
             newMesh.colors32 = null;
         }
-        
+
     }
 
 }
