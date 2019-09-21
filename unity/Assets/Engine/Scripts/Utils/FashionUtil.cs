@@ -162,7 +162,6 @@ namespace XEngine.Editor
                 var mat = AssetDatabase.LoadAssetAtPath<Material>(asset + ".mat");
                 if (mesh != null) smr.sharedMesh = mesh;
                 if (mat != null) smr.sharedMaterial = mat;
-                else Debug.LogError(asset);
 
                 if (row != null && row.dbparent != null)
                 {
