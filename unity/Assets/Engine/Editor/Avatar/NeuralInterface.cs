@@ -119,16 +119,21 @@ namespace XEngine.Editor
             if (connect == null)
             {
                 connect = new Connect();
-                connect.Initial(5010, 5011);
             }
+            else
+            {
+                connect.Quit();
+            }
+            connect.Initial(5010, 5011);
+            Send();
         }
 
-        [MenuItem("Tools/Send", priority = 2)]
         private static void Send()
         {
             if (connect != null)
             {
-                connect.Send();
+                string str = "hello world";
+                connect.Send(str);
             }
             else
             {

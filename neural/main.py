@@ -21,9 +21,13 @@ def main(_):
     while (True):
         input = raw_input("command: \n")
         if input == "s":
-            pass
+            msg = raw_input("input: ")
+            net.onlySend(msg)
+        elif input == 'r':
+            msg = raw_input("input: ")
+            net.sendRcv(msg)
         elif input == "q":
-            net.onlySend(bytes([0x01, 0x02]))
+            net.onlySend("quit")
             net.close()
             break
         else:

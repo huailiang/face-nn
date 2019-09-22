@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Net;
 using System;
 using System.Threading;
+using System.Text;
 
 public class Connect
 {
@@ -26,13 +27,13 @@ public class Connect
     }
 
 
-    public void Send()
+    public void Send(string msg)
     {
         try
         {
-            var data = new byte[] { 0x00, 0x11, 0x22, 0x33 };
+            var data = Encoding.ASCII.GetBytes(msg);
             sendClient.Send(data, data.Length, point1);
-            Debug.Log("send data");
+            Debug.Log("send " + msg);
         }
         catch (Exception ex)
         {
@@ -44,22 +45,20 @@ public class Connect
     {
         while (true)
         {
-            try
+            byte[] recivcedata = recviceClient.Receive(ref point2);
+            string str = Encoding.ASCII.GetString(recivcedata, 0, recivcedata.Length);
+            Debug.Log("rcv: " + str);
+            if (str.StartsWith("rcv"))
             {
-                byte[] recivcedata = recviceClient.Receive(ref point2);
-                string str = "rcv: ";
-                for (int i = 0; i < recivcedata.Length; i++)
-                {
-                    str += recivcedata[i].ToString("x2") + " ";
-                }
-                Debug.Log(str);
+                str = str.Substring(3);
+                Send("recv msg by client");
             }
-            catch (Exception ex)
+            if (str.Equals("quit"))
             {
-                Debug.LogError("udp recv error:" + ex.Message);
                 break;
             }
         }
+        Quit();
     }
 
 
