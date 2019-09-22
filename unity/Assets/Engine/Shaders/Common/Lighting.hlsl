@@ -211,7 +211,6 @@ FLOAT3 GetDirectLighting(FFragData FragData, FMaterialData MaterialData, FLighti
 				LightingData.gi.w = saturate(saturate(Luminance(bakedColorTex.rgb)*_LightmapShadowMask-1) + _ShadowIntensity);
 				DEBUG_PBS_CUSTOMDATA_PARAM(LightMapGI, LightingData.gi)
 			}
-
 			ShadingMode(FragData,MaterialData,LightingData,DirectDiffuse,DirectSpecular DEBUG_PBS_PARAM);
 		#else //!(LIGHTMAP_ON||_CUSTOM_LIGHTMAP_ON)
 			ShadingMode(FragData,MaterialData,LightingData,DirectDiffuse,DirectSpecular DEBUG_PBS_PARAM);
@@ -237,27 +236,26 @@ FLOAT3 GetDirectLighting(FFragData FragData, FMaterialData MaterialData, FLighti
 FLOAT3 GetImageBasedReflectionLighting(FFragData FragData,FMaterialData MaterialData, FLightingData LightingData DEBUG_PBS_ARGS)
 {
 	FLOAT r = sqrt(MaterialData.Roughness);
-	FLOAT AbsoluteSpecularMip = r * (1.7 - 0.7 * r) * _EnvCubemapParam.w;
+	FLOAT AbsoluteSpecularMip =  r * (1.7 - 0.7 * r) * _EnvCubemapParam.w;
 	FLOAT3 viewDir = FragData.WorldPosition_CamRelative;
 
 	DEBUG_PBS_CUSTOMDATA_PARAM(CubeMipmap, AbsoluteSpecularMip)
-	// Fetch from cubemap and convert to linear HDR
-	FLOAT3 SpecularIBL = DecodeHDR(SAMPLE_TEXCUBE_LOD(_EnvCubemap, MaterialData.ReflectionVector, AbsoluteSpecularMip), _EnvCubemapParam.xyz);
+	FLOAT3 SpecularIBL =  DecodeHDR(SAMPLE_TEXCUBE_LOD(_EnvCubemap, MaterialData.ReflectionVector, AbsoluteSpecularMip), _EnvCubemapParam.xyz);
 
 	FLOAT surfaceReduction = 1.0 / (Pow4(MaterialData.Roughness) + 1.0);
-	SpecularIBL = lerp(0.5, 0.8 , MaterialData.Metallic)*SpecularIBL*lerp(0.45,1,MaterialData.Metallic)*0.75;
+	SpecularIBL = lerp(0.5, 0.8 , MaterialData.Metallic) * SpecularIBL * lerp(0.45, 1, MaterialData.Metallic) * 0.75;
 	FLOAT grazingTerm = saturate(1.36 - r + 0.64*MaterialData.Metallic)*0.25;
 	FLOAT3 lighting = surfaceReduction * SpecularIBL * FresnelLerp(LightingData.SpecularColor, grazingTerm, LightingData.NdotC)*_IBLScale;
 	DEBUG_PBS_CUSTOMDATA_PARAM(ImageBasedReflectionLighting, lighting)
 
 #if defined(_ETX_EFFECT)
-	lighting *= saturate( AOMultiBounce(FLOAT3(1,1,1), MaterialData.EmissiveAO.a,_Emi_Color.w));
+	lighting *= saturate(AOMultiBounce(FLOAT3(1,1,1), MaterialData.EmissiveAO.a,_Emi_Color.w));
 #endif //_ETX_EFFECT
 
 #ifdef _DOUBLE_LIGHTS
-	return (0.5*(LightingData.lighting0 + LightingData.lighting1+ LightingData.IndirectDiffuseLighting + LightingData.pointLighting-1)+1)*lighting;
+	return (0.5 * (LightingData.lighting0 + LightingData.lighting1+ LightingData.IndirectDiffuseLighting + LightingData.pointLighting-1)+1)*lighting;
 #else
-	return (0.5*(LightingData.lighting0 + LightingData.IndirectDiffuseLighting + LightingData.pointLighting-1)+1)*lighting;
+	return (0.5 * (LightingData.lighting0 + LightingData.IndirectDiffuseLighting + LightingData.pointLighting - 1) + 1)*lighting;
 #endif
 }
 

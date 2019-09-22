@@ -217,10 +217,6 @@ namespace XEngine.Editor
 
         private void CreateRT()
         {
-            if (mainRt != null)
-            {
-                mainRt.Release();
-            }
             mainRt = new RenderTexture(mainTex.width, mainTex.height, 0, 0, RenderTextureReadWrite.Linear)
             {
                 name = "_FaceTex",

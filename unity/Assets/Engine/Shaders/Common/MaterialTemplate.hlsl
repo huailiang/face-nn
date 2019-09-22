@@ -36,7 +36,6 @@ FLOAT4 ParallaxMapping(FLOAT3 V,FLOAT3 L,FLOAT2 uv)
 	{
 		FLOAT4 v = SAMPLE_TEXTURE2D(_EffectTex,uvh.xy);
 		FLOAT  h = v.r*_ParallaxParamX+_ParallaxParamY;
-		//v.z = v.z*2.0f-1.0f;
 		uvh += (h-uvh.z)*v.z*V.xyz;
 	}
 
@@ -167,70 +166,7 @@ inline FLOAT4 GetBaseColor(in FFragData FragData,inout FMaterialData MaterialDat
 			return ColorModify(FragData);
 		#endif//_DEFAUTL_BASE_COLOR		
 	#else//!_COLOR_MODIFY
-		#ifdef _TERRAIN
-			FLOAT4 splat = FLOAT4(0,0,0,0);
-			#ifdef _SPLAT1
-				FLOAT2 uv0 = FragData.WorldPosition.xz*_TerrainScale.x;			
-				float4 blend = SAMPLE_TEXTURE2D(_BlendTex, GET_FRAG_UV);
-				float4 baseCol = SAMPLE_TEXTURE2D(_BaseTex0, uv0);
-				splat = baseCol;
-
-			#endif
-
-			#ifdef _SPLAT2
-				FLOAT4 blend = SAMPLE_TEXTURE2D(_BlendTex, GET_FRAG_UV);
-				MaterialData.BlendTex = blend;
-				FLOAT2 uv0 = FragData.WorldPosition.xz*_TerrainScale.x;
-				FLOAT2 uv1 = FragData.WorldPosition.xz*_TerrainScale.y;
-				splat += SAMPLE_TEXTURE2D(_BaseTex0, uv0)*blend.r;
-				splat += SAMPLE_TEXTURE2D(_BaseTex1, uv1)*blend.g;
-		
-			#endif
-			
-			#ifdef _SPLAT3
-				FLOAT4 blend = SAMPLE_TEXTURE2D(_BlendTex, GET_FRAG_UV);
-				MaterialData.BlendTex = blend;
-				FLOAT2 uv0 = FragData.WorldPosition.xz*_TerrainScale.x;
-				FLOAT2 uv1 = FragData.WorldPosition.xz*_TerrainScale.y;
-				FLOAT2 uv2 = FragData.WorldPosition.xz*_TerrainScale.z;
-
-				splat += SAMPLE_TEXTURE2D(_BaseTex0, uv0)*blend.r;
-				splat += SAMPLE_TEXTURE2D(_BaseTex1, uv1)*blend.g;
-				splat += SAMPLE_TEXTURE2D(_BaseTex2, uv2)*blend.b;
-			#endif
-
-			#ifdef _SPLAT4
-				FLOAT4 blend = SAMPLE_TEXTURE2D(_BlendTex, GET_FRAG_UV);
-				MaterialData.BlendTex = blend;
-				FLOAT2 uv0 = FragData.WorldPosition.xz*_TerrainScale.x;
-				FLOAT2 uv1 = FragData.WorldPosition.xz*_TerrainScale.y;
-				FLOAT2 uv2 = FragData.WorldPosition.xz*_TerrainScale.z;
-				FLOAT2 uv3 = FragData.WorldPosition.xz*_TerrainScale.w;
-
-				splat += SAMPLE_TEXTURE2D(_BaseTex0, uv0)*blend.r;
-				splat += SAMPLE_TEXTURE2D(_BaseTex1, uv1)*blend.g;
-				splat += SAMPLE_TEXTURE2D(_BaseTex2, uv2)*blend.b;
-				splat += SAMPLE_TEXTURE2D(_BaseTex3, uv3)*blend.a;
-
-	
-			#endif
-
-			return splat;// FLOAT4(0, blend.g, 0, 1);	
-		#else//!_TERRAIN
-			#ifdef _MESH_BLEND
-				FLOAT4 splat = FLOAT4(0,0,0,0);
-				FLOAT4 blend = SAMPLE_TEXTURE2D(_BlendTex, GET_FRAG_BACKUP_UV);
-				FLOAT4 base0 = SAMPLE_TEXTURE2D(_BaseTex, GET_FRAG_UV);
-				FLOAT4 base1 = SAMPLE_TEXTURE2D(_BaseTex1, GET_FRAG_UV2);				
-				splat += base0*blend.r*_MainColor*_MainColor.a*10;
-				splat += base1*blend.g*_Color0*_Color0.a*10;
-				MaterialData.BlendTex = blend;
-				MaterialData.MetallicScale = blend.r*_SpecScale0+blend.g*_SpecScale1;	
-				return splat;
-			#else//!_MESH_BLEND
-				return GetDefaultBaseColor(FragData);
-			#endif//_MESH_BLEND			
-		#endif//_TERRAIN
+		return GetDefaultBaseColor(FragData);
 	#endif//_COLOR_MODIFY
 #else
 	return _Color;
@@ -244,92 +180,15 @@ inline FLOAT4 GetPBSColor(FFragData FragData, in FMaterialData MaterialData)
 	#if defined(_PBS_FROM_PARAM)
 		pbs.zw = _PbsParam.zw;
 	#else//!_PBS_FROM_PARAM
-		#ifdef _TERRAIN
-			#if defined(_TERRAIN_PBS)
-			{
-				float4 blend = MaterialData.BlendTex;
-				#ifdef _SPLAT1
-				float2 uv0 = FragData.WorldPosition.xz*_TerrainScale[0];
-				float4 pbsColor0 = SAMPLE_TEXTURE2D(_TerrainPBSTex0, uv0);
-
-				pbs.xyz = UnpackNormal(pbsColor0.rg);
-				pbs.w = pbsColor0.b;
-				#endif
-
-				#ifdef _SPLAT2
-				float2 uv0 = FragData.WorldPosition.xz*_TerrainScale[0];
-				float2 uv1 = FragData.WorldPosition.xz*_TerrainScale[1];
-				float4 pbsColor0 = SAMPLE_TEXTURE2D(_TerrainPBSTex0, uv0);
-				float4 pbsColor1 = SAMPLE_TEXTURE2D(_TerrainPBSTex1, uv1);
-
-				float2 normalXY0 = pbsColor0.rg;
-				float2 normalXY1 = pbsColor1.rg;
-				float roughness0 = pbsColor0.b;
-				float roughness1 = pbsColor1.b;
-
-				pbs.xyz = BlendNormalTS(normalXY0, normalXY1, 0, 0, float4(blend.rg,0,0));
-				pbs.w = BlendRoughness(float4(roughness0, roughness1, 0, 0), blend);
-				#endif
-
-				#ifdef _SPLAT3
-				float2 uv0 = FragData.WorldPosition.xz*_TerrainScale[0];
-				float2 uv1 = FragData.WorldPosition.xz*_TerrainScale[1];
-				float2 uv2 = FragData.WorldPosition.xz*_TerrainScale[2];
-				float4 pbsColor0 = SAMPLE_TEXTURE2D(_TerrainPBSTex0, uv0);
-				float4 pbsColor1 = SAMPLE_TEXTURE2D(_TerrainPBSTex1, uv1);
-				float4 pbsColor2 = SAMPLE_TEXTURE2D(_TerrainPBSTex2, uv2);
-
-				float2 normalXY0 = pbsColor0.rg;
-				float2 normalXY1 = pbsColor1.rg;
-				float2 normalXY2 = pbsColor2.rg;
-				float roughness0 = pbsColor0.b;
-				float roughness1 = pbsColor1.b;
-				float roughness2 = pbsColor2.b;
-	
-				pbs.xyz = BlendNormalTS(normalXY0, normalXY1, normalXY2, 0, float4(blend.rgb,0));
-				pbs.w = BlendRoughness(float4(roughness0, roughness1, roughness2, 0), blend);
-				#endif
-
-				#ifdef _SPLAT4
-				float2 uv0 = FragData.WorldPosition.xz*_TerrainScale[0];
-				float2 uv1 = FragData.WorldPosition.xz*_TerrainScale[1];
-				float2 uv2 = FragData.WorldPosition.xz*_TerrainScale[2];
-				float2 uv3 = FragData.WorldPosition.xz*_TerrainScale[3];
-				float4 pbsColor0 = SAMPLE_TEXTURE2D(_TerrainPBSTex0, uv0);
-				float4 pbsColor1 = SAMPLE_TEXTURE2D(_TerrainPBSTex1, uv1);
-				float4 pbsColor2 = SAMPLE_TEXTURE2D(_TerrainPBSTex2, uv2);
-				float4 pbsColor3 = SAMPLE_TEXTURE2D(_TerrainPBSTex3, uv3);
-
-				float2 normalXY0 = pbsColor0.rg;
-				float2 normalXY1 = pbsColor1.rg;
-				float2 normalXY2 = pbsColor2.rg;
-				float2 normalXY3 = pbsColor3.rg;
-				float roughness0 = pbsColor0.b;
-				float roughness1 = pbsColor1.b;
-				float roughness2 = pbsColor2.b;
-				float roughness3 = pbsColor3.b;
-
-				blend = float4(blend.rgb, 1-blend.r-blend.g-blend.b);
-				pbs.xyz = BlendNormalTS(normalXY0, normalXY1, normalXY2, normalXY3, blend);
-				pbs.w = BlendRoughness(float4(roughness0, roughness1, roughness2, roughness3), blend);
-				#endif		// _SPLAT4 //
-			}
-			#endif		// _TERRAIN_PBS //
-
+		#ifdef _MESH_BLEND
+			FLOAT4 splat = FLOAT4(0,0,0,0);
+			FLOAT4 blend =MaterialData.BlendTex;
+			splat += (SAMPLE_TEXTURE2D(_PBSTex, GET_FRAG_UV)*2-1)*blend.r;
+			splat += (SAMPLE_TEXTURE2D(_PBSTex1, GET_FRAG_UV2)*2-1)*blend.g;
+			return splat*0.5+0.5;
 		#else
-			#ifdef _MESH_BLEND
-				FLOAT4 splat = FLOAT4(0,0,0,0);
-
-				FLOAT4 blend =MaterialData.BlendTex;
-				//MaterialData.BlendTex = blend;
-
-				splat += (SAMPLE_TEXTURE2D(_PBSTex, GET_FRAG_UV)*2-1)*blend.r;
-				splat += (SAMPLE_TEXTURE2D(_PBSTex1, GET_FRAG_UV2)*2-1)*blend.g;
-				return splat*0.5+0.5;
-			#else
-				pbs = SAMPLE_TEXTURE2D(_PBSTex, GET_FRAG_UV2);
-			#endif//_MESH_BLEND
-		#endif//_TERRAIN
+			pbs = SAMPLE_TEXTURE2D(_PBSTex, GET_FRAG_UV2);
+		#endif//_MESH_BLEND
 		#if defined(_PBS_HALF_FROM_PARAM)
 			pbs.zw = _PbsParam.zw;
 		#elif defined(_PBS_M_FROM_PARAM)
@@ -380,7 +239,6 @@ inline FLOAT GetShadow(in FFragData FragData,in FMaterialData MaterialData)
 
 		#ifdef _SELF_SHADOW_MAP		
 			FLOAT depthInLightSpace = PCF8Filter(coord);
-			//FLOAT depth = (depthInLightSpace < FragData.ShadowCoord.z)?0:(1-_SelfShadowFade);
 			FLOAT depth = depthInLightSpace ;
 		#else//!_SELF_SHADOW_MAP
 			FLOAT4 shadowMap = SAMPLE_TEXTURE2D(_ShadowMapTex, coord.xy);
@@ -455,10 +313,6 @@ inline FMaterialData GetMaterialData(FFragData FragData)
 	#if _ALPHA_TEST
 		MaterialAlphaTest(MaterialData);
 	#endif
-
-	// #if _ALPHA_PREMULT
-	// 	MaterialData.BlendColor *= MaterialData.BaseColor.a;
-	// #endif
 
 	#ifdef _PBS_MODIFY
 		PbsModify(FragData,MaterialData);

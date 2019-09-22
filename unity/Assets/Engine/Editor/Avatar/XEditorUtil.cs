@@ -93,6 +93,7 @@ namespace XEngine.Editor
             light.transform.parent = cam.transform;
             var env = cam.GetComponent<XEngine.Environment>();
             env.roleLight0 = light;
+            env.envCube = AssetDatabase.LoadAssetAtPath<Cubemap>("Assets/Engine/Editor/EditorResources/Env_0_CubeLDR.tga");
         }
 
         public static void ClearCreatures()

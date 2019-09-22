@@ -58,7 +58,7 @@ FLOAT4 fragForwardBase(in FInterpolantsVSToPS Interpolants, in FLOAT4 SvPosition
 			FLOAT3 DirectLighting = GetDirectLighting(FragData, MaterialData, LightingData DEBUG_PBS_PARAM);//direct diffuse
 			Color += DirectLighting;
 	#if !defined(_PBS_NO_IBL)
-			FLOAT3 ImageBasedReflectionLighting = GetImageBasedReflectionLighting(FragData,MaterialData, LightingData DEBUG_PBS_PARAM);//gi(specular+sh)
+			FLOAT3 ImageBasedReflectionLighting = GetImageBasedReflectionLighting(FragData, MaterialData, LightingData DEBUG_PBS_PARAM);//gi(specular+sh)
 			Color += ImageBasedReflectionLighting;
 	#endif
 		}

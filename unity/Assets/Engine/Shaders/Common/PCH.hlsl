@@ -50,13 +50,6 @@ FLOAT4 _SkinSpecularScatter;
 #define _SpecularRoughness _SkinSpecularScatter.y
 #define _ScatteringOffset _SkinSpecularScatter.z
 #define _ScatteringPower _SkinSpecularScatter.w
-//terrain
-FLOAT4 _TerrainScale;
-TEXTURE2D_SAMPLER2D(_BlendTex);
-TEXTURE2D_SAMPLER2D(_BaseTex0);
-TEXTURE2D_SAMPLER2D(_BaseTex1);
-TEXTURE2D_SAMPLER2D(_BaseTex2);
-TEXTURE2D_SAMPLER2D(_BaseTex3);
 
 //box Reflect
 TEXCUBE_SAMPLERCUBE(_EnvReflectTex);

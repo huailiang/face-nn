@@ -5,7 +5,8 @@ Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Player_male_plate_body
   m_Shader: {fileID: 4800000, guid: e4de0a982a4beda47ac898d08662d621, type: 3}
   m_ShaderKeywords: _ALPHA_TEST _ETX_EFFECT

@@ -7,30 +7,23 @@ using UnityEngine.Rendering;
 namespace XEngine
 {
 
-    public enum DrawType
-    {
-        Both,
-        Draw,
-        Cull,
-    }
-
     [DisallowMultipleComponent, ExecuteInEditMode]
     [RequireComponent(typeof(Camera))]
     public class Environment : MonoBehaviour
     {
         //IBL
-        public string EnveriomentCubePath;
         public float hdrScale = 4.6f;
         public float hdrPow = 0.1f;
         public float hdrAlpha = 0.5f;
+        public int iblLevel = 1;
+
         [XEngine.RangeAttribute(0, 1)]
         public float lightmapShadowMask = 0.25f;
         [XEngine.RangeAttribute(0, 1)]
         public float shadowIntensity = 0.1f;
         //Lighting
         public LightingModify lighting = null;
-        public string SkyboxMatPath;
-        public Vector3 sunDir = new Vector3(0, -1, 0);
+
         //Shadow
         public float shadowDepthBias = -0.03f;
         public float shadowNormalBias = 2.5f;
@@ -42,9 +35,8 @@ namespace XEngine
         public bool fogEnable = true;
         [NoSerialized]
         public SceneData sceneData = null;
-
-        private ResHandle EnveriomentCube;
-        private ResHandle SkyBoxMat;
+        public Cubemap envCube;
+        public Material SkyBoxMat;
         private Cubemap SkyBox;
         //shadow
         [System.NonSerialized]
@@ -57,7 +49,6 @@ namespace XEngine
         public Vector3 lightProjectForward;
         [System.NonSerialized]
         public Vector3 translatePos;
-
         [System.NonSerialized]
         public float shadowOrthoSize;
         public bool lightingFolder = true;
@@ -85,11 +76,10 @@ namespace XEngine
 
 
         public bool debugFolder = true;
-        public int quadIndex = -1;
-        public DrawType drawType = DrawType.Both;
         public bool showObjects = false;
 
         public ShaderDebugContext debugContext = new ShaderDebugContext();
+
         public static int[] debugShaderIDS = new int[]
         {
             Shader.PropertyToID ("_GlobalDebugMode"),
@@ -147,41 +137,6 @@ namespace XEngine
             }
         }
 
-
-        private void ProcessResCb(ref ResHandle resHandle, ref Vector4Int param)
-        {
-            if (resHandle.obj != null)
-            {
-                if (resHandle.obj is Cubemap)
-                {
-                    EnveriomentCube.Set(ref resHandle);
-                    return;
-                }
-                else if (resHandle.obj is Material)
-                {
-                    SkyBoxMat.Set(ref resHandle);
-                    return;
-                }
-                LoadMgr.singleton.Destroy(ref resHandle);
-            }
-        }
-
-        public void LoadRes(bool loadEnvCube = true, bool loadSkyBox = true)
-        {
-            ProcessLoadCb processResCb = ProcessResCb;
-            if (loadEnvCube && !string.IsNullOrEmpty(EnveriomentCubePath))
-            {
-                string suffix = EnveriomentCubePath.EndsWith("HDR") ? ".exr" : ".tga";
-                string path = string.Format("{0}/{1}{2}", AssetsConfig.GlobalAssetsConfig.ResourcePath, EnveriomentCubePath, suffix);
-                EnveriomentCube.obj = AssetDatabase.LoadAssetAtPath<Cubemap>(path);
-            }
-            if (loadSkyBox && !string.IsNullOrEmpty(SkyboxMatPath))
-            {
-                string path = string.Format("{0}/{1}.mat", AssetsConfig.GlobalAssetsConfig.ResourcePath, SkyboxMatPath);
-                SkyBoxMat.obj = AssetDatabase.LoadAssetAtPath<Material>(path);
-            }
-        }
-
         public void InitRender(UnityEngine.Camera camera)
         {
             sceneData.CameraRef = camera;
@@ -196,7 +151,6 @@ namespace XEngine
             RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_WeatherKeyWord, false);
 
             Shader.SetGlobalColor(ShaderIDs.Env_EffectParameter, Color.white);
-            LoadRes();
             UpdateEnv();
 
             SceneData.editorSetRes = SetRes;
@@ -343,17 +297,13 @@ namespace XEngine
 
         public void UpdateSkyBox()
         {
-            if (SkyBoxMat.obj is Material)
+            if (SkyBoxMat != null)
             {
-                Material mat = SkyBoxMat.obj as Material;
-                RenderSettings.skybox = mat;
-                if (mat != null)
+                RenderSettings.skybox = SkyBoxMat;
+                SkyBox = SkyBoxMat.GetTexture(ShaderIDs.Env_SkyCubeTex) as Cubemap;
+                if (SkyBox != null)
                 {
-                    SkyBox = mat.GetTexture(ShaderIDs.Env_SkyCubeTex) as Cubemap;
-                    if (SkyBox != null)
-                    {
-                        Shader.SetGlobalTexture(ShaderIDs.Env_SkyCube, SkyBox);
-                    }
+                    Shader.SetGlobalTexture(ShaderIDs.Env_SkyCube, SkyBox);
                 }
             }
         }
@@ -361,18 +311,8 @@ namespace XEngine
         public void UpdateEnv()
         {
             //IBL
-            float maxMipmap = 1;
-            if (EnveriomentCube.obj is Cubemap)
-            {
-                Cubemap envCube = EnveriomentCube.obj as Cubemap;
-                Shader.SetGlobalTexture(ShaderIDs.Env_Cubemap, envCube);
-
-                if (envCube != null)
-                {
-                    maxMipmap = envCube.mipmapCount;
-                }
-            }
-            Shader.SetGlobalVector(ShaderIDs.Env_CubemapParam, new Vector4(hdrScale, hdrPow, hdrAlpha, maxMipmap));
+            Shader.SetGlobalTexture(ShaderIDs.Env_Cubemap, envCube);
+            Shader.SetGlobalVector(ShaderIDs.Env_CubemapParam, new Vector4(hdrScale, hdrPow, hdrAlpha, iblLevel));
             Shader.SetGlobalVector(ShaderIDs.Env_LightmapScale, new Vector4(1.0f / lightmapShadowMask, lightmapShadowMask, shadowIntensity, 0));
 
             UpdateSkyBox();
@@ -411,7 +351,7 @@ namespace XEngine
                 Mathf.Pow(li.lightColor.r * li.lightDir.w, 2.2f),
                 Mathf.Pow(li.lightColor.g * li.lightDir.w, 2.2f),
                 Mathf.Pow(li.lightColor.b * li.lightDir.w, 2.2f), shadowIntensity);
-            // Shader.SetGlobalVector(colorKey, lightColorIntensity);
+            Shader.SetGlobalVector(colorKey, lightColorIntensity);
         }
 
         public void SyncLightInfo()

@@ -152,7 +152,7 @@ namespace XEngine.Editor
                 camera = GameObject.FindObjectOfType<Camera>();
             if (rt == null)
             {
-                string path = "Assets/BundleRes/Config/CameraOuput.renderTexture";
+                string path = "Assets/Engine/Editor/EditorResources/CameraOuput.renderTexture";
                 rt = AssetDatabase.LoadAssetAtPath<RenderTexture>(path);
             }
 

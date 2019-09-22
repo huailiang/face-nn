@@ -26,8 +26,7 @@
 //material
 #define Debug_BaseColor (Debug_CameraVector+1)
 #define Debug_BaseColorAlpha (Debug_BaseColor+1)
-#define Debug_BlendTex (Debug_BaseColorAlpha+1)
-#define Debug_Metallic (Debug_BlendTex+1)
+#define Debug_Metallic (Debug_BaseColorAlpha+1)
 #define Debug_Roughness (Debug_Metallic+1)
 #define Debug_WorldNormal (Debug_Roughness+1)
 #define Debug_TangentSpaceNormal (Debug_WorldNormal+1)
@@ -135,10 +134,6 @@ FLOAT4 DebugOutputColor(FLOAT4 OutColor,FFragData FragData,FMaterialData Materia
 	{
 		debugColor = FLOAT4(MaterialData.BaseColor.aaa,1);
 	}
-	else if (debugMode < Debug_BlendTex)
-	{
-		debugColor = MaterialData.BlendTex;
-	}	
 	else if (debugMode < Debug_Metallic)
 	{
 		debugColor = FLOAT4(MaterialData.Metallic.xxx, 1);

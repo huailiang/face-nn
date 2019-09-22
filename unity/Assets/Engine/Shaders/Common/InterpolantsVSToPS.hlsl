@@ -59,9 +59,7 @@ FInterpolantsVSToPS GetInterpolantsVSToPS(FVertexInput Input, FLOAT4 WorldPositi
 	SET_BACKUP_UV(Input.uv0);
 
 #if defined(LIGHTMAP_ON)||defined(_CUSTOM_LIGHTMAP_ON)
-	#if defined(_TERRAIN)
-		FLOAT2 uv = Input.uv0;
-	#elif defined(_WORLDSPACE_UV)
+	#if defined(_WORLDSPACE_UV)
 		FLOAT2 uv = (WorldPosition.xz - _wpOffset.xy)*_wpOffset.zw;
 	#else
 		FLOAT2 uv = Input.uv2;

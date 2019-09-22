@@ -6,14 +6,12 @@ namespace XEngine.Editor
     [CustomEditor(typeof(Environment))]
     public class EnvironmentEditor : BaseEditor<Environment>
     {
-        private SerializedProperty enveriomentCubePath;
-        private Cubemap envCube;
-
-        private SerializedProperty skyboxMatPath;
-        private Material skyMat;
+        private SerializedProperty envCube;
+        private SerializedProperty skyMat;
         private SerializedProperty hdrScale;
         private SerializedProperty hdrPow;
         private SerializedProperty hdrAlpha;
+        private SerializedProperty iblLevel;
         private SerializedParameter lightmapShadowMask;
         private SerializedParameter shadowIntensity;
         private SerializedProperty fogEnable;
@@ -25,8 +23,6 @@ namespace XEngine.Editor
         private SerializedProperty shadowMapLevel;
         private SerializedProperty shadowBound;
         private SerializedProperty drawShadowLighing;
-
-        private SerializedProperty drawType;
         private SerializedProperty showObjects;
 
         private SerializedProperty debugMode;
@@ -42,22 +38,13 @@ namespace XEngine.Editor
 
         public void OnEnable()
         {
-            enveriomentCubePath = FindProperty(x => x.EnveriomentCubePath);
-            if (!string.IsNullOrEmpty(enveriomentCubePath.stringValue))
-            {
-                string suffix = enveriomentCubePath.stringValue.EndsWith("HDR") ? ".exr" : ".tga";
-                string path = string.Format("{0}/{1}{2}", AssetsConfig.GlobalAssetsConfig.ResourcePath, enveriomentCubePath.stringValue, suffix);
-                envCube = AssetDatabase.LoadAssetAtPath<Cubemap>(path);
-            }
-            skyboxMatPath = FindProperty(x => x.SkyboxMatPath);
-            if (!string.IsNullOrEmpty(skyboxMatPath.stringValue))
-            {
-                string path = string.Format("{0}/{1}.mat", AssetsConfig.GlobalAssetsConfig.ResourcePath, skyboxMatPath.stringValue);
-                skyMat = AssetDatabase.LoadAssetAtPath<Material>(path);
-            }
+            envCube = FindProperty(x => x.envCube);
+            skyMat = FindProperty(x => x.SkyBoxMat);
             hdrScale = FindProperty(x => x.hdrScale);
             hdrPow = FindProperty(x => x.hdrPow);
             hdrAlpha = FindProperty(x => x.hdrAlpha);
+            iblLevel = FindProperty(x => x.iblLevel);
+            iblLevel.intValue = 1;
             lightmapShadowMask = FindParameter(x => x.lightmapShadowMask);
             shadowIntensity = FindParameter(x => x.shadowIntensity);
             fogEnable = FindProperty(x => x.fogEnable);
@@ -69,10 +56,7 @@ namespace XEngine.Editor
             shadowBound = FindProperty(x => x.shadowBound);
             lookTarget = FindProperty(x => x.lookTarget);
             drawShadowLighing = FindProperty(x => x.drawShadowLighing);
-
-            drawType = FindProperty(x => x.drawType);
             showObjects = FindProperty(x => x.showObjects);
-
             debugMode = FindProperty(x => x.debugContext.debugMode);
             debugDisplayType = FindProperty(x => x.debugContext.debugDisplayType);
             splitAngle = FindParameter(x => x.debugContext.splitAngle);
@@ -90,38 +74,13 @@ namespace XEngine.Editor
             textureFolder = EditorGUILayout.Foldout(textureFolder, "Texture");
             if (textureFolder)
             {
-                Cubemap cube = EditorGUILayout.ObjectField(envCube, typeof(Cubemap), false) as Cubemap;
-                if (cube != envCube)
+                EditorGUILayout.PropertyField(envCube);
+                EditorGUILayout.PropertyField(skyMat);
+                if (m_Target.envCube != null)
                 {
-                    envCube = cube;
-                    if (envCube == null)
-                    {
-                        env.EnveriomentCubePath = "";
-                    }
-                    else
-                    {
-                        string path = AssetDatabase.GetAssetPath(envCube);
-                        env.EnveriomentCubePath = path.Substring(AssetsConfig.GlobalAssetsConfig.ResourcePath.Length + 1);
-                        string suffix = env.EnveriomentCubePath.EndsWith(".tga") ? ".tga" : ".exr";
-                        env.EnveriomentCubePath = env.EnveriomentCubePath.Replace(suffix, "");
-                        env.LoadRes(true, false);
-                    }
-                }
-                Material sky = EditorGUILayout.ObjectField(skyMat, typeof(Material), false) as Material;
-                if (sky != skyMat)
-                {
-                    skyMat = sky;
-                    if (skyMat == null)
-                    {
-                        env.SkyboxMatPath = "";
-                    }
-                    else
-                    {
-                        string path = AssetDatabase.GetAssetPath(skyMat);
-                        env.SkyboxMatPath = path.Substring(AssetsConfig.GlobalAssetsConfig.ResourcePath.Length + 1);
-                        env.SkyboxMatPath = env.SkyboxMatPath.Replace(".mat", "");
-                        env.LoadRes(false, true);
-                    }
+                    Cubemap cube = m_Target.envCube;
+                    int max = cube.mipmapCount;
+                    m_Target.iblLevel = EditorGUILayout.IntSlider("IBL Level", m_Target.iblLevel, 1, max);
                 }
             }
             envLighingFolder = EditorGUILayout.Foldout(envLighingFolder, "EnvLighting");
@@ -242,8 +201,6 @@ namespace XEngine.Editor
 
             if (ToolsUtility.BeginFolderGroup("Debug", ref env.debugFolder))
             {
-                EditorGUILayout.PropertyField(drawType);
-
                 string[] debugNames = AssetsConfig.shaderDebugNames;
                 env.debugContext.shaderID = Environment.debugShaderIDS;
 
