@@ -55,8 +55,6 @@ FLOAT4 _SkinSpecularScatter;
 TEXCUBE_SAMPLERCUBE(_EnvReflectTex);
 TEXTURE2D_SAMPLER2D(_ShadowMapTexCSM);
 
-FLOAT4 _EffectParameter;
-
 #ifdef _PARAM_REMAP
     //Emission
     #define _Emi_Intensity _Param0.x

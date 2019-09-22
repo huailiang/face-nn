@@ -144,13 +144,6 @@ namespace XEngine
             if (lighting == null) lighting = new LightingModify();
             if (fog == null) fog = new FogModify();
 
-            RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_ThunderKeyWord, false);
-            RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_RainbowKeyWord, false);
-            RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_RainEffectKeyWord, false);
-            RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_StarKeyWord, false);
-            RuntimeUtilities.EnableKeyword(ShaderIDs.Weather_WeatherKeyWord, false);
-
-            Shader.SetGlobalColor(ShaderIDs.Env_EffectParameter, Color.white);
             UpdateEnv();
 
             SceneData.editorSetRes = SetRes;

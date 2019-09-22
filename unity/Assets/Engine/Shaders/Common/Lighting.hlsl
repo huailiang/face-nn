@@ -24,7 +24,6 @@ FLOAT3 GetAmbient(FFragData FragData, FMaterialData MaterialData)
 }
 
 
-
 FLightingData GetLighting(FFragData FragData,FMaterialData MaterialData DEBUG_PBS_ARGS)
 {
 	DECLARE_OUTPUT(FLightingData, LightingData)
@@ -60,9 +59,6 @@ FLightingData GetLighting(FFragData FragData,FMaterialData MaterialData DEBUG_PB
 	LightingData.IndirectDiffuseLighting = GetAmbient(FragData, MaterialData);
 #endif
 	DEBUG_PBS_CUSTOMDATA_PARAM(AmbientDiffuse, LightingData.IndirectDiffuseLighting)
-#ifndef _NO_VERTEX_POINTLIGHT
-	// LightingData.IndirectPointLight = FragData.VertexPointLight;
-#endif//_NO_VERTEX_POINTLIGHT
 
 	#ifdef _PLANE_LIGHT
 		LightingData.lighting0 = FLOAT3(1,1,1);
@@ -262,7 +258,6 @@ FLOAT3 GetImageBasedReflectionLighting(FFragData FragData,FMaterialData Material
 #endif//_FULL_SSS
 
 #ifdef _RIM
-//FLOAT4 glstate_lightmodel_ambient;
 FLOAT3 GetRimLighting(FMaterialData MaterialData,FLightingData LightingData DEBUG_PBS_ARGS)
 {
 	FLOAT3 lighting = FLOAT3(0, 0, 0);
@@ -411,7 +406,6 @@ FLOAT3 SubsurfaceProfileBxDF(FFragData FragData, FMaterialData MaterialData, FLi
 
 	FLOAT3 lighting = LightingData.Shadow * LightingData.DirectLightColor* LightingData.NdotL;	
 	FLOAT3 DirectDiffuse  = lighting * Diffuse_Burley( LightingData.DiffuseColor,MaterialData.Roughness,LightingData.NdotC,LightingData.NdotL,LightingData.VdotH) + LightingData.IndirectDiffuseLighting*LightingData.DiffuseColor;
-	//FLOAT3 DirectSpecular = lighting * DualSpecularGGX(AverageRoughness, Lobe0Roughness, Lobe1Roughness, LobeMix, GBuffer.SpecularColor, Context, NoL, AreaLight);
 	FLOAT3 DirectSpecular = FLOAT3(0, 0, 0);
 	DEBUG_PBS_CUSTOMDATA_PARAM(DirectDiffuse, DirectDiffuse)
 	DEBUG_PBS_CUSTOMDATA_PARAM(DirectSpecular, DirectSpecular)

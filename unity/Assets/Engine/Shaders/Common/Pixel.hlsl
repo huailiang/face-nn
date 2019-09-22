@@ -92,11 +92,6 @@ FLOAT4 fragForwardBase(in FInterpolantsVSToPS Interpolants, in FLOAT4 SvPosition
 	OutColor.rgb = ApplyFog2(OutColor.rgb,FragData.VertexFog, FragData.WorldPosition);
 #endif//_VERTEX_FOG
 
-#ifndef _UN_LIGHT	
-	OutColor.rgb = DropSaturationXColor(OutColor.rgb ,_EffectParameter); 
-#endif//_UN_LIGHT
-
-	DEBUG_PBS_COLOR(OutColor, FragData, MaterialData, LightingData)
 	return OutColor;
 }
 #endif //PBS_PIXEL_INCLUDE

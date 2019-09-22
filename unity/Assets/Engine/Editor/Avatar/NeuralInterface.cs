@@ -15,7 +15,6 @@ namespace XEngine.Editor
         public string name;
     }
 
-
     public class NeuralInterface
     {
         static RenderTexture rt;
@@ -57,7 +56,7 @@ namespace XEngine.Editor
         [MenuItem("Tools/Select")]
         public static void Select()
         {
-            SetupEnv();
+            XEditorUtil.SetupEnv();
             string file = EditorUtility.OpenFilePanel("Select model file", MODEL, "bytes");
             FileInfo info = new FileInfo(file);
             ProcessFile(info);
@@ -68,6 +67,7 @@ namespace XEngine.Editor
         [MenuItem("Tools/Batch")]
         public static void Batch()
         {
+            XEditorUtil.SetupEnv();
             DirectoryInfo dir = new DirectoryInfo(MODEL);
             var files = dir.GetFiles("*.bytes");
             for (int i = 0; i < files.Length; i++)
@@ -113,25 +113,30 @@ namespace XEngine.Editor
         }
 
 
-        [MenuItem("Tools/SetupEnv")]
-        private static void SetupEnv()
-        {
-            XEditorUtil.SetupEnv();
-
-        }
-
-        [MenuItem("Tools/Connect")]
+        [MenuItem("Tools/Connect", priority = 2)]
         private static void Connect()
         {
             if (connect == null)
             {
                 connect = new Connect();
-                connect.Initial(5006);
-                EditorApplication.update += connect.Receive;
+                connect.Initial(5010, 5011);
             }
         }
 
-        [MenuItem("Tools/CloseEnv")]
+        [MenuItem("Tools/Send", priority = 2)]
+        private static void Send()
+        {
+            if (connect != null)
+            {
+                connect.Send();
+            }
+            else
+            {
+                Debug.LogError("connect not initial");
+            }
+        }
+
+        [MenuItem("Tools/Close", priority = 2)]
         private static void Quit()
         {
             if (FashionPreview.preview != null)
@@ -140,7 +145,6 @@ namespace XEngine.Editor
             }
             if (connect != null)
             {
-                EditorApplication.update -= connect.Receive;
                 connect.Quit();
             }
         }

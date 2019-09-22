@@ -329,12 +329,6 @@ inline FMaterialData GetMaterialData(FFragData FragData)
 			MaterialData.Metallic = 0.01;
 			MaterialData.TangentSpaceNormal = normalTS;
 			MaterialData.WorldNormal = normalize(mul(normalTS, FragData.TangentToWorld));
-
-			#if defined(_TERRAIN_WATER)
-			{
-				TerrainMaterialData(MaterialData);
-			}
-			#endif
 		#else
 			MaterialData.Roughness = clamp(pbs.a, FLOAT(0.01), FLOAT(1));
 			#ifndef _FULL_SSS

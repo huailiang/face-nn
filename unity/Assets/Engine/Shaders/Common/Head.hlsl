@@ -127,7 +127,6 @@ struct FFragData
 	FLOAT3 WorldPosition_CamRelative;
 	FLOAT4 VertexColor;
 	FLOAT3 Ambient;	
-	// FLOAT3 VertexPointLight;
 	FLOAT3 CameraVector;//viewDIR
 	FLOAT3x3 TangentToWorld;
 	FLOAT4 VertexFog;
@@ -149,10 +148,6 @@ struct FMaterialData
 	FLOAT MetallicScale;
 	FLOAT4 SrcPbs;
 	FLOAT Roughness;	
-
-#if defined(_TERRAIN_WATER)
-	float WaterHeight;
-#endif
 
 	FLOAT3 ReflectionVector;	
 	FLOAT Metallic;

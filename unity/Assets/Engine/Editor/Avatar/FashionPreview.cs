@@ -25,7 +25,7 @@ namespace XEngine.Editor
 
         public static FashionPreview preview;
 
-        [MenuItem("Tools/Preview", priority = 1)]
+        [MenuItem("Tools/Preview", priority = 3)]
         static void AnimExportTool()
         {
             if (XEditorUtil.MakeNewScene())

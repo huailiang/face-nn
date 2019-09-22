@@ -39,12 +39,5 @@ namespace XEngine
         public static readonly int Env_HeighFogColorParameter1 = Shader.PropertyToID("_HeightFogColor1");
         public static readonly int Env_HeighFogColorParameter2 = Shader.PropertyToID("_HeightFogColor2");
 
-        public static readonly int Env_EffectParameter = Shader.PropertyToID("_EffectParameter");
-        public static readonly string Weather_WeatherKeyWord = "WEATHER_EFFECT_ON";
-        public static readonly string Weather_ThunderKeyWord = "THUNDER_ON";
-        public static readonly string Weather_RainbowKeyWord = "RAINBOW_ON";
-        public static readonly string Weather_StarKeyWord = "STAR_ON";
-        public static readonly string Weather_RainEffectKeyWord = "RAIN_EFFECT_ON";
-
     }
 }

@@ -640,7 +640,7 @@ float3 ChannelMixer(float3 c, float3 red, float3 green, float3 blue)
 
 float3 DropSaturationXColor(float3 x , float4 c)
 {
-    return lerp(Luminance(x),x,c.a)*c.rgb;
+    return lerp(Luminance(x), x, c.a) * c.rgb;
 }
 
 #endif // UNITY_POSTFX_COLOR
