@@ -4,6 +4,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEditor;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Text;
 
 namespace XEngine.Editor
 {
@@ -11,17 +14,8 @@ namespace XEngine.Editor
     {
         static Dictionary<string, GUIContent> s_GUIContentCache;
         static Dictionary<Type, AttributeDecorator> s_AttributeDecorators;
+        static IEnumerable<Type> m_AssemblyTypes;
 
-        public static bool isTargetingConsoles
-        {
-            get
-            {
-                var t = EditorUserBuildSettings.activeBuildTarget;
-                return t == BuildTarget.PS4
-                    || t == BuildTarget.XboxOne
-                    || t == BuildTarget.Switch;
-            }
-        }
 
         public static bool isTargetingMobiles
         {
@@ -31,11 +25,6 @@ namespace XEngine.Editor
                 return t == BuildTarget.Android
                     || t == BuildTarget.iOS;
             }
-        }
-
-        public static bool isTargetingConsolesOrMobiles
-        {
-            get { return isTargetingConsoles || isTargetingMobiles; }
         }
 
         static EditorUtilities()
@@ -51,17 +40,94 @@ namespace XEngine.Editor
             ReloadDecoratorTypes();
         }
 
+        public static IEnumerable<Type> GetAllAssemblyTypes()
+        {
+            if (m_AssemblyTypes == null)
+            {
+                m_AssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(t =>
+                    {
+                        return t.GetTypes();
+                    });
+            }
+            return m_AssemblyTypes;
+        }
+
+        public static T GetAttribute<T>(this Type type) where T : Attribute
+        {
+            Assert.IsTrue(type.IsDefined(typeof(T), false), "Attribute not found");
+            return (T)type.GetCustomAttributes(typeof(T), false)[0];
+        }
+
+        public static Attribute[] GetMemberAttributes<TType, TValue>(Expression<Func<TType, TValue>> expr)
+        {
+            Expression body = expr;
+
+            if (body is LambdaExpression)
+                body = ((LambdaExpression)body).Body;
+
+            switch (body.NodeType)
+            {
+                case ExpressionType.MemberAccess:
+                    var fi = (FieldInfo)((MemberExpression)body).Member;
+                    return fi.GetCustomAttributes(false).Cast<Attribute>().ToArray();
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public static string GetFieldPath<TType, TValue>(Expression<Func<TType, TValue>> expr)
+        {
+            MemberExpression me;
+            switch (expr.Body.NodeType)
+            {
+                case ExpressionType.MemberAccess:
+                    me = expr.Body as MemberExpression;
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+
+            var members = new List<string>();
+            while (me != null)
+            {
+                members.Add(me.Member.Name);
+                me = me.Expression as MemberExpression;
+            }
+
+            var sb = new StringBuilder();
+            for (int i = members.Count - 1; i >= 0; i--)
+            {
+                sb.Append(members[i]);
+                if (i > 0) sb.Append('.');
+            }
+
+            return sb.ToString();
+        }
+
+        public static object GetParentObject(string path, object obj)
+        {
+            var fields = path.Split('.');
+
+            if (fields.Length == 1)
+                return obj;
+
+            var info = obj.GetType().GetField(fields[0], BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            obj = info.GetValue(obj);
+            return GetParentObject(string.Join(".", fields, 1, fields.Length - 1), obj);
+        }
+
         static void ReloadDecoratorTypes()
         {
             s_AttributeDecorators.Clear();
-            
-            var types = RuntimeUtilities.GetAllAssemblyTypes()
+
+            var types = GetAllAssemblyTypes()
                             .Where(
                                 t => t.IsSubclassOf(typeof(AttributeDecorator))
                                   && t.IsDefined(typeof(DecoratorAttribute), false)
                                   && !t.IsAbstract
                             );
-            
+
             foreach (var type in types)
             {
                 var attr = type.GetAttribute<DecoratorAttribute>();
@@ -74,8 +140,7 @@ namespace XEngine.Editor
         {
             AttributeDecorator decorator;
             return !s_AttributeDecorators.TryGetValue(attributeType, out decorator)
-                ? null
-                : decorator;
+                ? null  : decorator;
         }
 
         public static GUIContent GetContent(string textAndTooltip)
@@ -95,7 +160,6 @@ namespace XEngine.Editor
 
                 s_GUIContentCache.Add(textAndTooltip, content);
             }
-
             return content;
         }
 
@@ -104,7 +168,7 @@ namespace XEngine.Editor
         public static void DrawSplitter()
         {
             var rect = GUILayoutUtility.GetRect(1f, 1f);
-            
+
             rect.xMin = 0f;
             rect.width += 4f;
 
@@ -186,10 +250,10 @@ namespace XEngine.Editor
                 : Styling.paneOptionsIconLight;
 
             var menuRect = new Rect(labelRect.xMax + 4f, labelRect.y + 4f, menuIcon.width, menuIcon.height);
-            
+
             backgroundRect.xMin = 0f;
             backgroundRect.width += 4f;
-            
+
             float backgroundTint = EditorGUIUtility.isProSkin ? 0.1f : 1f;
             EditorGUI.DrawRect(backgroundRect, new Color(backgroundTint, backgroundTint, backgroundTint, 0.2f));
 
@@ -210,7 +274,6 @@ namespace XEngine.Editor
             menu.AddSeparator(string.Empty);
             menu.DropDown(new Rect(position, Vector2.zero));
         }
-
 
     }
 }

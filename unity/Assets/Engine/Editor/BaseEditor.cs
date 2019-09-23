@@ -16,13 +16,13 @@ namespace XEngine.Editor
 
         protected SerializedProperty FindProperty<TValue>(Expression<Func<T, TValue>> expr)
         {
-            return serializedObject.FindProperty(RuntimeUtilities.GetFieldPath(expr));
+            return serializedObject.FindProperty(EditorUtilities.GetFieldPath(expr));
         }
 
         protected SerializedParameter FindParameter<TValue>(Expression<Func<T, TValue>> expr)
         {
-            var property = serializedObject.FindProperty(RuntimeUtilities.GetFieldPath(expr));
-            var attributes = RuntimeUtilities.GetMemberAttributes(expr);
+            var property = serializedObject.FindProperty(EditorUtilities.GetFieldPath(expr));
+            var attributes = EditorUtilities.GetMemberAttributes(expr);
             return new SerializedParameter(property, attributes);
         }
 
@@ -31,8 +31,6 @@ namespace XEngine.Editor
             var title = EditorUtilities.GetContent(property.displayName);
             PropertyField(property, title);
         }
-
-
 
         protected void PropertyField(SerializedParameter property, GUIContent title)
         {

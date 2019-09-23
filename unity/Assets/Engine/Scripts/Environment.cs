@@ -132,7 +132,10 @@ namespace XEngine
             }
             if (shadowMap != null)
             {
-                RuntimeUtilities.Destroy(shadowMap);
+                if (Application.isPlaying)
+                    UnityEngine.Object.Destroy(shadowMap);
+                else
+                    UnityEngine.Object.DestroyImmediate(shadowMap);
                 shadowMap = null;
             }
         }
