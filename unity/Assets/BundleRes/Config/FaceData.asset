@@ -4,7 +4,8 @@
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -380,11 +381,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 0
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Brow_01
   - dataIndex: 85
     name: "\u7709\u59862"
@@ -398,11 +395,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 0
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Brow_02
   - dataIndex: 88
     name: "\u7709\u59863"
@@ -416,11 +409,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 0
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Brow_03
   - dataIndex: 91
     name: "\u773C\u5F711"
@@ -434,11 +423,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 1
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Eye_01
   - dataIndex: 94
     name: "\u773C\u5F712"
@@ -452,11 +437,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 1
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Eye_02
   - dataIndex: 97
     name: "\u773C\u5F713"
@@ -470,11 +451,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 1
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Eye_03
   - dataIndex: 100
     name: "\u77B3\u82721"
@@ -488,11 +465,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 2
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Pupil_01
   - dataIndex: 103
     name: "\u77B3\u82722"
@@ -506,11 +479,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 2
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Pupil_02
   - dataIndex: 106
     name: "\u77B3\u82723"
@@ -524,11 +493,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 2
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Pupil_03
   - dataIndex: 109
     name: "\u5507\u5F691"
@@ -542,11 +507,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 3
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Mouth_01
   - dataIndex: 112
     name: "\u5507\u5F692"
@@ -560,11 +521,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 3
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Mouth_02
   - dataIndex: 115
     name: "\u5507\u5F693"
@@ -578,11 +535,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 3
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Mouth_03
   - dataIndex: 118
     name: "\u65E0"
@@ -596,11 +549,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 4
-    offset:
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
-    - {x: 0, y: 0}
+    offset: {x: 256, y: 256}
     texture: 
   - dataIndex: 118
     name: "\u9762\u7EB91"
@@ -614,11 +563,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 4
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Face_01
   - dataIndex: 121
     name: "\u9762\u7EB92"
@@ -632,11 +577,7 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 4
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Face_02
   - dataIndex: 124
     name: "\u9762\u7EB93"
@@ -650,79 +591,5 @@ MonoBehaviour:
     dummyRot: 180
     faceType: 2
     type: 4
-    offset:
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
-    - {x: 256, y: 256}
+    offset: {x: 256, y: 256}
     texture: Face_03
-  shapeData:
-  - dataIndex: 0
-    name: "\u9ED1\u6697\u5957\u7537"
-    icon: ui_faceicon_11_0_male
-    v2ID: 0
-    v2ID2: 0
-    v2Type: 3
-    properities: 
-    values: 
-    camPos: {x: 0, y: 1.04, z: -13}
-    dummyRot: 180
-    faceType: 3
-    suitID: 2
-  - dataIndex: 0
-    name: "\u91D1\u5C5E\u5957"
-    icon: ui_faceicon_11_1_male
-    v2ID: 0
-    v2ID2: 0
-    v2Type: 3
-    properities: 
-    values: 
-    camPos: {x: 0, y: 1.04, z: -13}
-    dummyRot: 180
-    faceType: 3
-    suitID: 1
-  - dataIndex: 0
-    name: "\u9ED1\u6697\u5957\u5973"
-    icon: ui_faceicon_11_2
-    v2ID: 0
-    v2ID2: 0
-    v2Type: 3
-    properities: 
-    values: 
-    camPos: {x: 0, y: 1.04, z: -13}
-    dummyRot: 180
-    faceType: 3
-    suitID: 5
-  - dataIndex: 0
-    name: "\u821E\u8005\u5957"
-    icon: ui_faceicon_11_1
-    v2ID: 0
-    v2ID2: 0
-    v2Type: 3
-    properities: 
-    values: 
-    camPos: {x: 0, y: 1.04, z: -13}
-    dummyRot: 180
-    faceType: 3
-    suitID: 11
-  - dataIndex: 0
-    name: "\u5361\u9C81\u521D\u59CB\u5957"
-    icon: ui_faceicon_11_2_male
-    v2ID: 0
-    v2ID2: 0
-    v2Type: 3
-    properities: 
-    values: 
-    camPos: {x: 0, y: 1.2, z: -15.5}
-    dummyRot: 180
-    faceType: 3
-    suitID: 6
-  shapeInfo:
-  - shape: 1
-    vinfo: {x: 0.66, y: 0.66, z: 0.66, w: 0.4}
-  - shape: 2
-    vinfo: {x: 0.66, y: 0.66, z: 0.66, w: 0.4}
-  - shape: 4
-    vinfo: {x: 1, y: 1, z: 1, w: 0}
-  - shape: 3
-    vinfo: {x: 1, y: 1, z: 1, w: 0}

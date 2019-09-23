@@ -70,9 +70,7 @@ namespace XEngine.Editor
                 GUIFacePart<HeadData>("脸型", 0, ref faceData.headData);
                 GUIFacePart<SenseData>("五官", 1, ref faceData.senseData);
                 GUIFacePart<PaintData>("妆容", 2, ref faceData.paintData);
-                GUIFacePart<ShapeData>("时装", 3, ref faceData.shapeData);
-
-                GUIShapeInfo();
+                
                 GUILayout.Space(5);
                 if (GUILayout.Button("Save", GUILayout.MaxWidth(100)))
                 {
@@ -124,14 +122,6 @@ namespace XEngine.Editor
                             {
                                 PaintData data = (t[i] as PaintData);
                                 data.type = (PaintSubType)EditorGUILayout.EnumPopup("sub type:", data.type);
-                            }
-                            else if (typeof(T) == typeof(ShapeData))
-                            {
-                                ShapeData data = (t[i] as ShapeData);
-                                data.suitID = (uint)EditorGUILayout.IntField("suitid:", (int)data.suitID);
-                                var row = XFashionLibrary.GetFashionsInfo(data.suitID);
-                                if (row != null) data.name = row.name;
-                                if (data.suitID == 0) EditorGUILayout.HelpBox("suit id can't be 0", MessageType.Error);
                             }
                             GUIFaceBase(t[i], indx, i);
                             EditorGUILayout.BeginHorizontal();
@@ -197,55 +187,54 @@ namespace XEngine.Editor
             }
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
-            if (!(data is ShapeData))
+
+            GUILayout.BeginHorizontal();
+            bool v2add = false;
+            if (data.v2Type == FaceV2Type.None) v2add = GUILayout.Button("AddV2Item", XEditorUtil.boldButtonStyle);
+            if (GUILayout.Button("AddV1Item", XEditorUtil.boldButtonStyle))
             {
-                GUILayout.BeginHorizontal();
-                bool v2add = false;
-                if (data.v2Type == FaceV2Type.None) v2add = GUILayout.Button("AddV2Item", XEditorUtil.boldButtonStyle);
-                if (GUILayout.Button("AddV1Item", XEditorUtil.boldButtonStyle))
+                if (data.properities == null || data.properities.Length < maxv1)
                 {
-                    if (data.properities == null || data.properities.Length < maxv1)
-                    {
-                        Add<int>(ref data.properities, data is PaintData ? (maxid + 1) : 1);
-                        Add<FaceValueType>(ref data.values, FaceValueType.BigSmall);
-                    }
-                    else
-                    {
-                        EditorUtility.DisplayDialog("Warn", "You add item too much!", "OK");
-                    }
+                    Add<int>(ref data.properities, data is PaintData ? (maxid + 1) : 1);
+                    Add<FaceValueType>(ref data.values, FaceValueType.BigSmall);
                 }
-                GUILayout.EndHorizontal();
-                if (v2add) data.v2Type = FaceV2Type.Position;
-                if (data.v2Type != FaceV2Type.None)
+                else
                 {
-                    data.v2Type = (FaceV2Type)EditorGUILayout.EnumPopup("v2Type", data.v2Type);
-                    data.v2ID = EditorGUILayout.IntField("v2ID1: ", data.v2ID);
-                    data.v2ID2 = EditorGUILayout.IntField("v2ID2: ", data.v2ID2);
-                }
-                if (data.values != null)
-                {
-                    for (int i = data.values.Length - 1; i >= 0; i--)
-                    {
-                        if (data.values[i] == FaceValueType.None)
-                        {
-                            data.properities = Remv<int>(data.properities, i);
-                            data.values = Remv<FaceValueType>(data.values, i);
-                        }
-                    }
-                    if (data.properities.Length > data.values.Length)
-                    {
-                        for (int i = data.values.Length; i < data.properities.Length; i++)
-                        {
-                            data.properities = Remv<int>(data.properities, i);
-                        }
-                    }
-                    for (int i = 0; i < data.properities.Length; i++)
-                    {
-                        GUIItem(ref data.values[i], ref data.properities[i]);
-                    }
-                    if (data is PaintData) GUIPaintItem(data, ix);
+                    EditorUtility.DisplayDialog("Warn", "You add item too much!", "OK");
                 }
             }
+            GUILayout.EndHorizontal();
+            if (v2add) data.v2Type = FaceV2Type.Position;
+            if (data.v2Type != FaceV2Type.None)
+            {
+                data.v2Type = (FaceV2Type)EditorGUILayout.EnumPopup("v2Type", data.v2Type);
+                data.v2ID = EditorGUILayout.IntField("v2ID1: ", data.v2ID);
+                data.v2ID2 = EditorGUILayout.IntField("v2ID2: ", data.v2ID2);
+            }
+            if (data.values != null)
+            {
+                for (int i = data.values.Length - 1; i >= 0; i--)
+                {
+                    if (data.values[i] == FaceValueType.None)
+                    {
+                        data.properities = Remv<int>(data.properities, i);
+                        data.values = Remv<FaceValueType>(data.values, i);
+                    }
+                }
+                if (data.properities.Length > data.values.Length)
+                {
+                    for (int i = data.values.Length; i < data.properities.Length; i++)
+                    {
+                        data.properities = Remv<int>(data.properities, i);
+                    }
+                }
+                for (int i = 0; i < data.properities.Length; i++)
+                {
+                    GUIItem(ref data.values[i], ref data.properities[i]);
+                }
+                if (data is PaintData) GUIPaintItem(data, ix);
+            }
+
             data.camPos = EditorGUILayout.Vector3Field("camera pos", data.camPos);
             data.dummyRot = EditorGUILayout.FloatField("player rot", data.dummyRot);
             EditorGUILayout.Space();
@@ -273,15 +262,8 @@ namespace XEngine.Editor
         {
             PaintData pdata = data as PaintData;
             EditorGUILayout.Space();
-            if (pdata.offset == null || pdata.offset.Length != 4) pdata.offset = new Vector2[4];
-            pdata.offset[0] = EditorGUILayout.Vector2Field("offset_tall  ", pdata.offset[0]);
-            pdata.offset[1] = EditorGUILayout.Vector2Field("offset_giant ", pdata.offset[1]);
-            pdata.offset[2] = EditorGUILayout.Vector2Field("offset_male  ", pdata.offset[2]);
-            pdata.offset[3] = EditorGUILayout.Vector2Field("offset_female", pdata.offset[3]);
-            if (pdata.offset[0] == Vector2.zero) pdata.offset[0] = 256 * Vector2.one;
-            if (pdata.offset[1] == Vector2.zero) pdata.offset[1] = 256 * Vector2.one;
-            if (pdata.offset[2] == Vector2.zero) pdata.offset[2] = 256 * Vector2.one;
-            if (pdata.offset[3] == Vector2.zero) pdata.offset[3] = 256 * Vector2.one;
+            pdata.offset = EditorGUILayout.Vector2Field("offset  ", pdata.offset);
+            if (pdata.offset == Vector2.zero) pdata.offset = 256 * Vector2.one;
             GUILayout.BeginHorizontal();
             GUILayout.Label("texture");
 
@@ -303,35 +285,7 @@ namespace XEngine.Editor
             }
             GUILayout.EndHorizontal();
         }
-
-
-        private void GUIShapeInfo()
-        {
-            folder[4] = EditorGUILayout.Foldout(folder[4], "体型", XEditorUtil.folderStyle);
-            if (folder[4])
-            {
-                GUILayout.BeginHorizontal();
-                EditorGUILayout.Space();
-                if (GUILayout.Button("Add"))
-                {
-                    Add<ShapeInfo>(ref faceData.shapeInfo, new ShapeInfo() { shape = RoleShape.FEMALE });
-                }
-                GUILayout.EndHorizontal();
-                if (faceData.shapeInfo != null)
-                {
-                    for (int i = 0; i < faceData.shapeInfo.Length; i++)
-                    {
-                        int indx = 4 * max + i;
-                        bsub[indx] = EditorGUILayout.Foldout(bsub[indx], i + "_" + faceData.shapeInfo[i].shape);
-                        if (bsub[indx])
-                        {
-                            faceData.shapeInfo[i].shape = (RoleShape)EditorGUILayout.EnumPopup("shape", faceData.shapeInfo[i].shape);
-                            faceData.shapeInfo[i].vinfo = EditorGUILayout.Vector4Field("info", faceData.shapeInfo[i].vinfo);
-                        }
-                    }
-                }
-            }
-        }
+        
 
         private void Add<T>(ref T[] arr, T item)
         {
