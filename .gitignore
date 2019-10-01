@@ -13,6 +13,7 @@ neural/input/
 neural/output/
 neural/models/
 neural/venv/
+neural/*.dat
 export/
 *.DS_Store
 *Animation.meta
