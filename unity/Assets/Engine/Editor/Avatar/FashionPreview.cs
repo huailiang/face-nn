@@ -45,6 +45,7 @@ namespace XEngine.Editor
             OnEnable();
             this.shape = data.shape;
             CreateAvatar();
+            suit_select = UnityEngine.Random.Range(0, fashionInfo.Length - 1);
             DrawSuit();
             Update();
             bone.NeuralProcess(data.boneArgs);

@@ -53,8 +53,8 @@ namespace XEngine.Editor
         }
 
 
-        [MenuItem("Tools/Select")]
-        public static void Select()
+        [MenuItem("Tools/SelectModel2Image")]
+        public static void Model2Image()
         {
             XEditorUtil.SetupEnv();
             string file = EditorUtility.OpenFilePanel("Select model file", MODEL, "bytes");
@@ -64,8 +64,8 @@ namespace XEngine.Editor
         }
 
 
-        [MenuItem("Tools/Batch")]
-        public static void Batch()
+        [MenuItem("Tools/BatchExportModels")]
+        public static void BatchModels()
         {
             XEditorUtil.SetupEnv();
             DirectoryInfo dir = new DirectoryInfo(MODEL);
@@ -74,8 +74,62 @@ namespace XEngine.Editor
             {
                 ProcessFile(files[i]);
             }
-            HelperEditor.Open(EXPORT);
+            MoveDestDir("model_*", "regular/");
         }
+
+        [MenuItem("Tools/GenerateDatabase")]
+        private static void RandomExportModels()
+        {
+            XEditorUtil.SetupEnv();
+            float[] args = new float[CNT];
+            int expc = 800;
+            FileStream fs = new FileStream(EXPORT + "db_description", FileMode.OpenOrCreate, FileAccess.Write);
+            BinaryWriter bw = new BinaryWriter(fs);
+            for (int j = 0; j < expc; j++)
+            {
+                int shape = UnityEngine.Random.Range(3, 5);
+                string name = string.Format("db_{0:000}_{1}", j, shape);
+                bw.Write(name);
+                for (int i = 0; i < CNT; i++)
+                {
+                    args[i] = UnityEngine.Random.Range(0.0f, 1.0f);
+                    bw.Write(args[i]);
+                }
+                NeuralData data = new NeuralData
+                {
+                    callback = Capture,
+                    boneArgs = args,
+                    shape = (RoleShape)shape,
+                    name = name
+                };
+                EditorUtility.DisplayProgressBar("database", string.Format("is generating {0}/{1}", j, expc), (float)j / expc);
+                NeuralInput(data);
+            }
+            EditorUtility.DisplayProgressBar("database", "post processing, wait for a moment", 1);
+            bw.Close();
+            fs.Close();
+            MoveDestDir("db_*", "database/");
+            EditorUtility.ClearProgressBar();
+        }
+
+
+        private static void MoveDestDir(string pattern, string sub)
+        {
+            var path = EXPORT + sub;
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+            Directory.CreateDirectory(path);
+            DirectoryInfo dir = new DirectoryInfo(EXPORT);
+            var files = dir.GetFiles(pattern);
+            for (int i = 0; i < files.Length; i++)
+            {
+                files[i].MoveTo(path + files[i].Name);
+            }
+            HelperEditor.Open(path);
+        }
+
 
 
         private static void ProcessFile(FileInfo info)
@@ -96,7 +150,7 @@ namespace XEngine.Editor
                     callback = Capture,
                     boneArgs = args,
                     shape = shape,
-                    name = info.Name.Replace(".bytes", "")
+                    name = "model_" + info.Name.Replace(".bytes", "")
                 };
                 NeuralInput(data);
                 br.Close();
