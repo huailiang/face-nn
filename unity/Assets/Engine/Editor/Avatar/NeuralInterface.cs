@@ -82,7 +82,7 @@ namespace XEngine.Editor
         {
             XEditorUtil.SetupEnv();
             float[] args = new float[CNT];
-            int expc = 800;
+            int expc = 2000;
             FileStream fs = new FileStream(EXPORT + "db_description", FileMode.OpenOrCreate, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
             for (int j = 0; j < expc; j++)
