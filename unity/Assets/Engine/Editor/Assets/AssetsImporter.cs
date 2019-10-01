@@ -5,7 +5,7 @@ namespace XEngine.Editor
 {
     public class AssetsImporter : AssetPostprocessor
     {
-        public static bool skipAutoImport = false;
+
         public void OnPreprocessModel()
         {
             if (!assetPath.ToLower().Contains("/test"))
@@ -19,18 +19,9 @@ namespace XEngine.Editor
             }
         }
 
+
         public void OnPreprocessAsset()
         {
-            if (!assetPath.ToLower().Contains("/test"))
-            {
-                if (!skipAutoImport)
-                {
-                    if (assetPath.EndsWith(AssetsConfig.GlobalAssetsConfig.ReadableMeshSuffix))
-                    {
-                        MeshAssets.MakeMakeReadable(assetPath);
-                    }
-                }
-            }
         }
 
         static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)

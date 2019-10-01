@@ -253,36 +253,6 @@ namespace XEngine
             }
         }
 
-        public static string GetReplaceStr(string str, string repalceStr = ".")
-        {
-            str = str.Replace(",", repalceStr);
-            str = str.Replace("٫", repalceStr);
-            return str;
-        }
-
-
-        public static int GetSize(this SpriteSize size)
-        {
-            int powerof2 = (int)size;
-            return 1 << powerof2;
-        }
-
-        public static bool HasFlag(uint flag, TexFlag f)
-        {
-            return (flag & (uint)f) != 0;
-        }
-
-        public static void SetFlag(ref uint flag, TexFlag f, bool add)
-        {
-            if (add)
-            {
-                flag |= (uint)f;
-            }
-            else
-            {
-                flag &= ~((uint)f);
-            }
-        }
 
     }
 }

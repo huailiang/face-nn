@@ -10,13 +10,7 @@ namespace XEngine.Editor
     {
 
         internal delegate void EnumAssetPreprocessCallback(string path);
-
-        internal delegate bool EnumAssetImportCallback<T, I>(T obj, I assetImporter, string path)
-        where T : UnityEngine.Object where I : UnityEditor.AssetImporter;
-
-        internal delegate void EnumAssetCallback<T>(T obj, string path)
-        where T : UnityEngine.Object;
-
+        
         internal class ObjectInfo
         {
             public UnityEngine.Object obj = null;
@@ -31,6 +25,7 @@ namespace XEngine.Editor
             bool Process(UnityEngine.Object asset, string path);
             void PostProcess(string path);
         }
+
         internal class BaseAssetLoadCallback<T> where T : UnityEngine.Object
         {
             public bool is_verbose = true;
@@ -86,7 +81,6 @@ namespace XEngine.Editor
                     files = di.GetFiles(extFilter2, SearchOption.AllDirectories);
                     GetObjectsInfolder(files);
                 }
-
             }
 
             private void GetObjectsInfolder(UnityEditor.DefaultAsset folder)
@@ -182,19 +176,9 @@ namespace XEngine.Editor
 
             public virtual void PostProcess(string path) { }
         }
-
-        internal delegate bool EnumFbxCallback<GameObject, ModelImporter>(GameObject fbx, ModelImporter modelImporter, string path);
-        internal delegate bool EnumTex2DCallback<Texture2D, TextureImporter>(Texture2D tex, TextureImporter textureImporter, string path);
-
-        internal static AssetLoadCallback<GameObject, ModelImporter> enumFbx = new AssetLoadCallback<GameObject, ModelImporter>("*.fbx");
-        internal static AssetLoadCallback<Texture2D, TextureImporter> enumTex2D = new AssetLoadCallback<Texture2D, TextureImporter>("*.png", "*.tga", "*.exr");
-
-        internal static AssetLoadCallback<GameObject> enumPrefab = new AssetLoadCallback<GameObject>("*.prefab");
-        internal static AssetLoadCallback<TextAsset> enumTxt = new AssetLoadCallback<TextAsset>("*.bytes", "*.txt");
+        
         internal static AssetLoadCallback<Material> enumMat = new AssetLoadCallback<Material>("*.mat");
         internal static AssetLoadCallback<Mesh> enumMesh = new AssetLoadCallback<Mesh>("*.asset");
-        internal static AssetLoadCallback<AnimationClip> enumAnimationClip = new AssetLoadCallback<AnimationClip>("*.anim");
-        internal static AssetLoadCallback<SceneAsset> enumSceneAsset = new AssetLoadCallback<SceneAsset>("*.unity");
         internal static void EnumAsset<T>(IAssetLoadCallback cb, string title, string dir = "") where T : UnityEngine.Object
         {
             if (cb != null)
@@ -226,24 +210,6 @@ namespace XEngine.Editor
             }
         }
 
-        internal static void EnumScript(IAssetLoadCallback cb, string title, string dir = "")
-        {
-            UnityEngine.Object[] objs = Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets);
-            foreach (UnityEngine.Object obj in objs)
-            {
-                Debug.LogError(obj.name);
-            }
-        }
-        private static bool multiSave = false;
-        public static void MultiSave(bool enable)
-        {
-            multiSave = enable;
-            if (!multiSave)
-            {
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-            }
-        }
         internal static T CreateAsset<T>(string path, string ext, UnityEngine.Object asset) where T : UnityEngine.Object
         {
             if (asset == null)
@@ -313,18 +279,13 @@ namespace XEngine.Editor
                     AssetDatabase.CreateAsset(asset, assetPath);
                     existingAsset = (T)asset;
                 }
-                if (!multiSave)
+                if (existingAsset is ScriptableObject)
                 {
-                    if (existingAsset is ScriptableObject)
-                    {
-                        EditorUtility.SetDirty(existingAsset);
-                    }
-                    AssetDatabase.SaveAssets();
-                    AssetDatabase.Refresh();
+                    EditorUtility.SetDirty(existingAsset);
                 }
-
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
             }
-
             return existingAsset;
         }
 
@@ -335,7 +296,6 @@ namespace XEngine.Editor
 
         internal static void DeleteAsset(UnityEngine.Object asset)
         {
-
             if (asset == null)
                 return;
 
@@ -382,8 +342,7 @@ namespace XEngine.Editor
                 smr.skinnedMotionVectors = false;
             }
         }
-
-
+        
         internal static SerializedProperty GetSerializeProperty(UnityEngine.Object obj, string name)
         {
             SerializedObject so = new SerializedObject(obj);
@@ -431,23 +390,6 @@ namespace XEngine.Editor
                 EditorUtility.SetDirty(obj);
                 AssetDatabase.SaveAssets();
             }
-        }
-
-        internal static bool IsSameProperty(Color color0, Color color1)
-        {
-            int deltaR = (int)(color0.r * 10) - (int)(color1.r * 10);
-            int deltaG = (int)(color0.g * 10) - (int)(color1.g * 10);
-            int deltaB = (int)(color0.b * 10) - (int)(color1.b * 10);
-            int deltaA = (int)(color0.a * 10) - (int)(color1.a * 10);
-            return deltaR == 0 && deltaG == 0 && deltaB == 0 && deltaA == 0;
-        }
-        internal static bool IsSameProperty(Vector4 vector0, Vector4 vector1)
-        {
-            int deltaX = (int)(vector0.x * 10) - (int)(vector1.x * 10);
-            int deltaY = (int)(vector0.y * 10) - (int)(vector1.y * 10);
-            int deltaZ = (int)(vector0.z * 10) - (int)(vector1.z * 10);
-            int deltaW = (int)(vector0.w * 10) - (int)(vector1.w * 10);
-            return deltaX == 0 && deltaY == 0 && deltaZ == 0 && deltaW == 0;
         }
 
     }

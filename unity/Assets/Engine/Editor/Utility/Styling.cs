@@ -16,6 +16,21 @@ namespace XEngine.Editor
 
         public static readonly GUIStyle preLabel;
 
+        static Texture2D m_TransparentTexture;
+        public static Texture2D transparentTexture
+        {
+            get
+            {
+                if (m_TransparentTexture == null)
+                {
+                    m_TransparentTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false);
+                    m_TransparentTexture.SetPixel(0, 0, Color.clear);
+                    m_TransparentTexture.Apply();
+                }
+                return m_TransparentTexture;
+            }
+        }
+
         static Styling()
         {
             smallTickbox = new GUIStyle("ShurikenCheckMark");
@@ -23,13 +38,13 @@ namespace XEngine.Editor
             miniLabelButton = new GUIStyle(EditorStyles.miniLabel);
             miniLabelButton.normal = new GUIStyleState
             {
-                background = RuntimeUtilities.transparentTexture,
+                background = transparentTexture,
                 scaledBackgrounds = null,
                 textColor = Color.grey
             };
             var activeState = new GUIStyleState
             {
-                background = RuntimeUtilities.transparentTexture,
+                background = transparentTexture,
                 scaledBackgrounds = null,
                 textColor = Color.white
             };

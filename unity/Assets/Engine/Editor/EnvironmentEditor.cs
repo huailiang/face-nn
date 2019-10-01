@@ -191,7 +191,6 @@ namespace XEngine.Editor
                     r.width = size;
                     r.height = size;
                     EditorGUI.DrawPreviewTexture(r, env.shadowMap);
-
                 }
                 EditorGUILayout.PropertyField(shadowBound);
                 EditorGUILayout.PropertyField(lookTarget);
@@ -251,7 +250,6 @@ namespace XEngine.Editor
             {
                 Undo.RecordObject(target, "lightSP" + name);
             }
-
             Light light = lightSP.objectReferenceValue as Light;
             if (light != null)
             {

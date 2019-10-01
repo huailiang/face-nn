@@ -14,7 +14,6 @@ namespace XEngine
         public static readonly int Env_Cubemap = Shader.PropertyToID("_EnvCubemap");
         public static readonly int Env_CubemapParam = Shader.PropertyToID("_EnvCubemapParam");
         public static readonly int Env_LightmapScale = Shader.PropertyToID("_LightmapScale");
-
         //Lighting
         public static readonly int Env_DirectionalLightDir = Shader.PropertyToID("_DirectionalLightDir0");
         public static readonly int Env_DirectionalLightDir1 = Shader.PropertyToID("_DirectionalLightDir1");

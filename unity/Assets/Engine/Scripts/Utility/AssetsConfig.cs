@@ -158,11 +158,6 @@ namespace XEngine
         And,
         Nor,
     }
-    public enum TexFlag
-    {
-        None,
-        IgnoreImport = 0x00000001
-    }
 
     [System.Serializable]
     public class TexCompressFilter

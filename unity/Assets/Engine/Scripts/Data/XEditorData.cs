@@ -6,6 +6,16 @@ using UnityEngine;
 
 namespace XEngine.Editor
 {
+    public class XTableReader
+    {
+        public static bool ReadFile(string location, CVSReader reader)
+        {
+            CVSReader.Init();
+            XBinaryReader.Init();
+            XInterfaceMgr.singleton.AttachInterface<IResourceHelp>(XCommon.singleton.XHash("XResourceHelper"), XResources.singleton);
+            return XResourceLoaderMgr.singleton.ReadFile(location, reader);
+        }
+    }
 
     public class XFashionLibrary
     {
@@ -19,8 +29,7 @@ namespace XEngine.Editor
             XTableReader.ReadFile(@"Table/FashionList", _list);
             XTableReader.ReadFile(@"Table/Profession", _profession);
         }
-
-
+        
         public static FashionSuit.RowData[] FashionsInfo
         {
             get { return _suit.Table; }
@@ -167,8 +176,7 @@ namespace XEngine.Editor
             }
             return null;
         }
-
-
+        
 
         public static GameObject GetDummy(uint presentid)
         {
