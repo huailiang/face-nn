@@ -26,8 +26,8 @@ class Face(object):
         self.sess = sess
         self.param_cnt = 95
         lit = random_params(self.param_cnt)
-        tens = param_2_tensor(lit)
-        print("tensor", tens.shape, tens)
+        # tens = param_2_tensor(lit)
+        # print("tensor", tens.shape, tens)
         array = param_2_arr(lit)
         print("np", array.shape, array)
         self.input_params = array
@@ -42,7 +42,8 @@ class Face(object):
         feed = {
             self.input_x: self.input_params
         }
-        self.sess.run(self.imitator, feed_dict=feed)
+        t = self.sess.run(self.imitator, feed_dict=feed)
+        print(t.shape)
 
 
 class Artgan(object):
