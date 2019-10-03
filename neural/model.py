@@ -19,6 +19,32 @@ import prepare_dataset
 import img_augm
 
 
+class Face(object):
+    def __init__(self, sess, args):
+        self.model_name = args.model_name
+        self.batch_size = args.batch_size
+        self.sess = sess
+        self.param_cnt = 95
+        lit = random_params(self.param_cnt)
+        tens = param_2_tensor(lit)
+        print("tensor", tens.shape, tens)
+        array = param_2_arr(lit)
+        print("np", array.shape, array)
+        self.input_params = array
+        with tf.name_scope('placeholder'):
+            self.input_x = tf.placeholder(
+                dtype=tf.float32, shape=[self.batch_size, None, None, self.param_cnt], name="params"
+            )
+        self.imitator = imitator(self.input_x, 4)
+        self.sess.run(tf.global_variables_initializer())
+
+    def train(self, args):
+        feed = {
+            self.input_x: self.input_params
+        }
+        self.sess.run(self.imitator, feed_dict=feed)
+
+
 class Artgan(object):
     def __init__(self, sess, args):
         self.model_name = args.model_name

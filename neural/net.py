@@ -1,18 +1,13 @@
 import atexit
-import io
-import json
-import os
 import socket
-import traceback
-import struct
-import time
 import logging
 logger = logging.getLogger("nn-face")
 
 
-
 class Net(object):
-    """docstring for Net"""
+    """
+    采用udp通信
+    """
     def __init__(self, port1, port2):
         atexit.register(self.close)
         self._port1 = port1
@@ -46,8 +41,7 @@ class Net(object):
             self._open_send = False
             raise
 
-
-    def sendRcv(self, msg):
+    def send_recv(self, msg):
         try:
             msg = "rcv"+msg
             self._snd_socket.sendto(msg.encode('utf-8'), self._bind2)
@@ -57,14 +51,18 @@ class Net(object):
             logger.error(e.message)
             raise 
 
-    def onlySend(self, msg):
+    def only_send(self, msg):
+        """
+        只发送 不接收
+        :param msg:
+        :return:
+        """
         try:
             self._snd_socket.sendto(msg.encode('utf-8'), self._bind2)
             print("send success")
         except Exception as e:
             logger.error(e.message)
             raise
-
 
     def recv(self):
         try:
@@ -74,7 +72,6 @@ class Net(object):
         except Exception as e:
             logger.error(e.message)
             raise
-    
 
     def close(self):
         print("socket close")

@@ -2,11 +2,38 @@ from __future__ import division
 import math
 import scipy.misc
 from scipy.ndimage.filters import gaussian_filter
-
+import tensorflow as tf
 import numpy as np
 from ops import *
 import random
 import copy
+
+
+def random_params(cnt):
+    params = []
+    for i in range(cnt):
+        params.append(random.randint(0, 1000) / 1000.0)
+    return params
+
+
+def param_2_arr(params):
+    cnt = len(params)
+    array = np.array(params)
+    array = array.reshape([1, 1, 1, cnt])
+    print (array.shape)
+    return array
+
+
+def param_2_tensor(params):
+    """
+    engine params convert to tensor
+    :param params: array with 95 elements
+    :return: tensor (batch, w, h, len)
+    """
+    tensor = tf.constant(params)
+    cnt = len(params)
+    tensor = tf.reshape(tensor, [cnt])
+    return tensor
 
 
 def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, output_photo_batch, filepath):
