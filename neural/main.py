@@ -7,7 +7,7 @@ import tensorflow as tf
 from parse import parser
 from model import Artgan, Face
 # from net import Net
-from prepare_dataset import FaceDataset
+
 
 import logging
 logger = logging.getLogger("nn-face")
@@ -17,14 +17,11 @@ tf.set_random_seed(228)
 
 def main(_):
     args = parser.parse_args()
-    dataset = FaceDataset(args)
-    dataset.get_batch(1)
-    # print (args.path_to_art_dataset)
-    # with tf.Session() as sess:
-    #     model = Face(sess, args)
-    #     if args.phase == "train":
-    #         model.train(args)
-    #         print ('train mode')
+    with tf.Session() as sess:
+        model = Face(sess, args)
+        if args.phase == "train":
+            model.train(args)
+            print ('train mode')
 
 
     # net = Net(5010, 5011)

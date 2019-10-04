@@ -114,6 +114,9 @@ class CocoDataset():
 
 
 class FaceDataset:
+    """
+    由Unity引擎生成的dataset
+    """
     def __init__(self, args):
         self.dataset = {}
         self.path_to_dataset = args.path_to_dataset
@@ -125,8 +128,7 @@ class FaceDataset:
             print(path)
             f = open(path, "rb")
             for it in range(cnt):
-                kk = f.read(9)
-                kk = kk[1:]  # 第一个是c#字符串的长度
+                kk = f.read(9)[1:]  # 第一个是c#字符串的长度
                 k = struct.unpack("8s", kk)[0]
                 v = []
                 for i in range(args.params_cnt):
@@ -150,6 +152,6 @@ class FaceDataset:
             name = key + ".jpg"
             path = os.path.join(self.path_to_dataset, name)
             image = scipy.misc.imread(name=path, mode='RGB')
-            print("info: ", key, len(val), path, image.shape)
+            # print("info: ", key, len(val), path, image.shape)
             batch_rst[key] = (val, image)
             return batch_rst

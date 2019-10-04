@@ -20,7 +20,6 @@ def param_2_arr(params):
     cnt = len(params)
     array = np.array(params)
     array = array.reshape([1, 1, 1, cnt])
-    print (array.shape)
     return array
 
 

@@ -10,6 +10,7 @@
 4. dlib-19.18
 5. numpy-1.15.4
 6. opencv-contrib-python 3.4.0.12
+7. tqdm-4.23.4
 ```
 
 

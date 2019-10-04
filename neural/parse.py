@@ -39,6 +39,11 @@ parser.add_argument(
     dest='phase',
     default='train',
     help='Specify current phase: train or inference.')
+parser.add_argument(
+    '--model_name',
+    dest='model_name',
+    default='imitator',
+    help='model named imitator')
 
 # ========================= TRAINING PARAMETERS ========================= #
 
