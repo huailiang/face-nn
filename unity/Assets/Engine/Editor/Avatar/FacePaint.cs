@@ -39,7 +39,7 @@ namespace XEngine.Editor
         GameObject helmet;
         Camera camera;
         Vector3 cam1 = new Vector3(0, 1.0f, -10.0f);
-        Vector3 cam2 = new Vector3(0, 1.7f, -8.8f);
+        Vector3 cam2 = new Vector3(0, 1.72f, -8.8f);
         bool focusFace;
 
         public FacePaint(FaceData dt)
@@ -203,7 +203,7 @@ namespace XEngine.Editor
             {
                 helmet.SetActive(!focusFace);
                 camera.transform.position = focusFace ? cam2 : cam1;
-                camera.fieldOfView = focusFace ? 30 : 60;
+                camera.fieldOfView = focusFace ? 21 : 60;
             }
         }
 

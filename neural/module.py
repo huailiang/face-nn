@@ -8,7 +8,19 @@ from ops import *
 
 
 def imitator(x, options, reuse=True, name="imitator"):
+    """
+    这里建立八层imitator网络， 用来拟合引擎生成mesh的过程
+    由于引擎中捏脸使用的参数跟论文《逆水寒》引擎中使用的参数不相同，所以每一个layer的depth不一样
+    :param x: 捏脸参数
+    :param options:
+    :return:
+    """
     with tf.variable_scope(name):
+        if reuse:
+            tf.get_variable_scope().reuse_variables()
+        else:
+            print("encoder reuse", tf.get_variable_scope().reuse)
+            assert tf.get_variable_scope().reuse is False
         y1 = tf.pad(x, [[0, 0], [1, 2], [1, 2], [0, 0]], "CONSTANT")  # (1, 4, 4, 95)
         y1 = tf.nn.relu(instance_norm(conv2d(y1, 64, 4, 1, name='i_e1_c'), name='i_e1_bn'))  # (1,4,4,64)
         y2 = tf.pad(y1, [[0, 0], [2, 2], [2, 2], [0, 0]], "REFLECT")  # (1, 8, 8, 64)
