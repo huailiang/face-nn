@@ -23,18 +23,6 @@ def param_2_arr(params):
     return array
 
 
-def param_2_tensor(params):
-    """
-    engine params convert to tensor
-    :param params: array with 95 elements
-    :return: tensor (batch, w, h, len)
-    """
-    tensor = tf.constant(params)
-    cnt = len(params)
-    tensor = tf.reshape(tensor, [cnt])
-    return tensor
-
-
 def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, output_photo_batch, filepath):
     """
     Concatenates, processes and stores batches as image 'filepath'.

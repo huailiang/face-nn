@@ -283,7 +283,6 @@ class Artgan(object):
                                         args=(q_content, augmentor, self.batch_size, i))
             p.start()
             jobs.append(p)
-
             p = multiprocessing.Process(target=art_dataset.initialize_batch_worker,
                                         args=(q_art, augmentor, self.batch_size, i))
             p.start()
@@ -322,18 +321,16 @@ class Artgan(object):
                 _, summary_all, gener_acc_ = self.sess.run([self.g_optim_step, self.summary_merged_all, self.gener_acc],
                                                            feed_dict={self.input_painting: normalize_arr_of_imgs(
                                                                batch_art['image']),
-                                                                      self.input_photo: normalize_arr_of_imgs(
-                                                                          batch_content['image']),
-                                                                      self.lr: self.options.lr})
+                                                               self.input_photo: normalize_arr_of_imgs(
+                                                                   batch_content['image']), self.lr: self.options.lr})
                 discr_success = discr_success * (1. - alpha) + alpha * (1. - gener_acc_)
             else:
                 # Train discriminator.
                 _, summary_all, discr_acc_ = self.sess.run([self.d_optim_step, self.summary_merged_all, self.discr_acc],
                                                            feed_dict={self.input_painting: normalize_arr_of_imgs(
                                                                batch_art['image']),
-                                                                      self.input_photo: normalize_arr_of_imgs(
-                                                                          batch_content['image']),
-                                                                      self.lr: self.options.lr})
+                                                               self.input_photo: normalize_arr_of_imgs(
+                                                                   batch_content['image']), self.lr: self.options.lr})
                 discr_success = discr_success * (1. - alpha) + alpha * discr_acc_
 
             self.writer.add_summary(summary_all, step * self.batch_size)
@@ -501,21 +498,9 @@ class Artgan(object):
             e_list = self.sess.run(self.input_photo_features, feed_dict={self.input_photo: normalize_arr_of_imgs(img)})
             export_layer(e_list[1], "encoder_c1")
             export_layer(e_list[2], "encoder_c2")
-            export_layer(e_list[3], "encoder_c3")
-            export_layer(e_list[4], "encoder_c4")
-            export_layer(e_list[0], "encoder_c5")
             d_list = self.sess.run(self.output_photo, feed_dict={self.input_photo: normalize_arr_of_imgs(img)})
             export_layer(d_list[1], "decoder_d1")
             export_layer(d_list[2], "decoder_d2")
-            export_layer(d_list[3], "decoder_d3")
-            export_layer(d_list[3], "decoder_d4")
-            export_layer(d_list[5], "decoder_y1")
-            export_layer(d_list[6], "decoder_y2")
-            export_layer(d_list[7], "decoder_y3")
-
-    def export_arg(self, cpkt):
-        checkpoint_pth = os.path.join(self.checkpoint_long_dir, cpkt)
-        export_args(checkpoint_pth)
 
     def save(self, step, is_long=False):
         if not os.path.exists(self.checkpoint_dir):

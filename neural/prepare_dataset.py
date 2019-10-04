@@ -12,7 +12,7 @@ import random
 import struct
 
 
-class ArtDataset():
+class ArtDataset:
     def __init__(self, path_to_art_dataset):
 
         self.dataset = [os.path.join(path_to_art_dataset, x) for x in os.listdir(path_to_art_dataset)]
@@ -61,7 +61,7 @@ class ArtDataset():
             queue.put(batch)
 
 
-class CocoDataset():
+class CocoDataset:
 
     def __init__(self, path_to_dataset):
         self.dataset = []
