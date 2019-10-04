@@ -51,6 +51,7 @@ class Face(object):
             print(key, len(val), t.shape)
 
 
+
 class Artgan(object):
     def __init__(self, sess, args):
         self.model_name = args.model_name

@@ -1,15 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Author: penghuailiang
+# @Date  : 2019-10-04
+
 from __future__ import division
 import math
 import scipy.misc
-from scipy.ndimage.filters import gaussian_filter
-import tensorflow as tf
+import torch
 import numpy as np
 from ops import *
 import random
-import copy
+from lightcnn.extract_features import *
 
 
 def random_params(cnt):
+    """
+    随机生成捏脸参数
+    """
     params = []
     for i in range(cnt):
         params.append(random.randint(0, 1000) / 1000.0)
@@ -17,10 +24,31 @@ def random_params(cnt):
 
 
 def param_2_arr(params):
+    """
+    捏脸参数转numpy array
+    """
     cnt = len(params)
     array = np.array(params)
     array = array.reshape([1, 1, 1, cnt])
     return array
+
+
+def feature256(img):
+    """
+    使用light cnn提取256维特征参数
+    :param img: 输入图片
+    :return: 256维特征参数
+    """
+    model = LightCNN_29Layers_v2(num_classes=79077)
+    model.eval()
+    model = torch.nn.DataParallel(model).cuda()
+    transform = transforms.Compose([transforms.ToTensor()])
+    img = np.reshape(img, (128, 128, 1))
+    img = transform(img)
+    input[0, :, :, :] = img
+    input_var = torch.autograd.Variable(input, volatile=True)
+    _, features = model(input_var)
+    return features
 
 
 def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, output_photo_batch, filepath):

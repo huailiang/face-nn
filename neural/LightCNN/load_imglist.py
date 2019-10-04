@@ -4,9 +4,11 @@ from PIL import Image
 import os
 import os.path
 
+
 def default_loader(path):
     img = Image.open(path).convert('L')
     return img
+
 
 def default_list_reader(fileList):
     imgList = []
@@ -16,12 +18,13 @@ def default_list_reader(fileList):
             imgList.append((imgPath, int(label)))
     return imgList
 
+
 class ImageList(data.Dataset):
     def __init__(self, root, fileList, transform=None, list_reader=default_list_reader, loader=default_loader):
-        self.root      = root
-        self.imgList   = list_reader(fileList)
+        self.root = root
+        self.imgList = list_reader(fileList)
         self.transform = transform
-        self.loader    = loader
+        self.loader = loader
 
     def __getitem__(self, index):
         imgPath, target = self.imgList[index]
