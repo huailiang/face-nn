@@ -4,9 +4,10 @@
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Player_male_plate_weapon_101_1
-  serializedVersion: 9
+  serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
@@ -58,6 +59,13 @@ Mesh:
     e33: 1
   m_BoneNameHashes: cf36801009a6ca8f
   m_RootBoneNameHash: 2412422665
+  m_BonesAABB:
+  - m_Min: {x: -0.17212436, y: -0.10175714, z: -0.12882452}
+    m_Max: {x: 1.1041316, y: 0.10072985, z: 0.12719157}
+  - m_Min: {x: -1.1041312, y: -0.10073018, z: -0.12719138}
+    m_Max: {x: 0.17212434, y: 0.10175681, z: 0.12882498}
+  m_VariableBoneCountWeights:
+    m_Data: 
   m_MeshCompression: 1
   m_IsReadable: 0
   m_KeepVertices: 0
@@ -65,7 +73,7 @@ Mesh:
   m_IndexFormat: 0
   m_IndexBuffer: 
   m_VertexData:
-    serializedVersion: 2
+    serializedVersion: 3
     m_VertexCount: 0
     m_Channels:
     - stream: 0
@@ -186,4 +194,8 @@ Mesh:
   m_BakedTriangleCollisionMesh: 
   m_MeshMetrics[0]: 0.5346396
   m_MeshMetrics[1]: 1
-  m_MeshOptimized: 1
+  m_MeshOptimizationFlags: -1
+  m_StreamData:
+    offset: 0
+    size: 0
+    path: 

@@ -20,7 +20,6 @@ namespace XEngine.Editor
         {
             public string name;
             public List<ShaderPropertyInstance> spiList = new List<ShaderPropertyInstance>();
-
             public bool hasCustomGroup = false;
         }
 
@@ -43,7 +42,6 @@ namespace XEngine.Editor
             public static string debugText = "Debug";
             public static string debugMode = "Debug Mode";
             public static readonly string[] blendNames = Enum.GetNames(typeof(BlendMode));
-
         }
 
         static Color[] mipMapColors = new Color[]
@@ -156,7 +154,6 @@ namespace XEngine.Editor
                                     sgi = shaderPropertyGroups[shaderPropertyGroups.Count - 1];
                                 }
                                 sgi.spiList.Add(spi);
-
                                 if (sf.name == "Color")
                                 {
                                     baseColorMp = spi.property;
@@ -230,7 +227,6 @@ namespace XEngine.Editor
                 m_FirstTimeApply = false;
             }
             ShaderPropertiesGUI();
-
         }
 
         private void Update()
@@ -444,7 +440,7 @@ namespace XEngine.Editor
                 else
                 {
                     EditorGUI.BeginChangeCheck();
-                    CustomPropertyDrawer.OnGUI(context.spi.property, context.materialEditor, context.spi.shaderFeature);
+                    PropertyDrawer.OnGUI(context.spi.property, context.materialEditor, context.spi.shaderFeature);
                     if (EditorGUI.EndChangeCheck())
                     {
                         Undo.RecordObject(context.materialEditor.target, context.spi.property.displayName);
@@ -464,7 +460,7 @@ namespace XEngine.Editor
                 else
                 {
                     EditorGUI.BeginChangeCheck();
-                    CustomPropertyDrawer.OnGUI(context.spi.property, context.materialEditor, scp, context.spi.customIndex);
+                    PropertyDrawer.OnGUI(context.spi.property, context.materialEditor, scp, context.spi.customIndex);
                     if (EditorGUI.EndChangeCheck())
                     {
                         Undo.RecordObject(context.materialEditor.target, context.spi.property.displayName);
@@ -528,7 +524,6 @@ namespace XEngine.Editor
                 {
                     Update();
                 }
-
             }
         }
 
@@ -585,7 +580,6 @@ namespace XEngine.Editor
                     }
                 }
             }
-
         }
 
         public static void SetupMaterialWithDebugMode(Material material, float debugMode)
@@ -608,4 +602,4 @@ namespace XEngine.Editor
                 m.DisableKeyword(keyword);
         }
     }
-} 
+}

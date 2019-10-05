@@ -95,8 +95,6 @@ namespace XEngine.Editor
                         if (decorator.OnGUI(property, title, attribute))
                             return;
                     }
-
-                    // Default unity field
                     if (property.value.hasVisibleChildren
                         && property.value.propertyType != SerializedPropertyType.Vector2
                         && property.value.propertyType != SerializedPropertyType.Vector3)

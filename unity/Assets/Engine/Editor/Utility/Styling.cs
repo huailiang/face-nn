@@ -49,12 +49,9 @@ namespace XEngine.Editor
             miniLabelButton.active = activeState;
             miniLabelButton.onNormal = activeState;
             miniLabelButton.onActive = activeState;
-
             paneOptionsIconDark = (Texture2D)EditorGUIUtility.Load("Builtin Skins/DarkSkin/Images/pane options.png");
             paneOptionsIconLight = (Texture2D)EditorGUIUtility.Load("Builtin Skins/LightSkin/Images/pane options.png");
-
             labelHeader = new GUIStyle(EditorStyles.miniLabel);
-
             wheelThumb = new GUIStyle("ColorPicker2DThumb");
 
             wheelThumbSize = new Vector2(
@@ -63,7 +60,6 @@ namespace XEngine.Editor
             );
 
             wheelLabel = new GUIStyle(EditorStyles.miniLabel);
-
             preLabel = new GUIStyle("ShurikenLabel");
         }
     }

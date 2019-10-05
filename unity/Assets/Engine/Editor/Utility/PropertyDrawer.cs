@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace XEngine.Editor
 {
-    public class CustomPropertyDrawer
+    public class PropertyDrawer
     {
         static void DrawSlider(AssetsConfig.ShaderCustomProperty scp, ref Vector4 value, int index)
         {

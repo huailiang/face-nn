@@ -26,12 +26,9 @@ namespace XEngine.Editor
         private bool shaderGroupDirty = true;
         private List<string> shaderFeatures = new List<string>();
         private AssetsConfig.DummyMaterialInfo genMat = null;
-        private bool multiBlend;
-
         private int dragType = -1;
         private string dragName = "";
         private int dragIndex = -1;
-
         private Rect groupRect;
         private Rect shaderFeatureRect;
         private Rect dummyMaterialsRect;
@@ -284,93 +281,6 @@ namespace XEngine.Editor
 
         }
 
-        private void TexturePlatformConfigGUI(TexImportSetting tis, string name)
-        {
-            tis.folder = EditorGUILayout.Foldout(tis.folder, name);
-            if (tis.folder)
-            {
-                tis.maxTextureSize = (SpriteSize)EditorGUILayout.EnumPopup("Size", tis.maxTextureSize, GUILayout.MaxWidth(300));
-                tis.format = (TextureImporterFormat)EditorGUILayout.EnumPopup("Format", tis.format, GUILayout.MaxWidth(300));
-                tis.alphaFormat = (TextureImporterFormat)EditorGUILayout.EnumPopup("Format_A", tis.alphaFormat, GUILayout.MaxWidth(300));
-            }
-        }
-
-        private void TextureProcessGUI(AssetsConfig ac)
-        {
-            ac.texCompressConfigFolder = EditorGUILayout.Foldout(ac.texCompressConfigFolder, "Texture Compress");
-            if (ac.texCompressConfigFolder)
-            {
-                if (GUILayout.Button("Add", GUILayout.MaxWidth(80)))
-                {
-                    ac.texCompressConfig.Add(new TexCompressConfig());
-                }
-                int removeIndex = -1;
-                for (int i = 0; i < ac.texCompressConfig.Count; ++i)
-                {
-                    var tcc = ac.texCompressConfig[i];
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField(string.IsNullOrEmpty(tcc.name) ? "empty" : tcc.name, GUILayout.MaxWidth(150));
-                    if (GUILayout.Button("Edit", GUILayout.MaxWidth(80)))
-                    {
-                        tcc.folder = !tcc.folder;
-                    }
-
-                    if (GUILayout.Button("Delete", GUILayout.MaxWidth(80)))
-                    {
-                        removeIndex = i;
-                    }
-                    EditorGUILayout.EndHorizontal();
-                    if (tcc.folder)
-                    {
-                        tcc.vaild = EditorGUILayout.Toggle("Valid", tcc.vaild);
-                        tcc.name = EditorGUILayout.TextField("Name", tcc.name);
-                        tcc.priority = EditorGUILayout.IntField("Priority", tcc.priority);
-                        tcc.importType = (TextureImporterType)EditorGUILayout.EnumPopup("Type", tcc.importType);
-                        tcc.importShape = (TextureImporterShape)EditorGUILayout.EnumPopup("Shape", tcc.importShape);
-                        tcc.sRGB = EditorGUILayout.Toggle("sRGB", tcc.sRGB);
-                        tcc.mipMap = EditorGUILayout.Toggle("Mipmap", tcc.mipMap);
-                        tcc.filterMode = (FilterMode)EditorGUILayout.EnumPopup("Filter", tcc.filterMode);
-                        tcc.wrapMode = (TextureWrapMode)EditorGUILayout.EnumPopup("Wrap", tcc.wrapMode);
-                        tcc.anisoLevel = EditorGUILayout.IntSlider("AnisoLevel", tcc.anisoLevel, 0, 3);
-                        EditorGUI.indentLevel++;
-                        TexturePlatformConfigGUI(tcc.iosSetting, "iOS");
-                        TexturePlatformConfigGUI(tcc.androidSetting, "Android");
-                        TexturePlatformConfigGUI(tcc.standaloneSetting, "Standalone");
-                        EditorGUI.indentLevel--;
-                        EditorGUI.indentLevel++;
-                        if (GUILayout.Button("AddFilter", GUILayout.MaxWidth(80)))
-                        {
-                            tcc.compressFilters.Add(new TexCompressFilter());
-                        }
-                        int subremoveIndex = -1;
-                        for (int j = 0; j < tcc.compressFilters.Count; ++j)
-                        {
-                            var cf = tcc.compressFilters[j];
-                            EditorGUILayout.BeginHorizontal();
-                            cf.type = (TexFilterType)EditorGUILayout.EnumPopup("", cf.type, GUILayout.MaxWidth(100));
-                            cf.str = EditorGUILayout.TextField("", cf.str, GUILayout.MaxWidth(300));
-                            if (GUILayout.Button("Delete", GUILayout.MaxWidth(80)))
-                            {
-                                subremoveIndex = j;
-                            }
-                            EditorGUILayout.EndHorizontal();
-                        }
-                        EditorGUI.indentLevel--;
-                        if (subremoveIndex >= 0)
-                        {
-                            tcc.compressFilters.RemoveAt(subremoveIndex);
-                        }
-                    }
-
-                }
-                if (removeIndex >= 0)
-                {
-                    ac.texCompressConfig.RemoveAt(removeIndex);
-                }
-            }
-        }
-
-
         private void ShaderGroupGUI(AssetsConfig ac)
         {
             ac.groupFolder = EditorGUILayout.Foldout(ac.groupFolder, "Shader Group");
@@ -557,7 +467,6 @@ namespace XEngine.Editor
                                 sf.dependencyPropertys.dependencyShaderProperty.Add("");
                             }
                         }
-
                     }
 
                 }
@@ -686,7 +595,6 @@ namespace XEngine.Editor
             if (ac != null)
             {
                 ConstValuesGUI(ac);
-                TextureProcessGUI(ac);
                 ShaderGroupGUI(ac);
                 AssetsConfig.GetGroupedShaderFeatureList(groupedShaderFeatures);
                 ShaderFeatureGUI(ac);

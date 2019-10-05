@@ -23,7 +23,6 @@ namespace XEngine
         public float shadowIntensity = 0.1f;
         //Lighting
         public LightingModify lighting = null;
-
         //Shadow
         public float shadowDepthBias = -0.03f;
         public float shadowNormalBias = 2.5f;
@@ -39,8 +38,6 @@ namespace XEngine
         public Material SkyBoxMat;
         private Cubemap SkyBox;
         //shadow
-        [System.NonSerialized]
-        public Vector3 cameraForward;
         [System.NonSerialized]
         public Vector3 lightProjectRight;
         [System.NonSerialized]
@@ -58,12 +55,9 @@ namespace XEngine
         public Light roleLight1;
         [System.NonSerialized]
         public TransformRotationGUIWrapper roleLight1Rot;
-
-
         public bool shadowFolder = true;
         public float shadowMapLevel = 0.25f;
         public bool shadowBound = false;
-        public GameObject shadowCasterProxy = null;
         public Transform lookTarget;
         public bool drawShadowLighing = false;
 
@@ -118,7 +112,6 @@ namespace XEngine
                 Shader.SetGlobalVector(ShaderIDs.Env_GameViewCameraPos, sceneData.cameraPos);
             }
             SyncLightInfo();
-            UpdateShadowCaster();
             BuildShadowMap();
             debugContext.Refresh();
         }
@@ -148,22 +141,10 @@ namespace XEngine
             if (fog == null) fog = new FogModify();
 
             UpdateEnv();
-
-            SceneData.editorSetRes = SetRes;
             if (shadowMapCb == null)
                 shadowMapCb = new CommandBuffer { name = "Editor Shadow Map Cb" };
-
-            shadowMat = AssetsConfig.GlobalAssetsConfig.ShadowCaster;
-            UpdateShadowCaster();
         }
 
-        void SetRes(System.Object obj, int type)
-        {
-            if (type == 0)
-            {
-                shadowMap = obj as RenderTexture;
-            }
-        }
 
         private void PrepareTransformGui(Light light, ref TransformRotationGUIWrapper wrapper)
         {
@@ -171,64 +152,6 @@ namespace XEngine
             {
                 wrapper = EditorCommon.GetTransformRotatGUI(light.transform);
             }
-        }
-
-
-        private void UpdateShadowCaster()
-        {
-            if (lookTarget == null)
-            {
-                GameObject go = GameObject.Find("LookTarget");
-                lookTarget = go != null ? go.transform : null;
-            }
-            if (lookTarget != null)
-            {
-                sceneData.currentEntityPos = lookTarget.position;
-            }
-            else
-            {
-                if (sceneData.CameraRef != null)
-                    sceneData.currentEntityPos = cameraForward * 10 + sceneData.cameraPos;
-            }
-            shadowCasters.Clear();
-            if (shadowCasterProxy == null)
-            {
-                shadowCasterProxy = GameObject.Find("ShadowCaster");
-            }
-            shadowRenderBatchs.Clear();
-            bool first = true;
-            Bounds shadowBound = new Bounds(Vector3.zero, Vector3.zero);
-            if (shadowCasterProxy != null)
-            {
-                shadowCasterProxy.GetComponentsInChildren<Renderer>(false, shadowCasters);
-                if (shadowCasters.Count > 0)
-                {
-                    for (int i = 0; i < shadowCasters.Count; ++i)
-                    {
-                        Renderer render = shadowCasters[i];
-                        if (render != null &&
-                            render.enabled &&
-                            render.shadowCastingMode != ShadowCastingMode.Off &&
-                            render.sharedMaterial != null)
-                        {
-                            RenderBatch rb = new RenderBatch();
-                            rb.render = render;
-                            rb.mat = render.sharedMaterial;
-                            rb.mpbRef = null;
-                            rb.passID = 0;
-                            shadowRenderBatchs.Add(rb);
-                            if (first)
-                            {
-                                shadowBound = render.bounds;
-                                first = false;
-                            }
-                            else
-                                shadowBound.Encapsulate(render.bounds);
-                        }
-                    }
-                }
-            }
-            sceneData.shadowBound = shadowBound;
         }
 
         private void BuildShadowMap()

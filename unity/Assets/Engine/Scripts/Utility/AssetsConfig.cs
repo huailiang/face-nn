@@ -15,22 +15,6 @@ namespace XEngine
         Transparent,
     }
 
-    public enum SpriteSize
-    {
-        E1x1,
-        E2x2,
-        E4x4,
-        E8x8,
-        E16x16,
-        E32x32,
-        E64x64,
-        E128x128,
-        E256x256,
-        E512x512,
-        E1024x1024,
-        E2048x2048,
-    }
-
     public enum KeywordFlags
     {
         _PBS_FROM_PARAM = 0x00000001,
@@ -148,65 +132,6 @@ namespace XEngine
         }
     }
 
-    public enum TexFilterType
-    {
-        Or,
-        And,
-        Nor,
-    }
-
-    [System.Serializable]
-    public class TexCompressFilter
-    {
-        public TexFilterType type = TexFilterType.Or;
-        public string str;
-    }
-
-    [System.Serializable]
-    public class TexImportSetting
-    {
-        public bool folder = false;
-        public SpriteSize maxTextureSize = SpriteSize.E1024x1024;
-        public TextureImporterFormat format = TextureImporterFormat.RGB24;
-        public TextureImporterFormat alphaFormat = TextureImporterFormat.RGBA32;
-    }
-
-    [System.Serializable]
-    public class TexCompressConfig
-    {
-        public bool folder = false;
-        public bool vaild = true;
-        public string name = "";
-        public int priority = 0;
-        public List<TexCompressFilter> compressFilters = new List<TexCompressFilter>();
-        public TextureImporterType importType = TextureImporterType.Default;
-        public TextureImporterShape importShape = TextureImporterShape.Texture2D;
-        public bool sRGB = true;
-        public bool mipMap = false;
-        public FilterMode filterMode = FilterMode.Bilinear;
-        public TextureWrapMode wrapMode = TextureWrapMode.Repeat;
-        public int anisoLevel = -1;
-        public TexImportSetting iosSetting = new TexImportSetting()
-        {
-            format = TextureImporterFormat.ASTC_RGB_5x5,
-            alphaFormat = TextureImporterFormat.ASTC_RGBA_5x5
-        };
-        public TexImportSetting androidSetting = new TexImportSetting()
-        {
-            format = TextureImporterFormat.ETC2_RGB4,
-            alphaFormat = TextureImporterFormat.ETC2_RGBA8Crunched
-        };
-        public TexImportSetting standaloneSetting = new TexImportSetting()
-        {
-            format = TextureImporterFormat.DXT1,
-            alphaFormat = TextureImporterFormat.DXT5
-        };
-
-        public override string ToString()
-        {
-            return name;
-        }
-    }
 
     [System.Serializable]
     public class ShaderProperty
@@ -337,20 +262,11 @@ namespace XEngine
             public string Name { get { return name; } set { name = value; } }
         }
         public string ResourcePath = "Assets/BundleRes";
-        public string Bandpose_Str = "Bandpose";
-        public string Fbx_Ext = ".fbx";
-        public string Creature_Path = "Assets/Creatures";
-        public string SharedMaterialPrefix = "SharedMaterials_";
-        public string Creature_Bandpose_Format_Path = "{0}/{1}/Bandpose";
-        public string Creature_Material_Format_Path = "{0}/{1}/Bandpose/Materials_{2}";
-        public string Creature_SharedMaterial_Format_Path = "{0}/{1}/Bandpose/{2}/Materials";
-        public string Creature_Material_Format_Folder = "Materials_{0}";
         public string BaseTex_Format_Path = "{0}/{1}_base.tga";
         public string PbsTex_Format_Path = "{0}/{1}_pbs.tga";
         public string DummyMatFolder = "MatShader";
         public string Table_Path = "Assets/Table/";
         public string Table_Bytes_Path = "Assets/BundleRes/Table/";
-        public string ReadableMeshSuffix = "_readable.asset";
 
         public string[] MaterialShaderMap = new string[]
         {
@@ -364,16 +280,9 @@ namespace XEngine
             "Custom/PBS/Entity"
         };
 
-        public Material ShadowCaster;
-
         public static string[] shaderDebugNames = null;
         [HideInInspector]
         public bool commonFolder = false;
-        public Shader ScenePreview;
-        public Shader TextureBake;
-        [HideInInspector]
-        public bool texCompressConfigFolder = false;
-        public List<TexCompressConfig> texCompressConfig = new List<TexCompressConfig>();
         [HideInInspector]
         public bool groupFolder = false;
         public List<string> ShaderGroupInfo = new List<string>()
@@ -450,11 +359,8 @@ namespace XEngine
 
         [HideInInspector]
         public bool shaderInfoFolder = false;
-
         public List<ShaderInfo> ShaderInfos = new List<ShaderInfo>();
-
         public List<DummyMaterialInfo> roleMaterials = new List<DummyMaterialInfo>();
-
         private static AssetsConfig g_AssetsConfig;
         public static AssetsConfig GlobalAssetsConfig
         {

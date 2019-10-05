@@ -1,11 +1,49 @@
 ﻿#if UNITY_EDITOR
 using CFUtilPoolLib;
 using System.Linq;
+using System.Collections.Generic;
+using System;
 using UnityEditor;
-using UnityEngine;
+using System.IO;
 
 namespace XEngine.Editor
 {
+
+    public class XResources : XSingleton<XResources>, IResourceHelp
+    {
+        public void CheckResource(UnityEngine.Object o, string path) { }
+
+        public UnityEngine.Object LoadEditorResource(string path, string suffix, Type t)
+        {
+            return AssetDatabase.LoadAssetAtPath(path + suffix, t);
+        }
+
+        public bool Deprecated { get; set; }
+
+        public static void LoadAllAssets(string folder, List<UnityEngine.Object> outputFiles)
+        {
+            DirectoryInfo direction = new DirectoryInfo(folder);
+            FileSystemInfo[] fs = direction.GetFileSystemInfos();
+
+            for (int i = 0; i < fs.Length; i++)
+            {
+                if (fs[i] is DirectoryInfo)
+                {
+                    LoadAllAssets(fs[i].FullName, outputFiles);
+                }
+                else if (fs[i] is FileInfo)
+                {
+                    if (fs[i].FullName.EndsWith(".meta")) continue;
+                    int index = fs[i].FullName.IndexOf("Assets\\");
+                    string path = fs[i].FullName.Substring(index).Replace('\\', '/');
+
+                    var obj = AssetDatabase.LoadMainAssetAtPath(path);
+                    if (obj != null) outputFiles.Add(obj);
+                }
+            }
+        }
+    }
+
     public class XTableReader
     {
         public static bool ReadFile(string location, CVSReader reader)
@@ -28,11 +66,6 @@ namespace XEngine.Editor
             XTableReader.ReadFile(@"Table/FashionSuit", _suit);
             XTableReader.ReadFile(@"Table/FashionList", _list);
             XTableReader.ReadFile(@"Table/Profession", _profession);
-        }
-
-        public static FashionSuit.RowData[] FashionsInfo
-        {
-            get { return _suit.Table; }
         }
 
         public static FashionList.RowData[] FashionList
@@ -61,97 +94,6 @@ namespace XEngine.Editor
             return ptable.Where(x => x.PresentID == presentid).First();
         }
 
-
-        public static void DrawRoleWithPresentID(uint presentid, GameObject go)
-        {
-            var role = FindRole(presentid);
-            if (role != null)
-            {
-                for (int i = 0; i < _suit.Table.Length; i++)
-                {
-                    if (_suit.Table[i].id == role.SuitID)
-                    {
-                        FashionUtil.DrawSuit(go, _suit.Table[i], presentid, 1);
-                        break;
-                    }
-                }
-            }
-        }
-
-    }
-
-    public class XAnimationLibrary
-    {
-        private static XEntityPresentation _presentations = new XEntityPresentation();
-        public static XEntityPresentation Presentations { get { return _presentations; } }
-        static XAnimationLibrary()
-        {
-            XTableReader.ReadFile(@"Table/XEntityPresentation", _presentations);
-        }
-
-        public static XEntityPresentation.RowData AssociatedAnimations(uint presentid)
-        {
-            return _presentations.GetByPresentID(presentid);
-        }
-
-        public static XEntityPresentation.RowData FindByColliderID(int colliderid)
-        {
-            int cnt = _presentations.Table.Length;
-            foreach (var item in _presentations.Table)
-            {
-                if (item.ColliderID != null)
-                {
-                    foreach (var id in item.ColliderID)
-                    {
-                        if (id == colliderid) return item;
-                    }
-                }
-            }
-            return null;
-        }
-
-
-        public static GameObject GetDummy(uint presentid)
-        {
-            XEntityPresentation.RowData raw_data = AssociatedAnimations(presentid);
-            if (raw_data == null) return null;
-
-            return GetDummy(raw_data.Prefab);
-        }
-
-        public static GameObject GetDummy(string path)
-        {
-
-            int n = path.LastIndexOf("_SkinnedMesh");
-            int m = path.LastIndexOf("Loading");
-            return n < 0 || m > 0 ?
-                AssetDatabase.LoadAssetAtPath("Assets/BundleRes/Prefabs/" + path + ".prefab", typeof(GameObject)) as GameObject :
-                AssetDatabase.LoadAssetAtPath("Assets/Editor/EditorResources/Prefabs/" + path.Substring(0, n) + ".prefab", typeof(GameObject)) as GameObject;
-        }
-
-        public static XEntityPresentation GetPresentation { get { return _presentations; } }
-    }
-
-    public class XStatisticsLibrary
-    {
-        private static XEntityStatistics _statistics = new XEntityStatistics();
-
-        static XStatisticsLibrary()
-        {
-            XTableReader.ReadFile(@"Table/XEntityStatistics", _statistics);
-        }
-
-        public static XEntityStatistics.RowData AssociatedData(uint id)
-        {
-            return _statistics.GetByID(id);
-        }
-
-        public static GameObject GetDummy(uint id)
-        {
-            XEntityStatistics.RowData data = AssociatedData(id);
-            if (data == null) return null;
-            return XAnimationLibrary.GetDummy(data.PresentID);
-        }
     }
 
 }

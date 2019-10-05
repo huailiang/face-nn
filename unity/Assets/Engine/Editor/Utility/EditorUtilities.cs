@@ -15,7 +15,6 @@ namespace XEngine.Editor
         static Dictionary<Type, AttributeDecorator> s_AttributeDecorators;
         static IEnumerable<Type> m_AssemblyTypes;
 
-
         static EditorUtilities()
         {
             s_GUIContentCache = new Dictionary<string, GUIContent>();

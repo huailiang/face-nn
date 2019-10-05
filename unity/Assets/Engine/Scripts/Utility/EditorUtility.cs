@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -72,44 +71,6 @@ namespace XEngine
             return null;
         }
 
-        public static ReflectFun GetInternalFunction(Type type, string function, bool isStatic, bool isPrivate, bool isInstance, bool baseType, bool all = false)
-        {
-            System.Reflection.BindingFlags flag = System.Reflection.BindingFlags.Default;
-            if (all)
-            {
-                flag = BindingFlags.NonPublic |
-                        BindingFlags.Public |
-                        BindingFlags.Instance |
-                        BindingFlags.Static;
-            }
-            else
-            {
-                if (isStatic)
-                {
-                    flag |= System.Reflection.BindingFlags.Static;
-                }
-                if (isPrivate)
-                {
-                    flag |= System.Reflection.BindingFlags.NonPublic;
-                }
-                else
-                {
-                    flag |= System.Reflection.BindingFlags.Public;
-                }
-                if (isInstance)
-                {
-                    flag |= System.Reflection.BindingFlags.Instance;
-                }
-            }
-
-            System.Reflection.MethodInfo mi = baseType ? type.BaseType.GetMethod(function, flag) : type.GetMethod(function, flag);
-            if (mi != null)
-            {
-                return new ReflectFun() { fun = mi };
-            }
-            return null;
-        }
-
         public static TransformRotationGUIWrapper GetTransformRotatGUI(Transform tran)
         {
             if (transformRotationGUIType == null)
@@ -138,51 +99,6 @@ namespace XEngine
                 }
             }
             return wrapper;
-        }
-
-        public static void SaveFieldInfo(Type src, Type des, object srcObj, object desObj, bool shaowError = true)
-        {
-            System.Reflection.BindingFlags flag = System.Reflection.BindingFlags.Default;
-            flag |= System.Reflection.BindingFlags.Public;
-            flag |= System.Reflection.BindingFlags.Instance;
-            FieldInfo[] fields = src.GetFields(flag);
-            FieldInfo[] fieldsSave = des.GetFields(flag);
-            for (int i = 0; i < fields.Length; ++i)
-            {
-                FieldInfo fi = fields[i];
-                FieldInfo saveFi = Array.Find(fieldsSave, (field) => { return field.Name == fi.Name; });
-                if (saveFi == null)
-                {
-                    if (shaowError)
-                    {
-                        var attr = fi.GetCustomAttributes(typeof(NonSerializedAttribute), false).FirstOrDefault();
-                        if (attr == null)
-                        {
-                            attr = fi.GetCustomAttributes(typeof(NoSerializedAttribute), false).FirstOrDefault();
-                            if (attr == null)
-                                Debug.LogError(string.Format("Field {0} not find.", fi.Name));
-                        }
-                    }
-                }
-                else
-                {
-                    object value = fi.GetValue(srcObj);
-                    saveFi.SetValue(desObj, value);
-                }
-
-            }
-        }
-
-        public static string GetSceneObjectPath(Transform trans)
-        {
-            string sceneObjectPath = trans.name;
-            Transform parent = trans.parent;
-            while (parent != null)
-            {
-                sceneObjectPath = parent.name + "/" + sceneObjectPath;
-                parent = parent.parent;
-            }
-            return sceneObjectPath;
         }
 
         public static void CreateDir(string dir)

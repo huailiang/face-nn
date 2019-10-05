@@ -53,14 +53,15 @@ namespace XEngine.Editor
         }
 
 
-        [MenuItem("Tools/SelectModel2Image")]
+        [MenuItem("Tools/SelectModel")]
         public static void Model2Image()
         {
             XEditorUtil.SetupEnv();
             string file = EditorUtility.OpenFilePanel("Select model file", MODEL, "bytes");
             FileInfo info = new FileInfo(file);
             ProcessFile(info);
-            HelperEditor.Open(EXPORT);
+            MoveDestDir("model_*", "regular/");
+            HelperEditor.Open(EXPORT + "regular/");
         }
 
 
