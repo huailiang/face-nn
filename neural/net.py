@@ -11,7 +11,8 @@ logger = logging.getLogger("nn-face")
 
 class Net(object):
     """
-    采用udp通信
+    此模块用来和引擎通信
+    使用udp，保证进程间通信，udp不保证时序性，也不保证引擎一定能收到
     """
     def __init__(self, port1, port2):
         atexit.register(self.close)
@@ -47,6 +48,10 @@ class Net(object):
             raise
 
     def send_recv(self, msg):
+        """
+        发送之后 也接收
+        :param msg:
+        """
         try:
             msg = "rcv"+msg
             self._snd_socket.sendto(msg.encode('utf-8'), self._bind2)
@@ -60,7 +65,6 @@ class Net(object):
         """
         只发送 不接收
         :param msg:
-        :return:
         """
         try:
             self._snd_socket.sendto(msg.encode('utf-8'), self._bind2)

@@ -7,6 +7,11 @@ import os
 import shutil
 import struct
 
+"""
+此工具用来生成一些规则的model（.bytes）
+可以在引擎里加载 显示对应的脸型
+Unity 菜单选择Tools->SelectModel2Image
+"""
 
 def write_layer(f, shape, args):
     f.write(struct.pack('i', shape))

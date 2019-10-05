@@ -26,7 +26,6 @@ namespace XEngine.Editor
                 {
                     value[index] = scp.defaultValue;
                 }
-
             }
         }
 

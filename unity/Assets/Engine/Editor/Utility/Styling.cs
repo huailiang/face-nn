@@ -13,9 +13,7 @@ namespace XEngine.Editor
         public static readonly GUIStyle wheelLabel;
         public static readonly GUIStyle wheelThumb;
         public static readonly Vector2 wheelThumbSize;
-
         public static readonly GUIStyle preLabel;
-
         static Texture2D m_TransparentTexture;
         public static Texture2D transparentTexture
         {

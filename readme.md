@@ -4,7 +4,7 @@
 ## VERSION
 
 ```
-1.  Unity2019.2.1f1
+1.  Unity-2019.2.1f1
 2.  python-2.7
 3.  tensorflow-1.1
 4.  dlib-19.18

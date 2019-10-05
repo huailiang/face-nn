@@ -24,6 +24,8 @@ class Face(object):
     def __init__(self, sess, args):
         self.args = args
         self.model_name = args.model_name
+        self.root_dir = './models'
+        self.logs_dir = os.path.join(self.root_dir, self.model_name, 'logs')
         self.batch_size = args.batch_size
         self.param_cnt = args.params_cnt
         self.learning_rate = args.learning_rate
@@ -37,7 +39,7 @@ class Face(object):
     def build(self):
         with tf.name_scope('placeholder'):
             self.input_x = tf.placeholder(dtype=tf.float32, shape=[self.batch_size, None, None, self.param_cnt],
-                                          name="params")
+                                          name="params_x")
             self.refer_img = tf.placeholder(dtype=tf.float32, shape=[self.batch_size, 512, 512, 3],
                                             name="reinference_img")
             self.lightcnn_checkpoint = torch.load(self.lightcnn_path)
@@ -49,6 +51,11 @@ class Face(object):
             loss1 = discriminative_loss(self.refer_img, self.imitator, self.lightcnn_checkpoint)
             self.i_optim_step = tf.train.AdamOptimizer(self.lr).minimize(loss=loss1, var_list=imitator_vars)
 
+            summary_i = tf.summary.scalar("discriminative/loss", loss1)
+            self.summary_feature_loss = tf.summary.merge([summary_i])
+            self.summary_merged_all = tf.summary.merge_all()
+            self.writer = tf.summary.FileWriter(self.logs_dir, self.sess.graph)
+
     def train(self):
         for step in tqdm(range(self.initial_step, self.total_steps + 1), initial=self.initial_step,
                          total=self.total_steps):
@@ -57,9 +64,10 @@ class Face(object):
             key = batch_rst.keys()[0]
             val = batch_rst[key][0]
             img = batch_rst[key][1]
-            feed = {self.input_x: param_2_arr(val)}
-            t = self.sess.run(self.i_optim_step, feed_dict=feed)
+            feed = {self.input_x: param_2_arr(val), self.refer_img: img}
+            t, summary_all = self.sess.run(self.i_optim_step, self.summary_merged_all, feed_dict=feed)
             print(key, len(val), t.shape)
+            self.writer.add_summary(summary_all, step * self.batch_size)
 
 
 class Artgan(object):
@@ -491,27 +499,6 @@ class Artgan(object):
             scipy.misc.imsave(os.path.join(to_save_dir, img_name[:-4] + "_stylized.jpg"), img)
 
         print("Inference is finished.")
-
-    def export_layers(self, path_to_folder, to_save_dir=None, ckpt_nmbr=None):
-        self.init_loadckpt(to_save_dir, ckpt_nmbr)
-        names = []
-        for d in path_to_folder:
-            names += glob(os.path.join(d, '*'))
-        names = sorted([x for x in names if os.path.basename(x)[0] != '.'])
-
-        for img_idx, img_path in enumerate(tqdm(names)):
-            img = scipy.misc.imread(img_path, mode='RGB')
-            img_shape = img.shape[:2]
-            # Resize the smallest side of the image to the self.image_size
-            alpha = float(self.image_size) / float(min(img_shape))
-            img = scipy.misc.imresize(img, size=alpha)
-            img = np.expand_dims(img, axis=0)
-            e_list = self.sess.run(self.input_photo_features, feed_dict={self.input_photo: normalize_arr_of_imgs(img)})
-            export_layer(e_list[1], "encoder_c1")
-            export_layer(e_list[2], "encoder_c2")
-            d_list = self.sess.run(self.output_photo, feed_dict={self.input_photo: normalize_arr_of_imgs(img)})
-            export_layer(d_list[1], "decoder_d1")
-            export_layer(d_list[2], "decoder_d2")
 
     def save(self, step, is_long=False):
         if not os.path.exists(self.checkpoint_dir):

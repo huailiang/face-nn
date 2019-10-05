@@ -4,11 +4,9 @@
 # @Date  : 2019-09-20
 
 import tensorflow as tf
-import numpy as np
 from parse import parser
 from model import Artgan, Face
-# from net import Net
-
+from net import Net
 
 import logging
 logger = logging.getLogger("nn-face")

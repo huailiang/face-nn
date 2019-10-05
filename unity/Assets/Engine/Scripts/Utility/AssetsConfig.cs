@@ -42,10 +42,6 @@ namespace XEngine
         _NEED_BOX_PROJECT_REFLECT = 0x00000800,
         _INSTANCE = 0x00001000,
         _PARALLAX_EFFECT = 0x00002000,
-        _SPLAT1 = 0x00100000,
-        _SPLAT2 = 0x00200000,
-        _SPLAT3 = 0x00400000,
-        _SPLAT4 = 0x00800000,
         _TERRAIN_LODCULL = 0x01000000,
         _SHADOW_MAP = 0x10000000,
         _SELF_SHADOW_MAP = 0x20000000,
@@ -330,10 +326,6 @@ namespace XEngine
             public Material mat;
             public Material mat1;
             public string ext1;
-            public Material mat2;
-            public string ext2;
-            public Material mat3;
-            public string ext3;
             public ELightMapMode lightmapMode = ELightMapMode.None;
             public EBlendType blendType = EBlendType.None;
             public bool shadowMat;

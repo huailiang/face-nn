@@ -6,9 +6,8 @@
 from __future__ import division
 
 import random
-
+import tensorflow as tf
 import scipy.misc
-
 from lightcnn.extract_features import *
 from ops import *
 

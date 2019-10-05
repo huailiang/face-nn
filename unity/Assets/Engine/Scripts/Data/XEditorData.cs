@@ -29,7 +29,7 @@ namespace XEngine.Editor
             XTableReader.ReadFile(@"Table/FashionList", _list);
             XTableReader.ReadFile(@"Table/Profession", _profession);
         }
-        
+
         public static FashionSuit.RowData[] FashionsInfo
         {
             get { return _suit.Table; }
@@ -79,73 +79,6 @@ namespace XEngine.Editor
         }
 
     }
-    
-
-    public class XDestructionLibrary
-    {
-        private static DestructionPart _part = new DestructionPart();
-        public static DestructionPart PartTable { get { return _part; } }
-        static XDestructionLibrary()
-        {
-            XTableReader.ReadFile(@"Table/DestructionPart", _part);
-        }
-
-        public static DestructionPart.RowData[] GetPartsInfo(uint presentid)
-        {
-            return PartTable.Table.Where(x => x.PresentID == presentid).ToArray();
-        }
-
-        public static void InitWithPerfectPart(DestructionPart.RowData[] dData, string suff, SkinnedMeshRenderer[] renders, XParts xpart)
-        {
-            for (int i = 0; i < dData.Length; i++)
-            {
-                var item = dData[i];
-                if (!string.IsNullOrEmpty(item.PerfectPart))
-                {
-                    if (!renders[i].gameObject.activeSelf)
-                        renders[i].gameObject.SetActive(true);
-                    var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(suff + item.PerfectPart + ".asset");
-                    var mat = AssetDatabase.LoadAssetAtPath<Material>(suff + item.PerfectPart + ".mat");
-                    if (mesh != null) renders[i].sharedMesh = mesh;
-                    if (mat != null) renders[i].sharedMaterial = mat;
-                    if (xpart != null)
-                    {
-                        for (int k = 0; k < xpart.parts.Count; k++)
-                        {
-                            if (xpart.parts[k].part == item.PerfectPart)
-                            {
-                                renders[i].bones = xpart.parts[k].perfect;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        public static void AttachDress(uint presentid, GameObject go)
-        {
-            var dData = XDestructionLibrary.GetPartsInfo(presentid);
-            var present = XAnimationLibrary.AssociatedAnimations(presentid);
-            XParts xpart = go.GetComponent<XParts>();
-            if (dData != null && dData.Length > 0)
-            {
-                SkinnedMeshRenderer[] renders = new SkinnedMeshRenderer[dData.Length];
-                for (int i = 0; i < dData.Length; i++)
-                {
-                    var t = go.transform.Find(dData[i].PerfectPart);
-                    if (t == null) { Debug.LogError("DestructionPart config error: " + presentid + " perfectpart: " + dData[i].PerfectPart); continue; }
-                    renders[i] = t.GetComponent<SkinnedMeshRenderer>();
-                }
-                InitWithPerfectPart(dData, "Assets/BundleRes/FBXRawData/" + present.Prefab + "/", renders, xpart);
-            }
-            else
-            {
-                XFashionLibrary.DrawRoleWithPresentID(presentid, go);
-            }
-        }
-    }
 
     public class XAnimationLibrary
     {
@@ -176,7 +109,7 @@ namespace XEngine.Editor
             }
             return null;
         }
-        
+
 
         public static GameObject GetDummy(uint presentid)
         {

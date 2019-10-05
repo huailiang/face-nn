@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 
 [AddComponentMenu("Dynamic Bone/Dynamic Bone")]
-public partial class DynamicBone : MonoBehaviour
+public class DynamicBone : MonoBehaviour
 {
 #if UNITY_5
 	[Tooltip("The root of the transform hierarchy to apply physics.")]
 #endif
     public Transform m_Root = null;
-	
+
 #if UNITY_5
 	[Tooltip("Internal physics simulation rate.")]
 #endif
     public float m_UpdateRate = 60.0f;
-	
+
     public enum UpdateMode
     {
         Normal,
@@ -21,35 +21,35 @@ public partial class DynamicBone : MonoBehaviour
         UnscaledTime
     }
     public UpdateMode m_UpdateMode = UpdateMode.Normal;
-	
+
 #if UNITY_5
 	[Tooltip("How much the bones slowed down.")]
 #endif
     [Range(0, 1)]
     public float m_Damping = 0.1f;
     public AnimationCurve m_DampingDistrib = null;
-	
+
 #if UNITY_5
 	[Tooltip("How much the force applied to return each bone to original orientation.")]
 #endif
     [Range(0, 1)]
     public float m_Elasticity = 0.1f;
     public AnimationCurve m_ElasticityDistrib = null;
-	
+
 #if UNITY_5
 	[Tooltip("How much bone's original orientation are preserved.")]
 #endif
     [Range(0, 1)]
     public float m_Stiffness = 0.1f;
     public AnimationCurve m_StiffnessDistrib = null;
-	
+
 #if UNITY_5
 	[Tooltip("How much character's position change is ignored in physics simulation.")]
 #endif
     [Range(0, 1)]
     public float m_Inert = 0;
     public AnimationCurve m_InertDistrib = null;
-	
+
 #if UNITY_5
 	[Tooltip("Each bone can be a sphere to collide with colliders. Radius describe sphere's size.")]
 #endif
@@ -60,17 +60,17 @@ public partial class DynamicBone : MonoBehaviour
 	[Tooltip("If End Length is not zero, an extra bone is generated at the end of transform hierarchy.")]
 #endif
     public float m_EndLength = 0;
-	
+
 #if UNITY_5
 	[Tooltip("If End Offset is not zero, an extra bone is generated at the end of transform hierarchy.")]
 #endif
     public Vector3 m_EndOffset = Vector3.zero;
-	
+
 #if UNITY_5
 	[Tooltip("The force apply to bones. Partial force apply to character's initial pose is cancelled out.")]
 #endif
     public Vector3 m_Gravity = Vector3.zero;
-	
+
 #if UNITY_5
 	[Tooltip("The force apply to bones.")]
 #endif
@@ -79,13 +79,13 @@ public partial class DynamicBone : MonoBehaviour
 	[Tooltip("Collider objects interact with the bones.")]
 #endif
     public List<DynamicBoneColliderBase> m_Colliders = null;
-	
+
 #if UNITY_5
 	[Tooltip("Bones exclude from physics simulation.")]
 #endif
     public List<Transform> m_Exclusions = null;
-	
-	
+
+
     public enum FreezeAxis
     {
         None, X, Y, Z
@@ -94,7 +94,7 @@ public partial class DynamicBone : MonoBehaviour
 	[Tooltip("Constrain bones to move on specified plane.")]
 #endif
     public FreezeAxis m_FreezeAxis = FreezeAxis.None;
-	
+
 #if UNITY_5
 	[Tooltip("Disable physics simulation automatically if character is far from camera or player.")]
 #endif
@@ -133,7 +133,6 @@ public partial class DynamicBone : MonoBehaviour
 
     void Start()
     {
-        Init();
         SetupParticles();
     }
 
@@ -260,8 +259,7 @@ public partial class DynamicBone : MonoBehaviour
     void UpdateDynamicBones(float t)
     {
         Vector3 vp = transform.position;
-        if (m_Root == null || !isValid(ref vp))
-            return;
+        if (m_Root == null) return;
 
         m_ObjectScale = Mathf.Abs(transform.lossyScale.x);
         m_ObjectMove = transform.position - m_ObjectPrevPosition;
@@ -461,7 +459,7 @@ public partial class DynamicBone : MonoBehaviour
         // Vector3 rf = m_Root.TransformDirection(m_LocalGravity);
         // Vector3 pf = fdir * Mathf.Max(Vector3.Dot(rf, fdir), 0);	// project current gravity to rest gravity
         // force -= pf;	// remove projected gravity
-        
+
         //These codes above that always cause zero force and no reason to remove the projected part of gravity direction,so I use the world space gravity directly.
         force = (force + m_Force) * m_ObjectScale;
 
