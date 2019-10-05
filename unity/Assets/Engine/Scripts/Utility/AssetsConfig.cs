@@ -32,12 +32,6 @@ namespace XEngine
         _ALPHA_FROM_COLOR = 0x40000000,
     }
 
-    public interface IRectSelect
-    {
-        Rect SelectRect { get; set; }
-        string Name { get; set; }
-    }
-
     public enum DebugDisplayType
     {
         Split,
@@ -64,16 +58,6 @@ namespace XEngine
         public bool posModify = false;
         [NonSerialized]
         public int[] shaderID = null;
-        public void Reset()
-        {
-            debugMode = 0;
-            splitAngle = 0;
-            splitPos = 0;
-            modeModify = true;
-            typeModify = true;
-            angleModify = true;
-            posModify = true;
-        }
         public void Refresh()
         {
             if (shaderID != null)
@@ -163,27 +147,22 @@ namespace XEngine
         [System.Serializable]
         public class ShaderCustomProperty
         {
-            public bool folder = false;
             public bool valid = false;
             public string desc;
             public float defaultValue = 0.0f;
             public float min = 0.0f;
             public float max = 1.0f;
             public string subGroup = "";
-            [NonSerialized]
-            public int shaderGroupIndex = 0;
             public int indexInGroup = -1;
         }
 
         [System.Serializable]
-        public class ShaderFeature : IRectSelect
+        public class ShaderFeature
         {
             public bool hide = false;
             public bool readOnly = false;
             public string name = "empty";
             public string shaderGroupName = "";
-            [NonSerialized]
-            public int shaderGroupIndex = 0;
             public int indexInGroup = -1;
             public string propertyName = "";
             public ShaderPropertyType type = ShaderPropertyType.Custom;
@@ -195,51 +174,16 @@ namespace XEngine
                 new ShaderCustomProperty(),
             };
             public ShaderPropertyDependency dependencyPropertys = new ShaderPropertyDependency();
-            public bool folder = false;
-
-            [System.NonSerialized]
-            private Rect rect;
-            public Rect SelectRect { get { return rect; } set { rect = value; } }
-            public string Name { get { return name; } set { name = value; } }
-
-            public void Clone(ShaderFeature src)
-            {
-                hide = src.hide;
-                readOnly = src.readOnly;
-                shaderGroupName = src.shaderGroupName;
-                propertyName = src.propertyName;
-                type = src.type;
-                dependencyPropertys.Clone(src.dependencyPropertys);
-            }
         }
 
         [System.Serializable]
         public class ShaderInfo
         {
-            public bool folder = false;
             public Shader shader;
             public List<string> shaderFeatures = new List<string>();
-            public bool customGroupDraw = false;
-        }
-
-        [System.Serializable]
-        public class DummyMaterialInfo : IRectSelect
-        {
-            public string name = "";
-            [System.NonSerialized]
-            public int enumIndex = -1;
-
-            [System.NonSerialized]
-            private Rect rect;
-            public Rect SelectRect { get { return rect; } set { rect = value; } }
-            public string Name { get { return name; } set { name = value; } }
         }
 
         public static string[] shaderDebugNames = null;
-        [HideInInspector]
-        public bool commonFolder = false;
-        [HideInInspector]
-        public bool groupFolder = false;
         public List<string> ShaderGroupInfo = new List<string>()
         {
             "Default",
@@ -251,8 +195,6 @@ namespace XEngine
             "Debug",
             "None",
         };
-        [HideInInspector]
-        public bool shaderFeatureFolder = false;
         public List<ShaderFeature> ShaderFeatures = new List<ShaderFeature>
         {
             new ShaderFeature () { name = "BlendMode", shaderGroupName = "Default", type = ShaderPropertyType.CustomFun, propertyName = "" },
@@ -311,11 +253,7 @@ namespace XEngine
             dependencyPropertys = new ShaderPropertyDependency () { dependencyType = DependencyType.Or, dependencyShaderProperty = new List<string> () { "Overlay" } }
             },
         };
-
-        [HideInInspector]
-        public bool shaderInfoFolder = false;
         public List<ShaderInfo> ShaderInfos = new List<ShaderInfo>();
-        public List<DummyMaterialInfo> roleMaterials = new List<DummyMaterialInfo>();
         private static AssetsConfig g_AssetsConfig;
         public static AssetsConfig GlobalAssetsConfig
         {
@@ -344,23 +282,6 @@ namespace XEngine
             }
             return shaderFeatures;
         }
-
-        public static void GetGroupedShaderFeatureList(Dictionary<string, List<ShaderFeature>> groupedShaderFeatures)
-        {
-            groupedShaderFeatures.Clear();
-            for (int i = 0; i < GlobalAssetsConfig.ShaderFeatures.Count; ++i)
-            {
-                ShaderFeature sf = GlobalAssetsConfig.ShaderFeatures[i];
-                List<ShaderFeature> sfList;
-                if (!groupedShaderFeatures.TryGetValue(sf.shaderGroupName, out sfList))
-                {
-                    sfList = new List<ShaderFeature>();
-                    groupedShaderFeatures[sf.shaderGroupName] = sfList;
-                }
-                sfList.Add(sf);
-            }
-        }
-
         public TextAsset debugFile;
         public static void RefreshShaderDebugNames(bool force = false)
         {

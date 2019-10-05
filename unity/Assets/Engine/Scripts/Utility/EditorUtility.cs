@@ -25,19 +25,6 @@ namespace XEngine
         }
     }
 
-    public class ReflectFun
-    {
-        public MethodInfo fun;
-
-        public object Call(object instance, object[] parameters)
-        {
-            if (fun != null)
-            {
-                return fun.Invoke(instance, parameters);
-            }
-            return null;
-        }
-    }
     public static class EditorCommon
     {
         public delegate void EnumTransform(Transform t, object param);

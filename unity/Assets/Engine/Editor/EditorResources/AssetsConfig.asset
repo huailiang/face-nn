@@ -12,22 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc11458067879e24899574d5f5c23452, type: 3}
   m_Name: AssetsConfig
   m_EditorClassIdentifier: 
-  ResourcePath: Assets/BundleRes
-  BaseTex_Format_Path: '{0}/{1}_base.tga'
-  PbsTex_Format_Path: '{0}/{1}_pbs.tga'
-  DummyMatFolder: MatShader
-  Table_Path: Assets/Table/
-  Table_Bytes_Path: Assets/BundleRes/Table/
-  MaterialShaderMap:
-  - _face
-  - Custom/PBS/Skin
-  - _hair
-  - Custom/Hair/HairTest01
-  - _lower|_upper|_weapon
-  - Custom/PBS/Role
-  - Custom/PBS/Entity
-  commonFolder: 1
-  groupFolder: 0
   ShaderGroupInfo:
   - Default
   - Base
@@ -48,7 +32,6 @@ MonoBehaviour:
   - WaterFlow
   - Debug
   - None
-  shaderFeatureFolder: 0
   ShaderFeatures:
   - hide: 0
     readOnly: 0
@@ -58,32 +41,28 @@ MonoBehaviour:
     propertyName: 
     type: 0
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -94,7 +73,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: Debug
@@ -103,32 +81,28 @@ MonoBehaviour:
     propertyName: _DebugMode
     type: 0
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -139,7 +113,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: BaseFromColor
@@ -148,32 +121,28 @@ MonoBehaviour:
     propertyName: _BASE_FROM_COLOR
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -184,7 +153,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: BaseTex
@@ -193,32 +161,28 @@ MonoBehaviour:
     propertyName: _BaseTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -230,7 +194,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - BaseFromColor
-    folder: 0
   - hide: 0
     readOnly: 0
     name: AlphaFromColor
@@ -239,32 +202,28 @@ MonoBehaviour:
     propertyName: _ALPHA_FROM_COLOR
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -275,7 +234,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: Color
@@ -284,32 +242,28 @@ MonoBehaviour:
     propertyName: _Color
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -322,7 +276,6 @@ MonoBehaviour:
       dependencyShaderProperty:
       - BaseFromColor
       - AlphaFromColor
-    folder: 0
   - hide: 0
     readOnly: 0
     name: ColorR
@@ -331,32 +284,28 @@ MonoBehaviour:
     propertyName: _ColorR
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -367,7 +316,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: ColorG
@@ -376,32 +324,28 @@ MonoBehaviour:
     propertyName: _ColorG
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -412,7 +356,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: ColorB
@@ -421,32 +364,28 @@ MonoBehaviour:
     propertyName: _ColorB
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -457,7 +396,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: ColorEX1
@@ -466,32 +404,28 @@ MonoBehaviour:
     propertyName: _ColorEX1
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -502,7 +436,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: ColorEX2
@@ -511,32 +444,28 @@ MonoBehaviour:
     propertyName: _ColorEX2
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -547,7 +476,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: PbsFromParam
@@ -556,32 +484,28 @@ MonoBehaviour:
     propertyName: _PBS_FROM_PARAM
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -592,7 +516,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: PbsHalfFromParam
@@ -601,32 +524,28 @@ MonoBehaviour:
     propertyName: _PBS_HALF_FROM_PARAM
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -638,7 +557,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - PbsFromParam
-    folder: 0
   - hide: 0
     readOnly: 0
     name: PbsParam
@@ -647,32 +565,28 @@ MonoBehaviour:
     propertyName: _PbsParam
     type: 5
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: 
       defaultValue: 0.75
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: 
       defaultValue: 0.75
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Metallic
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Roughness
       defaultValue: 1
       min: 0
@@ -685,7 +599,6 @@ MonoBehaviour:
       dependencyShaderProperty:
       - PbsFromParam
       - PbsHalfFromParam
-    folder: 0
   - hide: 0
     readOnly: 0
     name: PbsTex
@@ -694,32 +607,28 @@ MonoBehaviour:
     propertyName: _PBSTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -731,7 +640,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - PbsFromParam
-    folder: 0
   - hide: 0
     readOnly: 0
     name: MagicParam
@@ -740,32 +648,28 @@ MonoBehaviour:
     propertyName: _MagicParam
     type: 5
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: SpecInstensity
       defaultValue: 0.1
       min: 0.01
       max: 0.5
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: MetalicSepcInstensity
       defaultValue: 1
       min: 0.1
       max: 5
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Cutout
       defaultValue: 0.02
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: IBLScale
       defaultValue: 1
       min: 0
@@ -776,7 +680,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: PbsNoEnv
@@ -785,32 +688,28 @@ MonoBehaviour:
     propertyName: _PBS_NO_IBL
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -821,7 +720,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 1
     readOnly: 0
     name: OneLayer
@@ -830,32 +728,28 @@ MonoBehaviour:
     propertyName: _SPLAT1
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -866,7 +760,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 1
     readOnly: 0
     name: TwoLayer
@@ -875,32 +768,28 @@ MonoBehaviour:
     propertyName: _SPLAT2
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -911,7 +800,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 1
     readOnly: 0
     name: ThreeLayer
@@ -920,32 +808,28 @@ MonoBehaviour:
     propertyName: _SPLAT3
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -956,7 +840,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 1
     readOnly: 0
     name: FourLayer
@@ -965,32 +848,28 @@ MonoBehaviour:
     propertyName: _SPLAT4
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1001,7 +880,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 1
     name: BlendTex
@@ -1010,32 +888,28 @@ MonoBehaviour:
     propertyName: _BlendTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1049,7 +923,6 @@ MonoBehaviour:
       - TwoLayer
       - ThreeLayer
       - FourLayer
-    folder: 0
   - hide: 0
     readOnly: 1
     name: SplatTex0
@@ -1058,32 +931,28 @@ MonoBehaviour:
     propertyName: _BaseTex0
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1094,7 +963,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 1
     name: SplatTex1
@@ -1103,32 +971,28 @@ MonoBehaviour:
     propertyName: _BaseTex1
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1142,7 +1006,6 @@ MonoBehaviour:
       - TwoLayer
       - ThreeLayer
       - FourLayer
-    folder: 0
   - hide: 0
     readOnly: 1
     name: SplatTex2
@@ -1151,32 +1014,28 @@ MonoBehaviour:
     propertyName: _BaseTex2
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1189,7 +1048,6 @@ MonoBehaviour:
       dependencyShaderProperty:
       - ThreeLayer
       - FourLayer
-    folder: 0
   - hide: 0
     readOnly: 1
     name: SplatTex3
@@ -1198,32 +1056,28 @@ MonoBehaviour:
     propertyName: _BaseTex3
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1235,7 +1089,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - FourLayer
-    folder: 0
   - hide: 0
     readOnly: 0
     name: UVST
@@ -1244,32 +1097,28 @@ MonoBehaviour:
     propertyName: _uvST
     type: 3
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1280,7 +1129,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: NormalUVST
@@ -1289,32 +1137,28 @@ MonoBehaviour:
     propertyName: _uvST1
     type: 3
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1326,7 +1170,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - PbsFromParam
-    folder: 0
   - hide: 0
     readOnly: 0
     name: MainColor
@@ -1335,32 +1178,28 @@ MonoBehaviour:
     propertyName: _MainColor
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1371,7 +1210,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: EmissionAO
@@ -1380,32 +1218,28 @@ MonoBehaviour:
     propertyName: _ETX_EFFECT
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1416,7 +1250,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: EmissionAOTex
@@ -1425,32 +1258,28 @@ MonoBehaviour:
     propertyName: _EffectTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1462,7 +1291,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - EmissionAO
-    folder: 0
   - hide: 0
     readOnly: 0
     name: EmissionColor
@@ -1471,32 +1299,28 @@ MonoBehaviour:
     propertyName: _Color1
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1508,7 +1332,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - EmissionAO
-    folder: 0
   - hide: 0
     readOnly: 0
     name: EmissionParameter
@@ -1517,32 +1340,28 @@ MonoBehaviour:
     propertyName: _Param0
     type: 5
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Intentisy
       defaultValue: 1
       min: 0
       max: 10
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: FlowSpeed
       defaultValue: 0
       min: 0
       max: 5
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Amplitude
       defaultValue: 1
       min: 0
       max: 10
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1554,7 +1373,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - EmissionAO
-    folder: 0
   - hide: 0
     readOnly: 0
     name: Overlay
@@ -1563,32 +1381,28 @@ MonoBehaviour:
     propertyName: _OVERLAY
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1599,7 +1413,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: OverlayTex
@@ -1608,32 +1421,28 @@ MonoBehaviour:
     propertyName: _EffectTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1645,7 +1454,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - Overlay
-    folder: 0
   - hide: 0
     readOnly: 0
     name: OverLayParam
@@ -1654,32 +1462,28 @@ MonoBehaviour:
     propertyName: _Param0
     type: 5
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Mask
       defaultValue: 0
       min: -5
       max: 5
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Ratio
       defaultValue: 0
       min: -5
       max: 5
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: UVScale
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1691,7 +1495,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - Overlay
-    folder: 0
   - hide: 0
     readOnly: 0
     name: OverlayColor
@@ -1700,32 +1503,28 @@ MonoBehaviour:
     propertyName: _Color1
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1737,7 +1536,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - Overlay
-    folder: 0
   - hide: 0
     readOnly: 0
     name: SpecularScatter
@@ -1746,32 +1544,28 @@ MonoBehaviour:
     propertyName: _SkinSpecularScatter
     type: 5
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: SpecularIntensity
       defaultValue: 0.9
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: SpecularRoughness
       defaultValue: 1
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: ScatteringOffset
       defaultValue: 0.7
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: ScatteringPower
       defaultValue: 1
       min: 0
@@ -1782,7 +1576,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: WindEffect
@@ -1791,32 +1584,28 @@ MonoBehaviour:
     propertyName: _WIND_EFFECT
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1827,7 +1616,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: NeedBoxProjectReflect
@@ -1836,32 +1624,28 @@ MonoBehaviour:
     propertyName: _NEED_BOX_PROJECT_REFLECT
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1872,7 +1656,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: EnvReflectTex
@@ -1881,32 +1664,28 @@ MonoBehaviour:
     propertyName: _EnvReflectTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1918,7 +1697,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - NeedBoxProjectReflect
-    folder: 0
   - hide: 0
     readOnly: 0
     name: BoxCenter
@@ -1927,32 +1705,28 @@ MonoBehaviour:
     propertyName: _Param0
     type: 3
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -1964,7 +1738,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - NeedBoxProjectReflect
-    folder: 0
   - hide: 0
     readOnly: 0
     name: BoxSize
@@ -1973,32 +1746,28 @@ MonoBehaviour:
     propertyName: _Param1
     type: 3
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2010,7 +1779,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - NeedBoxProjectReflect
-    folder: 0
   - hide: 0
     readOnly: 0
     name: Instance
@@ -2019,32 +1787,28 @@ MonoBehaviour:
     propertyName: _INSTANCE
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2055,7 +1819,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: GrasOcc
@@ -2064,32 +1827,28 @@ MonoBehaviour:
     propertyName: _Param0
     type: 5
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: OccHeight
       defaultValue: 0.75
       min: 0
       max: 10
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: OccExp
       defaultValue: 2
       min: 0
       max: 10
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: OccToColor
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2100,7 +1859,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: Parallax
@@ -2109,32 +1867,28 @@ MonoBehaviour:
     propertyName: _PARALLAX_EFFECT
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2145,7 +1899,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: ParallaxParam
@@ -2154,32 +1907,28 @@ MonoBehaviour:
     propertyName: _Param0
     type: 5
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: ParamX
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: ParamY
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Count
       defaultValue: 1
       min: 1
       max: 8
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Count2
       defaultValue: 1
       min: 1
@@ -2191,7 +1940,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - Parallax
-    folder: 0
   - hide: 0
     readOnly: 0
     name: ParallaxHeight
@@ -2200,32 +1948,28 @@ MonoBehaviour:
     propertyName: _EffectTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2237,7 +1981,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - Parallax
-    folder: 0
   - hide: 0
     readOnly: 0
     name: WaterNormal
@@ -2246,32 +1989,28 @@ MonoBehaviour:
     propertyName: _WaterNormal
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2282,7 +2021,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: ScatterColor
@@ -2291,32 +2029,28 @@ MonoBehaviour:
     propertyName: _ScatteringColor
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2327,7 +2061,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: SubSurfaceColor
@@ -2336,32 +2069,28 @@ MonoBehaviour:
     propertyName: _SubSurfaceColor
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2372,7 +2101,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: SubSurfaceCrestColor
@@ -2381,32 +2109,28 @@ MonoBehaviour:
     propertyName: _SubSurfaceCrestColor
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2417,7 +2141,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: WaterParam0
@@ -2426,32 +2149,28 @@ MonoBehaviour:
     propertyName: _Param0
     type: 6
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: NormalStrength
       defaultValue: 0.3
       min: 0.01
       max: 2
       subGroup: WaterNormal
       indexInGroup: 1
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: NormalsScale
       defaultValue: 1
       min: 0.01
       max: 100
       subGroup: WaterNormal
       indexInGroup: 2
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: BaseMul
       defaultValue: 0.6
       min: 0
       max: 2
       subGroup: WaterScatter
       indexInGroup: 2
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: SunMul
       defaultValue: 0.8
       min: 0
@@ -2462,7 +2181,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: WaterParam1
@@ -2471,32 +2189,28 @@ MonoBehaviour:
     propertyName: _Param1
     type: 6
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: SunFallOff
       defaultValue: 4
       min: 1
       max: 16
       subGroup: WaterScatter
       indexInGroup: 4
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: HeightMax
       defaultValue: 3
       min: 0.01
       max: 50
       subGroup: WaterHeightScatter
       indexInGroup: 1
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: HeightPower
       defaultValue: 1
       min: 0.01
       max: 10
       subGroup: WaterHeightScatter
       indexInGroup: 2
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Width
       defaultValue: 0.1
       min: 0.01
@@ -2507,7 +2221,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: WaterParam2
@@ -2516,32 +2229,28 @@ MonoBehaviour:
     propertyName: _Param2
     type: 6
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: Power
       defaultValue: 1
       min: 0.01
       max: 10
       subGroup: WaterTransparency
       indexInGroup: 1
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: FresnelPower
       defaultValue: 3
       min: 0
       max: 20
       subGroup: WaterReflection
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: LightFallOff
       defaultValue: 128
       min: 0.01
       max: 4096
       subGroup: WaterReflection
       indexInGroup: 1
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: LightBoost
       defaultValue: 5
       min: 0
@@ -2552,7 +2261,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: WaterParam3
@@ -2561,32 +2269,28 @@ MonoBehaviour:
     propertyName: _Param3
     type: 6
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: RefractionStrength
       defaultValue: 0.1
       min: 0
       max: 1
       subGroup: WaterRefraction
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: DefaultDepth
       defaultValue: 0.1
       min: 0
       max: 1
       subGroup: WaterTransparency
       indexInGroup: 2
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: AlphaScale
       defaultValue: 1
       min: 0
       max: 1
       subGroup: WaterTransparency
       indexInGroup: 3
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: ReflectionScale
       defaultValue: 1
       min: 0
@@ -2597,7 +2301,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: WaterParam4
@@ -2606,32 +2309,28 @@ MonoBehaviour:
     propertyName: _Param4
     type: 6
     customProperty:
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: USpeed
       defaultValue: 0
       min: 0
       max: 10
       subGroup: WaterFlow
       indexInGroup: 0
-    - folder: 0
-      valid: 1
+    - valid: 1
       desc: VSpeed
       defaultValue: 0
       min: 0
       max: 10
       subGroup: WaterFlow
       indexInGroup: 1
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2642,7 +2341,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: MainTex
@@ -2651,32 +2349,28 @@ MonoBehaviour:
     propertyName: _MainTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2688,7 +2382,6 @@ MonoBehaviour:
       dependencyType: 0
       dependencyShaderProperty:
       - BaseFromColor
-    folder: 0
   - hide: 0
     readOnly: 0
     name: TerrainLodCull
@@ -2697,32 +2390,28 @@ MonoBehaviour:
     propertyName: _TerrainLodCull
     type: 3
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2733,7 +2422,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: MainTex0
@@ -2742,32 +2430,28 @@ MonoBehaviour:
     propertyName: _BaseTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2778,7 +2462,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: MainTex1
@@ -2787,32 +2470,28 @@ MonoBehaviour:
     propertyName: _BaseTex1
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2823,7 +2502,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: Normal0
@@ -2832,32 +2510,28 @@ MonoBehaviour:
     propertyName: _PBSTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2868,7 +2542,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: Normal1
@@ -2877,32 +2550,28 @@ MonoBehaviour:
     propertyName: _PBSTex1
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2913,7 +2582,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: LayerBlendTex
@@ -2922,32 +2590,28 @@ MonoBehaviour:
     propertyName: _BlendTex
     type: 1
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -2958,7 +2622,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: UVST0
@@ -2967,32 +2630,28 @@ MonoBehaviour:
     propertyName: _uvST
     type: 3
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3003,7 +2662,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: UVST1
@@ -3012,32 +2670,28 @@ MonoBehaviour:
     propertyName: _uvST1
     type: 3
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3048,7 +2702,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: NormalScale
@@ -3057,32 +2710,28 @@ MonoBehaviour:
     propertyName: _Param1
     type: 5
     customProperty:
-    - folder: 1
-      valid: 1
+    - valid: 1
       desc: NormalScale0
       defaultValue: 0
       min: 0
       max: 2
       subGroup: 
       indexInGroup: 0
-    - folder: 1
-      valid: 1
+    - valid: 1
       desc: NormalScale1
       defaultValue: 0
       min: 0
       max: 2
       subGroup: 
       indexInGroup: 0
-    - folder: 1
-      valid: 0
+    - valid: 0
       desc: ZScale0
       defaultValue: 0
       min: 0
       max: 2
       subGroup: 
       indexInGroup: 0
-    - folder: 1
-      valid: 0
+    - valid: 0
       desc: ZScale1
       defaultValue: 0
       min: 0
@@ -3093,7 +2742,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: MainColor0
@@ -3102,32 +2750,28 @@ MonoBehaviour:
     propertyName: _MainColor
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3138,7 +2782,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: MainColor1
@@ -3147,32 +2790,28 @@ MonoBehaviour:
     propertyName: _Color0
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3183,7 +2822,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: SpecParam
@@ -3192,32 +2830,28 @@ MonoBehaviour:
     propertyName: _MagicParam
     type: 5
     customProperty:
-    - folder: 1
-      valid: 1
+    - valid: 1
       desc: SpecIntensity
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 1
-      valid: 0
+    - valid: 0
       desc: SpecIntensity1
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 1
-      valid: 0
+    - valid: 0
       desc: SpecIntensity
       defaultValue: 0
       min: 0
       max: 2
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3228,7 +2862,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: SpecScale
@@ -3237,32 +2870,28 @@ MonoBehaviour:
     propertyName: _Param2
     type: 5
     customProperty:
-    - folder: 1
-      valid: 1
+    - valid: 1
       desc: SpecScale0
       defaultValue: 0
       min: 0
       max: 2
       subGroup: 
       indexInGroup: 0
-    - folder: 1
-      valid: 1
+    - valid: 1
       desc: SpecScale1
       defaultValue: 0
       min: 0
       max: 2
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3273,7 +2902,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: RimColor
@@ -3282,32 +2910,28 @@ MonoBehaviour:
     propertyName: _Color1
     type: 2
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: 0
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3318,7 +2942,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: LavaPara
@@ -3327,32 +2950,28 @@ MonoBehaviour:
     propertyName: _Param0
     type: 5
     customProperty:
-    - folder: 1
-      valid: 1
+    - valid: 1
       desc: X Speed
       defaultValue: 0
       min: 0
       max: 10
       subGroup: 
       indexInGroup: -1
-    - folder: 1
-      valid: 1
+    - valid: 1
       desc: Y Speed
       defaultValue: 1
       min: 0
       max: 10
       subGroup: 
       indexInGroup: -1
-    - folder: 1
-      valid: 1
+    - valid: 1
       desc: lava strength
       defaultValue: 1
       min: 0
       max: 10
       subGroup: 
       indexInGroup: -1
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3363,7 +2982,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: ReceiveShadow
@@ -3372,32 +2990,28 @@ MonoBehaviour:
     propertyName: _SHADOW_MAP
     type: 4
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: -1
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: -1
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: -1
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3408,7 +3022,6 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   - hide: 0
     readOnly: 0
     name: RenderQueue
@@ -3417,32 +3030,28 @@ MonoBehaviour:
     propertyName: 
     type: 7
     customProperty:
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: -1
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: -1
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
       max: 1
       subGroup: 
       indexInGroup: -1
-    - folder: 0
-      valid: 0
+    - valid: 0
       desc: 
       defaultValue: 0
       min: 0
@@ -3453,11 +3062,9 @@ MonoBehaviour:
       isNor: 0
       dependencyType: 0
       dependencyShaderProperty: []
-    folder: 0
   shaderInfoFolder: 0
   ShaderInfos:
-  - folder: 0
-    shader: {fileID: 4800000, guid: e4de0a982a4beda47ac898d08662d621, type: 3}
+  - shader: {fileID: 4800000, guid: e4de0a982a4beda47ac898d08662d621, type: 3}
     shaderFeatures:
     - BlendMode
     - Debug
@@ -3475,9 +3082,7 @@ MonoBehaviour:
     - EmissionColor
     - EmissionParameter
     - SpecularScatter
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: d98d49d7fea5f29479b229f890d6420a, type: 3}
+  - shader: {fileID: 4800000, guid: d98d49d7fea5f29479b229f890d6420a, type: 3}
     shaderFeatures:
     - BlendMode
     - Debug
@@ -3494,9 +3099,7 @@ MonoBehaviour:
     - EmissionAOTex
     - EmissionColor
     - EmissionParameter
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 496dac5bcc2628c409a5c1ad1ffead03, type: 3}
+  - shader: {fileID: 4800000, guid: 496dac5bcc2628c409a5c1ad1ffead03, type: 3}
     shaderFeatures:
     - BlendMode
     - Debug
@@ -3509,9 +3112,7 @@ MonoBehaviour:
     - EmissionColor
     - EmissionParameter
     - SpecularScatter
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 434a3017f6455474fb1ececce6d14831, type: 3}
+  - shader: {fileID: 4800000, guid: 434a3017f6455474fb1ececce6d14831, type: 3}
     shaderFeatures:
     - BlendMode
     - Debug
@@ -3520,322 +3121,16 @@ MonoBehaviour:
     - PbsTex
     - MagicParam
     - SpecularScatter
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 49940f20d3d8a544ea1d39a45a79d64d, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - BaseTex
-    - PbsFromParam
-    - PbsHalfFromParam
-    - PbsParam
-    - PbsTex
-    - MagicParam
-    - PbsNoEnv
-    - UVST
-    - NormalUVST
-    - MainColor
-    - EmissionAO
-    - EmissionColor
-    - EmissionParameter
-    - Overlay
-    - OverlayTex
-    - OverLayParam
-    - OverlayColor
-    - NeedBoxProjectReflect
-    - EnvReflectTex
-    - BoxCenter
-    - BoxSize
-    - Parallax
-    - ParallaxParam
-    - ParallaxHeight
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 9a7c901ada9b8b544a42a78fea8096a5, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - MagicParam
-    - OneLayer
-    - TwoLayer
-    - ThreeLayer
-    - FourLayer
-    - BlendTex
-    - SplatTex0
-    - SplatTex1
-    - SplatTex2
-    - SplatTex3
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: e3c8256e339914647afdbe97c8449ff6, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - BaseFromColor
-    - BaseTex
-    - Color
-    - MainTex
-    - PbsFromParam
-    - PbsHalfFromParam
-    - PbsParam
-    - PbsTex
-    - MagicParam
-    - PbsNoEnv
-    - UVST
-    - NormalUVST
-    - MainColor
-    - EmissionAO
-    - EmissionColor
-    - EmissionParameter
-    - Overlay
-    - OverlayTex
-    - OverLayParam
-    - OverlayColor
-    - NeedBoxProjectReflect
-    - EnvReflectTex
-    - BoxCenter
-    - BoxSize
-    - Parallax
-    - ParallaxParam
-    - ParallaxHeight
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 7afefaa37a269b740bd486145f3a08d1, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - OneLayer
-    - TwoLayer
-    - ThreeLayer
-    - FourLayer
-    - BlendTex
-    - SplatTex0
-    - SplatTex1
-    - SplatTex2
-    - SplatTex3
-    - TerrainLodCull
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: f93e70e4bebe99146bf7a247f1057fe2, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - RenderQueue
-    - Debug
-    - BaseTex
-    - AlphaFromColor
-    - Color
-    - UVST
-    - MainColor
-    - ReceiveShadow
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 26fa4cee3c3f56f49922c440776e921d, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - BaseTex
-    - MagicParam
-    - MainColor
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 6633f52002e871846ae96f5bedb36680, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - BaseTex
-    - PbsParam
-    - GrasOcc
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: fdc2da6c9e2550b4c980f88ad0c38294, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - WaterNormal
-    - ScatterColor
-    - SubSurfaceColor
-    - SubSurfaceCrestColor
-    - WaterParam0
-    - WaterParam1
-    - WaterParam2
-    - WaterParam3
-    - WaterParam4
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 422af7e70dab8254b88b02e571ba13ab, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - MainTex
-    - MagicParam
-    - MainColor
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: c6789ccf018233046bc07e7cc06b47e6, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - MainTex
-    - PbsParam
-    - GrasOcc
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 9802d8ea5e170b9498f35c92fda2607b, type: 3}
-    shaderFeatures:
-    - Debug
-    - MainTex0
-    - MainTex1
-    - Normal0
-    - Normal1
-    - LayerBlendTex
-    - UVST0
-    - UVST1
-    - NormalScale
-    - MainColor0
-    - MainColor1
-    - SpecParam
-    - RimColor
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 2e01e1abacf57c64b9a7ed20d00e5bba, type: 3}
-    shaderFeatures:
-    - Debug
-    - EmissionAO
-    - EmissionAOTex
-    - EmissionColor
-    - EmissionParameter
-    - MainTex0
-    - MainTex1
-    - Normal0
-    - Normal1
-    - LayerBlendTex
-    - UVST0
-    - UVST1
-    - NormalScale
-    - MainColor0
-    - MainColor1
-    - SpecParam
-    - SpecScale
-    customGroupDraw: 0
-  - folder: 0
-    shader: {fileID: 4800000, guid: 720190eff013f7545bd930cd70d4fb77, type: 3}
-    shaderFeatures:
-    - BlendMode
-    - Debug
-    - BaseTex
-    - UVST
-    - LavaPara
-    customGroupDraw: 0
   roleMaterials:
-  - folder: 0
-    name: Role
-    shader: {fileID: 4800000, guid: e4de0a982a4beda47ac898d08662d621, type: 3}
-    mat: {fileID: 2100000, guid: 87bebd599c5185e4aba7fffac2975447, type: 2}
-    mat1: {fileID: 2100000, guid: 27a02589a188bcc4ea71eb983705b95a, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 0
-  - folder: 0
-    name: RoleEffect
-    shader: {fileID: 4800000, guid: e4de0a982a4beda47ac898d08662d621, type: 3}
-    mat: {fileID: 2100000, guid: d1c496eae2d22b74cae15b7972f42623, type: 2}
-    mat1: {fileID: 2100000, guid: 97336f46e015c4c4f8e52ec21bad6b98, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 1
-  - folder: 0
-    name: RoleSelfShadow
-    shader: {fileID: 4800000, guid: e4de0a982a4beda47ac898d08662d621, type: 3}
-    mat: {fileID: 2100000, guid: 9d768496927baac41912c73f94406c36, type: 2}
-    mat1: {fileID: 2100000, guid: d987e17a24848bc4684ca40d59eb34a0, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 2
-  - folder: 0
-    name: RoleEffectSelfShadow
-    shader: {fileID: 4800000, guid: e4de0a982a4beda47ac898d08662d621, type: 3}
-    mat: {fileID: 2100000, guid: 7c8c6c07e2807de41a2f206ef2c444e9, type: 2}
-    mat1: {fileID: 2100000, guid: a887afd36e0cfbe46b96e1c913c7cc48, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 3
-  - folder: 0
-    name: Skin
-    shader: {fileID: 4800000, guid: 434a3017f6455474fb1ececce6d14831, type: 3}
-    mat: {fileID: 2100000, guid: de18b6bb6fc9c2d46ae774903c6fb110, type: 2}
-    mat1: {fileID: 2100000, guid: 0a74b25396039164e86ffca041b87e0d, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 0
-  - folder: 0
-    name: SkinSelfShadow
-    shader: {fileID: 4800000, guid: 434a3017f6455474fb1ececce6d14831, type: 3}
-    mat: {fileID: 2100000, guid: 08a1fffe86268484ca115ddf0f486e3c, type: 2}
-    mat1: {fileID: 2100000, guid: 2910ca5826b521d4a9b1d9dc9fe3540a, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 2
-  - folder: 0
-    name: Npc
-    shader: {fileID: 4800000, guid: 496dac5bcc2628c409a5c1ad1ffead03, type: 3}
-    mat: {fileID: 2100000, guid: d44be4a1ae153794889c5da6c3b4b07d, type: 2}
-    mat1: {fileID: 2100000, guid: 273e2fe9f87f16446ba18e75484c1a05, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 0
-  - folder: 0
-    name: NpcEffect
-    shader: {fileID: 4800000, guid: 496dac5bcc2628c409a5c1ad1ffead03, type: 3}
-    mat: {fileID: 2100000, guid: 9b6fa19b0a388974bac06f04a5baa823, type: 2}
-    mat1: {fileID: 2100000, guid: 2114753f865c1234ba51075966232eca, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 1
-  - folder: 0
-    name: Entity
-    shader: {fileID: 4800000, guid: d98d49d7fea5f29479b229f890d6420a, type: 3}
-    mat: {fileID: 2100000, guid: 29251d611d74c4e4cadfc8da7f812151, type: 2}
-    mat1: {fileID: 2100000, guid: b0113943afc18c9418ff129a3786947b, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 0
-  - folder: 0
-    name: EntityEffect
-    shader: {fileID: 4800000, guid: d98d49d7fea5f29479b229f890d6420a, type: 3}
-    mat: {fileID: 2100000, guid: 1acfa24f10e663e45b12aa5ac3534d92, type: 2}
-    mat1: {fileID: 2100000, guid: 7731dd4f9148d584b88b055adf3d1dfa, type: 2}
-    ext1: Cutout
-    lightmapMode: 0
-    blendType: 7
-    shadowMat: 0
-    flag: 1
-  - folder: 0
-    name: Hair
-    shader: {fileID: 0}
-    mat: {fileID: 0}
-    mat1: {fileID: 0}
-    ext1: 
-    lightmapMode: 0
-    blendType: 0
-    shadowMat: 0
-    flag: 0
+  - name: Role
+  - name: RoleEffect
+  - name: RoleSelfShadow
+  - name: RoleEffectSelfShadow
+  - name: Skin
+  - name: SkinSelfShadow
+  - name: Npc
+  - name: NpcEffect
+  - name: Entity
+  - name: EntityEffect
+  - name: Hair
   debugFile: {fileID: 10900000, guid: a39a8788a094b5644a872d757843b5f8, type: 3}
