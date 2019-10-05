@@ -32,22 +32,6 @@ namespace XEngine
         _ALPHA_FROM_COLOR = 0x40000000,
     }
 
-    public enum ELightMapMode
-    {
-        None,
-        LightmapMat,
-        LightmapKeyWord
-    }
-
-    public enum EBlendType
-    {
-        None = 0x0000,
-        Opaque = 0x0001,
-        Cutout = 0x0002,
-        CutoutTransparent = 0x0004,
-        Transparent = 0x0008,
-    }
-
     public interface IRectSelect
     {
         Rect SelectRect { get; set; }
@@ -128,7 +112,6 @@ namespace XEngine
             float b = 1 + k;
             splitLeft = -b / k;
             splitRight = -splitLeft;
-
         }
     }
 
@@ -136,7 +119,6 @@ namespace XEngine
     [System.Serializable]
     public class ShaderProperty
     {
-        public bool folder;
         public string shaderProperty;
         public bool isTex;
         public int shaderID;
@@ -243,42 +225,15 @@ namespace XEngine
         [System.Serializable]
         public class DummyMaterialInfo : IRectSelect
         {
-            public bool folder = false;
             public string name = "";
             [System.NonSerialized]
             public int enumIndex = -1;
-            public Shader shader;
-            public Material mat;
-            public Material mat1;
-            public string ext1;
-            public ELightMapMode lightmapMode = ELightMapMode.None;
-            public EBlendType blendType = EBlendType.None;
-            public bool shadowMat;
-            public uint flag;
 
             [System.NonSerialized]
             private Rect rect;
             public Rect SelectRect { get { return rect; } set { rect = value; } }
             public string Name { get { return name; } set { name = value; } }
         }
-        public string ResourcePath = "Assets/BundleRes";
-        public string BaseTex_Format_Path = "{0}/{1}_base.tga";
-        public string PbsTex_Format_Path = "{0}/{1}_pbs.tga";
-        public string DummyMatFolder = "MatShader";
-        public string Table_Path = "Assets/Table/";
-        public string Table_Bytes_Path = "Assets/BundleRes/Table/";
-
-        public string[] MaterialShaderMap = new string[]
-        {
-            "_face",
-            "Custom/PBS/Skin",
-            "_hair",
-            "Custom/Hair/HairTest01",
-            "_lower|_upper|_weapon",
-            "Custom/PBS/Role",
-            "",
-            "Custom/PBS/Entity"
-        };
 
         public static string[] shaderDebugNames = null;
         [HideInInspector]

@@ -5,77 +5,80 @@ using System;
 using System.Threading;
 using System.Text;
 
-public class Connect
+namespace XEngine
 {
-    UdpClient sendClient, recviceClient;
-    IPEndPoint point1, point2;
-    Thread thread;
-
-    public void Initial(int port1, int port2)
+    public class Connect
     {
-        var remoteIp = IPAddress.Parse("127.0.0.1");
-        point1 = new IPEndPoint(remoteIp, port1);
-        sendClient = new UdpClient(port1);
+        UdpClient sendClient, recviceClient;
+        IPEndPoint point1, point2;
+        Thread thread;
 
-        //recv
-        recviceClient = new UdpClient(port2);
-        point2 = new IPEndPoint(IPAddress.Any, port2);
-        thread = new Thread(Receive);
-        thread.IsBackground = true;
-        thread.Start();
-        Debug.Log("initial success send port:" + port1 + "  recv port:" + port2);
-    }
-
-
-    public void Send(string msg)
-    {
-        try
+        public void Initial(int port1, int port2)
         {
-            var data = Encoding.ASCII.GetBytes(msg);
-            sendClient.Send(data, data.Length, point1);
-            Debug.Log("send " + msg);
+            var remoteIp = IPAddress.Parse("127.0.0.1");
+            point1 = new IPEndPoint(remoteIp, port1);
+            sendClient = new UdpClient(port1);
+
+            //recv
+            recviceClient = new UdpClient(port2);
+            point2 = new IPEndPoint(IPAddress.Any, port2);
+            thread = new Thread(Receive);
+            thread.IsBackground = true;
+            thread.Start();
+            Debug.Log("initial success send port:" + port1 + "  recv port:" + port2);
         }
-        catch (Exception ex)
-        {
-            Debug.LogError("udp send error:" + ex.Message);
-        }
-    }
 
-    public void Receive()
-    {
-        while (true)
+
+        public void Send(string msg)
         {
-            byte[] recivcedata = recviceClient.Receive(ref point2);
-            string str = Encoding.ASCII.GetString(recivcedata, 0, recivcedata.Length);
-            Debug.Log("rcv: " + str);
-            if (str.StartsWith("rcv"))
+            try
             {
-                str = str.Substring(3);
-                Send("recv msg by client");
+                var data = Encoding.ASCII.GetBytes(msg);
+                sendClient.Send(data, data.Length, point1);
+                Debug.Log("send " + msg);
             }
-            if (str.Equals("quit"))
+            catch (Exception ex)
             {
-                break;
+                Debug.LogError("udp send error:" + ex.Message);
             }
         }
-        Quit();
+
+        public void Receive()
+        {
+            while (true)
+            {
+                byte[] recivcedata = recviceClient.Receive(ref point2);
+                string str = Encoding.ASCII.GetString(recivcedata, 0, recivcedata.Length);
+                Debug.Log("rcv: " + str);
+                if (str.StartsWith("rcv"))
+                {
+                    str = str.Substring(3);
+                    Send("recv msg by client");
+                }
+                if (str.Equals("quit"))
+                {
+                    break;
+                }
+            }
+            Quit();
+        }
+
+
+        public void Quit()
+        {
+            if (sendClient != null)
+            {
+                sendClient.Close();
+            }
+            if (recviceClient != null)
+            {
+                recviceClient.Close();
+            }
+            if (thread != null)
+            {
+                thread.Abort();
+            }
+        }
+
     }
-
-
-    public void Quit()
-    {
-        if (sendClient != null)
-        {
-            sendClient.Close();
-        }
-        if (recviceClient != null)
-        {
-            recviceClient.Close();
-        }
-        if (thread != null)
-        {
-            thread.Abort();
-        }
-    }
-
 }

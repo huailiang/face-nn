@@ -13,6 +13,7 @@ import struct
 Unity 菜单选择Tools->SelectModel
 """
 
+
 def write_layer(f, shape, args):
     f.write(struct.pack('i', shape))
     for i in range(0, 95):

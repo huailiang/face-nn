@@ -110,7 +110,7 @@ namespace XEngine
 
     [Conditional("UNITY_EDITOR")]
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class ColorUsageAttribute: PropertyAttribute
+    public sealed class ColorUsageAttribute : PropertyAttribute
     {
         //
         //     If false then the alpha bar is hidden in the ColorField and the alpha value is

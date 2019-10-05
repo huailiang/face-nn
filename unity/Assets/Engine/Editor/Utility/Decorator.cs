@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using UnityEditor;
+using System.Linq;
 
 namespace XEngine.Editor
 {
@@ -18,13 +20,38 @@ namespace XEngine.Editor
 
     public abstract class AttributeDecorator
     {
-        // Override this and return false if you want to customize the override checkbox position,
-        // else it'll automatically draw it and put the property content in a horizontal scope.
         public virtual bool IsAutoProperty()
         {
             return true;
         }
 
         public abstract bool OnGUI(SerializedParameter serializedParameterOverride, GUIContent title, Attribute attribute);
+    }
+
+    public class SerializedParameter
+    {
+        public SerializedProperty value { get; protected set; }
+        public Attribute[] attributes { get; protected set; }
+
+        internal SerializedProperty baseProperty;
+
+        public string displayName
+        {
+            get { return baseProperty.displayName; }
+        }
+        internal SerializedParameter() { }
+
+        internal SerializedParameter(SerializedProperty property, Attribute[] attributes)
+        {
+            baseProperty = property.Copy();
+            value = baseProperty.Copy();
+            this.attributes = attributes;
+        }
+
+        public T GetAttribute<T>()
+            where T : Attribute
+        {
+            return (T)attributes.FirstOrDefault(x => x is T);
+        }
     }
 }

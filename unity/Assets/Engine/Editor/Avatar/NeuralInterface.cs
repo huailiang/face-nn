@@ -3,10 +3,8 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-
 namespace XEngine.Editor
 {
-
     public class NeuralData
     {
         public float[] boneArgs;
