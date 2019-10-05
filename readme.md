@@ -4,13 +4,16 @@
 ## VERSION
 
 ```
-1. Unity2019.2.1f1
-2. python-2.7
-3. tensorflow-1.1
-4. dlib-19.18
-5. numpy-1.15.4
-6. opencv-contrib-python 3.4.0.12
-7. tqdm-4.23.4
+1.  Unity2019.2.1f1
+2.  python-2.7
+3.  tensorflow-1.1
+4.  dlib-19.18
+5.  numpy-1.15.4
+6.  opencv-contrib-python 3.4.0.12
+7.  tqdm-4.23.4
+8.  argparse-1.4.0
+9.  scipy-1.0.1
+10. Pillow
 ```
 
 
