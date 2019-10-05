@@ -7,7 +7,7 @@ using UnityEngine;
 namespace XEngine.Editor
 {
 
-    public static class FashionUtil
+    public static class FashionUtility
     {
 
         public static void UnloadSuit(GameObject go)
@@ -104,7 +104,7 @@ namespace XEngine.Editor
                 {
                     if (weapon_index == 1)
                     {
-                        FashionUtil.DrawPart(transf, asset, part.weapon[i].weapon1, part.weapon[i].sweapon1, row);
+                        FashionUtility.DrawPart(transf, asset, part.weapon[i].weapon1, part.weapon[i].sweapon1, row);
                     }
                     else
                     {

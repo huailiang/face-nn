@@ -163,7 +163,7 @@ namespace XEngine.Editor
         {
             if (fashionInfo.Length <= suit_select) suit_select = 0;
             FashionSuit.RowData rowData = fashionInfo[suit_select];
-            FashionUtil.DrawSuit(go, rowData, (uint)presentid, 1);
+            FashionUtility.DrawSuit(go, rowData, (uint)presentid, 1);
             paint.Initial(go, shape);
             bone.Initial(go, shape);
         }
