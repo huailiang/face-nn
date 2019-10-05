@@ -9,7 +9,7 @@ import cv2
 from PIL import Image
 
 
-class Augmentor():
+class Augmentor:
     def __init__(self,
                  crop_size=(256, 256),
                  scale_augm_prb=0.5, scale_augm_range=0.2,

@@ -43,8 +43,8 @@ def export_layer(path, shape, weight):
     shape = shape
     args = []
     for i in range(0, 95):
-        args.append(weight/10.0)
-    name = os.path.join(path, str(shape)+"-"+str(weight)+".bytes")
+        args.append(weight / 10.0)
+    name = os.path.join(path, str(shape) + "-" + str(weight) + ".bytes")
     f = open(name, 'wb')
     write_layer(f, shape, args)
     f.close()

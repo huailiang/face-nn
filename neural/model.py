@@ -22,34 +22,44 @@ import img_augm
 
 class Face(object):
     def __init__(self, sess, args):
+        self.args = args
         self.model_name = args.model_name
         self.batch_size = args.batch_size
         self.param_cnt = args.params_cnt
+        self.learning_rate = args.learning_rate
+        self.dataset = FaceDataset(args)
         self.sess = sess
         self.initial_step = 0
         self.total_steps = args.db_item_cnt
-        lit = random_params(self.param_cnt)
-        array = param_2_arr(lit)
-        print("np", array.shape, array)
-        self.input_params = array
+        self.sess.run(tf.global_variables_initializer())
+        self.lightcnn_path = args.lightcnn
+
+    def build(self):
         with tf.name_scope('placeholder'):
             self.input_x = tf.placeholder(dtype=tf.float32, shape=[self.batch_size, None, None, self.param_cnt],
                                           name="params")
+            self.refer_img = tf.placeholder(dtype=tf.float32, shape=[self.batch_size, 512, 512, 3],
+                                            name="reinference_img")
+            self.lightcnn_checkpoint = torch.load(self.lightcnn_path)
             self.imitator = imitator(self.input_x, 4)
-            self.sess.run(tf.global_variables_initializer())
 
-    def train(self, args):
-        dataset = FaceDataset(args)
+            # ================== Define optimization steps. =============== #
+            t_vars = tf.trainable_variables()
+            imitator_vars = [var for var in t_vars if 'imitator' in var.name]
+            loss1 = discriminative_loss(self.refer_img, self.imitator, self.lightcnn_checkpoint)
+            self.i_optim_step = tf.train.AdamOptimizer(self.lr).minimize(loss=loss1, var_list=imitator_vars)
+
+    def train(self):
         for step in tqdm(range(self.initial_step, self.total_steps + 1), initial=self.initial_step,
                          total=self.total_steps):
             # print(step)
-            batch_rst = dataset.get_batch(1)
+            batch_rst = self.dataset.get_batch(1)
             key = batch_rst.keys()[0]
             val = batch_rst[key][0]
+            img = batch_rst[key][1]
             feed = {self.input_x: param_2_arr(val)}
-            t = self.sess.run(self.imitator, feed_dict=feed)
+            t = self.sess.run(self.i_optim_step, feed_dict=feed)
             print(key, len(val), t.shape)
-
 
 
 class Artgan(object):

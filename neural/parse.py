@@ -44,6 +44,12 @@ parser.add_argument(
     dest='model_name',
     default='imitator',
     help='model named imitator')
+parser.add_argument(
+    '--learning_rate',
+    dest='learning_rate',
+    type=float,
+    default=0.01,
+    help='learning rate of imitator')
 
 # ========================= TRAINING PARAMETERS ========================= #
 

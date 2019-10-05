@@ -4,6 +4,7 @@
 # @Date  : 2019-09-20
 
 import tensorflow as tf
+import numpy as np
 from parse import parser
 from model import Artgan, Face
 # from net import Net
@@ -17,6 +18,7 @@ tf.set_random_seed(228)
 
 def main(_):
     args = parser.parse_args()
+
     with tf.Session() as sess:
         model = Face(sess, args)
         if args.phase == "train":

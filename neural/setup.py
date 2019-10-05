@@ -3,7 +3,7 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
-print here
+print(here)
 
 setup(name="neural",
       version="0.0.1",
@@ -16,6 +16,14 @@ setup(name="neural",
       ],
       packages=find_packages(),
       zip_safe=False,
-      install_requires=["tqdm", "dlib>=19.0", "numpy>=1.13.3,<2.0"],
+      install_requires=["tqdm",
+                        "dlib>=19.0",
+                        "numpy>=1.13.3,<2.0",
+                        "argparse>=1.4.0",
+                        'tensorflow>=1.1.0',
+                        'scipy>=1.5.0',
+                        'Pillow',
+                        'cv2',
+                        "torch"],
       python_requires=">=2.7"
       )
