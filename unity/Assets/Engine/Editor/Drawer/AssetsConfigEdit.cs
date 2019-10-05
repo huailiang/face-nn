@@ -10,13 +10,6 @@ namespace XEngine.Editor
     [CustomEditor(typeof(AssetsConfig))]
     public class AssetsConfigEdit : BaseEditor<AssetsConfigEdit>
     {
-        public enum OpType
-        {
-            None,
-            OpGenMat,
-            OpRefreshMat,
-        }
-
         private List<SerializedProperty> constPropertyList;
         private List<SerializedProperty> constListPropertyList;
         private List<SerializedProperty> commonPropertyList;
@@ -25,14 +18,12 @@ namespace XEngine.Editor
         private string[] shaderGroupNames = null;
         private bool shaderGroupDirty = true;
         private List<string> shaderFeatures = new List<string>();
-        private AssetsConfig.DummyMaterialInfo genMat = null;
         private int dragType = -1;
         private string dragName = "";
         private int dragIndex = -1;
         private Rect groupRect;
         private Rect shaderFeatureRect;
         private Rect dummyMaterialsRect;
-        private OpType opType = OpType.None;
         private int shaderFeatureCopyIndex = -1;
 
         private void OnEnable()
@@ -205,10 +196,7 @@ namespace XEngine.Editor
             }
             else if (e.type == EventType.MouseDrag)
             {
-                if (dragType >= 0)
-                {
-                    Repaint();
-                }
+                if (dragType >= 0) Repaint();
             }
             else if (e.type == EventType.MouseUp)
             {
@@ -278,7 +266,6 @@ namespace XEngine.Editor
                     }
                 }
             }
-
         }
 
         private void ShaderGroupGUI(AssetsConfig ac)
@@ -316,7 +303,6 @@ namespace XEngine.Editor
                     }
                 }
                 EndRect(ref groupRect, 100);
-
             }
             else
             {
@@ -370,7 +356,6 @@ namespace XEngine.Editor
                 for (int i = 0; i < ac.ShaderFeatures.Count; ++i)
                 {
                     var sf = ac.ShaderFeatures[i];
-
                     EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(400));
                     EditorGUILayout.LabelField(sf.name, GUILayout.MaxWidth(150));
                     BeginRect(ref shaderFeatureRect, sf, i, 150);
@@ -378,7 +363,6 @@ namespace XEngine.Editor
                     {
                         sf.folder = !sf.folder;
                     }
-
                     if (GUILayout.Button("Delete", GUILayout.MaxWidth(80)))
                     {
                         removeIndex = i;
@@ -468,7 +452,6 @@ namespace XEngine.Editor
                             }
                         }
                     }
-
                 }
                 EndRect(ref shaderFeatureRect, 150);
                 if (removeIndex != -1)
@@ -602,32 +585,6 @@ namespace XEngine.Editor
                 OnEventProcessGUI(ac);
             }
             serializedObject.ApplyModifiedProperties();
-            switch (opType)
-            {
-                case OpType.OpGenMat:
-                    GenMat();
-                    break;
-                case OpType.OpRefreshMat:
-                    RefreshMat();
-                    break;
-            }
-            opType = OpType.None;
-        }
-        private void GenMat()
-        {
-            if (genMat != null)
-            {
-                ShaderAssets.DefaultMat(genMat);
-                genMat = null;
-            }
-        }
-        private void RefreshMat()
-        {
-            if (genMat != null)
-            {
-                ShaderAssets.DefaultRefeshMat(genMat);
-                genMat = null;
-            }
         }
 
     }

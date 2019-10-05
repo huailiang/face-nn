@@ -9,37 +9,31 @@ namespace XEngine.Editor
     public class BaseEditor<T> : UnityEngineEditor
         where T : UnityEngine.Object
     {
-        protected T m_Target
-        {
-            get { return (T)target; }
-        }
+        protected T m_Target { get { return (T)target; } }
 
         protected SerializedProperty FindProperty<TValue>(Expression<Func<T, TValue>> expr)
         {
-            return serializedObject.FindProperty(EditorUtilities.GetFieldPath(expr));
+            return serializedObject.FindProperty(EditorUtility.GetFieldPath(expr));
         }
 
         protected SerializedParameter FindParameter<TValue>(Expression<Func<T, TValue>> expr)
         {
-            var property = serializedObject.FindProperty(EditorUtilities.GetFieldPath(expr));
-            var attributes = EditorUtilities.GetMemberAttributes(expr);
+            var property = serializedObject.FindProperty(EditorUtility.GetFieldPath(expr));
+            var attributes = EditorUtility.GetMemberAttributes(expr);
             return new SerializedParameter(property, attributes);
         }
 
         protected void PropertyField(SerializedParameter property)
         {
-            var title = EditorUtilities.GetContent(property.displayName);
+            var title = EditorUtility.GetContent(property.displayName);
             PropertyField(property, title);
         }
 
         protected void PropertyField(SerializedParameter property, GUIContent title)
         {
-            // Check for DisplayNameAttribute first
             var displayNameAttr = property.GetAttribute<DisplayNameAttribute>();
             if (displayNameAttr != null)
                 title.text = displayNameAttr.displayName;
-
-            // Add tooltip if it's missing and an attribute is available
             if (string.IsNullOrEmpty(title.tooltip))
             {
                 var tooltipAttr = property.GetAttribute<TooltipAttribute>();
@@ -47,20 +41,15 @@ namespace XEngine.Editor
                     title.tooltip = tooltipAttr.tooltip;
             }
 
-            // Look for a compatible attribute decorator
             AttributeDecorator decorator = null;
             Attribute attribute = null;
-
             foreach (var attr in property.attributes)
             {
-                // Use the first decorator we found
                 if (decorator == null)
                 {
-                    decorator = EditorUtilities.GetDecorator(attr.GetType());
+                    decorator = EditorUtility.GetDecorator(attr.GetType());
                     attribute = attr;
                 }
-
-                // Draw unity built-in Decorators (Space, Header)
                 if (attr is PropertyAttribute)
                 {
                     if (attr is SpaceAttribute)
@@ -72,7 +61,7 @@ namespace XEngine.Editor
                         var rect = EditorGUILayout.GetControlRect(false, 24f);
                         rect.y += 8f;
                         rect = EditorGUI.IndentedRect(rect);
-                        EditorGUI.LabelField(rect, (attr as HeaderAttribute).header, Styling.labelHeader);
+                        EditorGUI.LabelField(rect, (attr as HeaderAttribute).header, EditorStyles.miniLabel);
                     }
                 }
             }

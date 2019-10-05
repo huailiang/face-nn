@@ -7,8 +7,7 @@ namespace XEngine.Editor
 
     public class ToolsUtility
     {
-        
- 
+
         public static void BeginGroup(string name, bool beginHorizontal = true)
         {
             BeginGroup(name, new Vector4Int(0, 0, 1000, 100), beginHorizontal);

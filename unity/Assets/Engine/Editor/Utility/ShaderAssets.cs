@@ -1,6 +1,5 @@
 ﻿using CFUtilPoolLib;
 using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -195,136 +194,6 @@ namespace XEngine.Editor
             {
                 mat.shaderKeywords = keywordValue;
                 SetupMaterialWithBlendMode(mat, blendMode);
-            }
-        }
-
-        internal class RenderQueueValue : ShaderValue
-        {
-            public RenderQueueValue(Material mat) : base("", ShaderUtil.ShaderPropertyType.Float)
-            {
-                if (mat.shader.name == "Custom/PBS/Role" && mat.shader.name.EndsWith("_upper"))
-                {
-                    renderQueue = 2451;
-                }
-            }
-            public int renderQueue = -1;
-            public override void SetValue(Material mat)
-            {
-                mat.renderQueue = renderQueue;
-            }
-        }
-
-        internal static List<ShaderValue> shaderValue = new List<ShaderValue>();
-
-        [MenuItem("Assets/Engine/Material_Clear")]
-        static void ClearMat()
-        {
-            CommonAssets.enumMat.cb = (mat, path) =>
-            {
-                ClearMat(mat);
-            };
-            CommonAssets.EnumAsset<Material>(CommonAssets.enumMat, "ClearMat");
-        }
-
-        public static void ClearMat(Material mat)
-        {
-            shaderValue.Clear();
-            ShaderValue.GetShaderValue(mat, shaderValue);
-            Material emptyMat = new Material(mat.shader);
-            mat.CopyPropertiesFromMaterial(emptyMat);
-            UnityEngine.Object.DestroyImmediate(emptyMat);
-            for (int i = 0; i < shaderValue.Count; ++i)
-            {
-                ShaderValue sv = shaderValue[i];
-                sv.SetValue(mat);
-            }
-        }
-
-        internal static void ExtractMaterialsFromAsset(ModelImporter modelImporter, string destinationPath)
-        {
-            SerializedObject serializedObject = new UnityEditor.SerializedObject(modelImporter);
-            SerializedProperty materials = serializedObject.FindProperty("m_Materials");
-            for (int i = 0; i < materials.arraySize; ++i)
-            {
-                SerializedProperty arrayElementAtIndex = materials.GetArrayElementAtIndex(i);
-                string stringValue = arrayElementAtIndex.FindPropertyRelative("name").stringValue;
-                Material mat = null;
-                for (int j = 0; j < AssetsConfig.GlobalAssetsConfig.MaterialShaderMap.Length; j += 2)
-                {
-                    string keys = AssetsConfig.GlobalAssetsConfig.MaterialShaderMap[j];
-                    string value = AssetsConfig.GlobalAssetsConfig.MaterialShaderMap[j + 1];
-                    if (string.IsNullOrEmpty(keys))
-                    {
-                        mat = new Material(Shader.Find(value));
-                    }
-                    else
-                    {
-                        string[] keysList = keys.Split('|');
-                        foreach (string key in keysList)
-                        {
-                            if (stringValue.EndsWith(key))
-                            {
-                                mat = new Material(Shader.Find(value));
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (mat != null)
-                {
-                    mat.name = stringValue;
-                    Material newMat = AssetDatabase.LoadAssetAtPath<Material>(string.Format("{0}/{1}.mat", destinationPath, stringValue));
-                    if (newMat != null)
-                    {
-                        newMat.shader = mat.shader;
-                    }
-                    else
-                    {
-                        newMat = CommonAssets.CreateAsset<Material>(destinationPath, stringValue, ".mat", mat);
-                    }
-                    ClearMat(newMat);
-                    if (newMat != mat)
-                    {
-                        Object.DestroyImmediate(mat);
-                    }
-
-                }
-            }
-        }
-
-        internal static void SetPBSMaterial(Material mat, string materialFolder, string materialName)
-        {
-            string baseTexPath = string.Format(AssetsConfig.GlobalAssetsConfig.BaseTex_Format_Path, materialFolder, materialName);
-            Texture2D baseTex = AssetDatabase.LoadAssetAtPath<Texture2D>(baseTexPath);
-            mat.SetTexture("_BaseTex", baseTex);
-            if (!materialName.EndsWith("_hair"))
-            {
-                TextureImporter assetImporter = AssetImporter.GetAtPath(baseTexPath) as TextureImporter;
-                if (assetImporter != null)
-                {
-                    SetupMaterialWithBlendMode(mat, assetImporter.DoesSourceTextureHaveAlpha() ? BlendMode.Cutout : BlendMode.Opaque);
-                }
-                string pbsTexPath = string.Format(AssetsConfig.GlobalAssetsConfig.PbsTex_Format_Path, materialFolder, materialName);
-                mat.SetTexture("_PBSTex", AssetDatabase.LoadAssetAtPath<Texture2D>(pbsTexPath));
-            }
-        }
-
-        internal static bool IsHLSLorCGINC(string path)
-        {
-            return path.EndsWith(".hlsl") || path.EndsWith(".cginc");
-        }
-
-        internal static void ReImportShader()
-        {
-            string shaderFolder = "Assets/Engine/Shaders/PBS";
-            DirectoryInfo di = new DirectoryInfo(shaderFolder);
-            FileInfo[] files = di.GetFiles("*.shader", SearchOption.AllDirectories);
-            foreach (FileInfo fi in files)
-            {
-                string path = fi.FullName.Replace("\\", "/");
-                int index = path.IndexOf(shaderFolder);
-                path = path.Substring(index);
-                AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
             }
         }
 
@@ -583,48 +452,6 @@ namespace XEngine.Editor
                     mat.EnableKeyword("_SHADOW_MAP");
                 SetupMaterialWithBlendMode(mat, blendMode);
             }
-        }
-
-        public static void CreateDummyMat(string name, Shader shader, BlendMode blendMode, KeywordFlags keyWord, bool enableLightMap, bool enableShadow)
-        {
-            if (shader != null)
-            {
-                Material mat = new Material(shader);
-                RefeshMat(mat, blendMode, keyWord, enableLightMap, enableShadow);
-                CommonAssets.CreateAsset<Material>(string.Format("{0}/{1}",
-                    AssetsConfig.GlobalAssetsConfig.ResourcePath,
-                    AssetsConfig.GlobalAssetsConfig.DummyMatFolder), name, ".mat", mat);
-            }
-        }
-
-        private static BlendMode GetBlendMode(EBlendType blendType)
-        {
-            BlendMode mode = BlendMode.Opaque;
-            if (blendType == EBlendType.Cutout)
-                mode = BlendMode.Cutout;
-            else if (blendType == EBlendType.CutoutTransparent)
-                mode = BlendMode.CutoutTransparent;
-            else if (blendType == EBlendType.Transparent)
-                mode = BlendMode.Transparent;
-            return mode;
-        }
-        public static void DefaultMat(AssetsConfig.DummyMaterialInfo dmi)
-        {
-            if (dmi.shader != null)
-            {
-                string name = dmi.name;
-                CreateDummyMat(name, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, true, false);
-                if (dmi.shadowMat)
-                {
-                    CreateDummyMat(name + dmi.ext1, dmi.shader, GetBlendMode(dmi.blendType), (KeywordFlags)dmi.flag, true, true);
-                }
-            }
-        }
-        public static void DefaultRefeshMat(AssetsConfig.DummyMaterialInfo dmi)
-        {
-            BlendMode blendMode = GetBlendMode(dmi.blendType);
-            RefeshMat(dmi.mat, blendMode, (KeywordFlags)dmi.flag, true, false);
-            RefeshMat(dmi.mat1, blendMode, (KeywordFlags)dmi.flag, true, true);
         }
 
     }

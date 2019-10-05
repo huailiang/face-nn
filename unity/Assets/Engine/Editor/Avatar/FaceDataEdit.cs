@@ -18,17 +18,6 @@ namespace XEngine.Editor
         private int maxid = 0;
         int swap = 0;
 
-        [MenuItem("Assets/Engine/FaceData_Create")]
-        static void CreateFaceData()
-        {
-            string path = "Assets/BundleRes/Config/FaceData.asset";
-            if (!File.Exists(path))
-            {
-                FaceData fd = ScriptableObject.CreateInstance<FaceData>();
-                CommonAssets.CreateAsset<FaceData>("Assets/BundleRes/Config", "FaceData", ".asset", fd);
-            }
-        }
-
         private void OnEnable()
         {
             for (int i = 0; i < folder.Length; i++)
@@ -70,12 +59,13 @@ namespace XEngine.Editor
                 GUIFacePart<HeadData>("脸型", 0, ref faceData.headData);
                 GUIFacePart<SenseData>("五官", 1, ref faceData.senseData);
                 GUIFacePart<PaintData>("妆容", 2, ref faceData.paintData);
-                
+
                 GUILayout.Space(5);
                 if (GUILayout.Button("Save", GUILayout.MaxWidth(100)))
                 {
                     faceData.OnSave();
-                    CommonAssets.SaveAsset(faceData);
+                    UnityEditor.EditorUtility.SetDirty(faceData);
+                    AssetDatabase.SaveAssets();
                 }
             }
             serializedObject.ApplyModifiedProperties();
@@ -200,7 +190,7 @@ namespace XEngine.Editor
                 }
                 else
                 {
-                    EditorUtility.DisplayDialog("Warn", "You add item too much!", "OK");
+                    UnityEditor.EditorUtility.DisplayDialog("Warn", "You add item too much!", "OK");
                 }
             }
             GUILayout.EndHorizontal();
@@ -285,7 +275,7 @@ namespace XEngine.Editor
             }
             GUILayout.EndHorizontal();
         }
-        
+
 
         private void Add<T>(ref T[] arr, T item)
         {

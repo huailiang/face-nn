@@ -57,11 +57,11 @@ namespace XEngine.Editor
         public static void Model2Image()
         {
             XEditorUtil.SetupEnv();
-            string file = EditorUtility.OpenFilePanel("Select model file", MODEL, "bytes");
+            string file = UnityEditor.EditorUtility.OpenFilePanel("Select model file", MODEL, "bytes");
             FileInfo info = new FileInfo(file);
             ProcessFile(info);
             MoveDestDir("model_*", "regular/");
-            HelperEditor.Open(EXPORT + "regular/");
+            EditorUtility.Open(EXPORT + "regular/");
         }
 
 
@@ -103,14 +103,14 @@ namespace XEngine.Editor
                     shape = (RoleShape)shape,
                     name = name
                 };
-                EditorUtility.DisplayProgressBar("database", string.Format("is generating {0}/{1}", j, expc), (float)j / expc);
+                UnityEditor.EditorUtility.DisplayProgressBar("database", string.Format("is generating {0}/{1}", j, expc), (float)j / expc);
                 NeuralInput(data);
             }
-            EditorUtility.DisplayProgressBar("database", "post processing, wait for a moment", 1);
+            UnityEditor.EditorUtility.DisplayProgressBar("database", "post processing, wait for a moment", 1);
             bw.Close();
             fs.Close();
             MoveDestDir("db_*", "database/");
-            EditorUtility.ClearProgressBar();
+            UnityEditor.EditorUtility.ClearProgressBar();
         }
 
 
@@ -128,7 +128,7 @@ namespace XEngine.Editor
             {
                 files[i].MoveTo(path + files[i].Name);
             }
-            HelperEditor.Open(path);
+            EditorUtility.Open(path);
         }
 
 
