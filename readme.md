@@ -26,7 +26,7 @@
 
 ## 引擎预览
 
-打开Unity, 点击菜单栏Tools->Preview, 通过此工具可以手动去捏脸。
+打开Unity, 点击菜单栏Tools->Preview, 通过此工具可以手动去捏脸。当然， 此项目是通过神经网络生成参数params。
 
 ![](/image/t1.jpg)
 
