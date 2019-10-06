@@ -88,6 +88,10 @@ light_cnn优势在于一个很小的模型和一个非常不错的识别率。�
 	https://share.weiyun.com/5Q9ST03 密码：ndks4g
 
 
+![](/image/t3.jpg)
+
+
+
 [i1]: https://xueqiu.com/9217191040/133506937
 [i2]: https://arxiv.org/abs/1909.01064
 [i3]: http://www.sohu.com/a/339985351_823210
