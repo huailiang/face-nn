@@ -10,6 +10,7 @@ import tensorflow as tf
 import scipy.misc
 from lightcnn.extract_features import *
 from ops import *
+from faceparsing.evaluate import *
 
 
 def random_params(cnt):
@@ -76,6 +77,14 @@ def discriminative_loss(img1, img2, checkpoint):
     x1 = feature256(img1, checkpoint)
     x2 = feature256(img2, checkpoint)
     return 1 - get_cos_distance(x1, x2)
+
+
+def evalute_face(img):
+    """
+    face segmentation model
+    :return: face-parsing image
+    """
+    return out_evaluate(img)
 
 
 def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, output_photo_batch, filepath):

@@ -15,8 +15,8 @@ neural/models/
 neural/venv/
 neural/.idea/
 neural/dat/
-neural/face-parsing.PyTorch/res/
-neural/face-parsing.PyTorch/data/
+neural/faceparsing/res/
+neural/faceparsing/data/
 export/
 *.DS_Store
 *Animation.meta

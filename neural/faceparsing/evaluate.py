@@ -46,23 +46,37 @@ def vis_parsing_maps(im, parsing_anno, stride, save_im=False, save_path='vis_res
     # Save result or not
     if save_im:
         cv2.imwrite(save_path, vis_im, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+    return vis_im
 
-    # return vis_im
 
-
-def evaluate(respth='./res/test_res', dspth='./data', cp='79999_iter.pth'):
-    if not os.path.exists(respth):
-        os.makedirs(respth)
-
+def buildnet(cp='79999_iter.pth'):
     n_classes = 19
     net = BiSeNet(n_classes=n_classes)
     # net.cuda()
     save_pth = osp.join('res/cp', cp)
     net.load_state_dict(torch.load(save_pth, map_location="cpu"))
     net.eval()
-
     to_tensor = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)), ])
+    return net, to_tensor
+
+
+def out_evaluate(image, cp='79999_iter.pth'):
+    net, to_tensor = buildnet(cp)
+    with torch.no_grad():
+        img = to_tensor(image)
+        img = torch.unsqueeze(img, 0)
+        # img = img.cuda()
+        out = net(img)[0]
+        parsing = out.squeeze(0).cpu().numpy().argmax(0)
+        return vis_parsing_maps(image, parsing, stride=1, save_im=False)
+
+
+def inner_evaluate(respth='./res/test_res', dspth='./data', cp='79999_iter.pth'):
+    if not os.path.exists(respth):
+        os.makedirs(respth)
+
+    net, to_tensor = buildnet(cp)
     with torch.no_grad():
         for image_path in os.listdir(dspth):
             img = Image.open(osp.join(dspth, image_path))
@@ -78,4 +92,4 @@ def evaluate(respth='./res/test_res', dspth='./data', cp='79999_iter.pth'):
 
 if __name__ == "__main__":
     # setup_logger('./res')
-    evaluate()
+    inner_evaluate()
