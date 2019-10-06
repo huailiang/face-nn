@@ -91,7 +91,9 @@ light_cnn优势在于一个很小的模型和一个非常不错的识别率。�
 
 不用于论文里使用的resnet50，此项目引用的模型是resnet18。
 
-预训练model:	https://pan.baidu.com/s/1AEc7CJGirsdxOouD3boRBQ
+预训练model:	https://pan.baidu.com/s/1AEc7CJGirsdxOouD3boRBQ  
+
+下载后存放在face-parsing.PyTorch/res/cp 目录下
 
 
 最后的效果如图：
