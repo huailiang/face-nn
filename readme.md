@@ -88,8 +88,15 @@ light_cnn优势在于一个很小的模型和一个非常不错的识别率。�
 	https://share.weiyun.com/5Q9ST03 密码：ndks4g
 
 
-![](/image/t3.jpg)
 
+不用于论文里使用的resnet50，此项目引用的模型是resnet18。
+
+预训练model:	https://pan.baidu.com/s/1AEc7CJGirsdxOouD3boRBQ
+
+
+最后的效果如图：
+
+![](/image/t3.jpg)
 
 
 [i1]: https://xueqiu.com/9217191040/133506937
