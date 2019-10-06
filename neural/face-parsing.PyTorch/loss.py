@@ -22,7 +22,7 @@ class OhemCELoss(nn.Module):
         loss = self.criteria(logits, labels).view(-1)
         loss, _ = torch.sort(loss, descending=True)
         if loss[self.n_min] > self.thresh:
-            loss = loss[loss>self.thresh]
+            loss = loss[loss > self.thresh]
         else:
             loss = loss[:self.n_min]
         return torch.mean(loss)
@@ -36,7 +36,7 @@ class SoftmaxFocalLoss(nn.Module):
 
     def forward(self, logits, labels):
         scores = F.softmax(logits, dim=1)
-        factor = torch.pow(1.-scores, self.gamma)
+        factor = torch.pow(1. - scores, self.gamma)
         log_score = F.log_softmax(logits, dim=1)
         log_score = factor * log_score
         loss = self.nll(log_score, labels)
@@ -45,16 +45,12 @@ class SoftmaxFocalLoss(nn.Module):
 
 if __name__ == '__main__':
     torch.manual_seed(15)
-    criteria1 = OhemCELoss(thresh=0.7, n_min=16*20*20//16).cuda()
-    criteria2 = OhemCELoss(thresh=0.7, n_min=16*20*20//16).cuda()
-    net1 = nn.Sequential(
-        nn.Conv2d(3, 19, kernel_size=3, stride=2, padding=1),
-    )
+    criteria1 = OhemCELoss(thresh=0.7, n_min=16 * 20 * 20 // 16).cuda()
+    criteria2 = OhemCELoss(thresh=0.7, n_min=16 * 20 * 20 // 16).cuda()
+    net1 = nn.Sequential(nn.Conv2d(3, 19, kernel_size=3, stride=2, padding=1), )
     net1.cuda()
     net1.train()
-    net2 = nn.Sequential(
-        nn.Conv2d(3, 19, kernel_size=3, stride=2, padding=1),
-    )
+    net2 = nn.Sequential(nn.Conv2d(3, 19, kernel_size=3, stride=2, padding=1), )
     net2.cuda()
     net2.train()
 

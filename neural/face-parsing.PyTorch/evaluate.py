@@ -8,12 +8,9 @@ from face_dataset import FaceMask
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-import torch.nn.functional as F
-import torch.distributed as dist
 
 import os
 import os.path as osp
-import logging
 import time
 import numpy as np
 from tqdm import tqdm
@@ -22,17 +19,13 @@ from PIL import Image
 import torchvision.transforms as transforms
 import cv2
 
+
 def vis_parsing_maps(im, parsing_anno, stride, save_im=False, save_path='vis_results/parsing_map_on_im.jpg'):
     # Colors for all 20 parts
-    part_colors = [[255, 0, 0], [255, 85, 0], [255, 170, 0],
-                   [255, 0, 85], [255, 0, 170],
-                   [0, 255, 0], [85, 255, 0], [170, 255, 0],
-                   [0, 255, 85], [0, 255, 170],
-                   [0, 0, 255], [85, 0, 255], [170, 0, 255],
-                   [0, 85, 255], [0, 170, 255],
-                   [255, 255, 0], [255, 255, 85], [255, 255, 170],
-                   [255, 0, 255], [255, 85, 255], [255, 170, 255],
-                   [0, 255, 255], [85, 255, 255], [170, 255, 255]]
+    part_colors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 0, 85], [255, 0, 170], [0, 255, 0], [85, 255, 0],
+                   [170, 255, 0], [0, 255, 85], [0, 255, 170], [0, 0, 255], [85, 0, 255], [170, 0, 255], [0, 85, 255],
+                   [0, 170, 255], [255, 255, 0], [255, 255, 85], [255, 255, 170], [255, 0, 255], [255, 85, 255],
+                   [255, 170, 255], [0, 255, 255], [85, 255, 255], [170, 255, 255]]
 
     im = np.array(im)
     vis_im = im.copy().astype(np.uint8)
@@ -56,8 +49,8 @@ def vis_parsing_maps(im, parsing_anno, stride, save_im=False, save_path='vis_res
 
     # return vis_im
 
-def evaluate(respth='./res/test_res', dspth='./data', cp='79999_iter.pth'):
 
+def evaluate(respth='./res/test_res', dspth='./data', cp='79999_iter.pth'):
     if not os.path.exists(respth):
         os.makedirs(respth)
 
@@ -68,10 +61,8 @@ def evaluate(respth='./res/test_res', dspth='./data', cp='79999_iter.pth'):
     net.load_state_dict(torch.load(save_pth, map_location="cpu"))
     net.eval()
 
-    to_tensor = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-    ])
+    to_tensor = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)), ])
     with torch.no_grad():
         for image_path in os.listdir(dspth):
             img = Image.open(osp.join(dspth, image_path))
@@ -83,7 +74,6 @@ def evaluate(respth='./res/test_res', dspth='./data', cp='79999_iter.pth'):
             parsing = out.squeeze(0).cpu().numpy().argmax(0)
 
             vis_parsing_maps(image, parsing, stride=1, save_im=True, save_path=osp.join(respth, image_path))
-
 
 
 if __name__ == "__main__":

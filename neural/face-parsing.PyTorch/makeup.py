@@ -24,7 +24,7 @@ def sharpen(img):
 
 
 def hair(image, parsing, part=17, color=[230, 50, 20]):
-    b, g, r = color      #[10, 50, 250]       # [10, 250, 10]
+    b, g, r = color  # [10, 50, 250]       # [10, 250, 10]
     tar_color = np.zeros_like(image)
     tar_color[:, :, 0] = b
     tar_color[:, :, 1] = g
@@ -46,6 +46,7 @@ def hair(image, parsing, part=17, color=[230, 50, 20]):
     changed[parsing != part] = image[parsing != part]
     # changed = cv2.resize(changed, (512, 512))
     return changed
+
 
 #
 # def lip(image, parsing, part=17, color=[230, 50, 20]):
@@ -84,11 +85,7 @@ if __name__ == '__main__':
     # 13 lower lip
     # 17 hair
     num = 116
-    table = {
-        'hair': 17,
-        'upper_lip': 12,
-        'lower_lip': 13
-    }
+    table = {'hair': 17, 'upper_lip': 12, 'lower_lip': 13}
     image_path = '/home/zll/data/CelebAMask-HQ/test-img/{}.jpg'.format(num)
     parsing_path = 'res/test_res/{}.png'.format(num)
 
@@ -113,18 +110,3 @@ if __name__ == '__main__':
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -43,16 +43,6 @@ def main(_):
     #         net.close()
     #         break
 
-    # args = parser.parse_args()
-    # tfconfig = tf.ConfigProto(allow_soft_placement=False)
-    # tfconfig.gpu_options.allow_growth = True
-    # with tf.Session(config=tfconfig) as sess:
-    #     model = Artgan(sess, args)
-    #     if args.phase == 'train':
-    #         print("Train.")
-    #         model.train(args, ckpt_nmbr=args.ckpt_nmbr)
-
-
 
 if __name__ == '__main__':
     tf.app.run()
