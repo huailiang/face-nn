@@ -56,7 +56,7 @@ http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2
 
 ##  LightCNN
 
-[light_cnn][i5]出自2016 cvpr吴翔A Light CNN for Deep Face Representation with Noisy Labels，论文里使用LightCNN用于Loss函数L1, 衡量引擎生成的图片和Imitator生成的图片差异。
+[light_cnn][i5]出自2016 cvpr吴翔A Light CNN for Deep Face Representation with Noisy Labels，论文里使用LightCNN用于Loss函数L1, 即Discriminative Loss, 衡量引擎生成的图片和Imitator生成的图片差异。
 
 light_cnn优势在于一个很小的模型和一个非常不错的识别率。主要原因在于，
 
@@ -64,8 +64,28 @@ light_cnn优势在于一个很小的模型和一个非常不错的识别率。�
 
 （2）作者使用了NIN(Network inNetwork)来减少参数，并提升效果，作者提供的A模型是没有NIN操作的，B模型是有NIN操作的，2个模型的训练数据集都是CASIA，但是性能有0.5%的提升，当然代价是会有额外参数的产生。但是相比其他网络结构，使用NIN还是会使模型小不少，作者论文中的网络结构和B,C模型相对应。
 
-[the model of LightCNN-29 v2][i6]
+训练好的模型下载连接：[LightCNN-29 v2][i6]
 
+
+## 人脸分割
+
+
+论文里使用人脸分割，提取局部面部特征， 从而计算Facial Content Loss， 下面列出了我网上找到相关的人脸分割的相关介绍和数据集。
+
+1. 介绍
+
+	
+	[helen dataset 介绍]: http://www.ifp.illinois.edu/~vuongle2/helen
+
+	[Exemplar-Based Face Parsing]: http://pages.cs.wisc.edu/~lizhang/projects/face-parsing/
+
+	图像解析与编辑[中国科学院信息工程研究所网络空间技术实验室ppt]: https://pan.baidu.com/s/1FYznfGG914pPaU5bs0-4dw
+
+2. 数据集
+
+	helen_small4seg
+
+	https://share.weiyun.com/5Q9ST03 密码：ndks4g
 
 
 [i1]: https://xueqiu.com/9217191040/133506937
