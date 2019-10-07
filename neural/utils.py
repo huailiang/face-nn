@@ -40,13 +40,14 @@ def feature256(img, checkpoint):
     :param img: tensor 输入图片 shape:(batch, 512, 512, 3)
     :return: 256维特征参数
     """
-    model = LightCNN_29Layers_v2(num_classes=79077)
+    model = LightCNN_29Layers_v2(num_classes=80013)
     model.eval()
     model = torch.nn.DataParallel(model)  # .cuda()
     model.load_state_dict(checkpoint['state_dict'])
     transform = transforms.Compose([transforms.ToTensor()])
-    img = scipy.misc.imresize(arr=img, size=(128, 128))
-    # img = np.reshape(img, (128, 128, -1))
+    img = np.reshape(img, (1, 128, 128, -1))
+    print (img)
+    img = scipy.misc.imresize(arr=img.numpy(), size=(128, 128))
     img = transform(img)
     input[0, :, :, :] = img
     input_var = torch.autograd.Variable(input, volatile=True)

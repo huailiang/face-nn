@@ -56,16 +56,13 @@ http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat.bz2
 
 ##  LightCNN
 
-[light_cnn][i5]出自2016 cvpr吴翔A Light CNN for Deep Face Representation with Noisy Labels，论文里使用LightCNN用于Loss函数L1, 即Discriminative Loss, 衡量引擎生成的图片和Imitator生成的图片差异。
+[light_cnn][i5]出自2016 cvpr吴翔A Light CNN for Deep Face Representation with Noisy Labels，light_cnn优势在于一个很小的模型和一个非常不错的识别率。论文里使用LightCNN用于生成256 demonsion 信息，进而得到Loss函数L1, 即Discriminative Loss, 衡量引擎生成的图片和Imitator生成的图片差异。
 
-light_cnn优势在于一个很小的模型和一个非常不错的识别率。主要原因在于，
-
-（1）作者使用maxout作为激活函数，实现了对噪声的过滤和对有用信号的保留，从而产生更好的特征图MFM(Max-Feature-Map)。这个思想非常不错，本人将此思想用在center_loss中，实现了大概0.5%的性能提升，同时，这个maxout也就是所谓的slice+eltwise，这2个层的好处就是，一，不会产生训练的参数，二，基本很少耗时，给人的感觉就是不做白不做，性能还有提升。
-
-（2）作者使用了NIN(Network inNetwork)来减少参数，并提升效果，作者提供的A模型是没有NIN操作的，B模型是有NIN操作的，2个模型的训练数据集都是CASIA，但是性能有0.5%的提升，当然代价是会有额外参数的产生。但是相比其他网络结构，使用NIN还是会使模型小不少，作者论文中的网络结构和B,C模型相对应。
 
 训练好的模型下载连接：
+
 google driver: [LightCNN-29 v2][i6]
+
 baidu  yun:	   [LightCNN-29 v2][i7]
 
 

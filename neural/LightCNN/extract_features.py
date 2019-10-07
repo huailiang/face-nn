@@ -1,9 +1,3 @@
-'''
-implement the feature extractions for light CNN
-@author: Alfred Xiang Wu
-@date: 2017.07.04
-'''
-
 from __future__ import print_function
 import argparse
 import os
@@ -28,9 +22,11 @@ from load_imglist import ImageList
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Feature Extracting')
 parser.add_argument('--arch', '-a', metavar='ARCH', default='LightCNN')
-parser.add_argument('--cuda', '-c', default=True)
-parser.add_argument('--resume', default='', type=str, metavar='PATH', help='path to latest checkpoint (default: none)')
-parser.add_argument('--model', default='', type=str, metavar='Model', help='model type: LightCNN-9, LightCNN-29')
+parser.add_argument('--cuda', '-c', default=False)
+parser.add_argument('--resume', default='../dat/LightCNN_29Layers_V2_checkpoint.pth.tar', type=str, metavar='PATH',
+                    help='path to latest checkpoint (default: none)')
+parser.add_argument('--model', default='LightCNN-29v2', type=str, metavar='Model',
+                    help='model type: LightCNN-9, LightCNN-29')
 parser.add_argument('--root_path', default='', type=str, metavar='PATH',
                     help='root path of face images (default: none).')
 parser.add_argument('--img_list', default='', type=str, metavar='PATH',
@@ -41,7 +37,7 @@ parser.add_argument('--num_classes', default=79077, type=int, metavar='N', help=
 
 
 def main():
-    global args
+    # global args
     args = parser.parse_args()
 
     if args.model == 'LightCNN-9':
@@ -60,7 +56,7 @@ def main():
     if args.resume:
         if os.path.isfile(args.resume):
             print("=> loading checkpoint '{}'".format(args.resume))
-            checkpoint = torch.load(args.resume)
+            checkpoint = torch.load(args.resume, map_location="cpu")
             model.load_state_dict(checkpoint['state_dict'])
     else:
         print("=> no checkpoint found at '{}'".format(args.resume))

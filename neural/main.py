@@ -4,7 +4,6 @@
 # @Date  : 2019-09-20
 
 import tensorflow as tf
-
 from model import Face
 from net import Net
 from module import *
@@ -12,7 +11,6 @@ from parse import parser
 import logging
 
 logger = logging.getLogger("nn-face")
-
 tf.set_random_seed(228)
 
 
@@ -27,6 +25,10 @@ def main(_):
         elif args.phase == "inference":
             print ("inference")
             model.inference(args)
+        elif args.phase == "lightcnn":
+            print ("light cnn test")
+        elif args.phase == "faceparsing":
+            print ("faceparsing")
         elif args.phase == "net":
             net = Net(5010, 5011)
             while True:
