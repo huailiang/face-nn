@@ -9,8 +9,8 @@ from ops import *
 
 def feature_extractor(x, reuse=True, name="extractor"):
     """
+    此网络用来生成engine face的params
     :param x: reference image (batch, 512, 512, 3)
-    :param args: command args
     :param reuse:
     :param name: scope
     :return: engine params
@@ -63,10 +63,6 @@ def imitator(x, reuse=True, name="imitator"):
         y8 = tf.pad(y7, [[0, 0], [128, 128], [128, 128], [0, 0]], "REFLECT")
         y8 = tf.nn.relu(instance_norm(conv2d(y8, 3, 4, 1, name='i_e8_c'), name='i_e8_bn'))  # (1, 512, 512, 3)
         return y8
-
-
-def segment():
-    pass
 
 
 def encoder(image, options, reuse=True, name="encoder"):

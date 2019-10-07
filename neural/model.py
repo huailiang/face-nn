@@ -25,6 +25,7 @@ class Face(object):
         self.args = args
         self.model_name = args.model_name
         self.root_dir = './models'
+        self.checkpoint_dir = os.path.join(self.root_dir, self.model_name, 'checkpoint')
         self.logs_dir = os.path.join(self.root_dir, self.model_name, 'logs')
         self.batch_size = args.batch_size
         self.param_cnt = args.params_cnt
@@ -35,9 +36,10 @@ class Face(object):
         self.total_steps = args.db_item_cnt
         self.sess.run(tf.global_variables_initializer())
         self.lightcnn_path = args.lightcnn
-        self.build()
+        self._build_model()
+        self.saver = tf.train.Saver(max_to_keep=2)
 
-    def build(self):
+    def _build_model(self):
         with tf.name_scope('placeholder'):
             self.input_x = tf.placeholder(dtype=tf.float32, shape=[self.batch_size, None, None, self.param_cnt],
                                           name="params_x")
@@ -71,9 +73,18 @@ class Face(object):
             val = batch_rst[key][0]
             img = batch_rst[key][1]
             feed = {self.input_x: param_2_arr(val), self.refer_img: img}
-            t, summary_all = self.sess.run(self.i_optim_step, self.summary_merged_all, feed_dict=feed)
-            print(key, len(val), t.shape)
+            l1, l2, summary_all = self.sess.run(self.i_optim_step, self.e_optim_step, self.summary_merged_all,
+                                                feed_dict=feed)
             self.writer.add_summary(summary_all, step * self.batch_size)
+
+            if step % 500 == 0 and step > self.initial_step:
+                self.save(step)
+
+    def save(self, step):
+        if not os.path.exists(self.checkpoint_dir):
+            os.makedirs(self.checkpoint_dir)
+        self.saver.save(self.sess, os.path.join(self.checkpoint_dir, self.model_name + '_%d.ckpt' % step),
+                        global_step=step)
 
 
 class Artgan(object):
