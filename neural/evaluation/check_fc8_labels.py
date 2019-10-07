@@ -15,23 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import pandas as pd
-import h5py
 import numpy as np
+import pandas as pd
 
-ARTISTS = ['claude-monet',
-           'paul-cezanne',
-           'el-greco',
-           'paul-gauguin',
-           'samuel-peploe',
-           'vincent-van-gogh',
-           'edvard-munch',
-           'pablo-picasso',
-           'berthe-morisot',
-           'ernst-ludwig-kirchner',
-           'jackson-pollock',
-           'wassily-kandinsky',
-           'nicholas-roerich']
+ARTISTS = ['claude-monet', 'paul-cezanne', 'el-greco', 'paul-gauguin', 'samuel-peploe', 'vincent-van-gogh',
+           'edvard-munch', 'pablo-picasso', 'berthe-morisot', 'ernst-ludwig-kirchner', 'jackson-pollock',
+           'wassily-kandinsky', 'nicholas-roerich']
 
 
 def get_artist_labels_wikiart(artists=ARTISTS):
@@ -57,5 +46,4 @@ def get_artist_labels_wikiart(artists=ARTISTS):
 
 
 if __name__ == '__main__':
-
     print get_artist_labels_wikiart(ARTISTS)

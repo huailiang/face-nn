@@ -56,8 +56,6 @@ if __name__ == "__main__":
     counter = 0
     total = 0
     for i in range(15):
-        # files = os.listdir(osp.join(face_sep_mask, str(i)))
-
         atts = ['skin', 'l_brow', 'r_brow', 'l_eye', 'r_eye', 'eye_g', 'l_ear', 'r_ear', 'ear_r', 'nose', 'mouth',
                 'u_lip', 'l_lip', 'neck', 'neck_l', 'cloth', 'hair', 'hat']
 

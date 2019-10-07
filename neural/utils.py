@@ -37,7 +37,7 @@ def feature256(img, checkpoint):
     """
     使用light cnn提取256维特征参数
     :param checkpoint: lightcnn model
-    :param img: 输入图片 shape:(batch, 512, 512, 3)
+    :param img: tensor 输入图片 shape:(batch, 512, 512, 3)
     :return: 256维特征参数
     """
     model = LightCNN_29Layers_v2(num_classes=79077)
@@ -45,7 +45,8 @@ def feature256(img, checkpoint):
     model = torch.nn.DataParallel(model).cuda()
     model.load_state_dict(checkpoint['state_dict'])
     transform = transforms.Compose([transforms.ToTensor()])
-    img = np.reshape(img, (128, 128, -1))
+    img = scipy.misc.imresize(arr=img, size=(128, 128))
+    # img = np.reshape(img, (128, 128, -1))
     img = transform(img)
     input[0, :, :, :] = img
     input_var = torch.autograd.Variable(input, volatile=True)
@@ -63,7 +64,7 @@ def get_cos_distance(X1, X2):
     x1_norm = tf.sqrt(tf.reduce_sum(tf.square(X1)))
     x2_norm = tf.sqrt(tf.reduce_sum(tf.square(X2)))
     x1_x2 = tf.reduce_sum(tf.multiply(X1, X2))
-    return x1_x2 / x1_norm * x2_norm
+    return x1_x2 / (x1_norm * x2_norm)
 
 
 def discriminative_loss(img1, img2, checkpoint):
@@ -87,6 +88,17 @@ def evalute_face(img):
     return out_evaluate(img)
 
 
+def content_loss(img1, img2):
+    """
+    change resolution to 1/8, 512/8 = 64
+    :return:
+    """
+    image1 = scipy.misc.imresize(arr=img1, size=(64, 64))
+    image2 = scipy.misc.imresize(arr=img2, size=(64, 64))
+    cross = tf.losses.softmax_cross_entropy(onehot_labels=image1, logits=image2, weights=0.2)
+    return cross
+
+
 def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, output_photo_batch, filepath):
     """
     Concatenates, processes and stores batches as image 'filepath'.
@@ -96,9 +108,6 @@ def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, o
         output_painting_batch: numpy array of size [B x H x W x C]
         output_photo_batch: numpy array of size [B x H x W x C]
         filepath: full name with path of file that we save
-
-    Returns:
-
     """
 
     def batch_to_img(batch):

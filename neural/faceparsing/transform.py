@@ -2,10 +2,10 @@
 # -*- encoding: utf-8 -*-
 
 
-from PIL import Image
-import PIL.ImageEnhance as ImageEnhance
 import random
+import PIL.ImageEnhance as ImageEnhance
 import numpy as np
+from PIL import Image
 
 
 class RandomCrop(object):
@@ -40,7 +40,6 @@ class HorizontalFlip(object):
         else:
             im = im_lb['im']
             lb = im_lb['lb']
-
             #   1 'skin',
             #   2 'l_brow',
             #   3 'r_brow',

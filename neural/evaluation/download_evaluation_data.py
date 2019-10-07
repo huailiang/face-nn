@@ -20,7 +20,7 @@ def get_real_direct_link(sharing_link):
 def unzip(path, target_dir='.'):
     import zipfile
     with zipfile.ZipFile(path, 'r') as zip_ref:
-            zip_ref.extractall(target_dir)
+        zip_ref.extractall(target_dir)
 
 
 def main():
@@ -28,7 +28,7 @@ def main():
     link = get_real_direct_link(EVALUATION_DATA_URL)
     filename = 'evaluation_data.zip'
     print('Downloadng data (1Gb). This may take a while...')
-    download_url(link, root, filename,  None)
+    download_url(link, root, filename, None)
     print('Unzipping...')
     unzip(os.path.join(root, filename), target_dir='.')
     print('Done.')
@@ -36,4 +36,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
