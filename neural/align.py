@@ -17,22 +17,23 @@ def generate_detector():
     detector = dlib.get_frontal_face_detector()
     return detector, predictor, facerec
 
+
 def face_features(path_img, path_save):
     try:
         img = cv2.imread(path_img)
-        if img.shape[0] * img.shape[1] > 512*512:
-            img = cv2.resize(img, (0,0), fx=0.5, fy=0.5)
+        if img.shape[0] * img.shape[1] > 512 * 512:
+            img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
         detector, predictor, facerec = generate_detector()
-        dets = detector(img, 1) # 使用检测算子检测人脸，返回的是所有的检测到的人脸区域
+        dets = detector(img, 1)  # 使用检测算子检测人脸，返回的是所有的检测到的人脸区域
         print("检测的人脸图像：", path_img, "\n")
-        d = dets[0]     # 默认处理第一个检测到的人脸区域
+        d = dets[0]  # 默认处理第一个检测到的人脸区域
         bb = np.zeros(4, dtype=np.int32)
 
-        ext= 0
-        bb[0] = np.maximum(d.left()-ext, 0)
-        bb[1] = np.maximum(d.top()-ext, 0)
-        bb[2] = np.minimum(d.right()+ext, img.shape[1])
-        bb[3] = np.minimum(d.bottom()+ext, img.shape[0])
+        ext = 0
+        bb[0] = np.maximum(d.left() - ext, 0)
+        bb[1] = np.maximum(d.top() - ext, 0)
+        bb[2] = np.minimum(d.right() + ext, img.shape[1])
+        bb[3] = np.minimum(d.bottom() + ext, img.shape[0])
 
         rec = dlib.rectangle(bb[0], bb[1], bb[2], bb[3])
         shape = predictor(img, rec)  # 获取landmark
@@ -44,10 +45,9 @@ def face_features(path_img, path_save):
         cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]
         scaled = cv2.resize(cropped, (256, 256), interpolation=cv2.INTER_LINEAR)
         cv2.imwrite(path_save, img)
-        cv2.imwrite(path_save.replace("align_","align2_"), scaled)
+        cv2.imwrite(path_save.replace("align_", "align2_"), scaled)
     except Exception as e:
         print(e.message)
-
 
 
 def clean(path):
@@ -62,7 +62,7 @@ def export(path):
     for root, dirs, files in os.walk(path):
         for file in files:
             path1 = os.path.join(root, file)
-            path2 = os.path.join(root, "align_"+file)
+            path2 = os.path.join(root, "align_" + file)
             face_features(path1, path2)
 
 

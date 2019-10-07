@@ -35,6 +35,7 @@ class Face(object):
         self.total_steps = args.db_item_cnt
         self.sess.run(tf.global_variables_initializer())
         self.lightcnn_path = args.lightcnn
+        self.build()
 
     def build(self):
         with tf.name_scope('placeholder'):
@@ -43,16 +44,21 @@ class Face(object):
             self.refer_img = tf.placeholder(dtype=tf.float32, shape=[self.batch_size, 512, 512, 3],
                                             name="reinference_img")
             self.lightcnn_checkpoint = torch.load(self.lightcnn_path)
-            self.imitator = imitator(self.input_x, 4)
+            self.imitator = imitator(self.input_x)
+            self.extractor = feature_extractor(self.imitator)
 
             # ================== Define optimization steps. =============== #
             t_vars = tf.trainable_variables()
             imitator_vars = [var for var in t_vars if 'imitator' in var.name]
             loss1 = discriminative_loss(self.refer_img, self.imitator, self.lightcnn_checkpoint)
-            self.i_optim_step = tf.train.AdamOptimizer(self.lr).minimize(loss=loss1, var_list=imitator_vars)
+            self.i_optim_step = tf.train.AdamOptimizer(self.learning_rate).minimize(loss=loss1, var_list=imitator_vars)
+            extractor_vars = [var for var in t_vars if 'extractor' in var.name]
+            loss2 = content_loss(imitator(self.extractor), self.refer_img)
+            self.e_optim_step = tf.train.AdamOptimizer(self.learning_rate).minimize(loss=loss2, var_list=extractor_vars)
 
-            summary_i = tf.summary.scalar("discriminative/loss", loss1)
-            self.summary_feature_loss = tf.summary.merge([summary_i])
+            summary_i = tf.summary.scalar("face/loss1", loss1)
+            summary_e = tf.summary.scalar("face/loss2", loss2)
+            self.summary_feature_loss = tf.summary.merge([summary_i + summary_e])
             self.summary_merged_all = tf.summary.merge_all()
             self.writer = tf.summary.FileWriter(self.logs_dir, self.sess.graph)
 

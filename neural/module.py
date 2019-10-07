@@ -7,13 +7,38 @@ from __future__ import division
 from ops import *
 
 
-def imitator(x, options, reuse=True, name="imitator_"):
+def feature_extractor(x, reuse=True, name="extractor"):
+    """
+    :param x: reference image (batch, 512, 512, 3)
+    :param args: command args
+    :param reuse:
+    :param name: scope
+    :return: engine params
+    """
+    y1 = conv2d(x, 3, 2, name="ex_e1_c")  # (1, 256, 256, 3)
+    y1 = tf.nn.relu(instance_norm(y1, name="ex_e1_bn"))  # (1, 256, 256, 3)
+    y1 = tf.nn.max_pool(y1, ksize=[1, 3, 3, 1], strides=[1, 1, 1, 1], padding="VALID", name="ex_pool")  # (1, 254,
+    # 254, 3)
+    y2 = conv2d(y1, 8, 2, name="ex_e2_c")
+    y2 = tf.nn.relu(instance_norm(y2, name="ex_e2_bn"))  # (1, 127, 127, 8)
+    y3 = conv2d(y2, 16, 2, name="ex_e3_c")
+    y3 = tf.nn.relu(instance_norm(y3, name="ex_e3_bn"))  # (1, 64, 64, 16)
+    y4 = conv2d(y3, 32, 1, 4, name="ex_e4_c")
+    y4 = tf.nn.relu(instance_norm(y4, name="ex_e4_bn"))  # (1, 16, 16, 32)
+    y5 = conv2d(y4, 64, 1, 4, name="ex_e5_c")
+    y5 = tf.nn.relu(instance_norm(y5, name="ex_e5_bn"))  # (1, 4, 4, 64)
+    y6 = conv2d(y5, 95, 1, 8, name="ex_e6_c")
+    y6 = tf.nn.relu(instance_norm(y6, name="ex_e6_bn"))  # (1, 1, 1, 95)
+    return y6
+
+
+def imitator(x, reuse=True, name="imitator"):
     """
     这里建立八层imitator网络， 用来拟合引擎生成mesh的过程
     由于引擎中捏脸使用的参数跟论文《逆水寒》引擎中使用的参数不相同，所以每一个layer的depth不一样
     :param x: 捏脸参数
-    :param options: options defining number of kernels in conv layers
-    :return:
+    :param reuse:
+    :param name: scope
     """
     with tf.variable_scope(name):
         # if reuse:

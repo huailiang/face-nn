@@ -7,6 +7,7 @@ import tensorflow as tf
 from parse import parser
 from model import Artgan, Face
 from net import Net
+from module import *
 
 import logging
 logger = logging.getLogger("nn-face")
@@ -18,10 +19,12 @@ def main(_):
     args = parser.parse_args()
 
     with tf.Session() as sess:
-        model = Face(sess, args)
-        if args.phase == "train":
-            model.train(args)
-            print ('train mode')
+        x = tf.zeros([1, 512, 512, 3], tf.float32, name="s")
+        y1 = feature_extractor(x)
+        # model = Face(sess, args)
+        # if args.phase == "train":
+        #     model.train(args)
+        #     print ('train mode')
 
 
     # net = Net(5010, 5011)
