@@ -60,7 +60,7 @@ def train():
     Loss2 = OhemCELoss(thresh=score_thres, n_min=n_min, ignore_lb=ignore_idx)
     Loss3 = OhemCELoss(thresh=score_thres, n_min=n_min, ignore_lb=ignore_idx)
 
-    ## optimizer
+    # optimizer
     momentum = 0.9
     weight_decay = 5e-4
     lr_start = 1e-2
@@ -71,7 +71,7 @@ def train():
     optim = Optimizer(model=net.module, lr0=lr_start, momentum=momentum, wd=weight_decay, warmup_steps=warmup_steps,
         warmup_start_lr=warmup_start_lr, max_iter=max_iter, power=power)
 
-    ## train loop
+    # train loop
     msg_iter = 50
     loss_avg = []
     st = glob_st = time.time()

@@ -64,7 +64,9 @@ light_cnn优势在于一个很小的模型和一个非常不错的识别率。�
 
 （2）作者使用了NIN(Network inNetwork)来减少参数，并提升效果，作者提供的A模型是没有NIN操作的，B模型是有NIN操作的，2个模型的训练数据集都是CASIA，但是性能有0.5%的提升，当然代价是会有额外参数的产生。但是相比其他网络结构，使用NIN还是会使模型小不少，作者论文中的网络结构和B,C模型相对应。
 
-训练好的模型下载连接：[LightCNN-29 v2][i6]
+训练好的模型下载连接：
+google driver: [LightCNN-29 v2][i6]
+baidu  yun:	   [LightCNN-29 v2][i7]
 
 
 ## 人脸分割
@@ -107,3 +109,4 @@ light_cnn优势在于一个很小的模型和一个非常不错的识别率。�
 [i4]: https://blog.csdn.net/qiumokucao/article/details/81610628
 [i5]: https://github.com/AlfredXiangWu/LightCNN
 [i6]: https://drive.google.com/open?id=1Jn6aXtQ84WY-7J3Tpr2_j6sX0ch9yucS
+[i7]: https://pan.baidu.com/s/1E_rGkbqzf0ppyl5ks9FSLQ

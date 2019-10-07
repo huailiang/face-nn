@@ -42,7 +42,7 @@ def feature256(img, checkpoint):
     """
     model = LightCNN_29Layers_v2(num_classes=79077)
     model.eval()
-    model = torch.nn.DataParallel(model).cuda()
+    model = torch.nn.DataParallel(model)  # .cuda()
     model.load_state_dict(checkpoint['state_dict'])
     transform = transforms.Compose([transforms.ToTensor()])
     img = scipy.misc.imresize(arr=img, size=(128, 128))

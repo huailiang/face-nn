@@ -14,7 +14,7 @@ def parse_list(str_value):
     return str_value
 
 
-parser = argparse.ArgumentParser(description='')
+parser = argparse.ArgumentParser(description='face')
 
 # ========================== GENERAL PARAMETERS ========================= #
 parser.add_argument(
@@ -77,6 +77,12 @@ parser.add_argument(
     type=int,
     default=1000,
     help='Save model every save_freq steps')
+parser.add_argument(
+    '--lightcnn',
+    dest='lightcnn',
+    type=str,
+    default="./dat/LightCNN_29Layers_V2_checkpoint.pth.tar",
+    help='light cnn pre-train model')
 parser.add_argument(
     '--ngf',
     dest='ngf',

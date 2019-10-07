@@ -24,6 +24,7 @@ setup(name="neural",
                         'scipy>=1.5.0',
                         'Pillow',
                         'cv2',
-                        "torch", 'torchvision'],
+                        "torch",
+                        'torchvision'],
       python_requires=">=2.7"
       )

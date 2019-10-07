@@ -45,7 +45,7 @@ class Face(object):
                                           name="params_x")
             self.refer_img = tf.placeholder(dtype=tf.float32, shape=[self.batch_size, 512, 512, 3],
                                             name="reinference_img")
-            self.lightcnn_checkpoint = torch.load(self.lightcnn_path)
+            self.lightcnn_checkpoint = torch.load(self.lightcnn_path, map_location="cpu")
             self.imitator = imitator(self.input_x)
             self.extractor = feature_extractor(self.imitator)
 
