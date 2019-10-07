@@ -86,6 +86,31 @@ class Face(object):
         self.saver.save(self.sess, os.path.join(self.checkpoint_dir, self.model_name + '_%d.ckpt' % step),
                         global_step=step)
 
+    def loadckpt(self, checkpoint_dir=None):
+        init_op = tf.global_variables_initializer()
+        self.sess.run(init_op)
+        print("Start inference.")
+        ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
+        if ckpt and ckpt.model_checkpoint_path:
+            ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
+            print("checkpoint path: ", ckpt.model_checkpoint_path)
+            self.initial_step = int(ckpt_name.split("_")[-1].split(".")[0])
+            print("Load checkpoint %s. Initial step: %s." % (ckpt_name, self.initial_step))
+            self.saver.restore(self.sess, os.path.join(checkpoint_dir, ckpt_name))
+            return True
+        else:
+            return False
+
+    def inference(self, args, to_save_dir, img_path):
+        loaded = self.loadckpt(to_save_dir)
+        if loaded:
+            img = scipy.misc.imread(img_path, mode='RGB')
+            img = scipy.misc.imresize(img, size=512)
+            param = self.sess.run(self.extractor(img))
+            print("params:", param)
+        else:
+            print("error, loaded failed")
+
 
 class Artgan(object):
     def __init__(self, sess, args):
