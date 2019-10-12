@@ -16,8 +16,8 @@ class NnException(Exception):
 
 
 class IOException(Exception):
-    """docstring for TimeoutException"""
+    """docstring for io"""
 
     def __init__(self, message):
-        log.error("socket error: " + message)
+        log.error("io error: " + message)
         self.message = message

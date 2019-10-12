@@ -8,27 +8,28 @@ from model import Face
 from net import Net
 from module import *
 from parse import parser
-import logging
+import util.logit as log
 
-logger = logging.getLogger("nn-face")
 tf.set_random_seed(228)
 
 
 def main(_):
     args = parser.parse_args()
+    log.init("FaceNeural")
 
     with tf.Session() as sess:
-        model = Face(sess, args)
         if args.phase == "train":
+            model = Face(sess, args)
             model.train(args)
-            print ('train mode')
+            log.info('train mode')
         elif args.phase == "inference":
-            print ("inference")
+            log.info("inference")
+            model = Face(sess, args)
             model.inference(args)
         elif args.phase == "lightcnn":
-            print ("light cnn test")
+            log.info("light cnn test")
         elif args.phase == "faceparsing":
-            print ("faceparsing")
+            log.info("faceparsing")
         elif args.phase == "net":
             net = Net(5010, 5011)
             while True:
@@ -44,7 +45,7 @@ def main(_):
                     net.close()
                     break
                 else:
-                    logger.info("unknown code, quit")
+                    log.error("unknown code, quit")
                     net.close()
                     break
 

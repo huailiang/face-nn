@@ -5,8 +5,7 @@
 
 import atexit
 import socket
-import logging
-logger = logging.getLogger("nn-face")
+import util.logit as log
 
 
 class Net(object):
@@ -14,6 +13,7 @@ class Net(object):
     此模块用来和引擎通信
     使用udp在进程间通信，udp不保证时序性，也不保证引擎一定能收到
     """
+
     def __init__(self, port1, port2):
         atexit.register(self.close)
         self._port1 = port1
@@ -23,20 +23,20 @@ class Net(object):
         self._open_send = False
         self._loaded = False
         self._bind = ("localhost", port1)
-        print("socket start, rcv port:"+str(port1)+"  send port:"+str(port2))
+        log.error("socket start, rcv port:" + str(port1) + "  send port:" + str(port2))
 
         try:
             self._rcv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self._rcv_socket.bind(self._bind)
             self._open_socket = True
             data = self._rcv_socket.recvfrom(1024)
-            print("receive data")
-            print(data[0].decode('utf-8'))
+            log.info("receive data")
+            log.info(data[0].decode('utf-8'))
         except Exception as e:
             self._open_socket = False
             self.close()
-            logger.error(socket.error("socket error"+str(e.message)))
-            raise 
+            log.error(socket.error("socket error" + str(e.message)))
+            raise
 
         try:
             self._snd_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -53,13 +53,13 @@ class Net(object):
         :param msg:
         """
         try:
-            msg = "rcv"+msg
+            msg = "rcv" + msg
             self._snd_socket.sendto(msg.encode('utf-8'), self._bind2)
             if msg != "quit":
                 self.recv()
         except Exception as e:
-            logger.error(e.message)
-            raise 
+            log.error(e.message)
+            raise
 
     def only_send(self, msg):
         """
@@ -70,7 +70,7 @@ class Net(object):
             self._snd_socket.sendto(msg.encode('utf-8'), self._bind2)
             print("send success")
         except Exception as e:
-            logger.error(e.message)
+            log.error(e.message)
             raise
 
     def recv(self):
@@ -79,7 +79,7 @@ class Net(object):
             print("receive data")
             print(data[0].decode('utf-8'))
         except Exception as e:
-            logger.error(e.message)
+            log.error(e.message)
             raise
 
     def close(self):

@@ -56,7 +56,7 @@ def main():
         print('Error model type\n')
 
     if args.cuda:
-        model = torch.nn.DataParallel(model).cuda()
+        model = torch.nn.DataParallel(model) #.cuda()
 
     print(model)
 

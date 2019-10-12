@@ -11,6 +11,7 @@ from glob import glob
 from collections import namedtuple
 from tqdm import tqdm
 import multiprocessing
+import util.logit as log
 from prepare_dataset import FaceDataset
 
 from module import *
@@ -89,13 +90,13 @@ class Face(object):
     def loadckpt(self, checkpoint_dir=None):
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
-        print("Start inference.")
+        log.info("Start inference.")
         ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
         if ckpt and ckpt.model_checkpoint_path:
             ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
-            print("checkpoint path: ", ckpt.model_checkpoint_path)
+            log.info("checkpoint path: ", ckpt.model_checkpoint_path)
             self.initial_step = int(ckpt_name.split("_")[-1].split(".")[0])
-            print("Load checkpoint %s. Initial step: %s." % (ckpt_name, self.initial_step))
+            log.info("Load checkpoint %s. Initial step: %s." % (ckpt_name, self.initial_step))
             self.saver.restore(self.sess, os.path.join(checkpoint_dir, ckpt_name))
             return True
         else:
@@ -107,9 +108,9 @@ class Face(object):
             img = scipy.misc.imread(img_path, mode='RGB')
             img = scipy.misc.imresize(img, size=512)
             param = self.sess.run(self.extractor(img))
-            print("params:", param)
+            log.info("params:", param)
         else:
-            print("error, loaded failed")
+            log.error("error, loaded failed")
 
 
 class Artgan(object):
@@ -348,21 +349,21 @@ class Artgan(object):
                                         args=(q_art, augmentor, self.batch_size, i))
             p.start()
             jobs.append(p)
-        print("Processes are started.")
+        log.info("Processes are started.")
         time.sleep(3)
 
         # Now initialize the graph
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
-        print("Start training.")
+        log.info("Start training.")
 
         if self.load(self.checkpoint_dir, ckpt_nmbr):
-            print(" [*] Load SUCCESS")
+            log.info(" [*] Load SUCCESS")
         else:
             if self.load(self.checkpoint_long_dir, ckpt_nmbr):
-                print(" [*] Load SUCCESS")
+                log.info(" [*] Load SUCCESS")
             else:
-                print(" [!] Load failed...")
+                log.error(" [!] Load failed...")
 
         # Initial discriminator success rate.
         win_rate = args.discr_success_rate
@@ -413,12 +414,12 @@ class Artgan(object):
                            output_photo_batch=denormalize_arr_of_imgs(output_photos_),
                            filepath='%s/step_%d.jpg' % (self.sample_dir, step))
 
-        print("Training is finished. Terminate jobs.")
+        log.info("Training is finished. Terminate jobs.")
         for p in jobs:
             p.join()
             p.terminate()
 
-        print("Done.")
+        log.info("Done.")
 
     # Don't use this function yet.
     def inference_video(self, args, path_to_folder, to_save_dir=None, resize_to_original=True,
@@ -438,15 +439,15 @@ class Artgan(object):
         """
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
-        print("Start inference.")
+        log.info("Start inference.")
 
         if self.load(self.checkpoint_dir, ckpt_nmbr):
-            print(" [*] Load SUCCESS")
+            log.info(" [*] Load SUCCESS")
         else:
             if self.load(self.checkpoint_long_dir, ckpt_nmbr):
-                print(" [*] Load SUCCESS")
+                log.info(" [*] Load SUCCESS")
             else:
-                print(" [!] Load failed...")
+                log.info(" [!] Load failed...")
 
         # Create folder to store results.
         if to_save_dir is None:
@@ -498,15 +499,15 @@ class Artgan(object):
     def init_loadckpt(self, to_save_dir=None, ckpt_nmbr=None):
         init_op = tf.global_variables_initializer()
         self.sess.run(init_op)
-        print("Start inference.")
+        log.info("Start inference.")
 
         if self.load(self.checkpoint_dir, ckpt_nmbr):
-            print(" [*] Load SUCCESS")
+            log.info(" [*] Load SUCCESS")
         else:
             if self.load(self.checkpoint_long_dir, ckpt_nmbr):
-                print(" [*] Load SUCCESS")
+                log.info(" [*] Load SUCCESS")
             else:
-                print(" [!] Load failed...")
+                log.error(" [!] Load failed...")
 
         # Create folder to store results.
         if to_save_dir is None:
@@ -540,7 +541,7 @@ class Artgan(object):
             img_name = os.path.basename(img_path)
             scipy.misc.imsave(os.path.join(to_save_dir, img_name[:-4] + "_stylized.jpg"), img)
 
-        print("Inference is finished.")
+        log.info("Inference is finished.")
 
     def save(self, step, is_long=False):
         if not os.path.exists(self.checkpoint_dir):
@@ -555,11 +556,11 @@ class Artgan(object):
     def load(self, checkpoint_dir, ckpt_nmbr=None):
         if ckpt_nmbr:
             if len([x for x in os.listdir(checkpoint_dir) if str(ckpt_nmbr) in x]) > 0:
-                print(" [*] Reading checkpoint %d from folder %s." % (ckpt_nmbr, checkpoint_dir))
+                log.info(" [*] Reading checkpoint %d from folder %s." % (ckpt_nmbr, checkpoint_dir))
                 ckpt_name = [x for x in os.listdir(checkpoint_dir) if str(ckpt_nmbr) in x][0]
                 ckpt_name = '.'.join(ckpt_name.split('.')[:-1])
                 self.initial_step = ckpt_nmbr
-                print("Load checkpoint %s. Initial step: %s." % (ckpt_name, self.initial_step))
+                log.info("Load checkpoint %s. Initial step: %s." % (ckpt_name, self.initial_step))
                 self.saver.restore(self.sess, os.path.join(checkpoint_dir, ckpt_name))
                 return True
             else:
@@ -569,9 +570,9 @@ class Artgan(object):
             ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
             if ckpt and ckpt.model_checkpoint_path:
                 ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
-                print("checkpoint path: ", ckpt.model_checkpoint_path)
+                log.info("checkpoint path: ", ckpt.model_checkpoint_path)
                 self.initial_step = int(ckpt_name.split("_")[-1].split(".")[0])
-                print("Load checkpoint %s. Initial step: %s." % (ckpt_name, self.initial_step))
+                log.info("Load checkpoint %s. Initial step: %s." % (ckpt_name, self.initial_step))
                 self.saver.restore(self.sess, os.path.join(checkpoint_dir, ckpt_name))
                 return True
             else:

@@ -9,6 +9,7 @@ import struct
 import dlib
 import cv2
 import numpy as np
+import util.logit as log
 
 
 def generate_detector():
@@ -70,6 +71,6 @@ if __name__ == '__main__':
     pwd = os.getcwd()
     project_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
     model_path = os.path.join(project_path, "export/image/")
-    print(model_path)
+    log.info(model_path)
     clean(model_path)
     export(model_path)

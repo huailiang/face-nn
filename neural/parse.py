@@ -37,7 +37,7 @@ parser.add_argument(
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='train',
+    default='net',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--model_name',

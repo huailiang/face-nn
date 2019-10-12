@@ -10,13 +10,14 @@ from tqdm import tqdm
 import scipy.misc
 import random
 import struct
+import util.logit as log
 
 
 class ArtDataset:
     def __init__(self, path_to_art_dataset):
 
         self.dataset = [os.path.join(path_to_art_dataset, x) for x in os.listdir(path_to_art_dataset)]
-        print("Art dataset contains %d images." % len(self.dataset))
+        log.info("Art dataset contains %d images." % len(self.dataset))
 
     def get_batch(self, augmentor, batch_size=1):
         """
@@ -70,9 +71,9 @@ class CocoDataset:
             for file_name in tqdm(os.listdir(path_to_dataset)):
                 self.dataset.append(os.path.join(path_to_dataset, file_name))
         else:
-            print("can't be found path %s. Skip it." % path_to_dataset)
+            log.error("can't be found path %s. Skip it." % path_to_dataset)
 
-        print("Finished. Constructed Places2 dataset of %d images." % len(self.dataset))
+        log.info("Finished. Constructed Places2 dataset of %d images." % len(self.dataset))
 
     def get_batch(self, augmentor, batch_size=1):
         """
@@ -117,6 +118,7 @@ class FaceDataset:
     """
     由Unity引擎生成的dataset
     """
+
     def __init__(self, args):
         self.dataset = {}
         self.path_to_dataset = args.path_to_dataset
@@ -125,7 +127,7 @@ class FaceDataset:
         if os.path.exists(self.path_to_dataset):
             name = "db_description"
             path = os.path.join(self.path_to_dataset, name)
-            print(path)
+            log.info(path)
             f = open(path, "rb")
             for it in range(cnt):
                 kk = f.read(9)[1:]  # 第一个是c#字符串的长度
@@ -152,6 +154,6 @@ class FaceDataset:
             name = key + ".jpg"
             path = os.path.join(self.path_to_dataset, name)
             image = scipy.misc.imread(name=path, mode='RGB')
-            # print("info: ", key, len(val), path, image.shape)
+            # log.info("info: ", key, len(val), path, image.shape)
             batch_rst[key] = (val, image)
             return batch_rst
