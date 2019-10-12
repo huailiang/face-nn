@@ -48,7 +48,7 @@ def face_features(path_img, path_save):
         cv2.imwrite(path_save, img)
         cv2.imwrite(path_save.replace("align_", "align2_"), scaled)
     except Exception as e:
-        print(e.message)
+        log.error(e.message)
 
 
 def clean(path):
