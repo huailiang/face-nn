@@ -9,6 +9,7 @@ unity/Assets/Table*
 **/.vscode
 **/.vs
 **/*.pyc
+**/log.txt
 neural/input/
 neural/output/
 neural/models/
