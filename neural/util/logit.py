@@ -45,12 +45,12 @@ handler:
 
 
 def init(name="LOG", level=logging.INFO, log_path="log.txt"):
-    clear_log()
+    clear_log(log_path)
     global _log
     _log = logging.getLogger(name)
     _log.setLevel(level)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler = logging.FileHandler("log.txt")
+    handler = logging.FileHandler(log_path)
     handler.setLevel(level)
     handler.setFormatter(formatter)
     console = logging.StreamHandler()
@@ -60,11 +60,10 @@ def init(name="LOG", level=logging.INFO, log_path="log.txt"):
     _log.addHandler(console)
 
 
-def clear_log():
+def clear_log(log_path):
     try:
-        name = "log2.txt"
-        if os.path.exists(name):
-            os.remove(name)
+        if os.path.exists(log_path):
+            os.remove(log_path)
     except IOError:
         raise
 

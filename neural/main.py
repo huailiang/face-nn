@@ -9,13 +9,14 @@ from net import Net
 from module import *
 from parse import parser
 import util.logit as log
+import logging
 
 tf.set_random_seed(228)
 
 
 def main(_):
     args = parser.parse_args()
-    log.init("FaceNeural")
+    log.init("FaceNeural", logging.DEBUG, log_path="output/log.txt")
 
     with tf.Session() as sess:
         if args.phase == "train":
@@ -31,6 +32,7 @@ def main(_):
         elif args.phase == "faceparsing":
             log.info("faceparsing")
         elif args.phase == "net":
+            log.info("net start with ports (%d, %d)", 5010, 5011)
             net = Net(5010, 5011)
             while True:
                 r_input = raw_input("command: \n")
