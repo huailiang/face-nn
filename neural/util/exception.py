@@ -3,16 +3,17 @@
 # @Author: penghuailiang
 # @Date  : 2019-09-20
 
-import logit as log
+
 import traceback
+import util.logit as log
 
 
-class NnException(Exception):
+class NeuralException(Exception):
     """docstring for NnException"""
 
     def __init__(self, message):
-        log.error("neural error: " + message)
-        self.message = message
+        log.info("neural error: " + message)
+        self.message = "neural exception: " + message
 
 
 class IOException(Exception):

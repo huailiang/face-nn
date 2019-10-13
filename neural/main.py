@@ -4,12 +4,13 @@
 # @Date  : 2019-09-20
 
 import tensorflow as tf
+import util.logit as log
+import logging
 from model import Face
 from net import Net
 from module import *
 from parse import parser
-import util.logit as log
-import logging
+
 
 tf.set_random_seed(228)
 

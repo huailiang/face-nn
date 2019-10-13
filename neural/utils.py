@@ -51,8 +51,8 @@ def feature256(img, checkpoint):
     for i in range(batch):
         _img = img[i]
         log.info(_img.shape)
-        img = scipy.misc.imresize(arr=img, size=(128, 128))
-        img = transform(img)
+        img = scipy.misc.imresize(arr=_img, size=(128, 128))
+        img = transform(_img)
         input[0, :, :, :] = img
         input_var = torch.autograd.Variable(input, volatile=True)
         _, features = model(input_var)

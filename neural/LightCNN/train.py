@@ -14,8 +14,8 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import numpy as np
 
-from light_cnn import LightCNN_9Layers, LightCNN_29Layers, LightCNN_29Layers_v2
-from load_imglist import ImageList
+from .light_cnn import LightCNN_9Layers, LightCNN_29Layers, LightCNN_29Layers_v2
+from .load_imglist import ImageList
 
 parser = argparse.ArgumentParser(description='PyTorch Light CNN Training')
 parser.add_argument('--arch', '-a', metavar='ARCH', default='LightCNN')
