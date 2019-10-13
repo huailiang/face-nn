@@ -35,12 +35,12 @@ def main(_):
             log.info("net start with ports (%d, %d)", 5010, 5011)
             net = Net(5010, 5011)
             while True:
-                r_input = raw_input("command: \n")
+                r_input = input("command: \n")
                 if r_input == "s":
-                    msg = raw_input("input: ")
+                    msg = input("input: ")
                     net.only_send(msg)
                 elif r_input == 'r':
-                    msg = raw_input("input: ")
+                    msg = input("input: ")
                     net.send_recv(msg)
                 elif r_input == "q":
                     net.only_send("quit")

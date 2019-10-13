@@ -56,16 +56,16 @@ def feature256(img, checkpoint):
     return features
 
 
-def get_cos_distance(X1, X2):
+def get_cos_distance(x1, x2):
     """
     calculate cos distance between two sets
     https://blog.csdn.net/liuchonge/article/details/70049413
-    :param X1: 256 dimensions vector
-    :param X2: 256 dimensions vector
+    :param x1: 256 dimensions vector
+    :param x2: 256 dimensions vector
     """
-    x1_norm = tf.sqrt(tf.reduce_sum(tf.square(X1)))
-    x2_norm = tf.sqrt(tf.reduce_sum(tf.square(X2)))
-    x1_x2 = tf.reduce_sum(tf.multiply(X1, X2))
+    x1_norm = tf.sqrt(tf.reduce_sum(tf.square(x1)))
+    x2_norm = tf.sqrt(tf.reduce_sum(tf.square(x2)))
+    x1_x2 = tf.reduce_sum(tf.multiply(x1, x2))
     return x1_x2 / (x1_norm * x2_norm)
 
 

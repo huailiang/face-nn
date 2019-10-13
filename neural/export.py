@@ -6,6 +6,7 @@
 import os
 import shutil
 import struct
+import util.logit as log
 
 """
 此工具用来生成一些规则的model（.bytes）
@@ -28,13 +29,13 @@ def movefile(srcfile, dstfile):
     :param dstfile:  destination path
     """
     if not os.path.isfile(srcfile):
-        print("%s not exist!" % (srcfile))
+        log.info("%s not exist!" % (srcfile))
     else:
         fpath, fname = os.path.split(dstfile)  # 分离文件名和路径
         if not os.path.exists(fpath):
             os.makedirs(fpath)  # 创建路径
         shutil.move(srcfile, dstfile)  # 移动文件
-        print("move %s -> %s" % (srcfile, dstfile))
+        log.info("move %s -> %s" % (srcfile, dstfile))
 
 
 def move2unity(name):
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     pwd = os.getcwd()
     project_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
     model_path = os.path.join(project_path, "unity/models/")
-    print(model_path)
+    log.info(model_path)
 
     shapes = [3, 4]
     for i in shapes:
