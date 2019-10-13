@@ -18,6 +18,7 @@ neural/.idea/
 neural/dat/
 neural/faceparsing/res/
 neural/faceparsing/data/
-export/
+export/**/*jpg
+export/**/*jpeg
 *.DS_Store
 *Animation.meta

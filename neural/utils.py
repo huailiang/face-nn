@@ -47,7 +47,7 @@ def feature256(img, checkpoint):
     model.load_state_dict(checkpoint['state_dict'])
     transform = transforms.Compose([transforms.ToTensor()])
     img = np.reshape(img, (1, 128, 128, -1))
-    log.info (img)
+    log.info(img)
     img = scipy.misc.imresize(arr=img.numpy(), size=(128, 128))
     img = transform(img)
     input[0, :, :, :] = img

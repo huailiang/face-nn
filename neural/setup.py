@@ -12,19 +12,18 @@ setup(name="neural",
       author_email="peng_huailiang@qq.com",
       classifiers=[
           "Intended Audience :: Developers",
-          "Programming Language :: Python :: 2.7",
+          "Programming Language :: Python :: 3.5",
       ],
       packages=find_packages(),
       zip_safe=False,
       install_requires=["tqdm",
-                        "dlib>=19.0",
                         "numpy>=1.13.3,<2.0",
                         "argparse>=1.4.0",
-                        'tensorflow>=1.1.0',
+                        'tensorflow>=1.1.0, <2.0',
                         'scipy>=1.5.0',
-                        'Pillow',
+                        'pillow',
                         'cv2',
                         "torch",
                         'torchvision'],
-      python_requires=">=2.7"
+      python_requires=">=3.5"
       )

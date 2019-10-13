@@ -35,6 +35,8 @@
 
 打开Unity, 点击菜单栏Tools->GenerateDatabase
 
+在export会生成两个文件夹trainset和testset， 分别用作训练集和测试集。 trainset随机生成的噪点大概是1/95。
+
 这里由引擎随机生成2000张图片， 其中80%用作训练集， 20%用作验证集。同时在图片同目录会生成二进制文件db_description，记录捏脸相关的参数。
 
 生成图片分辨率：512x512, 生成目录在unity项目同级目录export/database文件夹里， 于论文里不同的是这里使用Unity引擎代替Justice引擎。

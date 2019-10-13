@@ -74,14 +74,23 @@ namespace XEngine.Editor
                 ProcessFile(files[i]);
             }
             MoveDestDir("model_*", "regular/");
+            EditorUtility.Open(EXPORT + "regular/");
         }
 
         [MenuItem("Tools/GenerateDatabase")]
-        private static void RandomExportModels()
+        private static void GenerateDatabase()
+        {
+            int datacount = 2000;
+            RandomExportModels((int)(datacount * 0.8), "trainset", true);
+            RandomExportModels((int)(datacount * 0.2), "testset", false);
+            EditorUtility.Open(EXPORT);
+        }
+
+        private static void RandomExportModels(int expc, string prefix, bool noise)
         {
             XEditorUtil.SetupEnv();
             float[] args = new float[CNT];
-            int expc = 1000;
+
             FileStream fs = new FileStream(EXPORT + "db_description", FileMode.OpenOrCreate, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
             for (int j = 0; j < expc; j++)
@@ -92,7 +101,7 @@ namespace XEngine.Editor
                 for (int i = 0; i < CNT; i++)
                 {
                     args[i] = UnityEngine.Random.Range(0.0f, 1.0f);
-                    bw.Write(args[i]);
+                    bw.Write(noise ? AddNoise(args[i], i) : args[i]);
                 }
                 NeuralData data = new NeuralData
                 {
@@ -101,14 +110,28 @@ namespace XEngine.Editor
                     shape = (RoleShape)shape,
                     name = name
                 };
-                UnityEditor.EditorUtility.DisplayProgressBar("database", string.Format("is generating {0}/{1}", j, expc), (float)j / expc);
+                UnityEditor.EditorUtility.DisplayProgressBar(prefix, string.Format("is generating {0}/{1}", j, expc), (float)j / expc);
                 NeuralInput(data);
             }
-            UnityEditor.EditorUtility.DisplayProgressBar("database", "post processing, wait for a moment", 1);
+            UnityEditor.EditorUtility.DisplayProgressBar(prefix, "post processing, wait for a moment", 1);
             bw.Close();
             fs.Close();
-            MoveDestDir("db_*", "database/");
+            MoveDestDir("db_*", prefix + "/");
             UnityEditor.EditorUtility.ClearProgressBar();
+        }
+
+        /// <summary>
+        /// tip: noise only for train set, not for test set
+        /// </summary>
+        private static float AddNoise(float arg, int indx)
+        {
+            int rnd = UnityEngine.Random.Range(0, CNT);
+            if (indx == rnd)
+            {
+                rnd = UnityEngine.Random.Range(-20, 20);
+                return ((arg * 60) + 20 + rnd) / 100.0f;
+            }
+            return arg;
         }
 
 
@@ -126,7 +149,6 @@ namespace XEngine.Editor
             {
                 files[i].MoveTo(path + files[i].Name);
             }
-            EditorUtility.Open(path);
         }
 
 
@@ -185,8 +207,7 @@ namespace XEngine.Editor
         {
             if (connect != null)
             {
-                string str = "hello world";
-                connect.Send(str);
+                connect.Send("hello world");
             }
             else
             {
