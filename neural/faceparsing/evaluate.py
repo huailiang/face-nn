@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- encoding: utf-8 -*-
 
-from logger import setup_logger
-from model import BiSeNet
-from face_dataset import FaceMask
+from .logger import setup_logger
+from .model import BiSeNet
+from .face_dataset import FaceMask
 
 import torch
 import torch.nn as nn

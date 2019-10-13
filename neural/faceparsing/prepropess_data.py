@@ -4,7 +4,7 @@
 import os.path as osp
 import os
 import cv2
-from transform import *
+from .transform import *
 from PIL import Image
 
 face_data = '/home/zll/data/CelebAMask-HQ/CelebA-HQ-img'

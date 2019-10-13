@@ -46,14 +46,17 @@ def feature256(img, checkpoint):
     model = torch.nn.DataParallel(model)  # .cuda()
     model.load_state_dict(checkpoint['state_dict'])
     transform = transforms.Compose([transforms.ToTensor()])
-    img = np.reshape(img, (1, 128, 128, -1))
     log.info(img)
-    img = scipy.misc.imresize(arr=img.numpy(), size=(128, 128))
-    img = transform(img)
-    input[0, :, :, :] = img
-    input_var = torch.autograd.Variable(input, volatile=True)
-    _, features = model(input_var)
-    return features
+    batch = img.shape[0]
+    for i in range(batch):
+        _img = img[i]
+        log.info(_img.shape)
+        img = scipy.misc.imresize(arr=img, size=(128, 128))
+        img = transform(img)
+        input[0, :, :, :] = img
+        input_var = torch.autograd.Variable(input, volatile=True)
+        _, features = model(input_var)
+        return features
 
 
 def get_cos_distance(x1, x2):
