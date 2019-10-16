@@ -13,12 +13,13 @@ import utils
 
 """
 imitator
-此网络用来生成engine face的params
+photo生成engine face's params
+photo solution: 512x512
 """
 
 
 class FeatureExtractor(nn.Module):
-    def __init__(self, name):
+    def __init__(self, name, lr=0.01, momentum=0.5):
         super(FeatureExtractor, self).__init__()
         log.info("construct feature_extractor %s", name)
         self.name = name
@@ -31,6 +32,7 @@ class FeatureExtractor(nn.Module):
             self.layer(32, 64, kernel_size=3, stride=2, pad=1),  # 6. (batch, 64, 8, 8)
             self.layer(64, 95, kernel_size=7, stride=2),  # 7. (batch, 95, 1, 1)
         )
+        self.optimizer = optim.SGD(self.parameters(), lr=lr, momentum=momentum)
 
     def layer(self, in_chanel, out_chanel, kernel_size, stride, pad=0):
         return nn.Sequential(
@@ -50,4 +52,3 @@ if __name__ == '__main__':
     extractor = FeatureExtractor("neural_extractor")
     y = extractor.forward(torch.randn(2, 3, 512, 512))
     log.info(y.size())
-    log.info(type(y))

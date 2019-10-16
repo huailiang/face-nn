@@ -11,12 +11,11 @@ import torch.optim
 import torch.utils.data
 import torch.nn.functional as F
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
 
 import numpy as np
 import cv2
-from .light_cnn import LightCNN_9Layers, LightCNN_29Layers, LightCNN_29Layers_v2
-from .load_imglist import ImageList
+from lightcnn.light_cnn import LightCNN_9Layers, LightCNN_29Layers, LightCNN_29Layers_v2
+from lightcnn.load_imglist import ImageList
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Feature Extracting')
 parser.add_argument('--arch', '-a', metavar='ARCH', default='LightCNN')
@@ -25,13 +24,13 @@ parser.add_argument('--resume', default='../dat/LightCNN_29Layers_V2_checkpoint.
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('--model', default='LightCNN-29v2', type=str, metavar='Model',
                     help='model type: LightCNN-9, LightCNN-29')
-parser.add_argument('--root_path', default='', type=str, metavar='PATH',
+parser.add_argument('--root_path', default='../dat/', type=str, metavar='PATH',
                     help='root path of face images (default: none).')
-parser.add_argument('--img_list', default='', type=str, metavar='PATH',
+parser.add_argument('--img_list', default='../dat/LightCNN_list.txt', type=str, metavar='PATH',
                     help='list of face images for feature extraction (default: none).')
-parser.add_argument('--save_path', default='', type=str, metavar='PATH',
+parser.add_argument('--save_path', default='../output/lightcnn_feature.txt', type=str, metavar='PATH',
                     help='save root path for features of face images.')
-parser.add_argument('--num_classes', default=79077, type=int, metavar='N', help='mini-batch size (default: 79077)')
+parser.add_argument('--num_classes', default=80013, type=int, metavar='N', help='mini-batch size (default: 79077)')
 
 
 def main():
@@ -50,7 +49,8 @@ def main():
     model.eval()
     if args.cuda:
         model = torch.nn.DataParallel(model).cuda()
-
+    else:
+        model = torch.nn.DataParallel(model)
     if args.resume:
         if os.path.isfile(args.resume):
             print("=> loading checkpoint '{}'".format(args.resume))
@@ -66,10 +66,15 @@ def main():
     for img_name in img_list:
         count = count + 1
         img = cv2.imread(os.path.join(args.root_path, img_name), cv2.IMREAD_GRAYSCALE)
+        # cv2.imshow(img_name, img)
+        # print("cv:", img.shape)
+        # cv2.waitKey()
         img = np.reshape(img, (128, 128, 1))
+        print("shape:", img.shape)
         img = transform(img)
+        print("img: ", img.size())
         input[0, :, :, :] = img
-
+        print("input shape: ", input.shape)
         start = time.time()
         if args.cuda:
             input = input.cuda()
@@ -82,6 +87,7 @@ def main():
 
 def read_list(list_path):
     img_list = []
+    print("list_path", list_path)
     with open(list_path, 'r') as f:
         for line in f.readlines()[0:]:
             img_path = line.strip().split()
@@ -92,7 +98,7 @@ def read_list(list_path):
 
 def save_feature(save_path, img_name, features):
     img_path = os.path.join(save_path, img_name)
-    img_dir = os.path.dirname(img_path) + '/';
+    img_dir = os.path.dirname(img_path) + '/'
     if not os.path.exists(img_dir):
         os.makedirs(img_dir)
     fname = os.path.splitext(img_path)[0]
