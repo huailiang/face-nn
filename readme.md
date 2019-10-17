@@ -9,11 +9,12 @@
 3.  tensorboardX
 4.  dlib-19.18
 5.  numpy-1.15.4
-6.  opencv-contrib-python 3.4.0.12
-7.  tqdm-4.23.4
-8.  argparse-1.4.0
-9.  scipy-1.0.1
-10. Pillow
+6.  torch-1.1.0
+7.  opencv-contrib-python 3.4.0.12
+8.  tqdm-4.23.4
+9.  argparse-1.4.0
+10. scipy-1.0.1
+11. Pillow
 ```
 
 

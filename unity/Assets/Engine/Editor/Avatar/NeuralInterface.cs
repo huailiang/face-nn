@@ -96,7 +96,7 @@ namespace XEngine.Editor
             for (int j = 0; j < expc; j++)
             {
                 int shape = UnityEngine.Random.Range(3, 5);
-                string name = string.Format("db_{0:000}_{1}", j, shape);
+                string name = string.Format("db_{0:0000}_{1}", j, shape);
                 bw.Write(name);
                 for (int i = 0; i < CNT; i++)
                 {

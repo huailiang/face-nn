@@ -24,6 +24,13 @@ output: tensor (batch, 3, 512, 512)
 
 class Imitator(nn.Module):
     def __init__(self, name, args, lr=0.01, momentum=0.5):
+        """
+        imitator
+        :param name: imitator name
+        :param args: argparse options
+        :param lr: learning rate for train
+        :param momentum: momentum for optimizer
+        """
         super(Imitator, self).__init__()
         self.name = name
         self.args = args
@@ -48,6 +55,9 @@ class Imitator(nn.Module):
 
     @staticmethod
     def layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
+        """
+        imitator convolution layer
+        """
         return nn.Sequential(
             nn.Conv2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
             nn.BatchNorm2d(out_chanel),
@@ -55,6 +65,11 @@ class Imitator(nn.Module):
         )
 
     def forward(self, params):
+        """
+        construct network
+        :param params: [batch, 95]
+        :return: (batch, 3, 512, 512)
+        """
         batch = params.size(0)
         length = params.size(1)
         _params = params.reshape((batch, length, 1, 1))
@@ -62,6 +77,12 @@ class Imitator(nn.Module):
         return self.model(_params)
 
     def itr_train(self, params, referimage, checkpoint):
+        """
+        iterator training
+        :param params:  [batch, 95]
+        :param referimage: reference photo [batch, 3, 512, 512]
+        :param checkpoint: light cnn's model
+        """
         self.optimizer.zero_grad()
         y_ = self.forward(params)
         print("shape: ", referimage.shape, y_.shape)
@@ -70,47 +91,23 @@ class Imitator(nn.Module):
         self.optimizer.step()  # 更新网络参数权重
 
     def do_train(self):
+        """
+        step training, cpu default
+        """
         location = self.args.lightcnn
         checkpoint = torch.load(location, map_location="cpu")
         dataset = FaceDataset(self.args)
         initial_step = 0
         total_steps = self.args.db_item_cnt
         for step in tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps):
-            set = dataset.get_batch(batch_size=1)
-            name = set.keys()[0]
-            val = set[name][0]
-            img = set[name][1]
-            log.info(step, name)
-
-
-def test():
-    x = torch.ones(2, 2, requires_grad=True)
-    y = x + 2
-    t = y.sum()
-    t.backward()
-    print("grad", x.grad)
-    x.grad.zero_()
-    t = y.mean()
-    t.backward()
-    print("grad2: ", x.grad)
-    x.grad.zero_()
-    z = y * y * 3
-    out = z.mean()
-    out.backward()
-    print("out", out.grad)
-    print("x", x.grad)
-    print("y", y.grad)
-
-    target = torch.randn(10)
-    print(target)
-    target = target.view(1, 2, -1)
-    print(target)
+            names, params, images = dataset.get_batch(batch_size=1)
+            # print(step, names[0], len(params[0]), images.size())
+            # self.itr_train(params, images, checkpoint)
 
 
 if __name__ == '__main__':
     log.init("FaceNeural", logging.DEBUG, log_path="output/log.txt")
-    test()
-    imitator = Imitator("neural_imitator")
+    imitator = Imitator("neural_imitator", None)
     lightcnn_checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")
     x = torch.randn(2, 95)
     y_ = torch.randn(2, 3, 512, 512)
