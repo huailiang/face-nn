@@ -6,6 +6,7 @@
 
 import utils
 from imitator import Imitator
+from feature_extractor import FeatureExtractor
 from model import Face
 from net import Net
 from module import *
@@ -25,10 +26,14 @@ def main(_):
             log.info('imitator train mode')
             imitator = Imitator("neural imitator", args)
             imitator.batch_train()
-        elif args.phase == "inference":
-            log.info("inference")
-            model = Face(sess, args)
-            model.inference(args)
+        elif args.phase == "train_extractor":
+            log.info('feature extractor train mode')
+            extractor = FeatureExtractor("neural extractor", args)
+            extractor.batch_train()
+        elif args.phase == "inference_imitator":
+            log.info("inference imitator")
+            imitator = Imitator("neural imitator", args)
+            imitator.load_checkpoint("./output/imitator/")
         elif args.phase == "lightcnn":
             log.info("light cnn test")
             checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")

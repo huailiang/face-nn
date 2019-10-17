@@ -11,7 +11,7 @@ import logging
 import util.logit as log
 import utils
 import numpy as np
-import sys, os
+import os
 from tqdm import tqdm
 from prepare_dataset import FaceDataset
 
@@ -25,7 +25,7 @@ output: tensor (batch, 3, 512, 512)
 
 
 class Imitator(nn.Module):
-    def __init__(self, name, args, lr=0.01, momentum=0.5):
+    def __init__(self, name, args, momentum=0.5):
         """
         imitator
         :param name: imitator name
@@ -56,7 +56,7 @@ class Imitator(nn.Module):
             nn.ReflectionPad2d(129),
             self.layer(4, 3, 3, 1),  # 8. (batch, 3, 512, 512)
         )
-        self.optimizer = optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
+        self.optimizer = optim.SGD(self.model.parameters(), lr=args.learning_rate, momentum=momentum)
 
     @staticmethod
     def layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
@@ -104,7 +104,7 @@ class Imitator(nn.Module):
         checkpoint = torch.load(location, map_location="cpu")
         dataset = FaceDataset(self.args)
         initial_step = self.initial_step
-        total_steps = self.args.db_item_cnt
+        total_steps = self.args.total_steps
         self.clean()
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
@@ -112,11 +112,11 @@ class Imitator(nn.Module):
             loss, y_ = self.itr_train(params, images, checkpoint)
             # print(step, names[0], len(params[0]), loss.detach().numpy())
             progress.set_description(names[0][:-4])
-            if (step + 1) % 2 == 0:
-                igloos = int(loss.detach().numpy() * 1000)
-                path = "{3}/{0}_step{1}_loss{2}.jpg".format(names[0][:-4], step, igloos, self.prev_path)
-                utils.save_img(path, y_)
             if (step + 1) % 20 == 0:
+                igloos = int(loss.detach().numpy() * 1000)
+                path = "{3}/imitator_{0}_step{1}_loss{2}.jpg".format(names[0][2:-4], step, igloos, self.prev_path)
+                utils.save_img(path, y_)
+            if (step + 1) % self.args.save_freq == 0:
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
 

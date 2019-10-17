@@ -32,39 +32,6 @@ def feature_extractor(x, reuse=True, name="extractor"):
     return y6
 
 
-def imitator(x, reuse=True, name="imitator"):
-    """
-    这里建立八层imitator网络， 用来拟合引擎生成mesh的过程
-    由于引擎中捏脸使用的参数跟论文《逆水寒》引擎中使用的参数不相同，所以每一个layer的depth不一样
-    :param x: 捏脸参数
-    :param reuse:
-    :param name: scope
-    """
-    with tf.variable_scope(name):
-        # if reuse:
-        #     tf.get_variable_scope().reuse_variables()
-        # else:
-        #     print("encoder reuse", tf.get_variable_scope().reuse)
-        #     assert tf.get_variable_scope().reuse is False
-        y1 = tf.pad(x, [[0, 0], [1, 2], [1, 2], [0, 0]], "CONSTANT")  # (1, 4, 4, 95)
-        y1 = tf.nn.relu(instance_norm(conv2d(y1, 64, 4, 1, name='i_e1_c'), name='i_e1_bn'))  # (1,4,4,64)
-        y2 = tf.pad(y1, [[0, 0], [2, 2], [2, 2], [0, 0]], "REFLECT")  # (1, 8, 8, 64)
-        y2 = tf.nn.relu(instance_norm(conv2d(y2, 32, 4, 1, name='i_e2_c'), name='i_e2_bn'))  # (1, 8, 8, 32)
-        y3 = tf.pad(y2, [[0, 0], [4, 4], [4, 4], [0, 0]], "REFLECT")
-        y3 = tf.nn.relu(instance_norm(conv2d(y3, 32, 4, 1, name='i_e3_c'), name='i_e3_bn'))  # (1, 16, 16, 32)
-        y4 = tf.pad(y3, [[0, 0], [8, 8], [8, 8], [0, 0]], "REFLECT")
-        y4 = tf.nn.relu(instance_norm(conv2d(y4, 16, 4, 1, name='i_e4_c'), name='i_e4_bn'))  # (1, 32, 32, 16)
-        y5 = tf.pad(y4, [[0, 0], [16, 16], [16, 16], [0, 0]], "REFLECT")
-        y5 = tf.nn.relu(instance_norm(conv2d(y5, 16, 4, 1, name='i_e5_c'), name='i_e5_bn'))  # (1, 64, 64, 16)
-        y6 = tf.pad(y5, [[0, 0], [32, 32], [32, 32], [0, 0]], "REFLECT")
-        y6 = tf.nn.relu(instance_norm(conv2d(y6, 16, 4, 1, name='i_e6_c'), name='i_e6_bn'))  # (1, 128, 128, 16)
-        y7 = tf.pad(y6, [[0, 0], [64, 64], [64, 64], [0, 0]], "REFLECT")
-        y7 = tf.nn.relu(instance_norm(conv2d(y7, 8, 4, 1, name='i_e7_c'), name='i_e7_bn'))  # (1, 256, 256, 16)
-        y8 = tf.pad(y7, [[0, 0], [128, 128], [128, 128], [0, 0]], "REFLECT")
-        y8 = tf.nn.relu(instance_norm(conv2d(y8, 3, 4, 1, name='i_e8_c'), name='i_e8_bn'))  # (1, 512, 512, 3)
-        return y8
-
-
 def encoder(image, options, reuse=True, name="encoder"):
     """
     Args:
