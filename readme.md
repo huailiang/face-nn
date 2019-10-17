@@ -6,7 +6,7 @@
 ```
 1.  Unity-2019.2.1f1
 2.  python-3.5
-3.  tensorflow-1.14
+3.  tensorboardX
 4.  dlib-19.18
 5.  numpy-1.15.4
 6.  opencv-contrib-python 3.4.0.12
@@ -20,6 +20,10 @@
 ## 论文
 
 网易伏羲实验室、密歇根大学、北航和浙大的研究者提出了一种游戏角色自动创建方法，利用 Face-to-Parameter 的转换快速创建游戏角色，用户还可以自行基于模型结果再次进行修改，直到得到自己满意的人物。此项目按照[论文][i2]里的描述建立。
+
+
+[Face-to-ParameterTranslationforGameCharacterAuto-Creation][i2]
+
 
 ![](/image/t2.jpeg)
 
@@ -48,7 +52,7 @@
 对于输入图片，通过此工具dlib进行脸部截取。
 
 ```
-pip install dlib
+pip3 install dlib
 ```
 
 dlib 引用模型下载地址:
