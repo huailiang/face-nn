@@ -47,7 +47,7 @@ def feature256(img, checkpoint):
     """
     使用light cnn提取256维特征参数
     :param checkpoint: lightcnn model
-    :param img: tensor 输入图片 shape:(batch, 512, 512, 3)
+    :param img: tensor 输入图片 shape:(batch, 3, 512, 512)
     :return: 256维特征参数 tensor [batch, 256]
     """
     model = LightCNN_29Layers_v2(num_classes=80013)

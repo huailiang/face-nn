@@ -41,6 +41,7 @@
 
 生成图片分辨率：512x512,  代替论文的是这里使用Unity引擎代替Justice引擎。
 
+![](/image/t4.jpg)
 
 ## 脸部对齐 - Face alignment
 
