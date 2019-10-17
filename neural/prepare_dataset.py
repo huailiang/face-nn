@@ -60,5 +60,6 @@ class FaceDataset:
             params[i] = torch.Tensor(val)
             image = np.swapaxes(image, 1, 0)
             image = np.swapaxes(image, 0, 2)
+            image = image/255.0
             images[i] = torch.Tensor(image)
         return names, params, images

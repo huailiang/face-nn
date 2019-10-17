@@ -24,7 +24,7 @@ def main(_):
         if args.phase == "train_imitator":
             log.info('imitator train mode')
             imitator = Imitator("neural imitator", args)
-            imitator.do_train()
+            imitator.batch_train()
         elif args.phase == "inference":
             log.info("inference")
             model = Face(sess, args)
