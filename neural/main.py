@@ -7,7 +7,6 @@
 import utils
 from imitator import Imitator
 from feature_extractor import FeatureExtractor
-from model import Face
 from net import Net
 from module import *
 from parse import parser
