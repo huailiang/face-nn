@@ -4,8 +4,6 @@
 # @Date  : 2019-10-01
 
 import os
-import shutil
-import struct
 import dlib
 import cv2
 import numpy as np
@@ -48,7 +46,7 @@ def face_features(path_img, path_save):
         cv2.imwrite(path_save, img)
         cv2.imwrite(path_save.replace("align_", "align2_"), scaled)
     except Exception as e:
-        log.error(e.message)
+        log.error(e)
 
 
 def clean(path):
@@ -68,9 +66,10 @@ def export(path):
 
 
 if __name__ == '__main__':
+    log.init("align")
     pwd = os.getcwd()
     project_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
-    model_path = os.path.join(project_path, "export/image/")
+    model_path = os.path.join(project_path, "neural/output/image/")
     log.info(model_path)
     clean(model_path)
     export(model_path)

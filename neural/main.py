@@ -11,6 +11,7 @@ from net import Net
 from parse import parser
 import logging
 import torch
+import align
 import util.logit as log
 
 
@@ -62,7 +63,7 @@ if __name__ == '__main__':
     程序入口函数
     """
     args = parser.parse_args()
-    log.init("FaceNeural", logging.DEBUG, log_path="output/log.txt")
+    log.init("FaceNeural", logging.DEBUG, log_path="./output/neural_log.txt")
     init_device(args)
     if args.phase == "train_imitator":
         log.info('imitator train mode')
@@ -87,3 +88,5 @@ if __name__ == '__main__':
     elif args.phase == "net":
         log.info("net start with ports (%d, %d)", 5010, 5011)
         ex_net()
+    elif args.phase == "align":
+        align.face_features("./output/image/timg.jpeg", "test.jpg")

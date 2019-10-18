@@ -89,9 +89,9 @@ def save_img(path, tensor1, tensor2):
     image1 = utils.normal_2_image(tensor1)
     image2 = utils.normal_2_image(tensor2)
     if len(image1) > 1:
-        img = merge_image(image1[0], image2[0], mode='h')
-    elif len(image1) > 0:
         img = merge_4image(image1[0], image2[0], image1[1], image2[1])
+    elif len(image1) > 0:
+        img = merge_image(image1[0], image2[0], mode='h')
     else:
         raise NeuralException("tensor error")
     cv2.imwrite(path, img)

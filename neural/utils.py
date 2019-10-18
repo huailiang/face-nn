@@ -44,8 +44,9 @@ def normal_2_image(tensor):
     images = []
     for i in range(batch):
         img = tensor[i].detach().numpy()
-        img = img.swapaxes(img, 0, 2)  # [h, w, c]
-        images[i] = img * 256
+        img = np.swapaxes(img, 0, 2)  # [h, w, c]
+        img = np.swapaxes(img, 0, 1)  # [w, h, c]
+        images.append(img * 256)
     return images
 
 

@@ -44,7 +44,7 @@ handler:
 """
 
 
-def init(name="LOG", level=logging.INFO, log_path="log.txt"):
+def init(name="LOG", level=logging.INFO, log_path="./output/log.txt"):
     clear_log(log_path)
     global _log
     _log = logging.getLogger(name)
