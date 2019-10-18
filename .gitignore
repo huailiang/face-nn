@@ -16,6 +16,8 @@ neural/models/
 neural/venv/
 neural/.idea/
 neural/dat/
+neural/logs/
+neural/runs/
 neural/faceparsing/res/
 neural/faceparsing/data/
 export/**/*jpg

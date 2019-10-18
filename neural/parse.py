@@ -63,7 +63,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(4e3),
+    default=int(3e4),
     help='Total number of steps')
 parser.add_argument(
     '--batch_size',
@@ -75,7 +75,7 @@ parser.add_argument(
     '--save_freq',
     dest='save_freq',
     type=int,
-    default=200,
+    default=500,
     help='Save model every save_freq steps')
 parser.add_argument(
     '--lightcnn',

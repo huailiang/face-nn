@@ -12,6 +12,8 @@ import utils
 import ops
 import os
 from tqdm import tqdm
+import align
+from tensorboardX import SummaryWriter
 
 """
 feature extractor
@@ -38,14 +40,15 @@ class FeatureExtractor(nn.Module):
         self.args = args
         self.model_path = "./output/imitator"
         self.params_path = "./output/params"
+        self.writer = SummaryWriter(comment="feature extractor")
         self.model = nn.Sequential(
-            self.layer(3, 3, kernel_size=7, stride=2, pad=3),    # 1. (batch, 3, 256, 256)
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),    # 2. (batch, 3, 128, 128)
-            self.layer(3, 8, kernel_size=3, stride=2, pad=1),    # 3. (batch, 8, 64, 64)
-            self.layer(8, 16, kernel_size=3, stride=2, pad=1),   # 4. (batch, 16, 32, 32)
+            self.layer(3, 3, kernel_size=7, stride=2, pad=3),  # 1. (batch, 3, 256, 256)
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),  # 2. (batch, 3, 128, 128)
+            self.layer(3, 8, kernel_size=3, stride=2, pad=1),  # 3. (batch, 8, 64, 64)
+            self.layer(8, 16, kernel_size=3, stride=2, pad=1),  # 4. (batch, 16, 32, 32)
             self.layer(16, 32, kernel_size=3, stride=2, pad=1),  # 5. (batch, 32, 16, 16)
             self.layer(32, 64, kernel_size=3, stride=2, pad=1),  # 6. (batch, 64, 8, 8)
-            self.layer(64, 95, kernel_size=7, stride=2),         # 7. (batch, 95, 1, 1)
+            self.layer(64, 95, kernel_size=7, stride=2),  # 7. (batch, 95, 1, 1)
         )
         self.optimizer = optim.SGD(self.parameters(),
                                    lr=args.extractor_learning_rate,
@@ -87,14 +90,18 @@ class FeatureExtractor(nn.Module):
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
             log.info("current step: %d", step)
-            if (step+1) % 20 == 0:
+            if (step + 1) % 20 == 0:
                 log.info("step {0}", step)
                 loss, params = self.itr_train(None)
-                path = os.path.join(self.params_path, "step"+str(step))
+                loss_ = loss.detach().numpy()
+                progress.set_description("loss:" + "{:.3f}".format(loss_))
+                self.writer.add_scalar('feature extractor/loss', loss_, step)
+                path = os.path.join(self.params_path, "step" + str(step))
                 ops.generate_file(path, params)
             if (step + 1) % self.args.extractor_save_freq == 0:
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
+        self.writer.close()
 
     def load_checkpoint(self, path):
         """
@@ -122,7 +129,7 @@ class FeatureExtractor(nn.Module):
         :param photo: input photo
         :return: params [batch, 95]
         """
+        align.align_face()
         self.load_checkpoint(path)
         _, params_ = self.forward(path)
         return params_
-

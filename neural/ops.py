@@ -3,13 +3,13 @@
 # @Author: penghuailiang
 # @Date  : 2019-09-27
 
-import numpy as np
+
 import cv2
 import os
 import shutil
+import numpy as np
 import util.logit as log
 from util.exception import NeuralException
-import utils
 
 
 def rm_dir(path):
@@ -79,6 +79,22 @@ def generate_file(path, content):
         log.error("io error, load imitator failed ", e)
 
 
+def normal_2_image(tensor):
+    """
+    将tensor转numpy array 给cv2使用
+    :param tensor: [batch, c, w, h]
+    :return: [batch, h, w, c]
+    """
+    batch = tensor.size(0)
+    images = []
+    for i in range(batch):
+        img = tensor[i].detach().numpy()
+        img = np.swapaxes(img, 0, 2)  # [h, w, c]
+        img = np.swapaxes(img, 0, 1)  # [w, h, c]
+        images.append(img * 256)
+    return images
+
+
 def save_img(path, tensor1, tensor2):
     """
     save first image of batch to disk
@@ -86,8 +102,8 @@ def save_img(path, tensor1, tensor2):
     :param tensor1: shape: [Batch, C, W, H)
     :param tensor2: shape: [Batch, C, W, H)
     """
-    image1 = utils.normal_2_image(tensor1)
-    image2 = utils.normal_2_image(tensor2)
+    image1 = normal_2_image(tensor1)
+    image2 = normal_2_image(tensor2)
     if len(image1) > 1:
         img = merge_4image(image1[0], image2[0], image1[1], image2[1])
     elif len(image1) > 0:
@@ -118,6 +134,7 @@ def merge_image(image1, image2, mode="h", show=False):
     if show:
         cv2.imshow("contact", image)
         cv2.waitKey()
+        cv2.destroyAllWindows()
     return image
 
 
@@ -154,8 +171,7 @@ if __name__ == '__main__':
     merge_4image(img1, img2, img3, img4, show=True)
 
 """ 
-# tensorflow implement
-# not use again
+# tensorflow implement, not use again
 
 def instance_norm(input, name="instance_norm", is_training=True):
     with tf.variable_scope(name):
@@ -167,12 +183,6 @@ def instance_norm(input, name="instance_norm", is_training=True):
         inv = tf.rsqrt(variance + epsilon)
         normalized = (input - mean) * inv
         return scale * normalized + offset
-
-
-def conv2d(input_, output_dim, ks=4, s=2, stddev=0.02, padding='SAME', name="conv2d", activation_fn=None):
-    with tf.variable_scope(name):
-        return slim.conv2d(input_, output_dim, ks, s, padding=padding, activation_fn=activation_fn,
-                           weights_initializer=tf.truncated_normal_initializer(stddev=stddev), biases_initializer=None)
 
 
 def deconv2d(input_, output_dim, ks=4, s=2, name="deconv2d"):

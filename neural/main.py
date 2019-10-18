@@ -19,7 +19,6 @@ def ex_net():
     """
     建立和引擎的通信
     python中启动之后， unity菜单栏选中Tools->Connect
-    :return:
     """
     net = Net(5010, 5011)
     while True:
@@ -65,6 +64,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     log.init("FaceNeural", logging.DEBUG, log_path="./output/neural_log.txt")
     init_device(args)
+
     if args.phase == "train_imitator":
         log.info('imitator train mode')
         imitator = Imitator("neural imitator", args)
@@ -90,3 +90,6 @@ if __name__ == '__main__':
         ex_net()
     elif args.phase == "align":
         align.face_features("./output/image/timg.jpeg", "test.jpg")
+    else:
+        log.error("not known phase %s", args.phase)
+

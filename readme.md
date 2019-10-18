@@ -108,6 +108,33 @@ baidu  yun:	   [LightCNN-29 v2][i7]
 ![](/image/t3.jpg)
 
 
+## train
+
+进入git 下载目录， 按照下面命令就可以train
+
+```sh
+cd /path/to/workdir
+
+cd neural/
+
+mkdir dat/
+
+# 这里需要将下载的lightcnn, dlib等模型拷贝过来
+copy yours_download_model_path data/
+
+python main.py \
+		--phase=train_imitator \
+		--batch_size=4 \
+		--learning_rate=0.01 \
+		--total_steps=30000	\
+		--path_to_dataset="../export/trainset/"
+
+tensorboard --logdir runs
+
+```
+
+
+
 [i1]: https://xueqiu.com/9217191040/133506937
 [i2]: https://arxiv.org/abs/1909.01064
 [i3]: http://www.sohu.com/a/339985351_823210

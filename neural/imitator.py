@@ -12,8 +12,8 @@ import utils
 import numpy as np
 import ops
 from tqdm import tqdm
-from prepare_dataset import FaceDataset
-
+from dataset import FaceDataset
+from tensorboardX import SummaryWriter
 """
 imitator
 用来模拟游戏引擎：由params生成图片
@@ -37,22 +37,23 @@ class Imitator(nn.Module):
         self.initial_step = 0
         self.prev_path = "./output/preview"
         self.model_path = "./output/imitator"
+        self.writer = SummaryWriter(comment='imitator')
         self.model = nn.Sequential(
             self.layer(95, 64, 4, 1, 3),  # 1. (batch, 64, 4, 4)
             nn.ReplicationPad2d(7),
-            self.layer(64, 32, 4, 2),     # 2. (batch, 32, 8, 8)
+            self.layer(64, 32, 4, 2),  # 2. (batch, 32, 8, 8)
             nn.ReflectionPad2d(5),
-            self.layer(32, 32, 3, 1),     # 3. (batch, 32, 16, 16)
+            self.layer(32, 32, 3, 1),  # 3. (batch, 32, 16, 16)
             nn.ReflectionPad2d(9),
-            self.layer(32, 16, 3, 1),     # 4. (batch, 16, 32, 32)
+            self.layer(32, 16, 3, 1),  # 4. (batch, 16, 32, 32)
             nn.ReplicationPad2d(17),
-            self.layer(16, 8, 3, 1),      # 5. (batch, 8, 64, 64)
+            self.layer(16, 8, 3, 1),  # 5. (batch, 8, 64, 64)
             nn.ReflectionPad2d(33),
-            self.layer(8, 8, 3, 1),       # 6. (batch, 8, 128, 128)
+            self.layer(8, 8, 3, 1),  # 6. (batch, 8, 128, 128)
             nn.ReflectionPad2d(65),
-            self.layer(8, 8, 3, 1),       # 7. (batch, 8, 256, 256)
+            self.layer(8, 8, 3, 1),  # 7. (batch, 8, 256, 256)
             nn.ReflectionPad2d(129),
-            self.layer(8, 3, 3, 1),       # 8. (batch, 3, 512, 512)
+            self.layer(8, 3, 3, 1),  # 8. (batch, 3, 512, 512)
         )
         self.optimizer = optim.SGD(self.model.parameters(), lr=args.learning_rate, momentum=momentum)
 
@@ -90,8 +91,8 @@ class Imitator(nn.Module):
         self.optimizer.zero_grad()
         y_ = self.forward(params)
         loss = utils.discriminative_loss(referimage, y_, checkpoint)
-        loss.backward()         # 求导  loss: [batch]
-        self.optimizer.step()   # 更新网络参数权重
+        loss.backward()  # 求导  loss: [batch]
+        self.optimizer.step()  # 更新网络参数权重
         return loss, y_
 
     def batch_train(self):
@@ -103,19 +104,23 @@ class Imitator(nn.Module):
         dataset = FaceDataset(self.args)
         initial_step = self.initial_step
         total_steps = self.args.total_steps
+
         self.clean()
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
             names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
             loss, y_ = self.itr_train(params, images, checkpoint)
             loss_ = loss.detach().numpy()
-            progress.set_description("loss:"+"{:.3f}".format(loss_))
-            if (step + 1) % 20 == 0:
-                path = "{2}/imitator_{0}_step{1}.jpg".format(names[0][2:-4], step, self.prev_path)
+            progress.set_description("loss:" + "{:.3f}".format(loss_))
+            self.writer.add_graph(self, input_to_model=(params, ))
+            self.writer.add_scalar('imitator/loss', loss_, step)
+            if (step + 1) % 80 == 0:
+                path = "{2}/imit{0}_step{1}.jpg".format(names[0][2:-6], step + 1, self.prev_path)
                 ops.save_img(path, images, y_)
             if (step + 1) % self.args.save_freq == 0:
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
+        self.writer.close()
 
     def load_checkpoint(self, path):
         """

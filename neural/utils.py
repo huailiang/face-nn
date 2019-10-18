@@ -10,7 +10,6 @@ import scipy.misc
 import util.logit as log
 from lightcnn.extract_features import *
 import torch.nn as nn
-from ops import *
 from faceparsing.evaluate import *
 
 
@@ -32,22 +31,6 @@ def param_2_arr(params):
     array = np.array(params)
     array = array.reshape([1, 1, 1, cnt])
     return array
-
-
-def normal_2_image(tensor):
-    """
-    将tensor转numpy array 给cv2使用
-    :param tensor: [batch, c, w, h]
-    :return: [batch, h, w, c]
-    """
-    batch = tensor.size(0)
-    images = []
-    for i in range(batch):
-        img = tensor[i].detach().numpy()
-        img = np.swapaxes(img, 0, 2)  # [h, w, c]
-        img = np.swapaxes(img, 0, 1)  # [w, h, c]
-        images.append(img * 256)
-    return images
 
 
 def to_gray(rgb):

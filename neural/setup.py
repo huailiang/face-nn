@@ -19,11 +19,11 @@ setup(name="neural",
       install_requires=["tqdm",
                         "numpy>=1.13.3,<2.0",
                         "argparse>=1.4.0",
-                        'tensorflow>=1.1.0, <2.0',
                         'scipy>=1.5.0',
                         'pillow',
                         'cv2',
                         "torch",
-                        'torchvision'],
+                        'torchvision',
+                        'tensorboardX'],
       python_requires=">=3.5"
       )
