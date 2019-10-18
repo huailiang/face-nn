@@ -8,7 +8,6 @@ import utils
 from imitator import Imitator
 from feature_extractor import FeatureExtractor
 from net import Net
-from module import *
 from parse import parser
 import logging
 import torch
@@ -16,6 +15,11 @@ import util.logit as log
 
 
 def ex_net():
+    """
+    建立和引擎的通信
+    python中启动之后， unity菜单栏选中Tools->Connect
+    :return:
+    """
     net = Net(5010, 5011)
     while True:
         r_input = input("command: \n")

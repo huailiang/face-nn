@@ -10,7 +10,6 @@ import torch.optim as optim
 import util.logit as log
 import utils
 import numpy as np
-import os
 import ops
 from tqdm import tqdm
 from prepare_dataset import FaceDataset
@@ -109,11 +108,10 @@ class Imitator(nn.Module):
         for step in progress:
             names, params, images = dataset.get_batch(batch_size=1)
             loss, y_ = self.itr_train(params, images, checkpoint)
-            # print(step, names[0], len(params[0]), loss.detach().numpy())
-            progress.set_description(names[0][:-4])
+            loss_ = loss.detach().numpy()
+            progress.set_description("loss:"+"{:.3f}".format(loss_))
             if (step + 1) % 20 == 0:
-                igloos = int(loss.detach().numpy() * 1000)
-                path = "{3}/imitator_{0}_step{1}_loss{2}.jpg".format(names[0][2:-4], step, igloos, self.prev_path)
+                path = "{2}/imitator_{0}_step{1}.jpg".format(names[0][2:-4], step, self.prev_path)
                 utils.save_img(path, y_)
             if (step + 1) % self.args.save_freq == 0:
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
@@ -130,6 +128,17 @@ class Imitator(nn.Module):
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.initial_step = checkpoint['epoch']
         log.info("recovery imitator from %s", path)
+
+    def inference(self, path, params):
+        """
+        imitator生成图片
+        :param path: checkpoint's path
+        :param params: engine's params
+        :return: images [batch, 3, 512, 512]
+        """
+        self.load_checkpoint(path)
+        _, images = self.forward(params)
+        return images
 
     def clean(self):
         """

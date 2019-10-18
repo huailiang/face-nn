@@ -7,9 +7,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import logging
 import util.logit as log
 import utils
+import ops
 import os
 from tqdm import tqdm
 
@@ -37,6 +37,7 @@ class FeatureExtractor(nn.Module):
         self.initial_step = 0
         self.args = args
         self.model_path = "./output/imitator"
+        self.params_path = "./output/params"
         self.model = nn.Sequential(
             self.layer(3, 3, kernel_size=7, stride=2, pad=3),    # 1. (batch, 3, 256, 256)
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1),    # 2. (batch, 3, 128, 128)
@@ -77,6 +78,7 @@ class FeatureExtractor(nn.Module):
         loss = utils.content_loss(image, img_)
         loss.backward()
         self.optimizer.step()
+        return loss, param_
 
     def batch_train(self):
         log.info("feature extractor train")
@@ -84,7 +86,12 @@ class FeatureExtractor(nn.Module):
         total_steps = self.args.total_extractor_steps
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
-            log.info("current step: ", step)
+            log.info("current step: %d", step)
+            if (step+1) % 20 == 0:
+                log.info("step {0}", step)
+                loss, params = self.itr_train(None)
+                path = os.path.join(self.params_path, "step"+str(step))
+                ops.generate_file(path, params)
             if (step + 1) % self.args.extractor_save_freq == 0:
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
@@ -102,16 +109,20 @@ class FeatureExtractor(nn.Module):
         log.info("recovery imitator from %s", path)
 
     def clean(self):
-        try:
-            if os.path.exists(self.model_path):
-                os.remove(self.model_path)
-            os.mkdir(self.model_path)
-        except IOError:
-            log.error("io error, path: ", self.prev_path, self.model_path)
+        """
+        清空前记得备份
+        :return:
+        """
+        ops.clear_folder(self.model_path)
 
+    def inference(self, path, photo):
+        """
+        feature extractor: 由图片生成捏脸参数
+        :param path: checkpoint's path
+        :param photo: input photo
+        :return: params [batch, 95]
+        """
+        self.load_checkpoint(path)
+        _, params_ = self.forward(path)
+        return params_
 
-if __name__ == '__main__':
-    log.init("FaceNeural", logging.DEBUG, log_path="output/log.txt")
-    extractor = FeatureExtractor("neural_extractor")
-    y = extractor.forward(torch.randn(2, 3, 512, 512))
-    log.info(y.size())

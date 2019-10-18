@@ -13,15 +13,14 @@ import util.logit as log
 def rm_dir(path):
     """
     清空文件夹 包含子文件夹
-    :param path:
     :param path: 文件夹路径
     """
     try:
         if os.path.exists(path):
-            log.warn("rm directory", path)
+            log.warn("rm directory %s", path)
             shutil.rmtree(path)
         else:
-            log.warn("not exist directory: ", path)
+            log.warn("not exist directory: %s", path)
     except IOError as e:
         log.error("io error, load imitator failed ", e)
 
@@ -39,7 +38,7 @@ def clear_folder(dir):
                 for name in dirs:
                     os.rmdir(os.path.join(root, name))
         else:
-            log.warn("not exist directory: ", dir)
+            log.warn("not exist directory: %s", dir)
     except IOError as e:
         log.error("io error, load imitator failed ", e)
 
@@ -55,7 +54,19 @@ def clear_files(dir):
                 for name in files:
                     os.remove(os.path.join(root, name))
         else:
-            log.warn("not exist directory: ", dir)
+            log.warn("not exist directory: %s", dir)
+    except IOError as e:
+        log.error("io error, load imitator failed ", e)
+
+
+def generate_file(path, content):
+    try:
+        dir = os.path.pardir(path)
+        if not os.path.exists(path):
+            os.mkdir(dir)
+        f = open(path, 'bw')
+        f.write(content)
+        f.close()
     except IOError as e:
         log.error("io error, load imitator failed ", e)
 

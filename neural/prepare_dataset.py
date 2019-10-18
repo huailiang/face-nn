@@ -50,7 +50,7 @@ class FaceDataset:
         params = torch.rand([batch_size, self.args.params_cnt])
         images = torch.rand([batch_size, 3, 512, 512])
         for i in range(batch_size):
-            ind = random.randint(0, cnt-1)
+            ind = random.randint(0, cnt - 1)
             name = self.names[ind]
             val = self.params[ind]
             name = name + ".jpg"
@@ -60,6 +60,8 @@ class FaceDataset:
             params[i] = torch.Tensor(val)
             image = np.swapaxes(image, 1, 0)
             image = np.swapaxes(image, 0, 2)
-            image = image/255.0
+            image = image / 255.0
             images[i] = torch.Tensor(image)
         return names, params, images
+
+

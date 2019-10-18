@@ -140,7 +140,7 @@ def extract_features(flipped, net=None, frame_ids=None, layer_names=None,
                                       total=num_batches, disable=(verbose == 0)):
             batch_idxs = frame_ids[batch_start:batch_start + batch_size]
             batch = image_getter.get_batch(batch_idxs, resize_shape=im_shape,
-                                                       mean=mean)
+                                           mean=mean)
             if flipped:
                 batch = batch[:, :, ::-1, :]
 
