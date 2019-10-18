@@ -123,11 +123,11 @@ mkdir dat/
 copy yours_download_model_path data/
 
 python main.py \
-		--phase=train_imitator \
-		--batch_size=4 \
-		--learning_rate=0.01 \
-		--total_steps=30000	\
-		--path_to_dataset="../export/trainset/"
+	--phase=train_imitator \
+	--batch_size=4 \
+	--learning_rate=0.01 \
+	--total_steps=30000	\
+	--path_to_dataset="../export/trainset/"
 
 tensorboard --logdir runs
 
