@@ -7,11 +7,11 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import logging
 import util.logit as log
 import utils
 import numpy as np
 import os
+import ops
 from tqdm import tqdm
 from prepare_dataset import FaceDataset
 
@@ -30,7 +30,6 @@ class Imitator(nn.Module):
         imitator
         :param name: imitator name
         :param args: argparse options
-        :param lr: learning rate for train
         :param momentum: momentum for optimizer
         """
         super(Imitator, self).__init__()
@@ -133,21 +132,9 @@ class Imitator(nn.Module):
         log.info("recovery imitator from %s", path)
 
     def clean(self):
-        try:
-            if os.path.exists(self.prev_path):
-                os.remove(self.prev_path)
-            os.mkdir(self.prev_path)
-            if os.path.exists(self.model_path):
-                os.remove(self.model_path)
-            os.mkdir(self.model_path)
-        except IOError:
-            log.error("io error, path: ", self.prev_path, self.model_path)
-
-
-if __name__ == '__main__':
-    log.init("FaceNeural", logging.DEBUG, log_path="output/log.txt")
-    imitator = Imitator("neural_imitator", None)
-    lightcnn_checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")
-    x = torch.randn(2, 95)
-    y_ = torch.randn(2, 3, 512, 512)
-    imitator.itr_train(x, y_, lightcnn_checkpoint)
+        """
+        清空前记得备份
+        :return:
+        """
+        ops.clear_files(self.prev_path)
+        ops.clear_files(self.model_path)

@@ -23,6 +23,13 @@ output: engine params [95]
 
 class FeatureExtractor(nn.Module):
     def __init__(self, name, args, imitator, momentum=0.5):
+        """
+        feature extractor
+        :param name: model name
+        :param args: argparse options
+        :param imitator: imitate engine's behaviour
+        :param momentum:  momentum for optimizer
+        """
         super(FeatureExtractor, self).__init__()
         log.info("construct feature_extractor %s", name)
         self.name = name
@@ -31,13 +38,13 @@ class FeatureExtractor(nn.Module):
         self.args = args
         self.model_path = "./output/imitator"
         self.model = nn.Sequential(
-            self.layer(3, 3, kernel_size=7, stride=2, pad=3),  # 1. (batch, 3, 256, 256)
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),  # 2. (batch, 3, 128, 128)
-            self.layer(3, 8, kernel_size=3, stride=2, pad=1),  # 3. (batch, 8, 64, 64)
-            self.layer(8, 16, kernel_size=3, stride=2, pad=1),  # 4. (batch, 16, 32, 32)
+            self.layer(3, 3, kernel_size=7, stride=2, pad=3),    # 1. (batch, 3, 256, 256)
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),    # 2. (batch, 3, 128, 128)
+            self.layer(3, 8, kernel_size=3, stride=2, pad=1),    # 3. (batch, 8, 64, 64)
+            self.layer(8, 16, kernel_size=3, stride=2, pad=1),   # 4. (batch, 16, 32, 32)
             self.layer(16, 32, kernel_size=3, stride=2, pad=1),  # 5. (batch, 32, 16, 16)
             self.layer(32, 64, kernel_size=3, stride=2, pad=1),  # 6. (batch, 64, 8, 8)
-            self.layer(64, 95, kernel_size=7, stride=2),  # 7. (batch, 95, 1, 1)
+            self.layer(64, 95, kernel_size=7, stride=2),         # 7. (batch, 95, 1, 1)
         )
         self.optimizer = optim.SGD(self.parameters(),
                                    lr=args.extractor_learning_rate,
@@ -60,6 +67,7 @@ class FeatureExtractor(nn.Module):
         """
         这里train的方式使用的是imitator
         第二种方法是 通过net把params发生引擎生成image
+        (这种方法需要保证同步，但效果肯定比imitator效果好)
         :param image: [batch, 3, 512, 512]
         :return: loss scalar
         """

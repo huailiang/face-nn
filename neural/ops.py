@@ -1,17 +1,68 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: penghuailiang
-# @Date  : 2019-04-27
+# @Date  : 2019-09-27
 
 import math
 import numpy as np
-import tensorflow as tf
-import tensorflow.contrib.slim as slim
-from tensorflow.python.framework import ops
-import cv2
+import os
+import shutil
+import util.logit as log
 
-from utils import *
 
+def rm_dir(path):
+    """
+    清空文件夹 包含子文件夹
+    :param path:
+    :param path: 文件夹路径
+    """
+    try:
+        if os.path.exists(path):
+            log.warn("rm directory", path)
+            shutil.rmtree(path)
+        else:
+            log.warn("not exist directory: ", path)
+    except IOError as e:
+        log.error("io error, load imitator failed ", e)
+
+
+def clear_folder(dir):
+    """
+    清空文件夹 包含子文件夹
+    :param dir: 文件夹路径
+    """
+    try:
+        if os.path.exists(dir):
+            for root, dirs, files in os.walk(dir, topdown=False):
+                for name in files:
+                    os.remove(os.path.join(root, name))
+                for name in dirs:
+                    os.rmdir(os.path.join(root, name))
+        else:
+            log.warn("not exist directory: ", dir)
+    except IOError as e:
+        log.error("io error, load imitator failed ", e)
+
+
+def clear_files(dir):
+    """
+    只清空文件 不清空子文件夹
+    :param dir: 文件夹路径
+    """
+    try:
+        if os.path.exists(dir):
+            for root, dirs, files in os.walk(dir, topdown=False):
+                for name in files:
+                    os.remove(os.path.join(root, name))
+        else:
+            log.warn("not exist directory: ", dir)
+    except IOError as e:
+        log.error("io error, load imitator failed ", e)
+
+
+""" 
+# tensorflow implement
+# not use again
 
 def instance_norm(input, name="instance_norm", is_training=True):
     with tf.variable_scope(name):
@@ -54,3 +105,4 @@ def linear(input_, output_size, scope=None, stddev=0.02, bias_start=0.0, with_w=
             return tf.matmul(input_, matrix) + bias, matrix, bias
         else:
             return tf.matmul(input_, matrix) + bias
+"""
