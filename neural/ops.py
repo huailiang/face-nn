@@ -3,11 +3,13 @@
 # @Author: penghuailiang
 # @Date  : 2019-09-27
 
-import math
 import numpy as np
+import cv2
 import os
 import shutil
 import util.logit as log
+from util.exception import NeuralException
+import utils
 
 
 def rm_dir(path):
@@ -60,6 +62,12 @@ def clear_files(dir):
 
 
 def generate_file(path, content):
+    """
+    生成文件
+    :param path: file path
+    :param content: file content
+    :return:
+    """
     try:
         dir = os.path.pardir(path)
         if not os.path.exists(path):
@@ -70,6 +78,80 @@ def generate_file(path, content):
     except IOError as e:
         log.error("io error, load imitator failed ", e)
 
+
+def save_img(path, tensor1, tensor2):
+    """
+    save first image of batch to disk
+    :param path: save path
+    :param tensor1: shape: [Batch, C, W, H)
+    :param tensor2: shape: [Batch, C, W, H)
+    """
+    image1 = utils.normal_2_image(tensor1)
+    image2 = utils.normal_2_image(tensor2)
+    if len(image1) > 1:
+        img = merge_image(image1[0], image2[0], mode='h')
+    elif len(image1) > 0:
+        img = merge_4image(image1[0], image2[0], image1[1], image2[1])
+    else:
+        raise NeuralException("tensor error")
+    cv2.imwrite(path, img)
+
+
+def merge_image(image1, image2, mode="h", show=False):
+    """
+    拼接图片
+    :param image1: numpy array
+    :param image2: numpy array
+    :param mode: 'h': 横向拼接 'v': 纵向拼接
+    :param show: 窗口显示
+    :return: numpy array
+    """
+    img1_ = cv2.resize(image1, (256, 256))
+    img2_ = cv2.resize(image2, (256, 256))
+    if mode == 'h':
+        image = np.append(img1_, img2_, axis=1)  # (256, 512, 3)
+    elif mode == 'v':
+        image2 = np.append(img1_, img2_, axis=0)
+    else:
+        log.warn("not implements mode: %s", mode)
+        return
+    if show:
+        cv2.imshow("contact", image)
+        cv2.waitKey()
+    return image
+
+
+def merge_4image(image1, image2, image3, image4, show=False):
+    """
+    拼接图片 512x512
+    :param image1: input image1
+    :param image2: input image2
+    :param image3: input image3
+    :param image4: input image4
+    :param show: 窗口显示
+    :return:
+    """
+    img1 = cv2.resize(image1, (256, 256))
+    img2 = cv2.resize(image2, (256, 256))
+    img3 = cv2.resize(image3, (256, 256))
+    img4 = cv2.resize(image4, (256, 256))
+    image1_ = np.append(img1, img2, axis=1)
+    image2_ = np.append(img3, img4, axis=1)
+    image = np.append(image1_, image2_, axis=0)
+    if show:
+        cv2.imshow("contact", image)
+        cv2.waitKey()
+        cv2.destroyAllWindows()
+    return image
+
+
+if __name__ == '__main__':
+    log.init("")
+    img1 = cv2.imread("./output/db_3.jpg")
+    img2 = cv2.imread("./output/db_4.jpg")
+    img3 = cv2.imread("./output/db_1.jpg")
+    img4 = cv2.imread("./output/db_2.jpg")
+    merge_4image(img1, img2, img3, img4, show=True)
 
 """ 
 # tensorflow implement

@@ -39,10 +39,31 @@ def ex_net():
             break
 
 
+def init_device(args):
+    """
+    检查配置和硬件是否支持gpu
+    :param args: 配置
+    :return: 返回True 则支持gpu
+    """
+    support_gpu = torch.cuda.is_available()
+    log.info("neural face network support gpu %s, use gpu %s", support_gpu, args.use_gpu)
+    if support_gpu and args.use_gpu:
+        if not args.gpuid:
+            args.gpuid = 0
+        device = torch.device("cuda:%d" % args.gpuid)
+        return True, device
+    else:
+        device = torch.device("cpu")
+        return False, device
+
+
 if __name__ == '__main__':
+    """
+    程序入口函数
+    """
     args = parser.parse_args()
     log.init("FaceNeural", logging.DEBUG, log_path="output/log.txt")
-
+    init_device(args)
     if args.phase == "train_imitator":
         log.info('imitator train mode')
         imitator = Imitator("neural imitator", args)

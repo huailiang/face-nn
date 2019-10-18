@@ -44,6 +44,18 @@ parser.add_argument(
     dest='phase',
     default='train_imitator',
     help='Specify current phase: train or inference.')
+parser.add_argument(
+    '--use_gpu',
+    dest='use_gpu',
+    type=bool,
+    default=bool(True),
+    help='count of engine face params')
+parser.add_argument(
+    '--gpuid',
+    dest='gpuid',
+    type=int,
+    default=int(0),
+    help='device GPU ID')
 
 # ========================= IMITATOR PARAMETERS ========================= #
 
@@ -51,13 +63,13 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(2e3),
+    default=int(4e3),
     help='Total number of steps')
 parser.add_argument(
     '--batch_size',
     dest='batch_size',
     type=int,
-    default=1,
+    default=4,
     help='# images in batch')
 parser.add_argument(
     '--save_freq',

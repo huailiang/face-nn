@@ -7,7 +7,6 @@ from .face_dataset import FaceMask
 
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
 
 import os
 import os.path as osp
