@@ -60,7 +60,7 @@ namespace XEngine.Editor
             shape = RoleShape.FEMALE;
             if (fData == null)
             {
-                fData = AssetDatabase.LoadAssetAtPath<FaceData>("Assets/BundleRes/Config/FaceData.asset");
+                fData = AssetDatabase.LoadAssetAtPath<FaceData>("Assets/Resource/Config/FaceData.asset");
             }
             if (paint == null)
             {
@@ -120,7 +120,7 @@ namespace XEngine.Editor
             List<int> list = new List<int>();
             var table = XFashionLibrary._profession.Table;
             presentid = table.Where(x => x.Shape == (int)shape).Select(x => x.PresentID).First();
-            string path = "Assets/BundleRes/Prefabs/Player_" + shape.ToString().ToLower() + ".prefab";
+            string path = "Assets/Resource/Prefabs/Player_" + shape.ToString().ToLower() + ".prefab";
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             if (prefab != null)
             {

@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Player_female_dancing_weapon_105_2
+  m_Shader: {fileID: 4800000, guid: e4de0a982a4beda47ac898d08662d621, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseTex:
+        m_Texture: {fileID: 2800000, guid: eb9202c3d80395146bf1a2239e574f8d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EffectTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PBSTex:
+        m_Texture: {fileID: 2800000, guid: a989176b1c65da54c9494cb073b5f41d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _DebugMode: 0
+    - _DstBlend: 0
+    - _SrcBlend: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color1: {r: 1, g: 1, b: 1, a: 1}
+    - _ColorB: {r: 0.4339623, g: 0.4300896, b: 0.41963333, a: 0.39215687}
+    - _ColorEX1: {r: 1, g: 1, b: 1, a: 0.1}
+    - _ColorEX2: {r: 1, g: 1, b: 1, a: 0.1}
+    - _ColorG: {r: 0.75471693, g: 0.6846719, b: 0.43075824, a: 0.18039216}
+    - _ColorR: {r: 0.1509434, g: 0.1509434, b: 0.1509434, a: 0.39215687}
+    - _EmissionAOColor: {r: 0, g: 0, b: 0, a: 0}
+    - _MagicParam: {r: 0.3, g: 3, b: 0.1, a: 1}
+    - _Param0: {r: 0, g: 0, b: 0, a: 0}
+    - _Rim: {r: 0, g: 0, b: 0, a: 1}
+    - _SkinSpecularScatter: {r: 0.9, g: 1, b: 0.7, a: 0}
+    - _SkinTranslucency: {r: 0, g: 1, b: 1, a: 0}

@@ -260,7 +260,7 @@ namespace XEngine.Editor
             int pindx = ix;
             if (!string.IsNullOrEmpty(pdata.texture) && paintings[pindx] == null)
             {
-                paintings[pindx] = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/BundleRes/Knead/" + pdata.texture + "_female.tga");
+                paintings[pindx] = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Res/Knead/" + pdata.texture + "_female.tga");
             }
             paintings[pindx] = EditorGUILayout.ObjectField(paintings[pindx], typeof(Texture2D), true);
             if (paintings[pindx] != null)

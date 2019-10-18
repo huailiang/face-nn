@@ -73,7 +73,7 @@ namespace XEngine.Editor
             XRoleParts parts = go.GetComponent<XRoleParts>();
             Transform root = parts.wingRoot;
             if (root.childCount > 0) return;
-            string path = "Assets/BundleRes/Prefabs/Wing/Player_common_" + dir + "_wing.prefab";
+            string path = "Assets/Resource/Prefabs/Wing/Player_common_" + dir + "_wing.prefab";
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             if (prefab != null)
             {
@@ -84,7 +84,7 @@ namespace XEngine.Editor
                 go.transform.position = Vector3.zero;
 
                 SkinnedMeshRenderer skm = go.GetComponentInChildren<SkinnedMeshRenderer>();
-                path = "Assets/BundleRes/FBXRawData/Player_common/Player_common_" + dir + "_wing";
+                path = "Assets/Resource/RawData/Player_common/Player_common_" + dir + "_wing";
                 skm.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(path + ".mat");
                 skm.sharedMesh = AssetDatabase.LoadAssetAtPath<Mesh>(path + ".asset");
             }
@@ -97,7 +97,7 @@ namespace XEngine.Editor
             Transform transf = go.transform.Find("Player_" + sshape + "_" + TCConst.WEAPON);
             string shape_dir = "Player_" + sshape;
             string cname = "Player_" + sshape + "_" + dir + "_" + TCConst.WEAPON + "_" + presentid + "_" + weapon_index;
-            string asset = "Assets/BundleRes/FBXRawData/" + shape_dir + "/" + shape_dir + "_" + dir + "/" + cname;
+            string asset = "Assets/Resource/RawData/" + shape_dir + "/" + shape_dir + "_" + dir + "/" + cname;
             for (int i = 0; i < part.weapon.Length; i++)
             {
                 if (part.weapon[i].presentid == presentid)
@@ -124,7 +124,7 @@ namespace XEngine.Editor
             if (row != null)
             {
                 string cname = "Player_" + sshape + "_common_" + TCConst.FACE + "_" + row.ID;
-                string asset = "Assets/BundleRes/FBXRawData/" + shape_dir + "/Common/" + cname;
+                string asset = "Assets/Resource/RawData/" + shape_dir + "/Common/" + cname;
                 DrawPart(transf, asset, bones, null, null);
             }
             else
@@ -142,13 +142,13 @@ namespace XEngine.Editor
             if (string.IsNullOrEmpty(part))
             {
                 string cname = "Player_" + sshape + "_" + dir + "_" + suffix;
-                asset = "Assets/BundleRes/FBXRawData/" + shape_dir + "/" + shape_dir + "_" + dir + "/" + cname;
+                asset = "Assets/Resource/RawData/" + shape_dir + "/" + shape_dir + "_" + dir + "/" + cname;
                 DrawPart(transf, asset, bones, dbones, row);
             }
             else if (!part.Equals("E"))
             {
                 string cname = "Player_" + sshape + "_common_" + suffix + "_" + part;
-                asset = "Assets/BundleRes/FBXRawData/" + shape_dir + "/Common/" + cname;
+                asset = "Assets/Resource/RawData/" + shape_dir + "/Common/" + cname;
                 DrawPart(transf, asset, bones, dbones, row);
             }
         }
@@ -167,7 +167,7 @@ namespace XEngine.Editor
                 {
                     for (int k = 0; k < row.dbparent.Length; k++)
                     {
-                        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/BundleRes/Prefabs/DynamicBones/" + row.dbprefab[k] + ".prefab");
+                        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Resource/Prefabs/DynamicBone/" + row.dbprefab[k] + ".prefab");
                         if (prefab == null)
                         {
                             Debug.LogError("DynamicBones error: fashionlist id: " + row.ID + " index: " + k + "  prefab config: " + row.dbprefab[k]);

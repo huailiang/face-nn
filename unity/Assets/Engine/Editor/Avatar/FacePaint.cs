@@ -50,7 +50,7 @@ namespace XEngine.Editor
 
         public void Initial(GameObject go, RoleShape shape)
         {
-            mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/BundleRes/MatShader/FaceMakeup.mat");
+            mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Resource/RawData/FaceMakeup.mat");
             string child = "Player_" + shape.ToString().ToLower() + "_face";
             Transform face = go.transform.Find(child);
             var skr = face.gameObject.GetComponent<SkinnedMeshRenderer>();
@@ -233,7 +233,7 @@ namespace XEngine.Editor
 
         private Texture2D GetPaintTex(string name, RoleShape shape)
         {
-            string path = "Assets/BundleRes/Knead/" + name + "_" + shape.ToString().ToLower() + ".tga";
+            string path = "Assets/Resource/Knead/" + name + "_" + shape.ToString().ToLower() + ".tga";
             return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }
 

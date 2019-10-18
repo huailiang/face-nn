@@ -20,7 +20,7 @@ namespace XEngine.Editor
     public class XEditorUtil
     {
         public static XEditorConfig _config;
-        public readonly static string uiFace = @"Assets/BundleRes/Faceicon/";
+        public readonly static string uiFace = @"Assets/Resource/Faceicon/";
 
         public static XEditorConfig Config
         {

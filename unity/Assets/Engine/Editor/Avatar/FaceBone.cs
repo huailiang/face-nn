@@ -241,7 +241,7 @@ namespace XEngine.Editor
         public void Initial(GameObject go, RoleShape shape)
         {
             RoleParts = go.GetComponent<XRoleParts>();
-            string path = "Assets/BundleRes/Config/" + shape.ToString().ToLower();
+            string path = "Assets/Resource/Config/" + shape.ToString().ToLower();
             TextAsset ta = AssetDatabase.LoadAssetAtPath<TextAsset>(path + ".bytes");
             if (ta != null)
             {
