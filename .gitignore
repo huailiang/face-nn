@@ -22,5 +22,6 @@ neural/faceparsing/res/
 neural/faceparsing/data/
 export/**/*jpg
 export/**/*jpeg
+export/**/db_description
 *.DS_Store
 *Animation.meta
