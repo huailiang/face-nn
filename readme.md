@@ -140,14 +140,12 @@ tensorboard --logdir runs
 
 ### reinference
 
-如果因为中间因为偶然因素（比如说断电）中间退出了训练， 又想从之前保存的model中恢复出来， 这时候可以先把model里的模型文件copy到reinference目录， 然后执行下面命令：
+如果因为中间因为偶然因素（比如说断电）退出了训练， 又想从之前保存的model中恢复出来， 这时候可以先把model里的模型文件copy到reinference目录， 然后执行下面命令：
 
 ```sh
 python main.py \
 	--phase=inference_imitator	\
 	--total_steps=30000	\
-	--prev_freq=100	\
-	--save_freq=500	\
 	--path_to_dataset="../export/trainset/"
 ```
 

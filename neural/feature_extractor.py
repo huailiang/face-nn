@@ -98,6 +98,7 @@ class FeatureExtractor(nn.Module):
                 self.writer.add_scalar('feature extractor/loss', loss_, step)
                 path = os.path.join(self.params_path, "step" + str(step))
                 ops.generate_file(path, params)
+                utils.update_optimizer_lr(self.optimizer, loss_)
             if (step + 1) % self.args.extractor_save_freq == 0:
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))

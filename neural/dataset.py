@@ -3,7 +3,6 @@
 # @Author: penghuailiang
 # @Date  : 2019-10-04
 
-from __future__ import print_function
 import numpy as np
 import torch
 import os
@@ -11,6 +10,7 @@ import cv2
 import random
 import struct
 import util.logit as log
+from util.exception import NeuralException
 
 
 class FaceDataset:
@@ -18,15 +18,25 @@ class FaceDataset:
     由Unity引擎生成的dataset
     """
 
-    def __init__(self, args):
+    def __init__(self, args, mode="train"):
+        """
+        Dataset construction
+        :param args: argparse options
+        :param mode: "train": 训练级； "test": 测试集
+        """
         self.names = []
         self.params = []
-        self.path_to_dataset = args.path_to_dataset
+        if mode == "train":
+            self.path = args.path_to_dataset
+        elif mode == "test":
+            self.path = args.path_to_dataset
+        else:
+            raise NeuralException("not such mode for dataset")
         cnt = args.db_item_cnt
         self.args = args
-        if os.path.exists(self.path_to_dataset):
+        if os.path.exists(self.path):
             name = "db_description"
-            path = os.path.join(self.path_to_dataset, name)
+            path = os.path.join(self.path, name)
             log.info(path)
             f = open(path, "rb")
             for it in range(cnt):
@@ -38,7 +48,7 @@ class FaceDataset:
                 self.params.append(v)
             f.close()
         else:
-            print("can't be found path %s. Skip it." % self.path_to_dataset)
+            log.info("can't be found path %s. Skip it.", self.path)
 
     def get_batch(self, batch_size):
         """
@@ -54,7 +64,7 @@ class FaceDataset:
             name = self.names[ind]
             val = self.params[ind]
             name = name + ".jpg"
-            path = os.path.join(self.path_to_dataset, name)
+            path = os.path.join(self.path, name)
             image = cv2.imread(path)
             names.append(name)
             params[i] = torch.Tensor(val)
@@ -63,5 +73,3 @@ class FaceDataset:
             image = image / 255.0
             images[i] = torch.Tensor(image)
         return names, params, images
-
-

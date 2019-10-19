@@ -98,7 +98,7 @@ parser.add_argument(
     '--learning_rate',
     dest='learning_rate',
     type=float,
-    default=0.01,
+    default=0.1,
     help='learning rate of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #
@@ -113,7 +113,7 @@ parser.add_argument(
     '--extractor_learning_rate',
     dest='extractor_learning_rate',
     type=float,
-    default=0.01,
+    default=0.05,
     help='learning rate of feature extractor')
 parser.add_argument(
     '--extractor_save_freq',

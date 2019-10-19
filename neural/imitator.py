@@ -43,17 +43,17 @@ class Imitator(nn.Module):
             self.layer(95, 64, 4, 1, 3),  # 1. (batch, 64, 4, 4)
             nn.ReplicationPad2d(7),
             self.layer(64, 32, 4, 2),  # 2. (batch, 32, 8, 8)
-            nn.ReflectionPad2d(5),
+            nn.ReplicationPad2d(5),
             self.layer(32, 32, 3, 1),  # 3. (batch, 32, 16, 16)
-            nn.ReflectionPad2d(9),
+            nn.ReplicationPad2d(9),
             self.layer(32, 16, 3, 1),  # 4. (batch, 16, 32, 32)
             nn.ReplicationPad2d(17),
             self.layer(16, 8, 3, 1),  # 5. (batch, 8, 64, 64)
-            nn.ReflectionPad2d(33),
+            nn.ZeroPad2d(33),
             self.layer(8, 8, 3, 1),  # 6. (batch, 8, 128, 128)
-            nn.ReflectionPad2d(65),
+            nn.ZeroPad2d(65),
             self.layer(8, 8, 3, 1),  # 7. (batch, 8, 256, 256)
-            nn.ReflectionPad2d(129),
+            nn.ZeroPad2d(129),
             self.layer(8, 3, 3, 1),  # 8. (batch, 3, 512, 512)
         )
         self.optimizer = optim.SGD(self.model.parameters(), lr=args.learning_rate, momentum=momentum)
@@ -102,7 +102,7 @@ class Imitator(nn.Module):
         """
         location = self.args.lightcnn
         checkpoint = torch.load(location, map_location="cpu")
-        dataset = FaceDataset(self.args)
+        dataset = FaceDataset(self.args, mode="train")
         initial_step = self.initial_step
         total_steps = self.args.total_steps
 
@@ -118,6 +118,7 @@ class Imitator(nn.Module):
             if (step + 1) % self.args.prev_freq == 0:
                 path = "{1}/imit_step{0}.jpg".format(step + 1, self.prev_path)
                 ops.save_img(path, images, y_)
+                utils.update_optimizer_lr(self.optimizer, self.args.learning_rate * loss_)
             if (step + 1) % self.args.save_freq == 0:
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
@@ -148,6 +149,25 @@ class Imitator(nn.Module):
         self.load_checkpoint(path)
         _, images = self.forward(params)
         return images
+
+    def evaluate(self):
+        """
+        评估准确率
+        :return: accuracy rate
+        """
+        dataset = FaceDataset(self.args, mode="test")
+        steps = 100
+        accuracy = 0.0
+        location = self.args.lightcnn
+        checkpoint = torch.load(location, map_location="cpu")
+        for step in range(steps):
+            log.info("step: %d", step)
+            names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
+            loss, _ = self.itr_train(params, images, checkpoint)
+            accuracy += 1.0 - loss
+        accuracy = accuracy / steps
+        log.info("accuracy rate is %f", accuracy)
+        return accuracy
 
     def clean(self):
         """
