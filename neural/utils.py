@@ -7,7 +7,7 @@ from __future__ import division
 
 import random
 import scipy.misc
-import util.logit as log
+from util.exception import NeuralException
 from lightcnn.extract_features import *
 import torch.nn as nn
 from faceparsing.evaluate import *
@@ -33,21 +33,52 @@ def param_2_arr(params):
     return array
 
 
+def init_weights(m):
+    classcache = m.__class__.__name__
+    if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, a=0, mode='fan_in')
+        if m.bias is not None:
+            nn.init.constant_(m.bias, 0.0)
+    if isinstance(m, nn.BatchNorm2d):
+        nn.init.constant_(m.weight, 1.0)
+        nn.init.constant_(m.bias, 0.0)
+
+
 def to_gray(rgb):
     """
     灰度处理
     :param rgb: Tensor(RGB)
     :return: Tensor(Grey)
     """
-    arr = np.mean(rgb, axis=2)
-    return arr[:, :, np.newaxis]
+    if len(rgb.shape) >= 3:
+        arr = np.mean(rgb, axis=2)
+        return arr[:, :, np.newaxis]
+    else:
+        raise NeuralException("to gray error")
+
+
+def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
+    """
+    实现一个通用的卷积layer, 卷积->BN->Relu
+    :param in_chanel: chanel in, int
+    :param out_chanel: chanel out, int
+    :param kernel_size: triple or int
+    :param stride: conv stride
+    :param pad: pad
+    :return: nn.Sequential
+    """
+    return nn.Sequential(
+        nn.Conv2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
+        nn.BatchNorm2d(out_chanel),
+        nn.ReLU()
+    )
 
 
 def feature256(img, checkpoint):
     """
     使用light cnn提取256维特征参数
     :param checkpoint: lightcnn model
-    :param img: tensor 输入图片 shape:(batch, 3, 512, 512)
+    :param img: tensor 输入图片 shape:(batch, 1, 512, 512)
     :return: 256维特征参数 tensor [batch, 256]
     """
     model = LightCNN_29Layers_v2(num_classes=80013)
@@ -60,10 +91,10 @@ def feature256(img, checkpoint):
     feature_tensor = torch.empty(batch, 256)
     for i in range(batch):
         _img = img[i].cpu().detach().numpy()
-        _img = scipy.misc.imresize(arr=_img, size=(128, 128, 1), interp='bilinear')
-        _img = to_gray(_img)
+        _img = _img.reshape((_img.shape[1], _img.shape[2]))
+        _img = scipy.misc.imresize(arr=_img, size=(128, 128), interp='bilinear')
         _img = transform(_img)
-        input[0, :, :, :] = _img
+        input[0, 0, :, :] = _img
         input_var = torch.autograd.Variable(input, volatile=True)
         _, features = model(input_var)
         feature_tensor[i] = features

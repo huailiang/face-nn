@@ -85,7 +85,7 @@ parser.add_argument(
     '--prev_freq',
     dest='prev_freq',
     type=int,
-    default=100,
+    default=10,
     help='generate preview image when training')
 parser.add_argument(
     '--save_freq',
@@ -103,7 +103,7 @@ parser.add_argument(
     '--learning_rate',
     dest='learning_rate',
     type=float,
-    default=0.1,
+    default=8.1,
     help='learning rate of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #

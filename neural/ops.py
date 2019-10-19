@@ -48,6 +48,7 @@ def clear_folder(dir):
 def clear_files(dir):
     """
     只清空文件 不清空子文件夹
+    如果文件夹不存在 则创建一个新的文件夹
     :param dir: 文件夹路径
     """
     try:
@@ -57,6 +58,7 @@ def clear_files(dir):
                     os.remove(os.path.join(root, name))
         else:
             log.warn("not exist directory: %s", dir)
+            os.mkdir(dir)
     except IOError as e:
         log.error("io error, load imitator failed ", e)
 

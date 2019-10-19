@@ -44,23 +44,15 @@ class FeatureExtractor(nn.Module):
         self.model = nn.Sequential(
             self.layer(3, 3, kernel_size=7, stride=2, pad=3),  # 1. (batch, 3, 256, 256)
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1),  # 2. (batch, 3, 128, 128)
-            self.layer(3, 8, kernel_size=3, stride=2, pad=1),  # 3. (batch, 8, 64, 64)
-            self.layer(8, 16, kernel_size=3, stride=2, pad=1),  # 4. (batch, 16, 32, 32)
-            self.layer(16, 32, kernel_size=3, stride=2, pad=1),  # 5. (batch, 32, 16, 16)
-            self.layer(32, 64, kernel_size=3, stride=2, pad=1),  # 6. (batch, 64, 8, 8)
-            self.layer(64, 95, kernel_size=7, stride=2),  # 7. (batch, 95, 1, 1)
+            utils.conv_layer(3, 8, kernel_size=3, stride=2, pad=1),  # 3. (batch, 8, 64, 64)
+            utils.conv_layer(8, 16, kernel_size=3, stride=2, pad=1),  # 4. (batch, 16, 32, 32)
+            utils.conv_layer(16, 32, kernel_size=3, stride=2, pad=1),  # 5. (batch, 32, 16, 16)
+            utils.conv_layer(32, 64, kernel_size=3, stride=2, pad=1),  # 6. (batch, 64, 8, 8)
+            utils.conv_layer(64, 95, kernel_size=7, stride=2),  # 7. (batch, 95, 1, 1)
         )
         self.optimizer = optim.SGD(self.parameters(),
                                    lr=args.extractor_learning_rate,
                                    momentum=momentum)
-
-    @staticmethod
-    def layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
-        return nn.Sequential(
-            nn.Conv2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
-            nn.BatchNorm2d(out_chanel),
-            nn.ReLU()
-        )
 
     def forward(self, x):
         batch = x.size(0)

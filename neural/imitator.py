@@ -17,7 +17,7 @@ from tensorboardX import SummaryWriter
 
 """
 imitator
-用来模拟游戏引擎：由params生成图片
+用来模拟游戏引擎：由params生成图片/灰度图
 network: 8 layer
 input: params (batch,95)
 output: tensor (batch, 3, 512, 512)
@@ -41,34 +41,25 @@ class Imitator(nn.Module):
         self.clean()
         self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
-            self.layer(95, 64, 4, 1, 3),  # 1. (batch, 64, 4, 4)
-            nn.ReplicationPad2d(7),
-            self.layer(64, 32, 4, 2),  # 2. (batch, 32, 8, 8)
-            nn.ReplicationPad2d(5),
-            self.layer(32, 32, 3, 1),  # 3. (batch, 32, 16, 16)
+            nn.ConstantPad2d(3, 0.5),
+            utils.conv_layer(95, 64, 4, 1),  # 1. (batch, 64, 4, 4)
             nn.ReplicationPad2d(9),
-            self.layer(32, 16, 3, 1),  # 4. (batch, 16, 32, 32)
-            nn.ReplicationPad2d(17),
-            self.layer(16, 8, 3, 1),  # 5. (batch, 8, 64, 64)
-            nn.ZeroPad2d(33),
-            self.layer(8, 8, 3, 1),  # 6. (batch, 8, 128, 128)
-            nn.ZeroPad2d(65),
-            self.layer(8, 8, 3, 1),  # 7. (batch, 8, 256, 256)
-            nn.ZeroPad2d(129),
-            self.layer(8, 3, 3, 1),  # 8. (batch, 3, 512, 512)
+            utils.conv_layer(64, 32, 7, 2),  # 2. (batch, 32, 8, 8)
+            nn.ReflectionPad2d(5),
+            utils.conv_layer(32, 32, 3, 1),  # 3. (batch, 32, 16, 16)
+            nn.ReplicationPad2d(9),
+            utils.conv_layer(32, 16, 3, 1),  # 4. (batch, 16, 32, 32)
+            nn.ReflectionPad2d(17),
+            utils.conv_layer(16, 8, 3, 1),  # 5. (batch, 8, 64, 64)
+            nn.ReplicationPad2d(33),
+            utils.conv_layer(8, 8, 3, 1),  # 6. (batch, 8, 128, 128)
+            nn.ReflectionPad2d(65),
+            utils.conv_layer(8, 8, 3, 1),  # 7. (batch, 8, 256, 256)
+            nn.ReflectionPad2d(129),
+            utils.conv_layer(8, 1, 3, 1),  # 8. (batch, 1, 512, 512) grey
         )
+        self.model.apply(utils.init_weights)
         self.optimizer = optim.SGD(self.model.parameters(), lr=args.learning_rate, momentum=momentum)
-
-    @staticmethod
-    def layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
-        """
-        imitator convolution layer
-        """
-        return nn.Sequential(
-            nn.Conv2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
-            nn.BatchNorm2d(out_chanel),
-            nn.ReLU()
-        )
 
     def forward(self, params):
         """
@@ -113,7 +104,6 @@ class Imitator(nn.Module):
         dataset = FaceDataset(self.args, mode="train")
         initial_step = self.initial_step
         total_steps = self.args.total_steps
-
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
             names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
@@ -124,6 +114,8 @@ class Imitator(nn.Module):
             loss_ = loss.detach().numpy()
             progress.set_description("loss:" + "{:.3f}".format(loss_))
             self.writer.add_scalar('imitator/loss', loss_, step)
+            self.upload_weights(step)
+
             if (step + 1) % self.args.prev_freq == 0:
                 path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
                 ops.save_img(path, images, y_)
@@ -134,6 +126,24 @@ class Imitator(nn.Module):
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
         self.writer.close()
+
+    def upload_weights(self, step):
+        """
+        把neural net的权重以图片的方式上传到tensorboard
+        :param step: train step
+        """
+        for module in self.model._modules.values():
+            if isinstance(module, nn.Sequential):
+                for it in module._modules.values():
+                    if isinstance(it, nn.Conv2d):
+                        name = "weight_{0}_{1}".format(it.in_channels, it.out_channels)
+                        if it.in_channels == 32 and it.out_channels == 32:
+                            weights = it.weight.reshape(3, 48, -1)
+                            self.writer.add_image(name, weights, step)
+                        if it.in_channels == 16:
+                            weights = it.weight.reshape(3, 24, -1)
+                            self.writer.add_image(name, weights, step)
+                        break
 
     def load_checkpoint(self, path, training=False):
         """
