@@ -59,7 +59,7 @@ def feature256(img, checkpoint):
     input = torch.zeros(1, 1, 128, 128)
     feature_tensor = torch.empty(batch, 256)
     for i in range(batch):
-        _img = img[i].detach().numpy()
+        _img = img[i].cpu().detach().numpy()
         _img = scipy.misc.imresize(arr=_img, size=(128, 128, 1), interp='bilinear')
         _img = to_gray(_img)
         _img = transform(_img)

@@ -40,7 +40,7 @@ class FeatureExtractor(nn.Module):
         self.args = args
         self.model_path = "./output/imitator"
         self.params_path = "./output/params"
-        self.writer = SummaryWriter(comment="feature extractor")
+        self.writer = SummaryWriter(comment="feature extractor", log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
             self.layer(3, 3, kernel_size=7, stride=2, pad=3),  # 1. (batch, 3, 256, 256)
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1),  # 2. (batch, 3, 128, 128)
@@ -83,7 +83,7 @@ class FeatureExtractor(nn.Module):
         self.optimizer.step()
         return loss, param_
 
-    def batch_train(self):
+    def batch_train(self, cuda):
         log.info("feature extractor train")
         initial_step = self.initial_step
         total_steps = self.args.total_extractor_steps

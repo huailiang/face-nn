@@ -50,11 +50,11 @@ def init_device(args):
     if support_gpu and args.use_gpu:
         if not args.gpuid:
             args.gpuid = 0
-        device = torch.device("cuda:%d" % args.gpuid)
-        return True, device
+        dev = torch.device("cuda:%d" % args.gpuid)
+        return True, dev
     else:
-        device = torch.device("cpu")
-        return False, device
+        dev = torch.device("cpu")
+        return False, dev
 
 
 if __name__ == '__main__':
@@ -63,15 +63,19 @@ if __name__ == '__main__':
     """
     args = parser.parse_args()
     log.init("FaceNeural", logging.DEBUG, log_path="./output/neural_log.txt")
-    init_device(args)
+    cuda, device = init_device(args)
 
     if args.phase == "train_imitator":
         log.info('imitator train mode')
         imitator = Imitator("neural imitator", args)
-        imitator.batch_train()
+        if cuda:
+            imitator.cuda()
+        imitator.batch_train(cuda)
     elif args.phase == "train_extractor":
         log.info('feature extractor train mode')
         extractor = FeatureExtractor("neural extractor", args)
+        if cuda:
+            extractor.cuda()
         extractor.batch_train()
     elif args.phase == "inference_imitator":
         log.info("inference imitator")

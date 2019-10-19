@@ -88,7 +88,7 @@ def normal_2_image(tensor):
     batch = tensor.size(0)
     images = []
     for i in range(batch):
-        img = tensor[i].detach().numpy()
+        img = tensor[i].cpu().detach().numpy()
         img = np.swapaxes(img, 0, 2)  # [h, w, c]
         img = np.swapaxes(img, 0, 1)  # [w, h, c]
         images.append(img * 256)

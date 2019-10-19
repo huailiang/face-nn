@@ -38,7 +38,8 @@ class Imitator(nn.Module):
         self.initial_step = 0
         self.prev_path = "./output/preview"
         self.model_path = "./output/imitator"
-        self.writer = SummaryWriter(comment='imitator')
+        self.clean()
+        self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
             self.layer(95, 64, 4, 1, 3),  # 1. (batch, 64, 4, 4)
             nn.ReplicationPad2d(7),
@@ -96,29 +97,39 @@ class Imitator(nn.Module):
         self.optimizer.step()  # 更新网络参数权重
         return loss, y_
 
-    def batch_train(self):
+    def batch_train(self, cuda=False):
         """
-        step training, cpu default
+        batch training
+        :param cuda: 是否开启gpu加速运算， cpu default
         """
         location = self.args.lightcnn
-        checkpoint = torch.load(location, map_location="cpu")
+        rnd_input = torch.randn(self.args.batch_size, self.args.params_cnt)
+        if cuda:
+            checkpoint = torch.load(location)
+            rnd_input = rnd_input.cuda()
+        else:
+            checkpoint = torch.load(location, map_location="cpu")
+        self.writer.add_graph(self, input_to_model=rnd_input)
         dataset = FaceDataset(self.args, mode="train")
         initial_step = self.initial_step
         total_steps = self.args.total_steps
 
-        self.clean()
-        self.writer.add_graph(self, input_to_model=(torch.randn([self.args.batch_size, self.args.params_cnt]),))
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
             names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
+            if cuda:
+                params = params.cuda()
+                images = images.cuda()
             loss, y_ = self.itr_train(params, images, checkpoint)
             loss_ = loss.detach().numpy()
             progress.set_description("loss:" + "{:.3f}".format(loss_))
             self.writer.add_scalar('imitator/loss', loss_, step)
             if (step + 1) % self.args.prev_freq == 0:
-                path = "{1}/imit_step{0}.jpg".format(step + 1, self.prev_path)
+                path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
                 ops.save_img(path, images, y_)
-                utils.update_optimizer_lr(self.optimizer, self.args.learning_rate * loss_)
+                lr = self.args.learning_rate * loss_
+                utils.update_optimizer_lr(self.optimizer, lr)
+                self.writer.add_scalar('imitator/learning rate', lr, step)
             if (step + 1) % self.args.save_freq == 0:
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
@@ -130,7 +141,6 @@ class Imitator(nn.Module):
         :param training: 恢复之后 是否接着train
         :param path: checkpoint's path
         """
-        self.clean()
         checkpoint = torch.load(self.args.path_to_inference + "/" + path)
         self.model.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])

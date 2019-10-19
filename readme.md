@@ -134,7 +134,8 @@ python main.py \
 	--save_freq=500	\
 	--path_to_dataset="../export/trainset/"
 
-tensorboard --logdir runs
+# 开启tensorboard 查看graph运行情况
+tensorboard --logdir logs
 
 ```
 

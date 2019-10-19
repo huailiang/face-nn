@@ -45,6 +45,11 @@ parser.add_argument(
     default="./output/inference/",
     help='model path for inference')
 parser.add_argument(
+    '--path_tensor_log',
+    dest='path_tensor_log',
+    default="./logs/",
+    help='model path for inference')
+parser.add_argument(
     '--phase',
     dest='phase',
     default='train_imitator',
