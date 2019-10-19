@@ -7,7 +7,7 @@ from __future__ import print_function
 import numpy as np
 import torch
 import os
-import scipy.misc
+import cv2
 import random
 import struct
 import util.logit as log
@@ -55,7 +55,7 @@ class FaceDataset:
             val = self.params[ind]
             name = name + ".jpg"
             path = os.path.join(self.path_to_dataset, name)
-            image = scipy.misc.imread(name=path, mode='RGB')
+            image = cv2.imread(path)
             names.append(name)
             params[i] = torch.Tensor(val)
             image = np.swapaxes(image, 1, 0)

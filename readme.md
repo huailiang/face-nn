@@ -108,9 +108,12 @@ baidu  yun:	   [LightCNN-29 v2][i7]
 ![](/image/t3.jpg)
 
 
-## train
+## Operation
 
-进入git 下载目录， 按照下面命令就可以train
+
+### 训练 train
+
+进入git 下载目录， 按照下面命令就可以train， 训练的时候每隔100步会生成preview 图片，实时查看训练结果; 每隔500步就会保存下当前模型, 保存在model文件夹下
 
 ```sh
 cd /path/to/workdir
@@ -127,10 +130,25 @@ python main.py \
 	--batch_size=4 \
 	--learning_rate=0.01 \
 	--total_steps=30000	\
+	--prev_freq=100	\
+	--save_freq=500	\
 	--path_to_dataset="../export/trainset/"
 
 tensorboard --logdir runs
 
+```
+
+### reinference
+
+如果因为中间因为偶然因素（比如说断电）中间退出了训练， 又想从之前保存的model中恢复出来， 这时候可以先把model里的模型文件copy到reinference目录， 然后执行下面命令：
+
+```sh
+python main.py \
+	--phase=inference_imitator	\
+	--total_steps=30000	\
+	--prev_freq=100	\
+	--save_freq=500	\
+	--path_to_dataset="../export/trainset/"
 ```
 
 

@@ -76,7 +76,7 @@ if __name__ == '__main__':
     elif args.phase == "inference_imitator":
         log.info("inference imitator")
         imitator = Imitator("neural imitator", args)
-        imitator.load_checkpoint("./output/imitator/")
+        imitator.load_checkpoint("model_imitator_20000.pth", training=True)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
         checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")

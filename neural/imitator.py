@@ -14,6 +14,7 @@ import ops
 from tqdm import tqdm
 from dataset import FaceDataset
 from tensorboardX import SummaryWriter
+
 """
 imitator
 用来模拟游戏引擎：由params生成图片
@@ -106,33 +107,36 @@ class Imitator(nn.Module):
         total_steps = self.args.total_steps
 
         self.clean()
+        self.writer.add_graph(self, input_to_model=(torch.randn([self.args.batch_size, self.args.params_cnt]),))
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
             names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
             loss, y_ = self.itr_train(params, images, checkpoint)
             loss_ = loss.detach().numpy()
             progress.set_description("loss:" + "{:.3f}".format(loss_))
-            self.writer.add_graph(self, input_to_model=(params, ))
             self.writer.add_scalar('imitator/loss', loss_, step)
-            if (step + 1) % 80 == 0:
-                path = "{2}/imit{0}_step{1}.jpg".format(names[0][2:-6], step + 1, self.prev_path)
+            if (step + 1) % self.args.prev_freq == 0:
+                path = "{1}/imit_step{0}.jpg".format(step + 1, self.prev_path)
                 ops.save_img(path, images, y_)
             if (step + 1) % self.args.save_freq == 0:
                 state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
         self.writer.close()
 
-    def load_checkpoint(self, path):
+    def load_checkpoint(self, path, training=False):
         """
         从checkpoint 中恢复net
+        :param training: 恢复之后 是否接着train
         :param path: checkpoint's path
         """
         self.clean()
-        checkpoint = torch.load(path)
+        checkpoint = torch.load(self.args.path_to_inference + "/" + path)
         self.model.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.initial_step = checkpoint['epoch']
         log.info("recovery imitator from %s", path)
+        if training:
+            self.batch_train()
 
     def inference(self, path, params):
         """
