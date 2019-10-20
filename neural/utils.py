@@ -87,15 +87,14 @@ def feature256(img, checkpoint):
     model.load_state_dict(checkpoint['state_dict'])
     transform = transforms.Compose([transforms.ToTensor()])
     batch = img.size(0)
-    input = torch.zeros(1, 1, 128, 128)
     feature_tensor = torch.empty(batch, 256)
     for i in range(batch):
         _img = img[i].cpu().detach().numpy()
         _img = _img.reshape((_img.shape[1], _img.shape[2]))
         _img = scipy.misc.imresize(arr=_img, size=(128, 128), interp='bilinear')
         _img = transform(_img)
-        input[0, 0, :, :] = _img
-        input_var = torch.autograd.Variable(input, volatile=True)
+        _img = _img.view(1, 1, 128, 128)
+        input_var = torch.autograd.Variable(_img)
         _, features = model(input_var)
         feature_tensor[i] = features
     return feature_tensor
