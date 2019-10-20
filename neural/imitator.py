@@ -73,17 +73,17 @@ class Imitator(nn.Module):
         _params.requires_grad_(True)
         return self.model(_params)
 
-    def itr_train(self, params, referimage, checkpoint):
+    def itr_train(self, params, referimage, lightcnn_inst):
         """
         iterator training
         :param params:  [batch, 95]
         :param referimage: reference photo [batch, 3, 512, 512]
-        :param checkpoint: light cnn's model
+        :param lightcnn_inst: light cnn's model
         :return loss: [batch]
         """
         self.optimizer.zero_grad()
         y_ = self.forward(params)
-        loss = utils.discriminative_loss(referimage, y_, checkpoint)
+        loss = utils.discriminative_loss(referimage, y_, lightcnn_inst)
         loss.backward()  # 求导  loss: [batch]
         self.optimizer.step()  # 更新网络参数权重
         return loss, y_
@@ -94,12 +94,10 @@ class Imitator(nn.Module):
         :param cuda: 是否开启gpu加速运算， cpu default
         """
         location = self.args.lightcnn
+        lightcnn_inst = utils.load_lightcnn(location)
         rnd_input = torch.randn(self.args.batch_size, self.args.params_cnt)
         if cuda:
-            checkpoint = torch.load(location)
             rnd_input = rnd_input.cuda()
-        else:
-            checkpoint = torch.load(location, map_location="cpu")
         self.writer.add_graph(self, input_to_model=rnd_input)
         dataset = FaceDataset(self.args, mode="train")
         initial_step = self.initial_step
@@ -110,7 +108,7 @@ class Imitator(nn.Module):
             if cuda:
                 params = params.cuda()
                 images = images.cuda()
-            loss, y_ = self.itr_train(params, images, checkpoint)
+            loss, y_ = self.itr_train(params, images, lightcnn_inst)
             loss_ = loss.detach().numpy()
             progress.set_description("loss:" + "{:.3f}".format(loss_))
             self.writer.add_scalar('imitator/loss', loss_, step)
@@ -132,18 +130,19 @@ class Imitator(nn.Module):
         把neural net的权重以图片的方式上传到tensorboard
         :param step: train step
         """
-        for module in self.model._modules.values():
-            if isinstance(module, nn.Sequential):
-                for it in module._modules.values():
-                    if isinstance(it, nn.Conv2d):
-                        name = "weight_{0}_{1}".format(it.in_channels, it.out_channels)
-                        if it.in_channels == 32 and it.out_channels == 32:
-                            weights = it.weight.reshape(3, 48, -1)
-                            self.writer.add_image(name, weights, step)
-                        if it.in_channels == 16:
-                            weights = it.weight.reshape(3, 24, -1)
-                            self.writer.add_image(name, weights, step)
-                        break
+        if self.args.open_tensorboard_image:
+            for module in self.model._modules.values():
+                if isinstance(module, nn.Sequential):
+                    for it in module._modules.values():
+                        if isinstance(it, nn.Conv2d):
+                            name = "weight_{0}_{1}".format(it.in_channels, it.out_channels)
+                            if it.in_channels == 32 and it.out_channels == 32:
+                                weights = it.weight.reshape(3, 48, -1)
+                                self.writer.add_image(name, weights, step)
+                            if it.in_channels == 16:
+                                weights = it.weight.reshape(3, 24, -1)
+                                self.writer.add_image(name, weights, step)
+                            break
 
     def load_checkpoint(self, path, training=False):
         """
@@ -194,5 +193,6 @@ class Imitator(nn.Module):
         清空前记得手动备份
         :return:
         """
+        ops.clear_files(self.args.path_tensor_log)
         ops.clear_files(self.prev_path)
         ops.clear_files(self.model_path)

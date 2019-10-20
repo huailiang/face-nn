@@ -66,6 +66,12 @@ parser.add_argument(
     type=int,
     default=int(0),
     help='device GPU ID')
+parser.add_argument(
+    '--open_tensorboard_image',
+    dest='open_tensorboard_image',
+    type=bool,
+    default=bool(False),
+    help='open tensorboard image upload')
 
 # ========================= IMITATOR PARAMETERS ========================= #
 
