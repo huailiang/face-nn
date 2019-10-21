@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Author: penghuailiang
-# @Date  : 2019-04-27
+# @Date  : 2019-09-27
 
 import argparse
 
@@ -17,6 +17,11 @@ def parse_list(str_value):
 parser = argparse.ArgumentParser(description='face')
 
 # ========================== GENERAL PARAMETERS ========================= #
+parser.add_argument(
+    '--phase',
+    dest='phase',
+    default='train_imitator',
+    help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',
     dest='params_cnt',
@@ -50,22 +55,17 @@ parser.add_argument(
     default="./logs/",
     help='model path for inference')
 parser.add_argument(
-    '--phase',
-    dest='phase',
-    default='train_imitator',
-    help='Specify current phase: train or inference.')
-parser.add_argument(
     '--use_gpu',
     dest='use_gpu',
     type=bool,
     default=bool(True),
-    help='count of engine face params')
+    help='manual open gpu mode, if device is supported')
 parser.add_argument(
     '--gpuid',
     dest='gpuid',
     type=int,
     default=int(0),
-    help='device GPU ID')
+    help='device GPU ID, if use_gpu set True')
 parser.add_argument(
     '--open_tensorboard_image',
     dest='open_tensorboard_image',
@@ -79,7 +79,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(3e4),
+    default=int(8e4),
     help='Total number of steps')
 parser.add_argument(
     '--batch_size',
@@ -91,7 +91,7 @@ parser.add_argument(
     '--prev_freq',
     dest='prev_freq',
     type=int,
-    default=10,
+    default=100,
     help='generate preview image when training')
 parser.add_argument(
     '--save_freq',

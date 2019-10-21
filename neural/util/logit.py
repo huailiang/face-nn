@@ -5,7 +5,6 @@
 
 import os
 import logging
-import platform
 import sys
 
 """
@@ -52,17 +51,18 @@ def init(name="LOG", level=logging.INFO, log_path="./output/log.txt"):
     global _log
     _log = logging.getLogger(name)
     _log.setLevel(level)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler = logging.FileHandler(log_path)
-    handler.setLevel(level)
-    handler.setFormatter(formatter)
     console = logging.StreamHandler()
+    console.emit = add_console_to_emit(console.emit)
     formatter = logging.Formatter('%(message)s')
     console.setFormatter(formatter)
     console.setLevel(level)
-    _log.addHandler(handler)
     _log.addHandler(console)
-    logging.StreamHandler.emit = add_coloring_to_emit_ansi(logging.StreamHandler.emit)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler = logging.FileHandler(log_path)
+    handler.emit = add_file_to_emit(handler.emit)
+    handler.setLevel(level)
+    handler.setFormatter(formatter)
+    _log.addHandler(handler)
 
 
 def clear_log(log_path):
@@ -74,29 +74,47 @@ def clear_log(log_path):
         raise
 
 
-def add_coloring_to_emit_ansi(fn):
+def add_file_to_emit(fn):
     def new(*args):
-        levelno = args[1].levelno
+        msg = args[0].msg
+        if isinstance(msg, str):
+            idx = msg.find('\t')
+            if idx <= 0:
+                idx = 5
+            else:
+                idx += 1
+            args[0].msg = args[0].msg[idx:-4]
+        return fn(*args)
+
+    return new
+
+
+def add_console_to_emit(fn):
+    def new(*args):
+        levelno = args[0].levelno
         if levelno >= 50:
-            color = '\x1b[31m'  # red
+            color = '\x1b[35m'  # pink - critical
         elif levelno >= 40:
-            color = '\x1b[31m'  # red
+            color = '\x1b[31m'  # red - error
         elif levelno >= 30:
-            color = '\x1b[33m'  # yellow
+            color = '\x1b[33m'  # yellow - warn
         elif levelno >= 20:
-            color = '\x1b[32m'  # green
+            color = '\x1b[37m'  # white
         elif levelno >= 10:
-            color = '\x1b[35m'  # pink
+            color = '\x1b[37m'  # white
         else:
             color = '\x1b[0m'  # normal
-        if not args[1].msg.startswith(color):
-            args[1].msg = color + format_header() + args[1].msg + '\x1b[0m'
+        msg = args[0].msg
+        if isinstance(msg, str):
+            args[0].msg = color + format_header() + args[0].msg + '\x1b[0m'
+        else:
+            args[0].msg = color + format_header() + str(args[0].msg) + '\x1b[0m'
         return fn(*args)
 
     def format_header():
         filename, no, function = get_stack_info()
         filename = os.path.basename(filename)
-        header = filename + ":" + str(no) + " "
+        header = filename + ":" + str(no) + "\t"
         return header
 
     def get_stack_info():
@@ -110,7 +128,6 @@ def add_coloring_to_emit_ansi(fn):
                     f = f.f_back
                     co = f.f_code
                     return co.co_filename, f.f_lineno, co.co_name
-            f = f.f_back
 
     return new
 
