@@ -174,6 +174,7 @@ class Imitator(nn.Module):
         评估准确率
         :return: accuracy rate
         """
+        self.model.eval()
         dataset = FaceDataset(self.args, mode="test")
         steps = 100
         accuracy = 0.0
