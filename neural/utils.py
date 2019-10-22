@@ -63,6 +63,10 @@ def to_gray(rgb):
         raise NeuralException("to gray error")
 
 
+def residule_layer(in_chanel, out_chanel, kernel_size=3, stride=1, pad=1):
+    nn.Conv2d(in_chanel, out_chanel, kernel_size=3, stride=stride, padding=pad)
+
+
 def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
     """
     实现一个通用的卷积layer, 卷积->BN->Relu
@@ -74,8 +78,7 @@ def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
     :return: nn.Sequential
     """
     return nn.Sequential(nn.Conv2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
-                         nn.BatchNorm2d(out_chanel),
-                         nn.ReLU())
+                         nn.BatchNorm2d(out_chanel), nn.ReLU())
 
 
 def load_lightcnn(location, cuda=False):
@@ -155,8 +158,7 @@ def batch_feature256(img, lightcnn_inst):
     img = F.max_pool2d(img, (4, 4))
     # input_var = torch.autograd.Variable(img)
     _, features = lightcnn_inst(img)
-    log.debug("features shape:{0} {1} {2}".
-              format(features.size(), features.requires_grad, img.requires_grad))
+    log.debug("features shape:{0} {1} {2}".format(features.size(), features.requires_grad, img.requires_grad))
     return features
 
 

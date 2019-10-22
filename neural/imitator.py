@@ -6,6 +6,7 @@
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 import util.logit as log
 import utils
@@ -14,6 +15,7 @@ import ops
 from tqdm import tqdm
 from dataset import FaceDataset
 from tensorboardX import SummaryWriter
+from module import ResidualBlock
 
 """
 imitator
@@ -25,7 +27,7 @@ output: tensor (batch, 3, 512, 512)
 
 
 class Imitator(nn.Module):
-    def __init__(self, name, args, momentum=0.8):
+    def __init__(self, name, args, block=ResidualBlock, momentum=0.8):
         """
         imitator
         :param name: imitator name
@@ -40,27 +42,20 @@ class Imitator(nn.Module):
         self.model_path = "./output/imitator"
         self.clean()
         self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
-        self.model = nn.Sequential(
-            nn.ConstantPad2d(3, 0.5),
-            utils.conv_layer(95, 64, 4, 1),  # 1. (batch, 64, 4, 4)
-            nn.ReplicationPad2d(9),
-            utils.conv_layer(64, 32, 7, 2),  # 2. (batch, 32, 8, 8)
-            nn.ReflectionPad2d(5),
-            utils.conv_layer(32, 32, 3, 1),  # 3. (batch, 32, 16, 16)
-            nn.ReplicationPad2d(9),
-            utils.conv_layer(32, 16, 3, 1),  # 4. (batch, 16, 32, 32)
-            nn.ReflectionPad2d(17),
-            utils.conv_layer(16, 8, 3, 1),  # 5. (batch, 8, 64, 64)
-            nn.ReplicationPad2d(33),
-            utils.conv_layer(8, 8, 3, 1),  # 6. (batch, 8, 128, 128)
-            nn.ReflectionPad2d(65),
-            utils.conv_layer(8, 8, 3, 1),  # 7. (batch, 8, 256, 256)
-            nn.ReflectionPad2d(129),
-            utils.conv_layer(8, 1, 3, 1),  # 8. (batch, 1, 512, 512) grey
-        )
+        self.layer1 = nn.Sequential(nn.ConstantPad2d(3, 0.5), utils.conv_layer(95, 64, 4, 1))  # (batch, 64, 4, 4)
+        self.block1 = block(64, 64)  # (batch, 64, 4, 4)
+        self.layer2 = nn.Sequential(nn.ReplicationPad2d(9), utils.conv_layer(64, 32, 7, 2))  # (batch, 32, 8, 8)
+        self.block2 = block(32, 32)  # (batch, 32, 8, 8)
+        self.layer3 = nn.Sequential(nn.ReflectionPad2d(5), utils.conv_layer(32, 32, 3, 1))  # (batch, 32, 16, 16))
+        self.layer4 = nn.Sequential(nn.ReplicationPad2d(9), utils.conv_layer(32, 16, 3, 1))  # (batch, 16, 32, 32)
+        self.block4 = block(16, 16)  # (batch, 16, 32, 32)
+        self.layer5 = nn.Sequential(nn.ReflectionPad2d(17), utils.conv_layer(16, 8, 3, 1))  # (batch, 8, 64, 64)
+        self.layer6 = nn.Sequential(nn.ReplicationPad2d(33), utils.conv_layer(8, 8, 3, 1))  # (batch, 8, 128, 128)
+        self.layer7 = nn.Sequential(nn.ReflectionPad2d(65), utils.conv_layer(8, 8, 3, 1), )  # (batch, 8, 256, 256)
+        self.layer8 = nn.Sequential(nn.ReflectionPad2d(129), utils.conv_layer(8, 1, 3, 1))  # (batch, 1, 512, 512) grey
 
-        self.model.apply(utils.init_weights)
-        self.optimizer = optim.SGD(self.model.parameters(), lr=args.learning_rate, momentum=momentum)
+        self.apply(utils.init_weights)
+        self.optimizer = optim.SGD(self.parameters(), lr=args.learning_rate, momentum=momentum)
 
     def forward(self, params):
         """
@@ -72,7 +67,18 @@ class Imitator(nn.Module):
         length = params.size(1)
         _params = params.reshape((batch, length, 1, 1))
         _params.requires_grad_(True)
-        return self.model(_params)
+        y = self.layer1(_params)
+        y = self.block1(y)
+        y = self.layer2(y)
+        y = self.block2(y)
+        y = self.layer3(y)
+        y = self.layer4(y)
+        y = self.block4(y)
+        y = self.layer5(y)
+        y = self.layer6(y)
+        y = self.layer7(y)
+        y = self.layer8(y)
+        return y
 
     def itr_train(self, params, reference, lightcnn_inst):
         """
@@ -125,7 +131,7 @@ class Imitator(nn.Module):
                 utils.update_optimizer_lr(self.optimizer, lr)
                 self.writer.add_scalar('imitator/learning rate', lr, step)
             if (step + 1) % self.args.save_freq == 0:
-                state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
+                state = {'net': self.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
                 torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
         self.writer.close()
 
@@ -135,7 +141,7 @@ class Imitator(nn.Module):
         :param step: train step
         """
         if self.args.open_tensorboard_image:
-            for module in self.model._modules.values():
+            for module in self.layer2._modules.values():
                 if isinstance(module, nn.Sequential):
                     for it in module._modules.values():
                         if isinstance(it, nn.Conv2d):
@@ -156,7 +162,7 @@ class Imitator(nn.Module):
         :param cuda: gpu speedup
         """
         checkpoint = torch.load(self.args.path_to_inference + "/" + path)
-        self.model.load_state_dict(checkpoint['net'])
+        self.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.initial_step = checkpoint['epoch']
         log.info("recovery imitator from %s", path)
@@ -180,7 +186,7 @@ class Imitator(nn.Module):
         评估准确率
         :return: accuracy rate
         """
-        self.model.eval()
+        self.eval()
         dataset = FaceDataset(self.args, mode="test")
         steps = 100
         accuracy = 0.0

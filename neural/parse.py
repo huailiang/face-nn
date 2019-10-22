@@ -91,13 +91,13 @@ parser.add_argument(
     '--prev_freq',
     dest='prev_freq',
     type=int,
-    default=200,
+    default=2,
     help='generate preview image when training')
 parser.add_argument(
     '--save_freq',
     dest='save_freq',
     type=int,
-    default=1000,
+    default=10,
     help='Save model every save_freq steps')
 parser.add_argument(
     '--lightcnn',
