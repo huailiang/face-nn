@@ -13,6 +13,7 @@ unity/Assets/Table*
 neural/input/
 neural/output/
 neural/models/
+neural/test/
 neural/venv/
 neural/.idea/
 neural/dat/

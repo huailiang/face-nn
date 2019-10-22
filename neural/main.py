@@ -12,7 +12,10 @@ from parse import parser
 import logging
 import torch
 import align
+import cv2
+import numpy as np
 import util.logit as log
+import torch.nn.functional as F
 
 
 def ex_net():
@@ -46,7 +49,7 @@ def init_device(args):
     :return: 返回True 则支持gpu
     """
     support_gpu = torch.cuda.is_available()
-    log.info("neural face network support gpu %s, use gpu %s", support_gpu, args.use_gpu)
+    log.info("neural face network use gpu: %s", support_gpu and args.use_gpu)
     if support_gpu and args.use_gpu:
         if not args.gpuid:
             args.gpuid = 0
@@ -62,7 +65,7 @@ if __name__ == '__main__':
     程序入口函数
     """
     args = parser.parse_args()
-    log.init("FaceNeural", logging.DEBUG, log_path="./output/neural_log.txt")
+    log.init("FaceNeural", logging.INFO, log_path="./output/neural_log.txt")
     cuda, device = init_device(args)
 
     if args.phase == "train_imitator":
@@ -94,6 +97,17 @@ if __name__ == '__main__':
         ex_net()
     elif args.phase == "align":
         align.face_features("./output/image/timg.jpeg", "test.jpg")
+    elif args.phase == "test":
+        log.info("phase test")
+        # np.set_printoptions(threshold=np.nan)
+        imitator = Imitator("neural imitator", args)
+        params = utils.random_params(95)
+        log.info(params)
+        params2 = torch.rand(1, 95)
+        params2[0] = torch.Tensor(params)
+        out = imitator.forward(params2)
+        arr = out.detach().numpy()[0] * 255
+        arr = np.swapaxes(arr, 0, 2).reshape(512, 512, 1)
+        cv2.imwrite("./output/batch0.jpg", arr)
     else:
         log.error("not known phase %s", args.phase)
-

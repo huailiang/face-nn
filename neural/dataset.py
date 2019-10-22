@@ -22,7 +22,7 @@ class FaceDataset:
         """
         Dataset construction
         :param args: argparse options
-        :param mode: "train": 训练级； "test": 测试集
+        :param mode: "train": 训练集, "test": 测试集
         """
         self.names = []
         self.params = []
@@ -57,17 +57,21 @@ class FaceDataset:
         """
         names = []
         cnt = self.args.db_item_cnt
-        params = torch.rand([batch_size, self.args.params_cnt])
-        images = torch.rand([batch_size, 1, 512, 512])
+        param_cnt = self.args.params_cnt
+        np_params = np.zeros((batch_size, param_cnt), dtype=np.float32)
+        np_images = np.zeros((batch_size, 1, 512, 512), dtype=np.float32)
         for i in range(batch_size):
             ind = random.randint(0, cnt - 1)
             name = self.names[ind]
-            val = self.params[ind]
+            np_params[i] = self.params[ind]
             name = name + ".jpg"
+            names.append(name)
             path = os.path.join(self.path, name)
             image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-            names.append(name)
-            params[i] = torch.Tensor(val)
-            image = image[np.newaxis, :, :] / 255.0
-            images[i] = torch.Tensor(image)
+            np_images[i] = image[np.newaxis, :, :] / 255.0
+        params = torch.from_numpy(np_params)
+        params.requires_grad = True
+        images = torch.from_numpy(np_images)
+        log.debug("\nbatch leaf:{0}  grad:{1} type:{2}".format(params.is_leaf, params.requires_grad, params.dtype))
+        log.debug("numpy params type:{0}".format(np_params.dtype))
         return names, params, images

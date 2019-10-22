@@ -99,9 +99,9 @@ def add_console_to_emit(fn):
         elif levelno >= 30:
             color = '\x1b[33m'  # yellow - warn
         elif levelno >= 20:
-            color = '\x1b[37m'  # white
+            color = '\x1b[37m'  # white - info
         elif levelno >= 10:
-            color = '\x1b[37m'  # white
+            color = '\x1b[32m'  # green - debug
         else:
             color = '\x1b[0m'  # normal
         msg = args[0].msg

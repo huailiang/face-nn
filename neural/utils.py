@@ -10,6 +10,7 @@ import scipy.misc
 from util.exception import NeuralException
 from lightcnn.extract_features import *
 import torch.nn as nn
+import util.logit as log
 from faceparsing.evaluate import *
 
 
@@ -34,6 +35,10 @@ def param_2_arr(params):
 
 
 def init_weights(m):
+    """
+    使用正太分布初始化网络权重
+    :param m: model
+    """
     classcache = m.__class__.__name__
     if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
         # nn.init.uniform(m.weight, a=0., b=1.)
@@ -69,7 +74,8 @@ def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
     :return: nn.Sequential
     """
     return nn.Sequential(nn.Conv2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
-                         nn.BatchNorm2d(out_chanel), nn.ReLU())
+                         nn.BatchNorm2d(out_chanel),
+                         nn.ReLU())
 
 
 def load_lightcnn(location, cuda=False):
@@ -80,6 +86,8 @@ def load_lightcnn(location, cuda=False):
     :return: 29-layer light cnn model
     """
     model = LightCNN_29Layers_v2(num_classes=80013)
+    lock_net(model)
+    # net_parameters(model, "light cnn")
     model.eval()
     if cuda:
         checkpoint = torch.load(location)
@@ -89,6 +97,29 @@ def load_lightcnn(location, cuda=False):
         model = torch.nn.DataParallel(model)
     model.load_state_dict(checkpoint['state_dict'])
     return model
+
+
+def net_parameters(model, tag="_model_"):
+    """
+    debug parameters
+    :param tag: debug tag
+    :param model: net model
+    :return:
+    """
+    log.debug("\n **** %s ****", tag)
+    for index, param in enumerate(model.parameters()):
+        log.debug("layer: {0} {1} grad {2}".format(index, param.shape, param.requires_grad))
+
+
+def lock_net(model, opening=False):
+    """
+    是否锁住某个model, 锁住之后不再更新权重梯度
+    :param model: net model
+    :param opening: True 会更新梯度， False 则不会
+    :return:
+    """
+    for param in model.parameters():
+        param.requires_grad = opening
 
 
 def feature256(img, lightcnn_inst):
@@ -111,6 +142,22 @@ def feature256(img, lightcnn_inst):
         _, features = lightcnn_inst(input_var)
         feature_tensor[i] = features
     return feature_tensor
+
+
+def batch_feature256(img, lightcnn_inst):
+    """
+       使用light cnn提取256维特征参数
+       :param lightcnn_inst: lightcnn model instance
+       :param img: tensor 输入图片 shape:(batch, 1, 512, 512)
+       :return: 256维特征参数 tensor [batch, 256]
+       """
+    transform = transforms.Compose([transforms.ToTensor()])
+    img = F.max_pool2d(img, (4, 4))
+    # input_var = torch.autograd.Variable(img)
+    _, features = lightcnn_inst(img)
+    log.debug("features shape:{0} {1} {2}".
+             format(features.size(), features.requires_grad, img.requires_grad))
+    return features
 
 
 def get_cos_distance(x1, x2):
@@ -147,8 +194,8 @@ def discriminative_loss(img1, img2, lightcnn_inst):
     :return tensor scalar
     """
     batch_size = img1.size(0)
-    x1 = feature256(img1, lightcnn_inst)
-    x2 = feature256(img2, lightcnn_inst)
+    x1 = batch_feature256(img1, lightcnn_inst)
+    x2 = batch_feature256(img2, lightcnn_inst)
     cos_t = get_cos_distance(x1, x2)
     return torch.mean(torch.ones(batch_size) - cos_t)
 

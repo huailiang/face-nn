@@ -115,17 +115,19 @@ def save_img(path, tensor1, tensor2):
     cv2.imwrite(path, img)
 
 
-def merge_image(image1, image2, mode="h", show=False):
+def merge_image(image1, image2, mode="h", size=512, show=False):
     """
     拼接图片
     :param image1: numpy array
     :param image2: numpy array
     :param mode: 'h': 横向拼接 'v': 纵向拼接
+    :param size: 输出分辨率
     :param show: 窗口显示
     :return: numpy array
     """
-    img1_ = cv2.resize(image1, (256, 256))
-    img2_ = cv2.resize(image2, (256, 256))
+    size_ = (int(size / 2), int(size / 2))
+    img1_ = cv2.resize(image1, size_)
+    img2_ = cv2.resize(image2, size_)
     if mode == 'h':
         image = np.append(img1_, img2_, axis=1)  # (256, 512, 3)
     elif mode == 'v':
@@ -140,22 +142,24 @@ def merge_image(image1, image2, mode="h", show=False):
     return image
 
 
-def merge_4image(image1, image2, image3, image4, show=False):
+def merge_4image(image1, image2, image3, image4, size=512, show=False):
     """
-    拼接图片 512x512
+    拼接图片
     :param image1: input image1
     :param image2: input image2
     :param image3: input image3
     :param image4: input image4
+    :param size: 输出分辨率
     :param show: 窗口显示
     :return:
     """
-    img1 = cv2.resize(image1, (256, 256))
-    img2 = cv2.resize(image2, (256, 256))
-    img3 = cv2.resize(image3, (256, 256))
-    img4 = cv2.resize(image4, (256, 256))
-    image1_ = np.append(img1, img2, axis=1)
-    image2_ = np.append(img3, img4, axis=1)
+    size_ = (int(size / 2), int(size / 2))
+    img_1 = cv2.resize(image1, size_)
+    img_2 = cv2.resize(image2, size_)
+    img_3 = cv2.resize(image3, size_)
+    img_4 = cv2.resize(image4, size_)
+    image1_ = np.append(img_1, img_2, axis=1)
+    image2_ = np.append(img_3, img_4, axis=1)
     image = np.append(image1_, image2_, axis=0)
     if show:
         cv2.imshow("contact", image)

@@ -19,13 +19,13 @@ from tensorboardX import SummaryWriter
 imitator
 用来模拟游戏引擎：由params生成图片/灰度图
 network: 8 layer
-input: params (batch,95)
+input: params (batch, 95)
 output: tensor (batch, 3, 512, 512)
 """
 
 
 class Imitator(nn.Module):
-    def __init__(self, name, args, momentum=0.5):
+    def __init__(self, name, args, momentum=0.8):
         """
         imitator
         :param name: imitator name
@@ -58,6 +58,7 @@ class Imitator(nn.Module):
             nn.ReflectionPad2d(129),
             utils.conv_layer(8, 1, 3, 1),  # 8. (batch, 1, 512, 512) grey
         )
+
         self.model.apply(utils.init_weights)
         self.optimizer = optim.SGD(self.model.parameters(), lr=args.learning_rate, momentum=momentum)
 
@@ -65,7 +66,7 @@ class Imitator(nn.Module):
         """
         construct network
         :param params: [batch, 95]
-        :return: (batch, 3, 512, 512)
+        :return: (batch, 1, 512, 512)
         """
         batch = params.size(0)
         length = params.size(1)
@@ -73,25 +74,27 @@ class Imitator(nn.Module):
         _params.requires_grad_(True)
         return self.model(_params)
 
-    def itr_train(self, params, referimage, lightcnn_inst):
+    def itr_train(self, params, reference, lightcnn_inst):
         """
         iterator training
         :param params:  [batch, 95]
-        :param referimage: reference photo [batch, 3, 512, 512]
+        :param reference: reference photo [batch, 1, 512, 512]
         :param lightcnn_inst: light cnn's model
         :return loss: [batch]
         """
         self.optimizer.zero_grad()
         y_ = self.forward(params)
-        loss = utils.discriminative_loss(referimage, y_, lightcnn_inst)
-        loss.backward()  # 求导  loss: [batch]
+        loss = utils.discriminative_loss(reference, y_, lightcnn_inst)
+        # utils.net_parameters(self.model, "imitator")
+
+        loss.backward()  # 求导  loss: [1] scalar
         self.optimizer.step()  # 更新网络参数权重
         return loss, y_
 
     def batch_train(self, cuda=False):
         """
         batch training
-        :param cuda: 是否开启gpu加速运算， cpu default
+        :param cuda: 是否开启gpu加速运算
         """
         location = self.args.lightcnn
         lightcnn_inst = utils.load_lightcnn(location)
@@ -108,6 +111,7 @@ class Imitator(nn.Module):
             if cuda:
                 params = params.cuda()
                 images = images.cuda()
+
             loss, y_ = self.itr_train(params, images, lightcnn_inst)
             loss_ = loss.detach().numpy()
             progress.set_description("loss:" + "{:.3f}".format(loss_))
