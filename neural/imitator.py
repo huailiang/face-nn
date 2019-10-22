@@ -148,11 +148,12 @@ class Imitator(nn.Module):
                                 self.writer.add_image(name, weights, step)
                             break
 
-    def load_checkpoint(self, path, training=False):
+    def load_checkpoint(self, path, training=False, cuda=False):
         """
         从checkpoint 中恢复net
         :param training: 恢复之后 是否接着train
         :param path: checkpoint's path
+        :param cuda: gpu speedup
         """
         checkpoint = torch.load(self.args.path_to_inference + "/" + path)
         self.model.load_state_dict(checkpoint['net'])
@@ -160,16 +161,17 @@ class Imitator(nn.Module):
         self.initial_step = checkpoint['epoch']
         log.info("recovery imitator from %s", path)
         if training:
-            self.batch_train()
+            self.batch_train(cuda)
 
-    def inference(self, path, params):
+    def inference(self, path, params, cuda=False):
         """
         imitator生成图片
         :param path: checkpoint's path
         :param params: engine's params
-        :return: images [batch, 3, 512, 512]
+        :param cuda: gpu speedup
+        :return: images [batch, 1, 512, 512]
         """
-        self.load_checkpoint(path)
+        self.load_checkpoint(path, cuda=cuda)
         _, images = self.forward(params)
         return images
 

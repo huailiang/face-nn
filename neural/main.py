@@ -83,7 +83,9 @@ if __name__ == '__main__':
     elif args.phase == "inference_imitator":
         log.info("inference imitator")
         imitator = Imitator("neural imitator", args)
-        imitator.load_checkpoint("model_imitator_20000.pth", training=True)
+        if cuda:
+            imitator.cuda()
+        imitator.load_checkpoint("model_imitator_263000.pth", training=True, cuda=cuda)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
         checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")
@@ -99,7 +101,6 @@ if __name__ == '__main__':
         align.face_features("./output/image/timg.jpeg", "test.jpg")
     elif args.phase == "test":
         log.info("phase test")
-        # np.set_printoptions(threshold=np.nan)
         imitator = Imitator("neural imitator", args)
         params = utils.random_params(95)
         log.info(params)
