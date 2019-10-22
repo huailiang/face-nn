@@ -107,7 +107,7 @@ def debug_parameters(model, tag="_model_"):
     :return:
     """
     log.debug("\n **** %s ****", tag)
-    for index, (name, param) in enumerate(model.parameters()):
+    for index, (name, param) in enumerate(model.named_parameters()):
         log.debug("{0}\t{1}\tgrad:{2}\tshape:{3}".format(index, name, param.requires_grad, param.size()))
 
 
