@@ -15,7 +15,6 @@ import align
 import cv2
 import numpy as np
 import util.logit as log
-import torch.nn.functional as F
 
 
 def ex_net():
@@ -85,7 +84,7 @@ if __name__ == '__main__':
         imitator = Imitator("neural imitator", args)
         if cuda:
             imitator.cuda()
-        imitator.load_checkpoint("model_imitator_263000.pth", training=True, cuda=cuda)
+        imitator.load_checkpoint("model_imitator_4000.pth", training=True, cuda=cuda)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
         checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")

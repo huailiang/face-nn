@@ -40,14 +40,18 @@ def init_weights(m):
     :param m: model
     """
     classcache = m.__class__.__name__
-    if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-        # nn.init.uniform(m.weight, a=0., b=1.)
-        nn.init.normal_(m.weight.data, 1.0, 0.2)
+    if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
+        nn.init.normal_(m.weight, mean=0.5, std=0.1)
         if m.bias is not None:
-            nn.init.constant_(m.bias.data, 0.0)
+            nn.init.constant_(m.bias, 0.5)
     if isinstance(m, nn.BatchNorm2d):
-        nn.init.normal_(m.weight.data, 1.0, 0.2)
-        nn.init.constant_(m.bias.data, 0.0)
+        nn.init.normal_(m.weight, 1.0, 0.2)
+        nn.init.constant_(m.bias, 0.0)
+        m.running_var.data.fill_(0.01)
+        m.running_mean.data.fill_(0.5)
+    if isinstance(m, nn.Linear):
+        nn.init.normal_(m.weight, 1, 0.2)
+        nn.init.constant_(m.bias, 0.8)
 
 
 def to_gray(rgb):
@@ -63,8 +67,28 @@ def to_gray(rgb):
         raise NeuralException("to gray error")
 
 
-def residule_layer(in_chanel, out_chanel, kernel_size=3, stride=1, pad=1):
-    nn.Conv2d(in_chanel, out_chanel, kernel_size=3, stride=stride, padding=pad)
+def expand_layer(chanel):
+    return nn.Sequential(
+        nn.BatchNorm2d(chanel),
+        nn.ReLU()
+    )
+
+
+def deconv_layer(in_chanel, out_chanel, kernel_size, stride=1, pad=0):
+    """
+    反卷积layer, CT->BN->Relu
+    :param in_chanel: chanel in, int
+    :param out_chanel: chanel out, int
+    :param kernel_size: triple or int
+    :param stride: conv stride
+    :param pad: pad
+    :return: nn.Sequential
+    """
+    return nn.Sequential(
+        nn.ConvTranspose2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
+        nn.BatchNorm2d(out_chanel),
+        nn.ReLU()
+    )
 
 
 def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
@@ -102,16 +126,25 @@ def load_lightcnn(location, cuda=False):
     return model
 
 
-def debug_parameters(model, tag="_model_"):
+def debug_parameters(model, tag="_model_", out_state=False):
     """
     debug parameters
     :param tag: debug tag
     :param model: net model
+    :param out_state: model state for checkpoint
     :return:
     """
     log.debug("\n **** %s ****", tag)
     for index, (name, param) in enumerate(model.named_parameters()):
         log.debug("{0}\t{1}\tgrad:{2}\tshape:{3}".format(index, name, param.requires_grad, param.size()))
+    if out_state:
+        states = model.state_dict()
+        for index, state in enumerate(states):
+            log.debug("{0} {1}".format(index, state))
+        log.debug("************************")
+        states = model.optimizer.state_dict()
+        for index, state in enumerate(states):
+            log.debug("{0} {1}".format(index, state))
 
 
 def lock_net(model, opening=False):

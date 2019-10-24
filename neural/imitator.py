@@ -42,18 +42,16 @@ class Imitator(nn.Module):
         self.model_path = "./output/imitator"
         self.clean()
         self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
-        self.layer1 = nn.Sequential(nn.ConstantPad2d(3, 0.5), utils.conv_layer(95, 64, 4, 1))  # (batch, 64, 4, 4)
-        self.block1 = block(64, 64)  # (batch, 64, 4, 4)
-        self.layer2 = nn.Sequential(nn.ReplicationPad2d(9), utils.conv_layer(64, 32, 7, 2))  # (batch, 32, 8, 8)
-        self.block2 = block(32, 32)  # (batch, 32, 8, 8)
-        self.layer3 = nn.Sequential(nn.ReflectionPad2d(5), utils.conv_layer(32, 32, 3, 1))  # (batch, 32, 16, 16))
-        self.layer4 = nn.Sequential(nn.ReplicationPad2d(9), utils.conv_layer(32, 16, 3, 1))  # (batch, 16, 32, 32)
-        self.block4 = block(16, 16)  # (batch, 16, 32, 32)
-        self.layer5 = nn.Sequential(nn.ReflectionPad2d(17), utils.conv_layer(16, 8, 3, 1))  # (batch, 8, 64, 64)
-        self.layer6 = nn.Sequential(nn.ReplicationPad2d(33), utils.conv_layer(8, 8, 3, 1))  # (batch, 8, 128, 128)
+        self.layer1 = nn.Linear(95, 32 * 32)  # (batch, 64, 4, 4)
+        self.layer2 = utils.deconv_layer(64, 32, kernel_size=5)
+        self.layer3 = utils.deconv_layer(32, 32, kernel_size=2, stride=2)
+        self.layer4 = nn.Sequential(nn.ReflectionPad2d(10), utils.conv_layer(32, 16, 5, 1))  # (batch, 16, 32, 32)
+        self.layer5 = nn.Sequential(nn.ReplicationPad2d(17), utils.conv_layer(16, 8, 3, 1))  # (batch, 8, 64, 64)
+        self.layer6 = nn.Sequential(nn.ReflectionPad2d(33), utils.conv_layer(8, 8, 3, 1))  # (batch, 8, 128, 128)
         self.layer7 = nn.Sequential(nn.ReflectionPad2d(65), utils.conv_layer(8, 8, 3, 1), )  # (batch, 8, 256, 256)
         self.layer8 = nn.Sequential(nn.ReflectionPad2d(129), utils.conv_layer(8, 1, 3, 1))  # (batch, 1, 512, 512) grey
-
+        self.block_64 = block(64, 64)
+        self.block_32 = block(32, 32)
         self.apply(utils.init_weights)
         self.optimizer = optim.SGD(self.parameters(), lr=args.learning_rate, momentum=momentum)
 
@@ -65,15 +63,14 @@ class Imitator(nn.Module):
         """
         batch = params.size(0)
         length = params.size(1)
-        _params = params.reshape((batch, length, 1, 1))
+        _params = params.reshape((batch, 1, 1, length))
         _params.requires_grad_(True)
-        y = self.layer1(_params)
-        y = self.block1(y)
+        y = self.layer1(_params).view((batch, 64, 4, 4))
+        y = self.block_64(y)
         y = self.layer2(y)
-        y = self.block2(y)
+        y = self.block_32(y)
         y = self.layer3(y)
         y = self.layer4(y)
-        y = self.block4(y)
         y = self.layer5(y)
         y = self.layer6(y)
         y = self.layer7(y)
@@ -91,8 +88,7 @@ class Imitator(nn.Module):
         self.optimizer.zero_grad()
         y_ = self.forward(params)
         loss = utils.discriminative_loss(reference, y_, lightcnn_inst)
-        # utils.net_parameters(self.model, "imitator")
-
+        # loss = F.mse_loss(reference, y_)
         loss.backward()  # 求导  loss: [1] scalar
         self.optimizer.step()  # 更新网络参数权重
         return loss, y_
@@ -119,7 +115,7 @@ class Imitator(nn.Module):
                 images = images.cuda()
 
             loss, y_ = self.itr_train(params, images, lightcnn_inst)
-            loss_ = loss.detach().numpy()
+            loss_ = loss.cpu().detach().numpy()
             progress.set_description("loss:" + "{:.3f}".format(loss_))
             self.writer.add_scalar('imitator/loss', loss_, step)
             self.upload_weights(step)

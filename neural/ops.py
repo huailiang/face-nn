@@ -57,7 +57,7 @@ def clear_files(dir):
                 for name in files:
                     os.remove(os.path.join(root, name))
         else:
-            log.warn("not exist directory: %s", dir)
+            log.warn("there is not directory: %s, it will be created", dir)
             os.mkdir(dir)
     except IOError as e:
         log.error("io error, load imitator failed ", e)
