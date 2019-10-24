@@ -15,7 +15,6 @@ import align
 import cv2
 import numpy as np
 import util.logit as log
-import torch.nn.functional as F
 
 
 def ex_net():
@@ -94,6 +93,8 @@ if __name__ == '__main__':
         log.info(features.size())
     elif args.phase == "faceparsing":
         log.info("faceparsing")
+        im = utils.evalute_face("./output/face/db_0000_3.jpg", args.extractor_checkpoint, True)
+        cv2.imwrite("./output/eval.jpg", im)
     elif args.phase == "net":
         log.info("net start with ports (%d, %d)", 5010, 5011)
         ex_net()
@@ -102,9 +103,9 @@ if __name__ == '__main__':
     elif args.phase == "test":
         log.info("phase test")
         imitator = Imitator("neural imitator", args)
-        params = utils.random_params(95)
+        params = utils.random_params(args.params_cnt)
         log.info(params)
-        params2 = torch.rand(1, 95)
+        params2 = torch.rand(1, args.params_cnt)
         params2[0] = torch.Tensor(params)
         out = imitator.forward(params2)
         arr = out.detach().numpy()[0] * 255

@@ -1,25 +1,20 @@
 #!/usr/bin/python
 # -*- encoding: utf-8 -*-
 
-from faceparsing.logger import setup_logger
-from faceparsing.model import BiSeNet
-from faceparsing.face_dataset import FaceMask
 
+from faceparsing.model import BiSeNet
+import os
+import cv2
+from tqdm import tqdm
 import torch
 import torch.nn as nn
-
-import os
 import os.path as osp
-import time
 import numpy as np
-from tqdm import tqdm
-import math
 from PIL import Image
 import torchvision.transforms as transforms
-import cv2
 
 
-def vis_parsing_maps(im, parsing_anno, stride, save_im=False, save_path='vis_results/parsing_map_on_im.jpg'):
+def vis_parsing_maps(im, parsing_anno, stride, save_im, save_path):
     # Colors for all 20 parts
     part_colors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 0, 85], [255, 0, 170], [0, 255, 0], [85, 255, 0],
                    [170, 255, 0], [0, 255, 85], [0, 255, 170], [0, 0, 255], [85, 0, 255], [170, 0, 255], [0, 85, 255],
@@ -48,45 +43,54 @@ def vis_parsing_maps(im, parsing_anno, stride, save_im=False, save_path='vis_res
     return vis_im
 
 
-def buildnet(cp='79999_iter.pth'):
+def build_net(cp, cuda=False):
     n_classes = 19
     net = BiSeNet(n_classes=n_classes)
-    # net.cuda()
-    save_pth = osp.join('../dat', cp)
-    net.load_state_dict(torch.load(save_pth, map_location="cpu"))
+
+    if cuda:
+        net.cuda()
+        net.load_state_dict(torch.load(cp))
+    else:
+        net.load_state_dict(torch.load(cp, map_location="cpu"))
     net.eval()
     to_tensor = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)), ])
     return net, to_tensor
 
 
-def out_evaluate(image, cp='79999_iter.pth'):
-    net, to_tensor = buildnet(cp)
+def out_evaluate(image, cp, cuda=False):
+    net, to_tensor = build_net(cp)
     with torch.no_grad():
         img = to_tensor(image)
         img = torch.unsqueeze(img, 0)
-        # img = img.cuda()
+        if cuda:
+            img = img.cuda()
+            net.cuda()
         out = net(img)[0]
         parsing = out.squeeze(0).cpu().numpy().argmax(0)
-        return vis_parsing_maps(image, parsing, stride=1, save_im=False)
+        return vis_parsing_maps(image, parsing, stride=1, save_im=False, save_path="")
 
 
-def inner_evaluate(respth='../output/face_parsing', dspth='../output/face', cp='79999_iter.pth'):
-    if not os.path.exists(respth):
-        os.makedirs(respth)
-    net, to_tensor = buildnet(cp)
+def inner_evaluate(dst_pth, src_path):
+    if not os.path.exists(dst_pth):
+        os.makedirs(dst_pth)
+    net, to_tensor = build_net('../dat/79999_iter.pth')
     with torch.no_grad():
-        for image_path in os.listdir(dspth):
-            img = Image.open(osp.join(dspth, image_path))
+        list_image = os.listdir(src_path)
+        total = len(list_image)
+        progress = tqdm(range(0, total), initial=0, total=total)
+        for step in progress:
+            img = Image.open(osp.join(src_path, list_image[step]))
             image = img.resize((512, 512), Image.BILINEAR)
             img = to_tensor(image)
             img = torch.unsqueeze(img, 0)
-            # img = img.cuda()
             out = net(img)[0]
             parsing = out.squeeze(0).cpu().numpy().argmax(0)
-            vis_parsing_maps(image, parsing, stride=1, save_im=True, save_path=osp.join(respth, image_path))
+            vis_parsing_maps(image, parsing,
+                             stride=1, save_im=True,
+                             save_path=osp.join(dst_pth, list_image[step]))
 
 
 if __name__ == "__main__":
-    inner_evaluate()
-    print(" evalute finish")
+    inner_evaluate(dst_pth='../output/face_parsing', src_path='../output/face')
+    print("****** evalute finish *****")

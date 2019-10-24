@@ -41,7 +41,6 @@ def init_weights(m):
     """
     classcache = m.__class__.__name__
     if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-        # nn.init.uniform(m.weight, a=0., b=1.)
         nn.init.normal_(m.weight.data, 1.0, 0.2)
         if m.bias is not None:
             nn.init.constant_(m.bias.data, 0.0)
@@ -220,12 +219,16 @@ def discriminative_loss(img1, img2, lightcnn_inst):
     return torch.mean(torch.ones(batch_size) - cos_t)
 
 
-def evalute_face(img):
+def evalute_face(img_path, cp, cuda):
     """
     face segmentation model
+    :param img_path: cv read image path
+    :param cp:  face parsing checkpoint name
+    :param cuda: gpu speed up
     :return: face-parsing image
     """
-    return out_evaluate(img)
+    image = cv2.imread(img_path)
+    return out_evaluate(image, cp=cp, cuda=cuda)
 
 
 def content_loss(img1, img2):

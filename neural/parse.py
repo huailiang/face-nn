@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='face')
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='train_imitator',
+    default='faceparsing',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',
@@ -113,7 +113,12 @@ parser.add_argument(
     help='learning rate of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #
-
+parser.add_argument(
+    '--extractor_checkpoint',
+    dest='extractor_checkpoint',
+    type=str,
+    default="./dat/79999_iter.pth",
+    help='faceparsing trained model')
 parser.add_argument(
     '--total_extractor_steps',
     dest='total_extractor_steps',

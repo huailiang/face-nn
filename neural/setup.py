@@ -24,6 +24,6 @@ setup(name="neural",
                         'cv2',
                         "torch",
                         'torchvision',
-                        'tensorboardX'],
+                        'tensorboardX', 'scikit-image'],
       python_requires=">=3.5"
       )

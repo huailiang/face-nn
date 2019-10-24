@@ -13,9 +13,9 @@ import torch.distributed as dist
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from evaluate import *
-from loss import OhemCELoss
-from optimizer import Optimizer
+from faceparsing.evaluate import *
+from faceparsing.loss import OhemCELoss
+from faceparsing.optimizer import Optimizer
 
 respth = './res'
 if not osp.exists(respth):

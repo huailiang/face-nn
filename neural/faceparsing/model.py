@@ -1,15 +1,11 @@
 #!/usr/bin/python
 # -*- encoding: utf-8 -*-
 
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 from faceparsing.resnet import Resnet18
-
-
-# from modules.bn import InPlaceABNSync as BatchNorm2d
 
 
 class ConvBNReLU(nn.Module):
@@ -28,7 +24,8 @@ class ConvBNReLU(nn.Module):
         for ly in self.children():
             if isinstance(ly, nn.Conv2d):
                 nn.init.kaiming_normal_(ly.weight, a=1)
-                if not ly.bias is None: nn.init.constant_(ly.bias, 0)
+                if ly.bias is not None:
+                    nn.init.constant_(ly.bias, 0)
 
 
 class BiSeNetOutput(nn.Module):
@@ -47,7 +44,8 @@ class BiSeNetOutput(nn.Module):
         for ly in self.children():
             if isinstance(ly, nn.Conv2d):
                 nn.init.kaiming_normal_(ly.weight, a=1)
-                if not ly.bias is None: nn.init.constant_(ly.bias, 0)
+                if ly.bias is not None:
+                    nn.init.constant_(ly.bias, 0)
 
     def get_params(self):
         wd_params, nowd_params = [], []
@@ -83,7 +81,8 @@ class AttentionRefinementModule(nn.Module):
         for ly in self.children():
             if isinstance(ly, nn.Conv2d):
                 nn.init.kaiming_normal_(ly.weight, a=1)
-                if not ly.bias is None: nn.init.constant_(ly.bias, 0)
+                if ly.bias is not None:
+                    nn.init.constant_(ly.bias, 0)
 
 
 class ContextPath(nn.Module):
@@ -266,5 +265,4 @@ if __name__ == "__main__":
     in_ten = torch.randn(16, 3, 640, 480).cuda()
     out, out16, out32 = net(in_ten)
     print(out.shape)
-
     net.get_params()
