@@ -60,7 +60,7 @@ class Imitator(nn.Module):
         )
 
         self.model.apply(utils.init_weights)
-        self.optimizer = optim.SGD(self.model.parameters(), lr=args.learning_rate, momentum=momentum)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=args.learning_rate)
 
     def forward(self, params):
         """
