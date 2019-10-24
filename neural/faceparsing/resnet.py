@@ -27,7 +27,7 @@ class BasicBlock(nn.Module):
         self.downsample = None
         if in_chan != out_chan or stride != 1:
             self.downsample = nn.Sequential(nn.Conv2d(in_chan, out_chan, kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(out_chan), )
+                                            nn.BatchNorm2d(out_chan), )
 
     def forward(self, x):
         residual = self.conv1(x)
@@ -98,7 +98,5 @@ if __name__ == "__main__":
     net = Resnet18()
     x = torch.randn(16, 3, 224, 224)
     out = net(x)
-    print(out[0].size())
-    print(out[1].size())
-    print(out[2].size())
+    print(out[0].size(), out[1].size(), out[2].size())
     net.get_params()

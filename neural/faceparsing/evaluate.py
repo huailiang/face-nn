@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- encoding: utf-8 -*-
 
-from .logger import setup_logger
-from .model import BiSeNet
-from .face_dataset import FaceMask
+from faceparsing.logger import setup_logger
+from faceparsing.model import BiSeNet
+from faceparsing.face_dataset import FaceMask
 
 import torch
 import torch.nn as nn
@@ -52,7 +52,7 @@ def buildnet(cp='79999_iter.pth'):
     n_classes = 19
     net = BiSeNet(n_classes=n_classes)
     # net.cuda()
-    save_pth = osp.join('res/cp', cp)
+    save_pth = osp.join('../dat', cp)
     net.load_state_dict(torch.load(save_pth, map_location="cpu"))
     net.eval()
     to_tensor = transforms.Compose(
@@ -71,10 +71,9 @@ def out_evaluate(image, cp='79999_iter.pth'):
         return vis_parsing_maps(image, parsing, stride=1, save_im=False)
 
 
-def inner_evaluate(respth='./res/test_res', dspth='./data', cp='79999_iter.pth'):
+def inner_evaluate(respth='../output/face_parsing', dspth='../output/face', cp='79999_iter.pth'):
     if not os.path.exists(respth):
         os.makedirs(respth)
-
     net, to_tensor = buildnet(cp)
     with torch.no_grad():
         for image_path in os.listdir(dspth):
@@ -85,10 +84,9 @@ def inner_evaluate(respth='./res/test_res', dspth='./data', cp='79999_iter.pth')
             # img = img.cuda()
             out = net(img)[0]
             parsing = out.squeeze(0).cpu().numpy().argmax(0)
-
             vis_parsing_maps(image, parsing, stride=1, save_im=True, save_path=osp.join(respth, image_path))
 
 
 if __name__ == "__main__":
-    # setup_logger('./res')
     inner_evaluate()
+    print(" evalute finish")

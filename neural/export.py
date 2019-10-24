@@ -22,14 +22,14 @@ def write_layer(f, shape, args):
         f.write(byte)
 
 
-def movefile(srcfile, dstfile):
+def move_file(srcfile, dstfile):
     """
      move file from source to destination
     :param srcfile:  source path
     :param dstfile:  destination path
     """
     if not os.path.isfile(srcfile):
-        log.info("%s not exist!" % (srcfile))
+        log.info("%s not exist!" % srcfile)
     else:
         fpath, fname = os.path.split(dstfile)  # 分离文件名和路径
         if not os.path.exists(fpath):
@@ -39,17 +39,17 @@ def movefile(srcfile, dstfile):
 
 
 def move2unity(name):
-    pwd = os.getcwd()
-    project_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
-    source = project_path + "/python/" + name
-    destination = project_path + "/unity/Assets/Resources/" + name
-    movefile(source, destination)
+    current_path = os.getcwd()
+    proj_path = os.path.abspath(os.path.dirname(current_path) + os.path.sep + ".")
+    source = proj_path + "/python/" + name
+    destination = proj_path + "/unity/Assets/Resources/" + name
+    move_file(source, destination)
 
 
 def export_layer(path, shape, weight):
     shape = shape
     args = []
-    for i in range(0, 95):
+    for _ in range(0, 95):
         args.append(weight / 10.0)
     name = os.path.join(path, str(shape) + "-" + str(weight) + ".bytes")
     f = open(name, 'wb')
