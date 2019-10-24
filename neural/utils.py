@@ -63,9 +63,28 @@ def to_gray(rgb):
         raise NeuralException("to gray error")
 
 
+def deconv_layer(in_chanel, out_chanel, kernel_size, stride=1, pad=0):
+    """
+    反卷积layer, CT->BN->Relu 主要用于上采样
+    公式： output = (input - 1) * stride + outputpadding - 2 * padding + kernel_size
+    :param in_chanel: chanel in, int
+    :param out_chanel: chanel out, int
+    :param kernel_size: triple or int
+    :param stride: conv stride
+    :param pad: pad
+    :return: nn.Sequential
+    """
+    return nn.Sequential(
+        nn.ConvTranspose2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
+        nn.BatchNorm2d(out_chanel),
+        nn.ReLU()
+    )
+
+
 def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
     """
     实现一个通用的卷积layer, 卷积->BN->Relu
+    公式: output = [input + 2 *padding - (kernel_size - 1)] / stride
     :param in_chanel: chanel in, int
     :param out_chanel: chanel out, int
     :param kernel_size: triple or int
