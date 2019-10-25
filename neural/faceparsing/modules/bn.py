@@ -1,11 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as functional
-
-try:
-    from queue import Queue
-except ImportError:
-    from Queue import Queue
+from queue import Queue
 
 from .functions import *
 
@@ -116,7 +112,7 @@ class InPlaceABNSync(ABN):
 
     def forward(self, x):
         return inplace_abn_sync(x, self.weight, self.bias, self.running_mean, self.running_var,
-                                   self.training, self.momentum, self.eps, self.activation, self.slope)
+                                self.training, self.momentum, self.eps, self.activation, self.slope)
 
     def __repr__(self):
         rep = '{name}({num_features}, eps={eps}, momentum={momentum},' \
@@ -126,5 +122,3 @@ class InPlaceABNSync(ABN):
         else:
             rep += ')'
         return rep.format(name=self.__class__.__name__, **self.__dict__)
-
-

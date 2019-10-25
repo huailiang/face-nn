@@ -25,7 +25,7 @@ output: tensor (batch, 3, 512, 512)
 
 
 class Imitator(nn.Module):
-    def __init__(self, name, args, momentum=0.8):
+    def __init__(self, name, args, momentum=0.8, clean=True):
         """
         imitator
         :param name: imitator name
@@ -38,7 +38,8 @@ class Imitator(nn.Module):
         self.initial_step = 0
         self.prev_path = "./output/preview"
         self.model_path = "./output/imitator"
-        self.clean()
+        if clean:
+            self.clean()
         self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
             nn.ConstantPad2d(3, 0.5),

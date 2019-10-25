@@ -94,6 +94,7 @@ namespace XEngine.Editor
             var env = cam.GetComponent<XEngine.Environment>();
             env.roleLight0 = light;
             env.envCube = AssetDatabase.LoadAssetAtPath<Cubemap>("Assets/Engine/Editor/EditorResources/Env_0_CubeLDR.tga");
+            cam.GetComponent<Camera>().clearFlags = CameraClearFlags.SolidColor;
         }
 
         public static void ClearCreatures()

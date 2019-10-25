@@ -241,8 +241,21 @@ def content_loss(img1, img2):
     image1 = scipy.misc.imresize(arr=img1, size=(64, 64))
     image2 = scipy.misc.imresize(arr=img2, size=(64, 64))
     entroy = nn.CrossEntropyLoss()
+    F.cross_entropy(image1, image2)
     cross = entroy(image1, image2)
     return cross
+
+
+def img_edge(img):
+    """
+    提取原始图像的边缘
+    :param img: input image
+    :return: edge image
+    """
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    xgrad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
+    ygrad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
+    return cv2.Canny(xgrad, ygrad, 50, 150)
 
 
 def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, output_photo_batch, filepath):

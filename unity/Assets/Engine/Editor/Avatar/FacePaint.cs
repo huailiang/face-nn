@@ -36,16 +36,17 @@ namespace XEngine.Editor
         RenderTexture mainRt;
         Material mat, outputMat;
 
-        GameObject helmet;
+        GameObject helmet, body, hair;
         Camera camera;
         Vector3 cam1 = new Vector3(0, 1.0f, -10.0f);
-        Vector3 cam2 = new Vector3(0, 1.72f, -8.8f);
-        bool focusFace;
+        Vector3 cam2 = new Vector3(0, 1.73f, -8.8f);
+        bool focusFace, isComplate;
 
-        public FacePaint(FaceData dt)
+        public FacePaint(FaceData dt, bool complate)
         {
             data = dt;
             focusFace = true;
+            isComplate = complate;
         }
 
         public void Initial(GameObject go, RoleShape shape)
@@ -56,6 +57,10 @@ namespace XEngine.Editor
             var skr = face.gameObject.GetComponent<SkinnedMeshRenderer>();
             child = "Player_" + shape.ToString().ToLower() + "_helmet";
             helmet = go.transform.Find(child).gameObject;
+            child = "Player_" + shape.ToString().ToLower() + "_hair";
+            hair = go.transform.Find(child).gameObject;
+            child = "Player_" + shape.ToString().ToLower() + "_body";
+            body = go.transform.Find(child).gameObject;
             camera = GameObject.FindObjectOfType<Camera>();
             outputMat = skr.sharedMaterial;
             roleShape = shape;
@@ -164,8 +169,9 @@ namespace XEngine.Editor
             GUILayout.EndHorizontal();
         }
 
-        public void NeuralProcess()
+        public void NeuralProcess(bool complate)
         {
+            isComplate = complate;
             AnlyData();
             UpdatePainTex();
             UpdateHsv();
@@ -202,8 +208,10 @@ namespace XEngine.Editor
             if (helmet != null && camera != null)
             {
                 helmet.SetActive(!focusFace);
+                hair.SetActive(!focusFace || isComplate);
+                body.SetActive(!focusFace || isComplate);
                 camera.transform.position = focusFace ? cam2 : cam1;
-                camera.fieldOfView = focusFace ? 21 : 60;
+                camera.fieldOfView = focusFace ? 18 : 60;
             }
         }
 

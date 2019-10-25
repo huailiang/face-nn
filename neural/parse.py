@@ -79,7 +79,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(8e5),
+    default=int(9e5),
     help='Total number of steps')
 parser.add_argument(
     '--batch_size',

@@ -108,6 +108,15 @@ baidu  yun:	   [LightCNN-29 v2][i7]
 ![](/image/t3.jpg)
 
 
+去掉skybox(背景), 然后隐藏掉身体和脖子部分， 处理效果后如下:
+
+![](/image/t5.jpg)
+
+利用openCV的candy算法， 提取脸部轮廓:
+
+![](/image/t6.jpg)
+
+
 ## Operation
 
 

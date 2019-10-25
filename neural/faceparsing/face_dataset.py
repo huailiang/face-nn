@@ -7,9 +7,6 @@ import torchvision.transforms as transforms
 
 import os.path as osp
 import os
-from PIL import Image
-import numpy as np
-import json
 import cv2
 from .transform import *
 
@@ -21,14 +18,13 @@ class FaceMask(Dataset):
         self.mode = mode
         self.ignore_lb = 255
         self.rootpth = rootpth
-
         self.imgs = os.listdir(os.path.join(self.rootpth, 'CelebA-HQ-img'))
 
         #  pre-processing
         self.to_tensor = transforms.Compose(
             [transforms.ToTensor(), transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)), ])
         self.trans_train = Compose([ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5), HorizontalFlip(),
-            RandomScale((0.75, 1.0, 1.25, 1.5, 1.75, 2.0)), RandomCrop(cropsize)])
+                                    RandomScale((0.75, 1.0, 1.25, 1.5, 1.75, 2.0)), RandomCrop(cropsize)])
 
     def __getitem__(self, idx):
         impth = self.imgs[idx]
@@ -59,9 +55,7 @@ if __name__ == "__main__":
                 'u_lip', 'l_lip', 'neck', 'neck_l', 'cloth', 'hair', 'hat']
 
         for j in range(i * 2000, (i + 1) * 2000):
-
             mask = np.zeros((512, 512))
-
             for l, att in enumerate(atts, 1):
                 total += 1
                 file_name = ''.join([str(j).rjust(5, '0'), '_', att, '.png'])
@@ -70,8 +64,6 @@ if __name__ == "__main__":
                 if os.path.exists(path):
                     counter += 1
                     sep_mask = np.array(Image.open(path).convert('P'))
-                    # print(np.unique(sep_mask))
-
                     mask[sep_mask == 225] = l
             cv2.imwrite('{}/{}.png'.format(mask_path, j), mask)
             print(j)

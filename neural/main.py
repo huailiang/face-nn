@@ -81,10 +81,10 @@ if __name__ == '__main__':
         extractor.batch_train()
     elif args.phase == "inference_imitator":
         log.info("inference imitator")
-        imitator = Imitator("neural imitator", args)
+        imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             imitator.cuda()
-        imitator.load_checkpoint("model_imitator_263000.pth", training=True, cuda=cuda)
+        imitator.load_checkpoint("model_imitator_832000.pth", training=True, cuda=cuda)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
         checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")

@@ -57,9 +57,46 @@ namespace XEngine.Editor
             XEditorUtil.SetupEnv();
             string file = UnityEditor.EditorUtility.OpenFilePanel("Select model file", MODEL, "bytes");
             FileInfo info = new FileInfo(file);
-            ProcessFile(info);
+            ProcessFile(info, true);
             MoveDestDir("model_*", "regular/");
             EditorUtility.Open(EXPORT + "regular/");
+        }
+
+        [MenuItem("Tools/SelectPicture")]
+        public static void Picture2Model()
+        {
+            XEditorUtil.SetupEnv();
+            string picture = UnityEditor.EditorUtility.OpenFilePanel("Select model file", EXPORT, "jpg");
+            int idx = picture.LastIndexOf('/') + 1;
+            string descript = picture.Substring(0,idx) + "db_description";
+            if (!string.IsNullOrEmpty(descript))
+            {
+                string key = picture.Substring(idx).Replace(".jpg", "");
+                FileInfo info = new FileInfo(descript);
+                FileStream fs = new FileStream(descript, FileMode.Open, FileAccess.Read);
+                BinaryReader reader = new BinaryReader(fs);
+                float[] args = new float[CNT];
+                while (true)
+                {
+                    string name = reader.ReadString();
+                    for (int i = 0; i < CNT; i++) args[i] = reader.ReadSingle();
+                    if (name == key)
+                    {
+                        int shape = int.Parse(name[name.Length - 1].ToString());
+                        NeuralData data = new NeuralData
+                        {
+                            callback = Capture,
+                            boneArgs = args,
+                            shape = (RoleShape)shape,
+                            name = name
+                        };
+                        NeuralInput(data, true);
+                        break;
+                    }
+                }
+                reader.Close();
+                fs.Close();
+            }
         }
 
 
@@ -71,22 +108,32 @@ namespace XEngine.Editor
             var files = dir.GetFiles("*.bytes");
             for (int i = 0; i < files.Length; i++)
             {
-                ProcessFile(files[i]);
+                ProcessFile(files[i], true);
             }
             MoveDestDir("model_*", "regular/");
             EditorUtility.Open(EXPORT + "regular/");
         }
 
+        
         [MenuItem("Tools/GenerateDatabase")]
-        private static void GenerateDatabase()
+        private static void GenerateDatabase2()
         {
             int datacount = 2000;
-            RandomExportModels((int)(datacount * 0.8), "trainset", true);
-            RandomExportModels((int)(datacount * 0.2), "testset", false);
+            RandomExportModels((int)(datacount * 0.8), "trainset", true, true);
+            RandomExportModels((int)(datacount * 0.2), "testset", false, true);
             EditorUtility.Open(EXPORT);
         }
 
-        private static void RandomExportModels(int expc, string prefix, bool noise)
+        [MenuItem("Tools/GenerateFaceDatabase")]
+        private static void GenerateDatabase()
+        {
+            int datacount = 2000;
+            RandomExportModels((int)(datacount * 0.8), "trainset", true, false);
+            RandomExportModels((int)(datacount * 0.2), "testset", false, false);
+            EditorUtility.Open(EXPORT);
+        }
+
+        private static void RandomExportModels(int expc, string prefix, bool noise, bool complate)
         {
             XEditorUtil.SetupEnv();
             float[] args = new float[CNT];
@@ -111,7 +158,7 @@ namespace XEngine.Editor
                     name = name
                 };
                 UnityEditor.EditorUtility.DisplayProgressBar(prefix, string.Format("is generating {0}/{1}", j, expc), (float)j / expc);
-                NeuralInput(data);
+                NeuralInput(data, complate);
             }
             UnityEditor.EditorUtility.DisplayProgressBar(prefix, "post processing, wait for a moment", 1);
             bw.Close();
@@ -128,8 +175,8 @@ namespace XEngine.Editor
             int rnd = UnityEngine.Random.Range(0, CNT);
             if (indx == rnd)
             {
-                rnd = UnityEngine.Random.Range(-20, 20);
-                return ((arg * 60) + 20 + rnd) / 100.0f;
+                rnd = UnityEngine.Random.Range(-10, 10);
+                return ((arg * 80) + 10 + rnd) / 100.0f;
             }
             return arg;
         }
@@ -137,23 +184,31 @@ namespace XEngine.Editor
 
         private static void MoveDestDir(string pattern, string sub)
         {
-            var path = EXPORT + sub;
-            if (Directory.Exists(path))
+            try
             {
-                Directory.Delete(path, true);
+                var path = EXPORT + sub;
+                if (Directory.Exists(path))
+                {
+                    Directory.Delete(path, true);
+                }
+                Directory.CreateDirectory(path);
+                DirectoryInfo dir = new DirectoryInfo(EXPORT);
+                var files = dir.GetFiles(pattern);
+                for (int i = 0; i < files.Length; i++)
+                {
+                    files[i].MoveTo(path + files[i].Name);
+                }
             }
-            Directory.CreateDirectory(path);
-            DirectoryInfo dir = new DirectoryInfo(EXPORT);
-            var files = dir.GetFiles(pattern);
-            for (int i = 0; i < files.Length; i++)
+            catch (Exception e)
             {
-                files[i].MoveTo(path + files[i].Name);
+                Debug.LogError(e.Message + "\n" + e.StackTrace);
+                UnityEditor.EditorUtility.ClearProgressBar();
             }
         }
 
 
 
-        private static void ProcessFile(FileInfo info)
+        private static void ProcessFile(FileInfo info, bool complate)
         {
             if (info != null)
             {
@@ -173,17 +228,17 @@ namespace XEngine.Editor
                     shape = shape,
                     name = "model_" + info.Name.Replace(".bytes", "")
                 };
-                NeuralInput(data);
+                NeuralInput(data, complate);
                 br.Close();
                 fs.Close();
             }
         }
 
 
-        private static void NeuralInput(NeuralData data)
+        private static void NeuralInput(NeuralData data, bool complate)
         {
             var prev = ScriptableObject.CreateInstance<FashionPreview>();
-            prev.NeuralProcess(data);
+            prev.NeuralProcess(data, complate);
             FashionPreview.preview = prev;
         }
 
@@ -238,8 +293,9 @@ namespace XEngine.Editor
                 string path = "Assets/Engine/Editor/EditorResources/CameraOuput.renderTexture";
                 rt = AssetDatabase.LoadAssetAtPath<RenderTexture>(path);
             }
-
+            rt.Release();
             camera.targetTexture = rt;
+            camera.Render();
             camera.Render();
             SaveRenderTex(rt, name);
             Clear();
