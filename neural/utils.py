@@ -45,7 +45,7 @@ def init_weights(m):
         if m.bias is not None:
             nn.init.constant_(m.bias.data, 0.0)
     if isinstance(m, nn.BatchNorm2d):
-        nn.init.normal_(m.weight.data, 1.0, 0.2)
+        nn.init.normal_(m.weight.data, 0.0, 0.2)
         nn.init.constant_(m.bias.data, 0.0)
 
 
@@ -91,9 +91,12 @@ def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
     :param pad: pad
     :return: nn.Sequential
     """
-    return nn.Sequential(nn.Conv2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
+    return nn.Sequential(nn.Conv2d(in_chanel, out_chanel,
+                                   kernel_size=kernel_size,
+                                   stride=stride,
+                                   padding=pad),
                          nn.BatchNorm2d(out_chanel),
-                         nn.ReLU())
+                         nn.Sigmoid())
 
 
 def load_lightcnn(location, cuda=False):
@@ -105,7 +108,6 @@ def load_lightcnn(location, cuda=False):
     """
     model = LightCNN_29Layers_v2(num_classes=80013)
     lock_net(model)
-    # net_parameters(model, "light cnn")
     model.eval()
     if cuda:
         checkpoint = torch.load(location)
@@ -171,7 +173,6 @@ def batch_feature256(img, lightcnn_inst):
        """
     transform = transforms.Compose([transforms.ToTensor()])
     img = F.max_pool2d(img, (4, 4))
-    # input_var = torch.autograd.Variable(img)
     _, features = lightcnn_inst(img)
     log.debug("features shape:{0} {1} {2}".
               format(features.size(), features.requires_grad, img.requires_grad))
@@ -253,9 +254,9 @@ def img_edge(img):
     :return: edge image
     """
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    xgrad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
-    ygrad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
-    return cv2.Canny(xgrad, ygrad, 50, 150)
+    x_grad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
+    y_grad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
+    return cv2.Canny(x_grad, y_grad, 50, 150)
 
 
 def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, output_photo_batch, filepath):

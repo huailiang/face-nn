@@ -6,7 +6,7 @@
 
 import utils
 from imitator import Imitator
-from feature_extractor import FeatureExtractor
+from extractor import Extractor
 from net import Net
 from parse import parser
 import logging
@@ -75,10 +75,10 @@ if __name__ == '__main__':
         imitator.batch_train(cuda)
     elif args.phase == "train_extractor":
         log.info('feature extractor train mode')
-        extractor = FeatureExtractor("neural extractor", args)
-        if cuda:
-            extractor.cuda()
-        extractor.batch_train()
+        extractor = Extractor("neural extractor", args)
+        # if cuda:
+        #     extractor.cuda()
+        # extractor.batch_train()
     elif args.phase == "inference_imitator":
         log.info("inference imitator")
         imitator = Imitator("neural imitator", args, clean=False)

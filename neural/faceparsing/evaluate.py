@@ -45,9 +45,9 @@ def img_edge(img):
     :return: edge image
     """
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    xgrad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
-    ygrad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
-    return cv2.Canny(xgrad, ygrad, 10, 50)
+    x_grad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
+    y_grad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
+    return cv2.Canny(x_grad, y_grad, 30, 50)
 
 
 def build_net(cp, cuda=False):

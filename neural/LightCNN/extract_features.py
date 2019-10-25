@@ -65,23 +65,19 @@ def main():
     for img_name in img_list:
         count = count + 1
         img = cv2.imread(os.path.join(args.root_path, img_name), cv2.IMREAD_GRAYSCALE)
-        # cv2.imshow(img_name, img)
-        # print("cv:", img.shape)
-        # cv2.waitKey()
         img = np.reshape(img, (128, 128, 1))
-        print("shape:", img.shape)
         img = transform(img)
-        print("img: ", img.size())
         input[0, :, :, :] = img
         print("input shape: ", input.shape)
         start = time.time()
         if args.cuda:
             input = input.cuda()
-        input_var = torch.autograd.Variable(input, volatile=True)
-        _, features = model(input_var)
-        end = time.time() - start
-        print("{}({}/{}). Time: {}".format(os.path.join(args.root_path, img_name), count, len(img_list), end))
-        save_feature(args.save_path, img_name, features.data.cpu().numpy()[0])
+        with torch.no_grad():
+            input_var = torch.autograd.Variable(input)
+            _, features = model(input_var)
+            end = time.time() - start
+            print("{}({}/{}). Time: {}".format(os.path.join(args.root_path, img_name), count, len(img_list), end))
+            save_feature(args.save_path, img_name, features.data.cpu().numpy()[0])
 
 
 def read_list(list_path):

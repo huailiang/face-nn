@@ -14,6 +14,7 @@ import ops
 from tqdm import tqdm
 from dataset import FaceDataset
 from tensorboardX import SummaryWriter
+from module import ResidualBlock
 
 """
 imitator
@@ -44,14 +45,17 @@ class Imitator(nn.Module):
         self.model = nn.Sequential(
             nn.ConstantPad2d(3, 0.5),
             utils.conv_layer(95, 64, 4, 1),  # 1. (batch, 64, 4, 4)
+            ResidualBlock(64, 64),
             nn.ReplicationPad2d(9),
             utils.conv_layer(64, 32, 7, 2),  # 2. (batch, 32, 8, 8)
             nn.ReflectionPad2d(5),
             utils.conv_layer(32, 32, 3, 1),  # 3. (batch, 32, 16, 16)
+            ResidualBlock(32, 32),
             nn.ReplicationPad2d(9),
             utils.conv_layer(32, 16, 3, 1),  # 4. (batch, 16, 32, 32)
             nn.ReflectionPad2d(17),
             utils.conv_layer(16, 8, 3, 1),  # 5. (batch, 8, 64, 64)
+            ResidualBlock(8, 8),
             nn.ReplicationPad2d(33),
             utils.conv_layer(8, 8, 3, 1),  # 6. (batch, 8, 128, 128)
             nn.ReflectionPad2d(65),
@@ -59,7 +63,6 @@ class Imitator(nn.Module):
             nn.ReflectionPad2d(129),
             utils.conv_layer(8, 1, 3, 1),  # 8. (batch, 1, 512, 512) grey
         )
-
         self.model.apply(utils.init_weights)
         self.optimizer = optim.Adam(self.model.parameters(), lr=args.learning_rate)
 
@@ -72,8 +75,10 @@ class Imitator(nn.Module):
         batch = params.size(0)
         length = params.size(1)
         _params = params.reshape((batch, length, 1, 1))
+        _params = (_params * 2) - 1
         _params.requires_grad_(True)
-        return self.model(_params)
+        y = self.model(_params)
+        return (y + 1) * 0.5
 
     def itr_train(self, params, reference, lightcnn_inst):
         """

@@ -80,9 +80,12 @@ namespace XEngine.Editor
                 {
                     string name = reader.ReadString();
                     for (int i = 0; i < CNT; i++) args[i] = reader.ReadSingle();
+                    string str = string.Empty;
                     if (name == key)
                     {
                         int shape = int.Parse(name[name.Length - 1].ToString());
+                        for (int i = 0; i < CNT; i++) str += args[i].ToString("f3") + " ";
+                        Debug.Log(str);
                         NeuralData data = new NeuralData
                         {
                             callback = Capture,

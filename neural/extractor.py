@@ -13,6 +13,7 @@ import ops
 import os
 from tqdm import tqdm
 import align
+from module import ResidualBlock, group
 from tensorboardX import SummaryWriter
 
 """
@@ -23,8 +24,8 @@ output: engine params [95]
 """
 
 
-class FeatureExtractor(nn.Module):
-    def __init__(self, name, args, imitator, momentum=0.5):
+class Extractor(nn.Module):
+    def __init__(self, name, args, imitator=None, momentum=0.5):
         """
         feature extractor
         :param name: model name
@@ -32,32 +33,44 @@ class FeatureExtractor(nn.Module):
         :param imitator: imitate engine's behaviour
         :param momentum:  momentum for optimizer
         """
-        super(FeatureExtractor, self).__init__()
+        super(Extractor, self).__init__()
         log.info("construct feature_extractor %s", name)
         self.name = name
         self.imitator = imitator
         self.initial_step = 0
         self.args = args
-        self.model_path = "./output/imitator"
+        self.model_path = "./output/extractor"
         self.params_path = "./output/params"
+        self.training = False
         self.writer = SummaryWriter(comment="feature extractor", log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
-            self.layer(3, 3, kernel_size=7, stride=2, pad=3),  # 1. (batch, 3, 256, 256)
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),  # 2. (batch, 3, 128, 128)
-            utils.conv_layer(3, 8, kernel_size=3, stride=2, pad=1),  # 3. (batch, 8, 64, 64)
-            utils.conv_layer(8, 16, kernel_size=3, stride=2, pad=1),  # 4. (batch, 16, 32, 32)
-            utils.conv_layer(16, 32, kernel_size=3, stride=2, pad=1),  # 5. (batch, 32, 16, 16)
-            utils.conv_layer(32, 64, kernel_size=3, stride=2, pad=1),  # 6. (batch, 64, 8, 8)
-            utils.conv_layer(64, 95, kernel_size=7, stride=2),  # 7. (batch, 95, 1, 1)
+            nn.Conv2d(1, 4, kernel_size=7, stride=2, padding=3),  # 1. (batch, 3, 32, 32)
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),  # 2. (batch, 4, 16, 16)
+            group(4, 8, kernel_size=3, stride=1, padding=1),  # 3. (batch, 8, 16, 16)
+            ResidualBlock.make_layer(8, channels=8),  # 4. (batch, 8, 16, 16)
+            group(8, 16, kernel_size=3, stride=1, padding=1),  # 5. (batch, 16, 16, 16)
+            ResidualBlock.make_layer(16, channels=16),  # 6. (batch, 16, 16, 16)
+            group(16, 8, kernel_size=3, stride=1, padding=1),  # 7. (batch, 8, 16, 16)
+            ResidualBlock.make_layer(8, channels=8),  # 8. (batch, 8, 16, 16)
+            group(8, 4, kernel_size=3, stride=1, padding=1),  # 9. (batch, 8, 16, 16)
+            ResidualBlock.make_layer(4, channels=4),  # 10. (batch, 8, 16, 16)
         )
+        self.fc = nn.Linear(4 * 16 * 16, 256)
+        self.fc2 = nn.Linear(256, 95)
         self.optimizer = optim.SGD(self.parameters(),
                                    lr=args.extractor_learning_rate,
                                    momentum=momentum)
 
-    def forward(self, x):
-        batch = x.size(0)
-        log.info("feature_extractor forward with batch: %d", batch)
-        return self.model(x)
+    def forward(self, input):
+        batch = input.size(0)
+        log.info("feature extractor forward with batch: %d", batch)
+        output = self.model(input)
+        output = output.view(x.size(0), -1)
+        output = self.fc(output)
+        output = self.fc2(output)
+        output = F.dropout(output, training=self.training)
+        output = torch.sigmoid(output)
+        return output
 
     def itr_train(self, image):
         """
@@ -79,6 +92,7 @@ class FeatureExtractor(nn.Module):
         log.info("feature extractor train")
         initial_step = self.initial_step
         total_steps = self.args.total_extractor_steps
+        self.training = True
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
             log.info("current step: %d", step)
@@ -92,8 +106,7 @@ class FeatureExtractor(nn.Module):
                 ops.generate_file(path, params)
                 utils.update_optimizer_lr(self.optimizer, loss_)
             if (step + 1) % self.args.extractor_save_freq == 0:
-                state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
-                torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
+                self.save(step)
         self.writer.close()
 
     def load_checkpoint(self, path):
@@ -115,6 +128,10 @@ class FeatureExtractor(nn.Module):
         """
         ops.clear_folder(self.model_path)
 
+    def save(self, step):
+        state = {'net': self.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
+        torch.save(state, '{1}/model_extractor_{0}.pth'.format(step + 1, self.model_path))
+
     def inference(self, path, photo):
         """
         feature extractor: 由图片生成捏脸参数
@@ -126,3 +143,18 @@ class FeatureExtractor(nn.Module):
         self.load_checkpoint(path)
         _, params_ = self.forward(path)
         return params_
+
+
+if __name__ == '__main__':
+    from parse import parser
+    import logging
+
+    args = parser.parse_args()
+    log.init("FaceNeural", logging.INFO, log_path="./output/ex_log.txt")
+    extractor = Extractor("neural extractor", args)
+    x = torch.randn(1, 1, 64, 64)
+    log.info(x.size())
+    y = extractor.forward(x)
+    log.info(y.size())
+    log.info(y)
+    extractor.save(100)

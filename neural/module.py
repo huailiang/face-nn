@@ -33,6 +33,18 @@ class mfm(nn.Module):
         return torch.max(out[0], out[1])
 
 
+class group(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
+        super(group, self).__init__()
+        self.conv_a = mfm(in_channels, in_channels, 1, 1, 0)
+        self.conv = mfm(in_channels, out_channels, kernel_size, stride, padding)
+
+    def forward(self, x):
+        x = self.conv_a(x)
+        x = self.conv(x)
+        return x
+
+
 class ResidualBlock(nn.Module):
     """
     残差网络
@@ -49,3 +61,10 @@ class ResidualBlock(nn.Module):
         out = self.conv2(out)
         out = out + res
         return out
+
+    @staticmethod
+    def make_layer(num_blocks, channels):
+        layers = []
+        for i in range(0, num_blocks):
+            layers.append(ResidualBlock(channels, channels))
+        return nn.Sequential(*layers)

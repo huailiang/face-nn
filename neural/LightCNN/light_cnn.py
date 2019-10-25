@@ -131,7 +131,8 @@ class network_29layers_v2(nn.Module):
         self.fc = nn.Linear(8 * 8 * 128, 256)
         self.fc2 = nn.Linear(256, num_classes, bias=False)
 
-    def _make_layer(self, block, num_blocks, in_channels, out_channels):
+    @staticmethod
+    def _make_layer(block, num_blocks, in_channels, out_channels):
         layers = []
         for i in range(0, num_blocks):
             layers.append(block(in_channels, out_channels))
