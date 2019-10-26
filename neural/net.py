@@ -5,6 +5,9 @@
 
 import atexit
 import socket
+import json
+import utils
+import random
 import util.logit as log
 
 
@@ -14,81 +17,78 @@ class Net(object):
     使用udp在进程间通信，udp不保证时序性，也不保证引擎一定能收到
     """
 
-    def __init__(self, port1, port2):
+    def __init__(self, port, args):
         atexit.register(self.close)
-        self._port1 = port1
-        self._port2 = port2
-        self._buffer_size = 1024
-        self._open_socket = False
-        self._open_send = False
-        self._loaded = False
-        self._bind = ("localhost", port1)
-        log.error("socket start, rcv port:" + str(port1) + "  send port:" + str(port2))
-
+        self.port = port
+        self.args = args
+        self.buffer_size = 1024
+        self.open = False
+        log.info("socket start,  port:" + str(port))
         try:
-            self._rcv_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self._rcv_socket.bind(self._bind)
-            self._open_socket = True
-            data = self._rcv_socket.recvfrom(1024)
-            log.info("receive data")
-            log.info(data[0].decode('utf-8'))
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.bind = ("localhost", port)
+            self.open = True
         except Exception as e:
-            self._open_socket = False
             self.close()
-            log.error(socket.error("socket error" + str(e.message)))
             raise
 
-        try:
-            self._snd_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self._bind2 = ("localhost", port2)
-            self._open_send = True
-        except Exception as e:
-            self._snd_socket.close()
-            self._open_send = False
-            raise
+    def send_params(self, param, name):
+        """
+        发送参数给引擎
+        :param param: 捏脸参数
+        """
+        shape = utils.curr_roleshape(self.args.path_to_dataset)
+        dic = {"shape": shape, "param": param, "name": name}
+        self._send('p', json.dumps(dic))
 
-    def send_recv(self, msg):
-        """
-        发送之后 也接收
-        :param msg:
-        """
-        try:
-            msg = "rcv" + msg
-            self._snd_socket.sendto(msg.encode('utf-8'), self._bind2)
-            if msg != "quit":
-                self.recv()
-        except Exception as e:
-            log.error(e.message)
-            raise
+    def send_message(self, message):
+        self._send('m', message)
 
-    def only_send(self, msg):
+    def _send(self, cmd, message):
         """
-        只发送 不接收
-        :param msg:
+        私有方法 发送消息
+        :param message: 消息体
         """
-        try:
-            self._snd_socket.sendto(msg.encode('utf-8'), self._bind2)
-            print("send success")
-        except Exception as e:
-            log.error(e.message)
-            raise
-
-    def recv(self):
-        try:
-            data = self._rcv_socket.recvfrom(self._buffer_size)
-            print("receive data")
-            print(data[0].decode('utf-8'))
-        except Exception as e:
-            log.error(e.message)
-            raise
+        if self.open:
+            try:
+                message = cmd + message
+                self.socket.sendto(message.encode('utf-8'), self.bind)
+            except Exception as e:
+                log.error(e)
+                raise
+        else:
+            log.warn("connect closed")
 
     def close(self):
         """
         关闭连接
-        :return:
         """
-        print("socket close")
-        if self._open_socket:
-            self._rcv_socket.close()
-        if self._open_send:
-            self._snd_socket.close()
+        if self.open:
+            log.warn("socket close")
+            self._send('q', "-")  # quit
+            self.socket.close()
+            self.open = False
+
+
+if __name__ == '__main__':
+    from parse import parser
+    import logging
+
+    args = parser.parse_args()
+    log.init("FaceNeural", logging.INFO, log_path="./output/log.txt")
+    log.info(utils.curr_roleshape(args.path_to_dataset))
+    net = Net(5011, args)
+    while True:
+        r_input = input("command: ")
+        if r_input == "m":
+            net.send_message("hello world")
+        elif r_input == "p":
+            params = utils.random_params(95)
+            net.send_params(params, str(random.randint(1000, 9999)))
+        elif r_input == "q":
+            net.close()
+            break
+        else:
+            log.error("unknown code, quit")
+            net.close()
+            break

@@ -75,8 +75,8 @@ class Extractor(nn.Module):
 
     def itr_train(self, image):
         """
-        这里train的方式使用的是imitator
-        第二种方法是 通过net把params发生引擎生成image
+        这里train的方式使用的是imitator （同步）
+        第二种方法是 通过net把params发生引擎生成image (异步)
         (这种方法需要保证同步，但效果肯定比imitator效果好)
         :param image: [batch, 3, 512, 512]
         :return: loss scalar

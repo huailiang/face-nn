@@ -13,26 +13,23 @@ import logging
 import torch
 import align
 import cv2
+from dataset import FaceDataset
 import numpy as np
 import util.logit as log
 
 
-def ex_net():
+def ex_net(args):
     """
     建立和引擎的通信
     python中启动之后， unity菜单栏选中Tools->Connect
     """
-    net = Net(5010, 5011)
+    net = Net(5011, args)
     while True:
         r_input = input("command: \n")
         if r_input == "s":
             msg = input("input: ")
-            net.only_send(msg)
-        elif r_input == 'r':
-            msg = input("input: ")
-            net.send_recv(msg)
+            net.send_message(msg)
         elif r_input == "q":
-            net.only_send("quit")
             net.close()
             break
         else:
@@ -76,15 +73,15 @@ if __name__ == '__main__':
     elif args.phase == "train_extractor":
         log.info('feature extractor train mode')
         extractor = Extractor("neural extractor", args)
-        # if cuda:
-        #     extractor.cuda()
-        # extractor.batch_train()
+        if cuda:
+            extractor.cuda()
+        extractor.batch_train()
     elif args.phase == "inference_imitator":
         log.info("inference imitator")
         imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             imitator.cuda()
-        imitator.load_checkpoint("model_imitator_832000.pth", training=True, cuda=cuda)
+        imitator.load_checkpoint("model_imitator_14000.pth", training=True, cuda=cuda)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
         checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")
@@ -97,19 +94,11 @@ if __name__ == '__main__':
         cv2.imwrite("./output/eval.jpg", im)
     elif args.phase == "net":
         log.info("net start with ports (%d, %d)", 5010, 5011)
-        ex_net()
+        ex_net(args)
     elif args.phase == "align":
         align.face_features("./output/image/timg.jpeg", "test.jpg")
-    elif args.phase == "test":
-        log.info("phase test")
-        imitator = Imitator("neural imitator", args)
-        params = utils.random_params(args.params_cnt)
-        log.info(params)
-        params2 = torch.rand(1, args.params_cnt)
-        params2[0] = torch.Tensor(params)
-        out = imitator.forward(params2)
-        arr = out.detach().numpy()[0] * 255
-        arr = np.swapaxes(arr, 0, 2).reshape(512, 512, 1)
-        cv2.imwrite("./output/batch0.jpg", arr)
+    elif args.phase == "dataset":
+        dataset = FaceDataset(args, "test")
+        dataset.pre_process()
     else:
         log.error("not known phase %s", args.phase)

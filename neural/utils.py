@@ -256,7 +256,7 @@ def img_edge(img):
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     x_grad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
     y_grad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
-    return cv2.Canny(x_grad, y_grad, 50, 150)
+    return cv2.Canny(x_grad, y_grad, 40, 130)
 
 
 def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, output_photo_batch, filepath):
@@ -309,3 +309,15 @@ def update_optimizer_lr(optimizer, lr):
     """
     for group in optimizer.param_groups:
         group['lr'] = lr
+
+
+def curr_roleshape(dataset):
+    """
+    判断当前运行的是roleshape (c# RoleShape)
+    :param dataset: args path_to_dataset
+    :return: RoleShape
+    """
+    if dataset.find("female") >= 0:
+        return 4
+    else:
+        return 3

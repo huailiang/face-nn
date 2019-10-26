@@ -1,63 +1,65 @@
-﻿using System.Net.Sockets;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using System.Net;
-using System;
-using System.Threading;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
+using UnityEngine;
 
 namespace XEngine
 {
+
+    public class ParamMessage
+    {
+        public RoleShape shape;
+        public float[] param;
+        public string name;
+    }
+
     public class Connect
     {
-        UdpClient sendClient, recviceClient;
-        IPEndPoint point1, point2;
+        UdpClient udp;
+        IPEndPoint point;
         Thread thread;
 
-        public void Initial(int port1, int port2)
-        {
-            var remoteIp = IPAddress.Parse("127.0.0.1");
-            point1 = new IPEndPoint(remoteIp, port1);
-            sendClient = new UdpClient(port1);
 
-            //recv
-            recviceClient = new UdpClient(port2);
-            point2 = new IPEndPoint(IPAddress.Any, port2);
+        Queue<ParamMessage> messages = new Queue<ParamMessage>();
+
+        public void Initial(int port)
+        {
+            udp = new UdpClient(port);
+            point = new IPEndPoint(IPAddress.Any, port);
             thread = new Thread(Receive);
             thread.IsBackground = true;
+            messages.Clear();
             thread.Start();
-            Debug.Log("initial success send port:" + port1 + "  recv port:" + port2);
+            Debug.Log("initial success send port:" + port);
         }
 
-
-        public void Send(string msg)
-        {
-            try
-            {
-                var data = Encoding.ASCII.GetBytes(msg);
-                sendClient.Send(data, data.Length, point1);
-                Debug.Log("send " + msg);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("udp send error:" + ex.Message);
-            }
-        }
 
         public void Receive()
         {
             while (true)
             {
-                byte[] recivcedata = recviceClient.Receive(ref point2);
+                byte[] recivcedata = udp.Receive(ref point);
                 string str = Encoding.ASCII.GetString(recivcedata, 0, recivcedata.Length);
-                Debug.Log("rcv: " + str);
-                if (str.StartsWith("rcv"))
-                {
-                    str = str.Substring(3);
-                    Send("recv msg by client");
-                }
-                if (str.Equals("quit"))
+                char head = str[0];
+                string body = str.Substring(1);
+                if (head.Equals('q')) // quit
                 {
                     break;
+                }
+                else if (head == 'p')
+                {
+                    ParamMessage msg = JsonUtility.FromJson<ParamMessage>(body);
+                    Debug.Log(msg.shape + " " + msg.param[0] + "-" + msg.param[1]);
+                    Monitor.Enter(messages);
+                    if (messages.Count < 1024)
+                        messages.Enqueue(msg);
+                    Monitor.Exit(messages);
+                }
+                else if (head == 'm')
+                {
+                    Debug.Log(body);
                 }
             }
             Quit();
@@ -66,19 +68,30 @@ namespace XEngine
 
         public void Quit()
         {
-            if (sendClient != null)
+            Debug.Log("unity connect close");
+            if (udp != null)
             {
-                sendClient.Close();
-            }
-            if (recviceClient != null)
-            {
-                recviceClient.Close();
+                udp.Close();
             }
             if (thread != null)
             {
                 thread.Abort();
             }
+            messages.Clear();
+        }
+
+        public ParamMessage FetchMessage()
+        {
+            Monitor.Enter(messages);
+            ParamMessage msg = null;
+            if (messages.Count > 0)
+            {
+                msg = messages.Dequeue();
+            }
+            Monitor.Exit(messages);
+            return msg;
         }
 
     }
+
 }

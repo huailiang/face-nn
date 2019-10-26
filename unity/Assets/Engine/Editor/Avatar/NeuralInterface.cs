@@ -52,7 +52,7 @@ namespace XEngine.Editor
 
         RoleShape shape = RoleShape.FEMALE;
         bool complete = true;
-        int datacnt = 5000;
+        int datacnt = 10000;
         float weight = 0.4f;
 
         private void OnGUI()
@@ -107,7 +107,7 @@ namespace XEngine.Editor
             XEditorUtil.SetupEnv();
             string picture = UnityEditor.EditorUtility.OpenFilePanel("Select model file", EXPORT, "jpg");
             int idx = picture.LastIndexOf('/') + 1;
-            string descript = picture.Substring(0,idx) + "db_description";
+            string descript = picture.Substring(0, idx) + "db_description";
             if (!string.IsNullOrEmpty(descript))
             {
                 string key = picture.Substring(idx).Replace(".jpg", "");
@@ -163,7 +163,7 @@ namespace XEngine.Editor
             var window = EditorWindow.GetWindowWithRect<NeuralInterface>(new Rect(0, 0, 320, 400));
             window.Show();
         }
-        
+
 
         private static void RandomExportModels(int expc, RoleShape shape, string prefix, bool noise, bool complete)
         {
@@ -211,16 +211,16 @@ namespace XEngine.Editor
         }
 
 
-        private static void MoveDestDir(string pattern, string sub)
+        private static void MoveDestDir(string pattern, string sub, bool delete = true)
         {
             try
             {
                 var path = EXPORT + sub;
                 if (Directory.Exists(path))
                 {
-                    Directory.Delete(path, true);
+                    if (delete) Directory.Delete(path, true);
                 }
-                Directory.CreateDirectory(path);
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 DirectoryInfo dir = new DirectoryInfo(EXPORT);
                 var files = dir.GetFiles(pattern);
                 for (int i = 0; i < files.Length; i++)
@@ -234,7 +234,6 @@ namespace XEngine.Editor
                 UnityEditor.EditorUtility.ClearProgressBar();
             }
         }
-
 
 
         private static void ProcessFile(FileInfo info, bool complate)
@@ -262,7 +261,7 @@ namespace XEngine.Editor
                 fs.Close();
             }
         }
-
+        
 
         private static void NeuralInput(NeuralData data, bool complete)
         {
@@ -283,21 +282,28 @@ namespace XEngine.Editor
             {
                 connect.Quit();
             }
-            connect.Initial(5010, 5011);
-            Send();
+            connect.Initial(5011);
+            EditorApplication.update -= Update;
+            EditorApplication.update += Update;
         }
 
-        private static void Send()
+        private static void Update()
         {
-            if (connect != null)
+            var msg = connect.FetchMessage();
+            if (msg != null)
             {
-                connect.Send("hello world");
-            }
-            else
-            {
-                Debug.LogError("connect not initial");
+                NeuralData data = new NeuralData
+                {
+                    callback = Capture,
+                    boneArgs = msg.param,
+                    shape = msg.shape,
+                    name = "neural_" + msg.name
+                };
+                NeuralInput(data, false);
+                MoveDestDir("neural_*", "cache/", false);
             }
         }
+
 
         [MenuItem("Tools/Close", priority = 2)]
         private static void Quit()
@@ -310,8 +316,8 @@ namespace XEngine.Editor
             {
                 connect.Quit();
             }
+            EditorApplication.update -= Update;
         }
-
 
         private static void Capture(string name, RoleShape shape)
         {
@@ -361,6 +367,7 @@ namespace XEngine.Editor
                     Debug.Log("转换图片失败" + ex.Message);
                 }
             }
+            GameObject.DestroyImmediate(tex);
         }
 
     }

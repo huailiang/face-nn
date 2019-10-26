@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='face')
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='train_imitator',
+    default='inference_imitator',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',

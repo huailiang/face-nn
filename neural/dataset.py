@@ -10,6 +10,7 @@ import cv2
 import random
 import struct
 import util.logit as log
+import utils
 from util.exception import NeuralException
 
 
@@ -29,7 +30,7 @@ class FaceDataset:
         if mode == "train":
             self.path = args.path_to_dataset
         elif mode == "test":
-            self.path = args.path_to_dataset
+            self.path = args.path_to_testset
         else:
             raise NeuralException("not such mode for dataset")
         self.args = args
@@ -75,3 +76,16 @@ class FaceDataset:
         log.debug("\nbatch leaf:{0}  grad:{1} type:{2}".format(params.is_leaf, params.requires_grad, params.dtype))
         log.debug("numpy params type:{0}".format(np_params.dtype))
         return names, params, images
+
+    def pre_process(self):
+        """
+        预处理 change database to 64x64 edge pictures
+        """
+        for name in self.names:
+            path = os.path.join(self.path, name + ".jpg")
+            log.info(path)
+            img = utils.evalute_face(path, self.args.extractor_checkpoint, True)
+            img = utils.img_edge(img)
+            img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
+            cv2.imwrite(path, img)
+
