@@ -53,7 +53,7 @@ if __name__ == '__main__':
         extractor = Extractor("neural extractor", args)
         if cuda:
             extractor.cuda()
-        extractor.batch_train()
+        extractor.batch_train(cuda)
     elif args.phase == "inference_imitator":
         log.info("inference imitator")
         imitator = Imitator("neural imitator", args, clean=False)

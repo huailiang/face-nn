@@ -9,7 +9,6 @@ import torch.nn as nn
 import torch.optim as optim
 import util.logit as log
 import utils
-import numpy as np
 import ops
 from tqdm import tqdm
 from dataset import FaceDataset
@@ -132,8 +131,7 @@ class Imitator(nn.Module):
                 utils.update_optimizer_lr(self.optimizer, lr)
                 self.writer.add_scalar('imitator/learning rate', lr, step)
             if (step + 1) % self.args.save_freq == 0:
-                state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
-                torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
+                self.save(step)
         self.writer.close()
 
     def upload_weights(self, step):
@@ -210,3 +208,11 @@ class Imitator(nn.Module):
         ops.clear_files(self.args.path_tensor_log)
         ops.clear_files(self.prev_path)
         ops.clear_files(self.model_path)
+
+    def save(self, step):
+        """
+       save checkpoint
+       :param step: train step
+       """
+        state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
+        torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))

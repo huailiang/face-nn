@@ -6,7 +6,6 @@
 import align
 import utils
 import ops
-import os
 import cv2
 import torch
 import torch.nn as nn
@@ -29,6 +28,9 @@ output: engine params [95]
 
 
 class Extractor(nn.Module):
+    TRAIN_ASYN = 1
+    TRAIN_SYNC = 2
+
     def __init__(self, name, args, imitator=None, momentum=0.5):
         """
         feature extractor
@@ -48,6 +50,8 @@ class Extractor(nn.Module):
         self.training = False
         self.params_cnt = self.args.params_cnt
         self.dataset = None
+        self.train_mode = Extractor.TRAIN_SYNC
+        self.train_refer = 10
         self.net = Net(args.udp_port, args)
         self.clean()
         self.writer = SummaryWriter(comment="feature extractor", log_dir=args.path_tensor_log)
@@ -70,9 +74,9 @@ class Extractor(nn.Module):
 
     def forward(self, input):
         batch = input.size(0)
-        log.info("feature extractor forward with batch: %d", batch)
+        log.info("feature extractor forward with batch: {0}".format(batch))
         output = self.model(input)
-        output = output.view(x.size(0), -1)
+        output = output.view(output.size(0), -1)
         output = self.fc(output)
         output = F.dropout(output, training=self.training)
         output = torch.sigmoid(output)
@@ -96,9 +100,12 @@ class Extractor(nn.Module):
         """
         第二种方法是 通过net把params发生引擎生成image (异步)
         (这种方法需要保证同步，但效果肯定比imitator效果好)
-        :param name: 图片名
+        :param name: 图片名 [batch]
         :param image: [batch, 1, 64, 64]
         """
+        self.train_refer = self.train_refer - 1
+        if self.train_refer <= 0:
+            self.change_mode(Extractor.TRAIN_ASYN)
         param_ = self.forward(image)
         self.net.send_params(param_, name)
 
@@ -107,7 +114,11 @@ class Extractor(nn.Module):
         cache 中累计一定量的时候就可以asyn train
         :return:
         """
+        self.train_refer = self.train_refer - 1
+
         image1, image2 = self.dataset.get_cache()
+        if self.train_refer <= 0 or image1 is None:
+            self.change_mode(Extractor.TRAIN_SYNC)
         if image1 is not None:
             self.optimizer.zero_grad()
             loss = utils.content_loss(image1, image2)
@@ -116,6 +127,14 @@ class Extractor(nn.Module):
             return True, loss
         return False, 0
 
+    def change_mode(self, mode):
+        """
+        切换train mode 并恢复计数
+        :param mode: train mode
+        """
+        self.train_refer = 10
+        self.train_mode = mode
+
     def batch_train(self, cuda):
         log.info("feature extractor train")
         initial_step = self.initial_step
@@ -123,30 +142,28 @@ class Extractor(nn.Module):
         self.training = True
         self.dataset = FaceDataset(self.args, mode="train")
 
-        rnd_input = self.dataset.get_batch(self.args.batch_size, 1, 64, 64)
+        rnd_input = torch.randn(self.args.batch_size, 1, 64, 64)
         if cuda:
             rnd_input = rnd_input.cuda()
         self.writer.add_graph(self, input_to_model=rnd_input)
 
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
-            names, params, images = self.dataset.get_batch(batch_size=self.args.batch_size)
-            if cuda:
-                params = params.cuda()
-                images = images.cuda()
-            self.sync_train(images, names)
-
-            if (step + 1) % 20 == 0:
-                log.info("step {0}", step)
-                loss, params = self.itr_train(None)
-                loss_ = loss.detach().numpy()
-                progress.set_description("loss:" + "{:.3f}".format(loss_))
-                self.writer.add_scalar('feature extractor/loss', loss_, step)
-                path = os.path.join(self.params_path, "step" + str(step))
-                ops.generate_file(path, params)
-                utils.update_optimizer_lr(self.optimizer, loss_)
-            if (step + 1) % self.args.extractor_save_freq == 0:
-                self.save(step)
+            if self.train_mode == Extractor.TRAIN_SYNC:
+                names, params, images = self.dataset.get_batch(batch_size=self.args.batch_size)
+                if cuda:
+                    params = params.cuda()
+                    images = images.cuda()
+                self.sync_train(images, names)
+            else:
+                valid, loss = self.asyn_train()
+                if valid:
+                    loss_ = loss.detach().numpy()
+                    progress.set_description("loss:" + "{:.3f}".format(loss_))
+                    self.writer.add_scalar('feature extractor/loss', loss_, step)
+                    utils.update_optimizer_lr(self.optimizer, loss_)
+                    if (step + 1) % self.args.extractor_save_freq == 0:
+                        self.save(step)
         self.writer.close()
 
     def load_checkpoint(self, path):
@@ -169,6 +186,10 @@ class Extractor(nn.Module):
         ops.clear_files(self.args.path_to_cache)
 
     def save(self, step):
+        """
+        save checkpoint
+        :param step: train step
+        """
         state = {'net': self.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
         torch.save(state, '{1}/model_extractor_{0}.pth'.format(step + 1, self.model_path))
 
@@ -193,12 +214,10 @@ class Extractor(nn.Module):
         dataset = FaceDataset(self.args, mode="test")
         steps = 100
         accuracy = 0.0
-        location = self.args.lightcnn
-        checkpoint = torch.load(location, map_location="cpu")
         for step in range(steps):
             log.info("step: %d", step)
             names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
-            loss, _ = self.itr_train(params, images)
+            loss, _ = self.itr_train(images)
             accuracy += 1.0 - loss
         accuracy = accuracy / steps
         log.info("accuracy rate is %f", accuracy)

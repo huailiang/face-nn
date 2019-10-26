@@ -8,7 +8,6 @@ import socket
 import json
 import utils
 import random
-import torch
 import util.logit as log
 
 
@@ -45,9 +44,10 @@ class Net(object):
         :param name: list of name [batch]
         :return:
         """
-        shape = utils.curr_roleshape(self.args.path_to_dataset)
-        dic = {"shape": shape, "param": param.numpy().tolist(), "name": name}
-        self._send('b', json.dumps(dic))
+        list_ = param.numpy().tolist()
+        cnt = len(list_)
+        for i in range(cnt):
+            self.send_param(list_[i], name[i])
 
     def send_param(self, param, name):
         """
