@@ -141,7 +141,7 @@ python main.py \
 	--total_steps=30000	\
 	--prev_freq=100	\
 	--save_freq=500	\
-	--path_to_dataset="../export/trainset/"
+	--path_to_dataset="../export/trainset_female/"
 
 # 开启tensorboard 查看graph运行情况
 tensorboard --logdir logs
@@ -156,7 +156,7 @@ tensorboard --logdir logs
 python main.py \
 	--phase=inference_imitator	\
 	--total_steps=30000	\
-	--path_to_dataset="../export/trainset/"
+	--path_to_dataset="../export/trainset_female/"
 ```
 
 

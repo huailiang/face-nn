@@ -40,7 +40,7 @@ namespace XEngine.Editor
             }
         }
 
-        public void NeuralProcess(NeuralData data, bool complate)
+        public void NeuralProcess(NeuralData data, bool complete)
         {
             OnEnable();
             this.shape = data.shape;
@@ -49,8 +49,8 @@ namespace XEngine.Editor
             DrawSuit();
             Update();
             bone.NeuralProcess(data.boneArgs);
-            paint.NeuralProcess(complate);
-            data.callback(data.name);
+            paint.NeuralProcess(complete);
+            data.callback(data.name, data.shape);
         }
 
         private void OnEnable()

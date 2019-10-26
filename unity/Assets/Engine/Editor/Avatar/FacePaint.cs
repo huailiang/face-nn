@@ -40,13 +40,13 @@ namespace XEngine.Editor
         Camera camera;
         Vector3 cam1 = new Vector3(0, 1.0f, -10.0f);
         Vector3 cam2 = new Vector3(0, 1.73f, -8.8f);
-        bool focusFace, isComplate;
+        bool focusFace, isComplete;
 
         public FacePaint(FaceData dt, bool complate)
         {
             data = dt;
             focusFace = true;
-            isComplate = complate;
+            isComplete = complate;
         }
 
         public void Initial(GameObject go, RoleShape shape)
@@ -169,9 +169,9 @@ namespace XEngine.Editor
             GUILayout.EndHorizontal();
         }
 
-        public void NeuralProcess(bool complate)
+        public void NeuralProcess(bool complete)
         {
-            isComplate = complate;
+            isComplete = complete;
             AnlyData();
             UpdatePainTex();
             UpdateHsv();
@@ -208,8 +208,8 @@ namespace XEngine.Editor
             if (helmet != null && camera != null)
             {
                 helmet.SetActive(!focusFace);
-                hair.SetActive(!focusFace || isComplate);
-                body.SetActive(!focusFace || isComplate);
+                hair.SetActive(!focusFace || isComplete);
+                body.SetActive(!focusFace || isComplete);
                 camera.transform.position = focusFace ? cam2 : cam1;
                 camera.fieldOfView = focusFace ? 18 : 60;
             }

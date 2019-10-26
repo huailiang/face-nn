@@ -32,14 +32,14 @@ class FaceDataset:
             self.path = args.path_to_dataset
         else:
             raise NeuralException("not such mode for dataset")
-        cnt = args.db_item_cnt
         self.args = args
         if os.path.exists(self.path):
             name = "db_description"
             path = os.path.join(self.path, name)
             log.info(path)
             f = open(path, "rb")
-            for it in range(cnt):
+            self.cnt = struct.unpack("i", f.read(4))[0]
+            for it in range(self.cnt):
                 kk = f.read(10)[1:]  # 第一个是c#字符串的长度
                 self.names.append(str(kk, encoding='utf-8'))
                 v = []
@@ -56,7 +56,7 @@ class FaceDataset:
         formatter: [batch, ?]
         """
         names = []
-        cnt = self.args.db_item_cnt
+        cnt = self.cnt
         param_cnt = self.args.params_cnt
         np_params = np.zeros((batch_size, param_cnt), dtype=np.float32)
         np_images = np.zeros((batch_size, 1, 512, 512), dtype=np.float32)

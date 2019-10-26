@@ -8,12 +8,12 @@ namespace XEngine.Editor
     public class NeuralData
     {
         public float[] boneArgs;
-        public Action<string> callback;
+        public Action<string, RoleShape> callback;
         public RoleShape shape;
         public string name;
     }
 
-    public class NeuralInterface
+    public class NeuralInterface : EditorWindow
     {
         static RenderTexture rt;
         static Camera camera;
@@ -48,6 +48,45 @@ namespace XEngine.Editor
                 }
                 return model;
             }
+        }
+
+        RoleShape shape = RoleShape.FEMALE;
+        bool complete = true;
+        int datacnt = 5000;
+        float weight = 0.4f;
+
+        private void OnGUI()
+        {
+            GUILayout.BeginVertical();
+            GUILayout.Label("Generate Database", XEditorUtil.titleLableStyle);
+            GUILayout.Space(12);
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Role Shape");
+            shape = (RoleShape)EditorGUILayout.EnumPopup(shape, GUILayout.Width(120));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("complate show");
+            complete = GUILayout.Toggle(complete, "");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("data capacity");
+            weight = GUILayout.HorizontalSlider(weight, 0, 1, GUILayout.Width(120));
+            GUILayout.EndHorizontal();
+
+            GUILayout.Label("  database " + (int)(datacnt * weight));
+            GUILayout.Label("  trainset  " + (int)(datacnt * weight * 0.8));
+            GUILayout.Label("  testset   " + (int)(datacnt * weight * 0.2));
+            GUILayout.Space(8);
+            if (GUILayout.Button("Generate"))
+            {
+                RandomExportModels((int)(datacnt * weight * 0.8), shape, "trainset", true, complete);
+                RandomExportModels((int)(datacnt * weight * 0.2), shape, "testset", false, complete);
+                EditorUtility.Open(EXPORT);
+            }
+            GUILayout.EndVertical();
         }
 
 
@@ -117,36 +156,26 @@ namespace XEngine.Editor
             EditorUtility.Open(EXPORT + "regular/");
         }
 
-        
+
         [MenuItem("Tools/GenerateDatabase")]
         private static void GenerateDatabase2()
         {
-            int datacount = 2000;
-            RandomExportModels((int)(datacount * 0.8), "trainset", true, true);
-            RandomExportModels((int)(datacount * 0.2), "testset", false, true);
-            EditorUtility.Open(EXPORT);
+            var window = EditorWindow.GetWindowWithRect<NeuralInterface>(new Rect(0, 0, 320, 400));
+            window.Show();
         }
+        
 
-        [MenuItem("Tools/GenerateFaceDatabase")]
-        private static void GenerateDatabase()
-        {
-            int datacount = 2000;
-            RandomExportModels((int)(datacount * 0.8), "trainset", true, false);
-            RandomExportModels((int)(datacount * 0.2), "testset", false, false);
-            EditorUtility.Open(EXPORT);
-        }
-
-        private static void RandomExportModels(int expc, string prefix, bool noise, bool complate)
+        private static void RandomExportModels(int expc, RoleShape shape, string prefix, bool noise, bool complete)
         {
             XEditorUtil.SetupEnv();
             float[] args = new float[CNT];
 
             FileStream fs = new FileStream(EXPORT + "db_description", FileMode.OpenOrCreate, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
+            bw.Write(expc);
             for (int j = 0; j < expc; j++)
             {
-                int shape = UnityEngine.Random.Range(3, 5);
-                string name = string.Format("db_{0:0000}_{1}", j, shape);
+                string name = string.Format("db_{0:0000}_{1}", j, (int)shape);
                 bw.Write(name);
                 for (int i = 0; i < CNT; i++)
                 {
@@ -157,22 +186,19 @@ namespace XEngine.Editor
                 {
                     callback = Capture,
                     boneArgs = args,
-                    shape = (RoleShape)shape,
+                    shape = shape,
                     name = name
                 };
                 UnityEditor.EditorUtility.DisplayProgressBar(prefix, string.Format("is generating {0}/{1}", j, expc), (float)j / expc);
-                NeuralInput(data, complate);
+                NeuralInput(data, complete);
             }
             UnityEditor.EditorUtility.DisplayProgressBar(prefix, "post processing, wait for a moment", 1);
             bw.Close();
             fs.Close();
-            MoveDestDir("db_*", prefix + "/");
+            MoveDestDir("db_*", prefix + "_" + shape.ToString().ToLower() + "/");
             UnityEditor.EditorUtility.ClearProgressBar();
         }
 
-        /// <summary>
-        /// tip: noise only for train set, not for test set
-        /// </summary>
         private static float AddNoise(float arg, int indx)
         {
             int rnd = UnityEngine.Random.Range(0, CNT);
@@ -238,10 +264,10 @@ namespace XEngine.Editor
         }
 
 
-        private static void NeuralInput(NeuralData data, bool complate)
+        private static void NeuralInput(NeuralData data, bool complete)
         {
             var prev = ScriptableObject.CreateInstance<FashionPreview>();
-            prev.NeuralProcess(data, complate);
+            prev.NeuralProcess(data, complete);
             FashionPreview.preview = prev;
         }
 
@@ -287,7 +313,7 @@ namespace XEngine.Editor
         }
 
 
-        private static void Capture(string name)
+        private static void Capture(string name, RoleShape shape)
         {
             if (camera == null)
                 camera = GameObject.FindObjectOfType<Camera>();
@@ -300,7 +326,7 @@ namespace XEngine.Editor
             camera.targetTexture = rt;
             camera.Render();
             camera.Render();
-            SaveRenderTex(rt, name);
+            SaveRenderTex(rt, name, shape);
             Clear();
         }
 
@@ -313,7 +339,7 @@ namespace XEngine.Editor
         }
 
 
-        private static void SaveRenderTex(RenderTexture rt, string name)
+        private static void SaveRenderTex(RenderTexture rt, string name, RoleShape shape)
         {
             RenderTexture.active = rt;
             Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.RGBA32, false);

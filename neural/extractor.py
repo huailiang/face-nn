@@ -3,23 +3,25 @@
 # @Author: penghuailiang
 # @Date  : 2019/10/16
 
+import align
+import utils
+import ops
+import os
+import cv2
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import util.logit as log
-import utils
-import ops
-import os
+import numpy as np
 from tqdm import tqdm
-import align
 from module import ResidualBlock, group
 from tensorboardX import SummaryWriter
 
 """
 feature extractor
 photo生成engine face's params
-input: photo solution: 512x512
+input: photo solution: 64x64
 output: engine params [95]
 """
 
@@ -42,21 +44,21 @@ class Extractor(nn.Module):
         self.model_path = "./output/extractor"
         self.params_path = "./output/params"
         self.training = False
+        self.params_cnt = self.args.params_cnt
         self.writer = SummaryWriter(comment="feature extractor", log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
-            nn.Conv2d(1, 4, kernel_size=7, stride=2, padding=3),  # 1. (batch, 3, 32, 32)
+            nn.Conv2d(1, 4, kernel_size=7, stride=2, padding=3),  # 1. (batch, 4, 32, 32)
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1),  # 2. (batch, 4, 16, 16)
             group(4, 8, kernel_size=3, stride=1, padding=1),  # 3. (batch, 8, 16, 16)
             ResidualBlock.make_layer(8, channels=8),  # 4. (batch, 8, 16, 16)
             group(8, 16, kernel_size=3, stride=1, padding=1),  # 5. (batch, 16, 16, 16)
-            ResidualBlock.make_layer(16, channels=16),  # 6. (batch, 16, 16, 16)
-            group(16, 8, kernel_size=3, stride=1, padding=1),  # 7. (batch, 8, 16, 16)
-            ResidualBlock.make_layer(8, channels=8),  # 8. (batch, 8, 16, 16)
-            group(8, 4, kernel_size=3, stride=1, padding=1),  # 9. (batch, 8, 16, 16)
-            ResidualBlock.make_layer(4, channels=4),  # 10. (batch, 8, 16, 16)
+            ResidualBlock.make_layer(8, channels=16),  # 6. (batch, 16, 16, 16)
+            group(16, 64, kernel_size=3, stride=1, padding=1),  # 7. (batch, 64, 16, 16)
+            ResidualBlock.make_layer(8, channels=64),  # 8. (batch, 64, 16, 16)
+            group(64, self.params_cnt, kernel_size=3, stride=1, padding=1),  # 9. (batch, params_cnt, 16, 16)
+            ResidualBlock.make_layer(4, channels=self.params_cnt),  # 10. (batch, params_cnt, 16, 16)
         )
-        self.fc = nn.Linear(4 * 16 * 16, 256)
-        self.fc2 = nn.Linear(256, 95)
+        self.fc = nn.Linear(95 * 16 * 16, 95)
         self.optimizer = optim.SGD(self.parameters(),
                                    lr=args.extractor_learning_rate,
                                    momentum=momentum)
@@ -67,7 +69,6 @@ class Extractor(nn.Module):
         output = self.model(input)
         output = output.view(x.size(0), -1)
         output = self.fc(output)
-        output = self.fc2(output)
         output = F.dropout(output, training=self.training)
         output = torch.sigmoid(output)
         return output
@@ -152,9 +153,15 @@ if __name__ == '__main__':
     args = parser.parse_args()
     log.init("FaceNeural", logging.INFO, log_path="./output/ex_log.txt")
     extractor = Extractor("neural extractor", args)
-    x = torch.randn(1, 1, 64, 64)
+    x = np.random.rand(512, 512, 1).astype(np.float32)
+    log.info(x.shape)
+    x = cv2.resize(x, (64, 64), interpolation=cv2.INTER_LINEAR)
+    log.info(x.shape)
+    x = torch.from_numpy(x)
+    log.info(x.size())
+    x = x.view(-1, 1, 64, 64)
     log.info(x.size())
     y = extractor.forward(x)
     log.info(y.size())
     log.info(y)
-    extractor.save(100)
+    extractor.save(99)
