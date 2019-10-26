@@ -5,37 +5,15 @@
 
 
 import utils
-from imitator import Imitator
-from extractor import Extractor
-from net import Net
-from parse import parser
 import logging
 import torch
 import align
 import cv2
-from dataset import FaceDataset
-import numpy as np
 import util.logit as log
-
-
-def ex_net(args):
-    """
-    建立和引擎的通信
-    python中启动之后， unity菜单栏选中Tools->Connect
-    """
-    net = Net(5011, args)
-    while True:
-        r_input = input("command: \n")
-        if r_input == "s":
-            msg = input("input: ")
-            net.send_message(msg)
-        elif r_input == "q":
-            net.close()
-            break
-        else:
-            log.error("unknown code, quit")
-            net.close()
-            break
+from dataset import FaceDataset
+from imitator import Imitator
+from extractor import Extractor
+from parse import parser
 
 
 def init_device(args):
@@ -92,9 +70,6 @@ if __name__ == '__main__':
         log.info("faceparsing")
         im = utils.evalute_face("./output/face/db_0000_3.jpg", args.extractor_checkpoint, True)
         cv2.imwrite("./output/eval.jpg", im)
-    elif args.phase == "net":
-        log.info("net start with ports (%d, %d)", 5010, 5011)
-        ex_net(args)
     elif args.phase == "align":
         align.face_features("./output/image/timg.jpeg", "test.jpg")
     elif args.phase == "dataset":

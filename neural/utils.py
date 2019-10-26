@@ -53,7 +53,7 @@ def to_gray(rgb):
     """
     灰度处理
     :param rgb: Tensor(RGB)
-    :return: Tensor(Grey)
+    :return: Tensor(Gray)
     """
     if len(rgb.shape) >= 3:
         arr = np.mean(rgb, axis=2)

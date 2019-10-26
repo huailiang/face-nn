@@ -108,6 +108,7 @@ class Imitator(nn.Module):
         if cuda:
             rnd_input = rnd_input.cuda()
         self.writer.add_graph(self, input_to_model=rnd_input)
+
         dataset = FaceDataset(self.args, mode="train")
         initial_step = self.initial_step
         total_steps = self.args.total_steps

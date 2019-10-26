@@ -77,6 +77,24 @@ class FaceDataset:
         log.debug("numpy params type:{0}".format(np_params.dtype))
         return names, params, images
 
+    def get_cache(self):
+        """
+        extractor 运行的时候 从cache获取batch
+        cache 在训练的时候由引擎生成
+        """
+        cache = self.args.path_to_cache
+        if os.path.exists(cache):
+            for root, dirs, files in os.walk(cache, topdown=False):
+                for name in files:
+                    path = os.path.join(root, name)
+                    path2 = os.path.join(self.path, "db_" + name[7:])
+                    log.info("path1: {0}, path2:{1}".format(path, path2))
+                    image_1 = cv2.imread(path)
+                    image_2 = cv2.imread(path2)
+                    os.remove(path)
+                    return image_2, image_1
+        return None, None
+
     def pre_process(self):
         """
         预处理 change database to 64x64 edge pictures
@@ -88,4 +106,3 @@ class FaceDataset:
             img = utils.img_edge(img)
             img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
             cv2.imwrite(path, img)
-

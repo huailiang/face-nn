@@ -15,6 +15,8 @@ import torch.optim as optim
 import util.logit as log
 import numpy as np
 from tqdm import tqdm
+from dataset import FaceDataset
+from net import Net
 from module import ResidualBlock, group
 from tensorboardX import SummaryWriter
 
@@ -45,6 +47,9 @@ class Extractor(nn.Module):
         self.params_path = "./output/params"
         self.training = False
         self.params_cnt = self.args.params_cnt
+        self.dataset = None
+        self.net = Net(args.udp_port, args)
+        self.clean()
         self.writer = SummaryWriter(comment="feature extractor", log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
             nn.Conv2d(1, 4, kernel_size=7, stride=2, padding=3),  # 1. (batch, 4, 32, 32)
@@ -75,9 +80,7 @@ class Extractor(nn.Module):
 
     def itr_train(self, image):
         """
-        这里train的方式使用的是imitator （同步）
-        第二种方法是 通过net把params发生引擎生成image (异步)
-        (这种方法需要保证同步，但效果肯定比imitator效果好)
+        第一种方法 这里train的方式使用的是imitator （同步）
         :param image: [batch, 3, 512, 512]
         :return: loss scalar
         """
@@ -89,14 +92,50 @@ class Extractor(nn.Module):
         self.optimizer.step()
         return loss, param_
 
+    def sync_train(self, image, name):
+        """
+        第二种方法是 通过net把params发生引擎生成image (异步)
+        (这种方法需要保证同步，但效果肯定比imitator效果好)
+        :param name: 图片名
+        :param image: [batch, 1, 64, 64]
+        """
+        param_ = self.forward(image)
+        self.net.send_params(param_, name)
+
+    def asyn_train(self):
+        """
+        cache 中累计一定量的时候就可以asyn train
+        :return:
+        """
+        image1, image2 = self.dataset.get_cache()
+        if image1 is not None:
+            self.optimizer.zero_grad()
+            loss = utils.content_loss(image1, image2)
+            loss.backward()
+            self.optimizer.step()
+            return True, loss
+        return False, 0
+
     def batch_train(self, cuda):
         log.info("feature extractor train")
         initial_step = self.initial_step
         total_steps = self.args.total_extractor_steps
         self.training = True
+        self.dataset = FaceDataset(self.args, mode="train")
+
+        rnd_input = self.dataset.get_batch(self.args.batch_size, 1, 64, 64)
+        if cuda:
+            rnd_input = rnd_input.cuda()
+        self.writer.add_graph(self, input_to_model=rnd_input)
+
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
-            log.info("current step: %d", step)
+            names, params, images = self.dataset.get_batch(batch_size=self.args.batch_size)
+            if cuda:
+                params = params.cuda()
+                images = images.cuda()
+            self.sync_train(images, names)
+
             if (step + 1) % 20 == 0:
                 log.info("step {0}", step)
                 loss, params = self.itr_train(None)
@@ -115,7 +154,6 @@ class Extractor(nn.Module):
         从checkpoint 中恢复net
         :param path: checkpoint's path
         """
-        self.clean()
         checkpoint = torch.load(path)
         self.model.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
@@ -128,6 +166,7 @@ class Extractor(nn.Module):
         :return:
         """
         ops.clear_folder(self.model_path)
+        ops.clear_files(self.args.path_to_cache)
 
     def save(self, step):
         state = {'net': self.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
@@ -144,6 +183,26 @@ class Extractor(nn.Module):
         self.load_checkpoint(path)
         _, params_ = self.forward(path)
         return params_
+
+    def evaluate(self):
+        """
+        评估准确率
+        :return: accuracy rate
+        """
+        self.model.eval()
+        dataset = FaceDataset(self.args, mode="test")
+        steps = 100
+        accuracy = 0.0
+        location = self.args.lightcnn
+        checkpoint = torch.load(location, map_location="cpu")
+        for step in range(steps):
+            log.info("step: %d", step)
+            names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
+            loss, _ = self.itr_train(params, images)
+            accuracy += 1.0 - loss
+        accuracy = accuracy / steps
+        log.info("accuracy rate is %f", accuracy)
+        return accuracy
 
 
 if __name__ == '__main__':

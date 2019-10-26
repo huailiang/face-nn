@@ -8,6 +8,7 @@ import socket
 import json
 import utils
 import random
+import torch
 import util.logit as log
 
 
@@ -18,6 +19,11 @@ class Net(object):
     """
 
     def __init__(self, port, args):
+        """
+        net initial
+        :param port: udp 端口号
+        :param args: parse options
+        """
         atexit.register(self.close)
         self.port = port
         self.args = args
@@ -34,7 +40,19 @@ class Net(object):
 
     def send_params(self, param, name):
         """
+        batch params
+        :param param: torch.Tensor [batch, 95]
+        :param name: list of name [batch]
+        :return:
+        """
+        shape = utils.curr_roleshape(self.args.path_to_dataset)
+        dic = {"shape": shape, "param": param.numpy().tolist(), "name": name}
+        self._send('b', json.dumps(dic))
+
+    def send_param(self, param, name):
+        """
         发送参数给引擎
+        :param name: 图片名
         :param param: 捏脸参数
         """
         shape = utils.curr_roleshape(self.args.path_to_dataset)
@@ -46,8 +64,8 @@ class Net(object):
 
     def _send(self, cmd, message):
         """
-        私有方法 发送消息
-        :param message: 消息体
+        private method to send message
+        :param message: message body
         """
         if self.open:
             try:
@@ -61,7 +79,7 @@ class Net(object):
 
     def close(self):
         """
-        关闭连接
+        close connect
         """
         if self.open:
             log.warn("socket close")
@@ -77,14 +95,19 @@ if __name__ == '__main__':
     args = parser.parse_args()
     log.init("FaceNeural", logging.INFO, log_path="./output/log.txt")
     log.info(utils.curr_roleshape(args.path_to_dataset))
-    net = Net(5011, args)
+
+    net = Net(args.udp_port, args)
+    # x = torch.randn(2, 3)
+    # names = ['ally', 'join']
+    # net.send_params(x, names)
+
     while True:
         r_input = input("command: ")
         if r_input == "m":
             net.send_message("hello world")
         elif r_input == "p":
-            params = utils.random_params(95)
-            net.send_params(params, str(random.randint(1000, 9999)))
+            params = utils.random_params(args.params_cnt)
+            net.send_param(params, str(random.randint(1000, 9999)))
         elif r_input == "q":
             net.close()
             break
