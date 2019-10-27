@@ -6,12 +6,17 @@
 import os
 import shutil
 import struct
+import cv2
+import sys
+import utils
 import util.logit as log
 
 """
-此工具用来生成一些规则的model（.bytes）
-可以在引擎里加载 显示对应的脸型
-Unity 菜单选择Tools->SelectModel
+此工具
+1. 用来生成一些规则的model（.bytes）
+    可以在引擎里加载 显示对应的脸型
+    Unity 菜单选择Tools->SelectModel
+2. 将引擎生成的图片转换为edge图片
 """
 
 
@@ -57,13 +62,45 @@ def export_layer(path, shape, weight):
     f.close()
 
 
+def batch_transfer(dir):
+    """
+    批量转换edge图片
+    :param dir: 转换目录
+    :return:
+    """
+    if os.path.exists(dir):
+        dir_2 = dir + "_2"
+        if os.path.exists(dir_2):
+            shutil.rmtree(dir_2)
+        os.mkdir(dir_2)
+        for root, dirs, files in os.walk(dir, topdown=False):
+            for name in files:
+                path1 = os.path.join(root, name)
+                path2 = os.path.join(dir_2, name)
+                shutil.copy(path1, path2)
+                image_transfer(path2)
+    else:
+        print("there is not dir ", dir)
+
+
+def image_transfer(im_path):
+    print(im_path)
+    img = utils.evalute_face(im_path, "./dat/79999_iter.pth", False)
+    img = utils.img_edge(img)
+    img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
+    cv2.imwrite(im_path, img)
+
+
 if __name__ == '__main__':
     pwd = os.getcwd()
     project_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
     model_path = os.path.join(project_path, "unity/models/")
     log.info(model_path)
-
-    shapes = [3, 4]
-    for i in shapes:
-        for j in range(0, 10):
-            export_layer(model_path, i, j)
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+        batch_transfer(path)
+    else:
+        shapes = [3, 4]
+        for i in shapes:
+            for j in range(0, 10):
+                export_layer(model_path, i, j)

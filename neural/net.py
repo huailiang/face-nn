@@ -37,17 +37,17 @@ class Net(object):
             self.close()
             raise
 
-    def send_params(self, param, name):
+    def send_params(self, param, name, step):
         """
         batch params
+        :param step: train step
         :param param: torch.Tensor [batch, 95]
         :param name: list of name [batch]
-        :return:
         """
         list_ = param.cpu().detach().numpy().tolist()
         cnt = len(list_)
         for i in range(cnt):
-            self.send_param(list_[i], name[i][:-4])  # name remove ext .jpg
+            self.send_param(list_[i], name[i][:-4] + "_" + str(step))  # name remove ext .jpg
 
     def send_param(self, param, name):
         """
@@ -97,9 +97,6 @@ if __name__ == '__main__':
     log.info(utils.curr_roleshape(args.path_to_dataset))
 
     net = Net(args.udp_port, args)
-    # x = torch.randn(2, 3)
-    # names = ['ally', 'join']
-    # net.send_params(x, names)
 
     while True:
         r_input = input("command: ")

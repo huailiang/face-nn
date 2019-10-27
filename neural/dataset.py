@@ -91,7 +91,9 @@ class FaceDataset:
             for root, dirs, files in os.walk(cache, topdown=False):
                 for name in files:
                     path = os.path.join(root, name)
-                    path2 = os.path.join(self.path, "db_" + name[7:])
+                    idx = name.rindex('_')
+                    name2 = name[7:idx] + ".jpg"  # 7 is: neural_
+                    path2 = os.path.join(self.path, name2)
                     image_1 = cv2.imread(path)
                     image_2 = cv2.imread(path2)
                     os.remove(path)
@@ -109,3 +111,4 @@ class FaceDataset:
             img = utils.img_edge(img)
             img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
             cv2.imwrite(path, img)
+

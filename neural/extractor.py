@@ -96,10 +96,11 @@ class Extractor(nn.Module):
         self.optimizer.step()
         return loss, param_
 
-    def sync_train(self, image, name):
+    def sync_train(self, image, name, step):
         """
         第二种方法是 通过net把params发生引擎生成image (异步)
         (这种方法需要保证同步，但效果肯定比imitator效果好)
+        :param step: train step
         :param name: 图片名 [batch]
         :param image: [batch, 1, 64, 64]
         """
@@ -107,7 +108,7 @@ class Extractor(nn.Module):
         if self.train_refer <= 0:
             self.change_mode(Extractor.TRAIN_ASYN)
         param_ = self.forward(image)
-        self.net.send_params(param_, name)
+        self.net.send_params(param_, name, step)
 
     def asyn_train(self):
         """
@@ -155,7 +156,7 @@ class Extractor(nn.Module):
                 if cuda:
                     params = params.cuda()
                     images = images.cuda()
-                self.sync_train(images, names)
+                self.sync_train(images, names, step)
             else:
                 valid, loss = self.asyn_train()
                 if valid:
