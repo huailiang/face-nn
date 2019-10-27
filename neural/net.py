@@ -44,10 +44,10 @@ class Net(object):
         :param name: list of name [batch]
         :return:
         """
-        list_ = param.numpy().tolist()
+        list_ = param.cpu().detach().numpy().tolist()
         cnt = len(list_)
         for i in range(cnt):
-            self.send_param(list_[i], name[i])
+            self.send_param(list_[i], name[i][:-4])  # name remove ext .jpg
 
     def send_param(self, param, name):
         """

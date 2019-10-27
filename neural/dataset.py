@@ -51,16 +51,18 @@ class FaceDataset:
         else:
             log.info("can't be found path %s. Skip it.", self.path)
 
-    def get_batch(self, batch_size):
+    def get_batch(self, batch_size, size=512):
         """
         以<name, params, image>的形式返回
         formatter: [batch, ?]
+        :param batch_size:  batch size
+        :param size: 图片分辨率
         """
         names = []
         cnt = self.cnt
         param_cnt = self.args.params_cnt
         np_params = np.zeros((batch_size, param_cnt), dtype=np.float32)
-        np_images = np.zeros((batch_size, 1, 512, 512), dtype=np.float32)
+        np_images = np.zeros((batch_size, 1, size, size), dtype=np.float32)
         for i in range(batch_size):
             ind = random.randint(0, cnt - 1)
             name = self.names[ind]
@@ -69,6 +71,8 @@ class FaceDataset:
             names.append(name)
             path = os.path.join(self.path, name)
             image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+            if size != 512:
+                image = cv2.resize(image, (size, size), interpolation=cv2.INTER_LINEAR)
             np_images[i] = image[np.newaxis, :, :] / 255.0
         params = torch.from_numpy(np_params)
         params.requires_grad = True
@@ -88,7 +92,6 @@ class FaceDataset:
                 for name in files:
                     path = os.path.join(root, name)
                     path2 = os.path.join(self.path, "db_" + name[7:])
-                    log.info("path1: {0}, path2:{1}".format(path, path2))
                     image_1 = cv2.imread(path)
                     image_2 = cv2.imread(path2)
                     os.remove(path)

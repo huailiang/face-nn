@@ -261,7 +261,7 @@ namespace XEngine.Editor
                 fs.Close();
             }
         }
-        
+
 
         private static void NeuralInput(NeuralData data, bool complete)
         {
@@ -302,6 +302,7 @@ namespace XEngine.Editor
                 NeuralInput(data, false);
                 MoveDestDir("neural_*", "cache/", false);
             }
+            if (!connect.Connected) EditorApplication.update -= Update;
         }
 
 

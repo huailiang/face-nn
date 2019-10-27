@@ -10,6 +10,7 @@ import torch.optim as optim
 import util.logit as log
 import utils
 import ops
+import os
 from tqdm import tqdm
 from dataset import FaceDataset
 from tensorboardX import SummaryWriter
@@ -215,4 +216,6 @@ class Imitator(nn.Module):
        :param step: train step
        """
         state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
+        if not os.path.exists(self.model_path):
+            os.mkdir(self.model_path)
         torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))

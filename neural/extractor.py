@@ -6,6 +6,7 @@
 import align
 import utils
 import ops
+import os
 import cv2
 import torch
 import torch.nn as nn
@@ -51,7 +52,7 @@ class Extractor(nn.Module):
         self.params_cnt = self.args.params_cnt
         self.dataset = None
         self.train_mode = Extractor.TRAIN_SYNC
-        self.train_refer = 10
+        self.train_refer = 32
         self.net = Net(args.udp_port, args)
         self.clean()
         self.writer = SummaryWriter(comment="feature extractor", log_dir=args.path_tensor_log)
@@ -74,7 +75,6 @@ class Extractor(nn.Module):
 
     def forward(self, input):
         batch = input.size(0)
-        log.info("feature extractor forward with batch: {0}".format(batch))
         output = self.model(input)
         output = output.view(output.size(0), -1)
         output = self.fc(output)
@@ -132,7 +132,7 @@ class Extractor(nn.Module):
         切换train mode 并恢复计数
         :param mode: train mode
         """
-        self.train_refer = 10
+        self.train_refer = 32
         self.train_mode = mode
 
     def batch_train(self, cuda):
@@ -149,8 +149,9 @@ class Extractor(nn.Module):
 
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
+            progress.set_description("train mode: {0}".format(self.train_mode))
             if self.train_mode == Extractor.TRAIN_SYNC:
-                names, params, images = self.dataset.get_batch(batch_size=self.args.batch_size)
+                names, params, images = self.dataset.get_batch(batch_size=self.args.batch_size, size=64)
                 if cuda:
                     params = params.cuda()
                     images = images.cuda()
@@ -191,6 +192,8 @@ class Extractor(nn.Module):
         :param step: train step
         """
         state = {'net': self.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
+        if not os.path.exists(self.model_path):
+            os.mkdir(self.model_path)
         torch.save(state, '{1}/model_extractor_{0}.pth'.format(step + 1, self.model_path))
 
     def inference(self, path, photo):

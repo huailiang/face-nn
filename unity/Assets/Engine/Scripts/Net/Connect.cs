@@ -20,7 +20,9 @@ namespace XEngine
         UdpClient udp;
         IPEndPoint point;
         Thread thread;
+        bool connected = false;
 
+        public bool Connected { get { return connected; } }
 
         Queue<ParamMessage> messages = new Queue<ParamMessage>();
 
@@ -29,6 +31,7 @@ namespace XEngine
             udp = new UdpClient(port);
             point = new IPEndPoint(IPAddress.Any, port);
             thread = new Thread(Receive);
+            connected = true;
             thread.IsBackground = true;
             messages.Clear();
             thread.Start();
@@ -51,7 +54,6 @@ namespace XEngine
                 else if (head == 'p')
                 {
                     ParamMessage msg = JsonUtility.FromJson<ParamMessage>(body);
-                    Debug.Log(msg.shape + " " + msg.param[0] + "-" + msg.param[1]);
                     Monitor.Enter(messages);
                     if (messages.Count < 1024)
                         messages.Enqueue(msg);
@@ -78,6 +80,7 @@ namespace XEngine
                 thread.Abort();
             }
             messages.Clear();
+            connected = false;
         }
 
         public ParamMessage FetchMessage()
