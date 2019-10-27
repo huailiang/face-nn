@@ -73,11 +73,8 @@ def deconv_layer(in_chanel, out_chanel, kernel_size, stride=1, pad=0):
     :param pad: pad
     :return: nn.Sequential
     """
-    return nn.Sequential(
-        nn.ConvTranspose2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
-        nn.BatchNorm2d(out_chanel),
-        nn.ReLU()
-    )
+    return nn.Sequential(nn.ConvTranspose2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
+        nn.BatchNorm2d(out_chanel), nn.ReLU())
 
 
 def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
@@ -91,12 +88,8 @@ def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):
     :param pad: pad
     :return: nn.Sequential
     """
-    return nn.Sequential(nn.Conv2d(in_chanel, out_chanel,
-                                   kernel_size=kernel_size,
-                                   stride=stride,
-                                   padding=pad),
-                         nn.BatchNorm2d(out_chanel),
-                         nn.Sigmoid())
+    return nn.Sequential(nn.Conv2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
+                         nn.BatchNorm2d(out_chanel), nn.Sigmoid())
 
 
 def load_lightcnn(location, cuda=False):
@@ -174,8 +167,7 @@ def batch_feature256(img, lightcnn_inst):
     transform = transforms.Compose([transforms.ToTensor()])
     img = F.max_pool2d(img, (4, 4))
     _, features = lightcnn_inst(img)
-    log.debug("features shape:{0} {1} {2}".
-              format(features.size(), features.requires_grad, img.requires_grad))
+    log.debug("features shape:{0} {1} {2}".format(features.size(), features.requires_grad, img.requires_grad))
     return features
 
 
@@ -235,16 +227,15 @@ def evalute_face(img_path, cp, cuda):
 def content_loss(img1, img2):
     """
     change resolution to 1/8, 512/8 = 64
-    :param img1 str image1's path
-    :param img2 str image2's path
+    :param img1: numpy array 64x64
+    :param img2: numpy array
     :return: tensor
     """
-    image1 = scipy.misc.imresize(arr=img1, size=(64, 64))
-    image2 = scipy.misc.imresize(arr=img2, size=(64, 64))
-    entroy = nn.CrossEntropyLoss()
-    F.cross_entropy(image1, image2)
-    cross = entroy(image1, image2)
-    return cross
+    image1 = torch.from_numpy(img1)
+    image2 = torch.from_numpy(img2)
+    image2 = image2.view(64, 64, 1)
+    log.info("img1 size {0} img2 size: {1}".format(image1.size(), image2.size()))
+    return F.mse_loss(image1, image2)
 
 
 def img_edge(img):

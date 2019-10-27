@@ -110,19 +110,19 @@ class Extractor(nn.Module):
         param_ = self.forward(image)
         self.net.send_params(param_, name, step)
 
-    def asyn_train(self):
+    def asyn_train(self, cuda):
         """
         cache 中累计一定量的时候就可以asyn train
         :return:
         """
         self.train_refer = self.train_refer - 1
 
-        image1, image2 = self.dataset.get_cache()
+        image1, image2 = self.dataset.get_cache(cuda)
         if self.train_refer <= 0 or image1 is None:
             self.change_mode(Extractor.TRAIN_SYNC)
         if image1 is not None:
             self.optimizer.zero_grad()
-            loss = utils.content_loss(image1, image2)
+            loss = F.mse_loss(image1, image2)
             loss.backward()
             self.optimizer.step()
             return True, loss
@@ -150,7 +150,7 @@ class Extractor(nn.Module):
 
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
-            progress.set_description("train mode: {0}".format(self.train_mode))
+            progress.set_description("mode {0}".format(self.train_mode))
             if self.train_mode == Extractor.TRAIN_SYNC:
                 names, params, images = self.dataset.get_batch(batch_size=self.args.batch_size, size=64)
                 if cuda:
@@ -158,7 +158,7 @@ class Extractor(nn.Module):
                     images = images.cuda()
                 self.sync_train(images, names, step)
             else:
-                valid, loss = self.asyn_train()
+                valid, loss = self.asyn_train(cuda)
                 if valid:
                     loss_ = loss.detach().numpy()
                     progress.set_description("loss:" + "{:.3f}".format(loss_))

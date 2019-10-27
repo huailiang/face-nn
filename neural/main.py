@@ -74,6 +74,6 @@ if __name__ == '__main__':
         align.face_features("./output/image/timg.jpeg", "test.jpg")
     elif args.phase == "dataset":
         dataset = FaceDataset(args, "test")
-        dataset.pre_process()
+        dataset.pre_process(cuda)
     else:
         log.error("not known phase %s", args.phase)

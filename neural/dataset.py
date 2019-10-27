@@ -9,8 +9,8 @@ import os
 import cv2
 import random
 import struct
-import util.logit as log
 import utils
+import util.logit as log
 from util.exception import NeuralException
 
 
@@ -71,20 +71,21 @@ class FaceDataset:
             names.append(name)
             path = os.path.join(self.path, name)
             image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-            if size != 512:
+            if size != image.shape[0]:
                 image = cv2.resize(image, (size, size), interpolation=cv2.INTER_LINEAR)
             np_images[i] = image[np.newaxis, :, :] / 255.0
         params = torch.from_numpy(np_params)
         params.requires_grad = True
         images = torch.from_numpy(np_images)
-        log.debug("\nbatch leaf:{0}  grad:{1} type:{2}".format(params.is_leaf, params.requires_grad, params.dtype))
+        log.debug("batch leaf:{0}  grad:{1} type:{2}".format(params.is_leaf, params.requires_grad, params.dtype))
         log.debug("numpy params type:{0}".format(np_params.dtype))
         return names, params, images
 
-    def get_cache(self):
+    def get_cache(self, cuda):
         """
         extractor 运行的时候 从cache获取batch
         cache 在训练的时候由引擎生成
+        返回 64X64
         """
         cache = self.args.path_to_cache
         if os.path.exists(cache):
@@ -94,21 +95,29 @@ class FaceDataset:
                     idx = name.rindex('_')
                     name2 = name[7:idx] + ".jpg"  # 7 is: neural_
                     path2 = os.path.join(self.path, name2)
-                    image_1 = cv2.imread(path)
+                    image_1 = self.process_item(path, False, cuda=cuda)
                     image_2 = cv2.imread(path2)
+                    image_2 = utils.to_gray(image_2)
                     os.remove(path)
+                    image_1 = torch.from_numpy(image_1 / 255.0).view(64, 64, 1)
+                    image_2 = torch.from_numpy(image_2 / 255.0)
+                    image_2.requires_grad_(True)
                     return image_2, image_1
         return None, None
 
-    def pre_process(self):
+    def pre_process(self, cuda):
+        for name in self.names:
+            path = os.path.join(self.path, name + ".jpg")
+            self.process_item(path, save=True, cuda=cuda)
+
+    def process_item(self, path, save, cuda):
         """
         预处理 change database to 64x64 edge pictures
         """
-        for name in self.names:
-            path = os.path.join(self.path, name + ".jpg")
-            log.info(path)
-            img = utils.evalute_face(path, self.args.extractor_checkpoint, True)
-            img = utils.img_edge(img)
-            img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
+        # log.info(path)
+        img = utils.evalute_face(path, self.args.extractor_checkpoint, cuda)
+        img = utils.img_edge(img)
+        img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
+        if save:
             cv2.imwrite(path, img)
-
+        return img
