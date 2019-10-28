@@ -64,6 +64,10 @@ def export_layer(path, shape, weight):
 
 
 class Thread_Transfer(threading.Thread):
+    """
+    批量转换edge图片
+    """
+
     def __init__(self, threadID, root, dir_2, files):
         threading.Thread.__init__(self)
         self.root = root
@@ -82,7 +86,8 @@ class Thread_Transfer(threading.Thread):
 
 def batch_transfer(dir):
     """
-    批量转换edge图片 8ge
+    批量转换edge图片
+    默认开启8个线程， 根据自己电脑cpu核数自定义
     :param dir: 转换目录
     :return:
     """
@@ -91,7 +96,7 @@ def batch_transfer(dir):
         if os.path.exists(dir_2):
             shutil.rmtree(dir_2)
         os.mkdir(dir_2)
-        thread_cnt = 8
+        thread_cnt = 16
         for root, dirs, files in os.walk(dir, topdown=False):
             count = len(files)
             split = int(count / thread_cnt)

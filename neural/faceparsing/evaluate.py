@@ -65,15 +65,25 @@ def build_net(cp, cuda=False):
     return net, to_tensor
 
 
+_net_ = None
+_to_tensor_ = None
+
+
 def out_evaluate(image, cp, cuda=False):
-    net, to_tensor = build_net(cp)
+    """
+    global _net_, _to_tensor_ for performance
+    """
+    global _net_
+    global _to_tensor_
+    if _net_ is None or _to_tensor_ is None:
+        _net_, _to_tensor_ = build_net(cp)
     with torch.no_grad():
-        img = to_tensor(image)
+        img = _to_tensor_(image)
         img = torch.unsqueeze(img, 0)
         if cuda:
             img = img.cuda()
-            net.cuda()
-        out = net(img)[0]
+            _net_.cuda()
+        out = _net_(img)[0]
         parsing = out.squeeze(0).cpu().numpy().argmax(0)
         return vis_parsing_maps(image, parsing, stride=1, save_im=False, save_path="")
 
