@@ -46,10 +46,10 @@ namespace XEngine.Editor
             this.shape = data.shape;
             CreateAvatar();
             suit_select = UnityEngine.Random.Range(0, fashionInfo.Length - 1);
-            DrawSuit();
+            DrawSuit(complete);
             Update();
             bone.NeuralProcess(data.boneArgs);
-            paint.NeuralProcess(complete);
+            paint.NeuralProcess();
             data.callback(data.name, data.shape);
         }
 
@@ -64,7 +64,7 @@ namespace XEngine.Editor
             }
             if (paint == null)
             {
-                paint = new FacePaint(fData, true);
+                paint = new FacePaint(fData);
             }
             if (bone == null)
             {
@@ -102,7 +102,7 @@ namespace XEngine.Editor
                 suit_select = EditorGUILayout.Popup(suit_select, fashionDesInfo);
                 if (suit_pre != suit_select || shape != shape_pre)
                 {
-                    DrawSuit();
+                    DrawSuit(true);
                     suit_pre = suit_select;
                     shape_pre = shape;
                 }
@@ -159,11 +159,11 @@ namespace XEngine.Editor
             }
         }
 
-        private void DrawSuit()
+        private void DrawSuit(bool complete)
         {
             if (fashionInfo.Length <= suit_select) suit_select = 0;
             FashionSuit.RowData rowData = fashionInfo[suit_select];
-            FashionUtility.DrawSuit(go, rowData, (uint)presentid, 1);
+            FashionUtility.DrawSuit(go, rowData, (uint)presentid, 1, complete);
             paint.Initial(go, shape);
             bone.Initial(go, shape);
         }

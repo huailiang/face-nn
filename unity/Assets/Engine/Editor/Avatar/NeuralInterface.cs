@@ -21,6 +21,8 @@ namespace XEngine.Editor
         static string model;
         const int CNT = 95;
         static Connect connect;
+        static FashionPreview prev;
+
         static string EXPORT
         {
             get
@@ -114,8 +116,9 @@ namespace XEngine.Editor
                 FileInfo info = new FileInfo(descript);
                 FileStream fs = new FileStream(descript, FileMode.Open, FileAccess.Read);
                 BinaryReader reader = new BinaryReader(fs);
+                int cnt = reader.ReadInt32();
                 float[] args = new float[CNT];
-                while (true)
+                while (cnt-- > 0)
                 {
                     string name = reader.ReadString();
                     for (int i = 0; i < CNT; i++) args[i] = reader.ReadSingle();
@@ -236,7 +239,7 @@ namespace XEngine.Editor
         }
 
 
-        private static void ProcessFile(FileInfo info, bool complate)
+        private static void ProcessFile(FileInfo info, bool complete)
         {
             if (info != null)
             {
@@ -256,7 +259,7 @@ namespace XEngine.Editor
                     shape = shape,
                     name = "model_" + info.Name.Replace(".bytes", "")
                 };
-                NeuralInput(data, complate);
+                NeuralInput(data, complete);
                 br.Close();
                 fs.Close();
             }
@@ -265,7 +268,7 @@ namespace XEngine.Editor
 
         private static void NeuralInput(NeuralData data, bool complete)
         {
-            var prev = ScriptableObject.CreateInstance<FashionPreview>();
+            if (prev == null) prev = ScriptableObject.CreateInstance<FashionPreview>();
             prev.NeuralProcess(data, complete);
             FashionPreview.preview = prev;
         }

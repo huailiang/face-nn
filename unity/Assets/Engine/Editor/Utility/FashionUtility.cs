@@ -28,6 +28,7 @@ namespace XEngine.Editor
                     GameObject.DestroyImmediate(wing.GetChild(i).gameObject);
                 }
             }
+            Resources.UnloadUnusedAssets();
         }
 
 
@@ -44,7 +45,7 @@ namespace XEngine.Editor
             return null;
         }
 
-        public static void DrawSuit(GameObject go, FashionSuit.RowData rowData, uint presentid, int weapon_index)
+        public static void DrawSuit(GameObject go, FashionSuit.RowData rowData, uint presentid, int weapon_index, bool complete)
         {
             if (rowData != null)
             {
@@ -53,13 +54,16 @@ namespace XEngine.Editor
                 if (part != null)
                 {
                     UnloadSuit(go);
-                    DrawPart(go, rowData.body, (RoleShape)rowData.shape, rowData.dir, TCConst.BODY, part.body, part.sbody, SearchPart(rowData.id, (uint)FPart.BODY));
-                    DrawPart(go, rowData.hair, (RoleShape)rowData.shape, rowData.dir, TCConst.HAIR, part.hair, part.shair, SearchPart(rowData.id, (uint)FPart.HAIR));
-                    DrawPart(go, rowData.helmet, (RoleShape)rowData.shape, rowData.dir, TCConst.HELMET, part.helmet, part.shelmet, SearchPart(rowData.id, (uint)FPart.HELMET));
                     DrawFace(go, (RoleShape)rowData.shape, TCConst.FACE, xpart.face, presentid);
-                    uint pos = weapon_index == 1 ? (uint)FPart.WEAPON : 5;
-                    DrawWeapon(go, (RoleShape)rowData.shape, rowData.dir, part, presentid, weapon_index, SearchPart(rowData.id, pos));
-                    DrawWing(go, rowData.dir);
+                    if (complete)
+                    {
+                        DrawPart(go, rowData.body, (RoleShape)rowData.shape, rowData.dir, TCConst.BODY, part.body, part.sbody, SearchPart(rowData.id, (uint)FPart.BODY));
+                        DrawPart(go, rowData.hair, (RoleShape)rowData.shape, rowData.dir, TCConst.HAIR, part.hair, part.shair, SearchPart(rowData.id, (uint)FPart.HAIR));
+                        DrawPart(go, rowData.helmet, (RoleShape)rowData.shape, rowData.dir, TCConst.HELMET, part.helmet, part.shelmet, SearchPart(rowData.id, (uint)FPart.HELMET));
+                        uint pos = weapon_index == 1 ? (uint)FPart.WEAPON : 5;
+                        DrawWeapon(go, (RoleShape)rowData.shape, rowData.dir, part, presentid, weapon_index, SearchPart(rowData.id, pos));
+                        DrawWing(go, rowData.dir);
+                    }
                 }
             }
             else

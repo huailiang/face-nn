@@ -140,11 +140,11 @@ parser.add_argument(
     '--extractor_prev_freq',
     dest='extractor_prev_freq',
     type=int,
-    default=500,
+    default=1000,
     help='generate preview image when training')
 parser.add_argument(
     '--extractor_save_freq',
     dest='extractor_save_freq',
     type=int,
-    default=1000,
+    default=2000,
     help='Save model every save_freq steps')

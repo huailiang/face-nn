@@ -17,11 +17,7 @@ namespace XEngine.Editor
         FaceData data;
         RoleShape roleShape;
         Texture2D mainTex;
-        Texture2D tex1;
-        Texture2D tex2;
-        Texture2D tex3;
-        Texture2D tex4;
-        Texture2D tex5;
+        Texture2D tex1, tex2, tex3, tex4, tex5;
         Color color1 = Color.gray;
         Color color2 = Color.gray;
         Color color3 = Color.gray;
@@ -34,38 +30,34 @@ namespace XEngine.Editor
         Vector3 rotScale = new Vector3(0, 1, 1);
 
         RenderTexture mainRt;
-        Material mat, outputMat;
+        static Material mat;
+        Material outputMat;
 
-        GameObject helmet, body, hair;
+        GameObject helmet;
         Camera camera;
         Vector3 cam1 = new Vector3(0, 1.0f, -10.0f);
         Vector3 cam2 = new Vector3(0, 1.73f, -8.8f);
-        bool focusFace, isComplete;
+        bool focusFace;
 
-        public FacePaint(FaceData dt, bool complate)
+        public FacePaint(FaceData dt)
         {
             data = dt;
             focusFace = true;
-            isComplete = complate;
         }
 
         public void Initial(GameObject go, RoleShape shape)
         {
-            mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Resource/RawData/FaceMakeup.mat");
+            if (mat == null) mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Resource/RawData/FaceMakeup.mat");
             string child = "Player_" + shape.ToString().ToLower() + "_face";
             Transform face = go.transform.Find(child);
             var skr = face.gameObject.GetComponent<SkinnedMeshRenderer>();
             child = "Player_" + shape.ToString().ToLower() + "_helmet";
             helmet = go.transform.Find(child).gameObject;
-            child = "Player_" + shape.ToString().ToLower() + "_hair";
-            hair = go.transform.Find(child).gameObject;
-            child = "Player_" + shape.ToString().ToLower() + "_body";
-            body = go.transform.Find(child).gameObject;
             camera = GameObject.FindObjectOfType<Camera>();
             outputMat = skr.sharedMaterial;
             roleShape = shape;
             FecthMainTex();
-            CreateRT();
+            if (mainRt == null) CreateRT();
             Update();
             EditorSceneManager.sceneClosed += OnSceneClose;
         }
@@ -169,9 +161,8 @@ namespace XEngine.Editor
             GUILayout.EndHorizontal();
         }
 
-        public void NeuralProcess(bool complete)
+        public void NeuralProcess()
         {
-            isComplete = complete;
             AnlyData();
             UpdatePainTex();
             UpdateHsv();
@@ -208,8 +199,6 @@ namespace XEngine.Editor
             if (helmet != null && camera != null)
             {
                 helmet.SetActive(!focusFace);
-                hair.SetActive(!focusFace || isComplete);
-                body.SetActive(!focusFace || isComplete);
                 camera.transform.position = focusFace ? cam2 : cam1;
                 camera.fieldOfView = focusFace ? 18 : 60;
             }
