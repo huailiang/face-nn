@@ -121,7 +121,7 @@ class Imitator(nn.Module):
 
             loss, y_ = self.itr_train(params, images, lightcnn_inst)
             loss_ = loss.detach().numpy()
-            progress.set_description("loss:" + "{:.3f}".format(loss_))
+            progress.set_description("loss: {:.3f}".format(loss_))
             self.writer.add_scalar('imitator/loss', loss_, step)
             self.upload_weights(step)
 

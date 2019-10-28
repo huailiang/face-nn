@@ -9,6 +9,7 @@ import struct
 import cv2
 import sys
 import utils
+import threading
 import util.logit as log
 
 """
@@ -36,9 +37,9 @@ def move_file(srcfile, dstfile):
     if not os.path.isfile(srcfile):
         log.info("%s not exist!" % srcfile)
     else:
-        fpath, fname = os.path.split(dstfile)  # 分离文件名和路径
-        if not os.path.exists(fpath):
-            os.makedirs(fpath)  # 创建路径
+        file_root, file_name = os.path.split(dstfile)  # 分离文件名和路径
+        if not os.path.exists(file_root):
+            os.makedirs(file_root)  # 创建路径
         shutil.move(srcfile, dstfile)  # 移动文件
         log.info("move %s -> %s" % (srcfile, dstfile))
 
@@ -62,9 +63,26 @@ def export_layer(path, shape, weight):
     f.close()
 
 
+class Thread_Transfer(threading.Thread):
+    def __init__(self, threadID, root, dir_2, files):
+        threading.Thread.__init__(self)
+        self.root = root
+        self.dir2 = dir_2
+        self.files = files
+        print("start thread {0} files count {1}".format(threadID, len(files)))
+
+    def run(self):
+        for name in self.files:
+            path1 = os.path.join(self.root, name)
+            path2 = os.path.join(self.dir2, name)
+            if not os.path.exists(path2):
+                shutil.copy(path1, path2)
+                image_transfer(path2)
+
+
 def batch_transfer(dir):
     """
-    批量转换edge图片
+    批量转换edge图片 8ge
     :param dir: 转换目录
     :return:
     """
@@ -73,19 +91,27 @@ def batch_transfer(dir):
         if os.path.exists(dir_2):
             shutil.rmtree(dir_2)
         os.mkdir(dir_2)
+        thread_cnt = 8
         for root, dirs, files in os.walk(dir, topdown=False):
-            for name in files:
-                path1 = os.path.join(root, name)
-                path2 = os.path.join(dir_2, name)
-                if not os.path.exists(path2):
-                    shutil.copy(path1, path2)
-                    image_transfer(path2)
+            count = len(files)
+            split = int(count / thread_cnt)
+            thread_pool = []
+            for i in range(thread_cnt):
+                start = split * i
+                end = split * (i + 1)
+                end = end if (i < thread_cnt - 1) else count
+                files_ = files[start: end]
+                thread = Thread_Transfer(i, root, dir_2, files_)
+                thread.start()
+                thread_pool.append(thread)
+            for thread in thread_pool:
+                thread.join()
+
     else:
         print("there is not dir ", dir)
 
 
 def image_transfer(im_path):
-    print(im_path)
     if im_path.find('.jpg') >= 0:
         img = utils.evalute_face(im_path, "./dat/79999_iter.pth", False)
         img = utils.img_edge(img)

@@ -96,10 +96,9 @@ class FaceDataset:
                     name2 = name[7:idx] + ".jpg"  # 7 is: neural_
                     path2 = os.path.join(self.path, name2)
                     image_1 = self.process_item(path, False, cuda=cuda)
-                    image_2 = cv2.imread(path2)
-                    image_2 = utils.to_gray(image_2)
+                    image_2 = cv2.imread(path2, cv2.IMREAD_GRAYSCALE)
                     os.remove(path)
-                    image_1 = torch.from_numpy(image_1 / 255.0).view(64, 64, 1)
+                    image_1 = torch.from_numpy(image_1 / 255.0)
                     image_2 = torch.from_numpy(image_2 / 255.0)
                     image_2.requires_grad_(True)
                     return image_2, image_1
@@ -113,11 +112,15 @@ class FaceDataset:
     def process_item(self, path, save, cuda):
         """
         预处理 change database to 64x64 edge pictures
+        :param path: 图片路径
+        :param save: 是否将处理好的图片保存本地
+        :param cuda: gpu speedup
         """
         # log.info(path)
         img = utils.evalute_face(path, self.args.extractor_checkpoint, cuda)
         img = utils.img_edge(img)
-        img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
+        if img.shape[0] != 64:
+            img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
         if save:
             cv2.imwrite(path, img)
         return img

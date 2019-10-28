@@ -7,7 +7,6 @@ import align
 import utils
 import ops
 import os
-import cv2
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -150,21 +149,24 @@ class Extractor(nn.Module):
 
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
-            progress.set_description("mode {0}".format(self.train_mode))
             if self.train_mode == Extractor.TRAIN_SYNC:
-                names, params, images = self.dataset.get_batch(batch_size=self.args.batch_size, size=64)
+                progress.set_description("sync mode")
+                names, _, images = self.dataset.get_batch(batch_size=self.args.batch_size, size=64)
                 if cuda:
-                    params = params.cuda()
                     images = images.cuda()
                 self.sync_train(images, names, step)
             else:
                 valid, loss = self.asyn_train(cuda)
                 if valid:
                     loss_ = loss.detach().numpy()
-                    progress.set_description("loss:" + "{:.3f}".format(loss_))
-                    self.writer.add_scalar('feature extractor/loss', loss_, step)
+                    loss_display = loss_ * 100
+                    progress.set_description("loss: {:.3f}".format(loss_display))
+                    self.writer.add_scalar('feature extractor/loss', loss_display, step)
                     utils.update_optimizer_lr(self.optimizer, loss_)
                     if (step + 1) % self.args.extractor_save_freq == 0:
+                        lr = self.args.extractor_learning_rate * loss_display
+                        utils.update_optimizer_lr(self.optimizer, lr)
+                        self.writer.add_scalar('extractor/learning rate', lr, step)
                         self.save(step)
         self.writer.close()
 
@@ -226,24 +228,3 @@ class Extractor(nn.Module):
         accuracy = accuracy / steps
         log.info("accuracy rate is %f", accuracy)
         return accuracy
-
-
-if __name__ == '__main__':
-    from parse import parser
-    import logging
-
-    args = parser.parse_args()
-    log.init("FaceNeural", logging.INFO, log_path="./output/ex_log.txt")
-    extractor = Extractor("neural extractor", args)
-    x = np.random.rand(512, 512, 1).astype(np.float32)
-    log.info(x.shape)
-    x = cv2.resize(x, (64, 64), interpolation=cv2.INTER_LINEAR)
-    log.info(x.shape)
-    x = torch.from_numpy(x)
-    log.info(x.size())
-    x = x.view(-1, 1, 64, 64)
-    log.info(x.size())
-    y = extractor.forward(x)
-    log.info(y.size())
-    log.info(y)
-    extractor.save(99)

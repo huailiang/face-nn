@@ -128,17 +128,17 @@ parser.add_argument(
     '--total_extractor_steps',
     dest='total_extractor_steps',
     type=int,
-    default=int(256),
+    default=int(2e5),
     help='Total number of feature extractor steps')
 parser.add_argument(
     '--extractor_learning_rate',
     dest='extractor_learning_rate',
     type=float,
-    default=0.05,
+    default=0.1,
     help='learning rate of feature extractor')
 parser.add_argument(
     '--extractor_save_freq',
     dest='extractor_save_freq',
     type=int,
-    default=1000,
+    default=200,
     help='Save model every save_freq steps')
