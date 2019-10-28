@@ -107,7 +107,3 @@ def inner_evaluate(dst_pth, src_path):
                              stride=1, save_im=True,
                              save_path=osp.join(dst_pth, list_image[step]))
 
-
-if __name__ == "__main__":
-    inner_evaluate('../output/face_parsing', '../output/face')
-    print("****** evalute finish *****")

@@ -115,6 +115,17 @@ def save_img(path, tensor1, tensor2):
     cv2.imwrite(path, img)
 
 
+def save_grey(path, tensor1, tensor2):
+    image1 = tensor1.cpu().detach().numpy() * 255
+    image2 = tensor2.cpu().detach().numpy() * 255
+    shape = image1.shape
+    if len(shape) == 2:
+        image1 = image1[:, :, np.newaxis]
+        image2 = image2[:, :, np.newaxis]
+    img = merge_image(image1, image2)
+    cv2.imwrite(path, img)
+
+
 def merge_image(image1, image2, mode="h", size=512, show=False):
     """
     拼接图片

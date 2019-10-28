@@ -137,8 +137,14 @@ parser.add_argument(
     default=0.1,
     help='learning rate of feature extractor')
 parser.add_argument(
+    '--extractor_prev_freq',
+    dest='extractor_prev_freq',
+    type=int,
+    default=500,
+    help='generate preview image when training')
+parser.add_argument(
     '--extractor_save_freq',
     dest='extractor_save_freq',
     type=int,
-    default=200,
+    default=1000,
     help='Save model every save_freq steps')

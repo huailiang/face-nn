@@ -18,6 +18,7 @@ import util.logit as log
     可以在引擎里加载 显示对应的脸型
     Unity 菜单选择Tools->SelectModel
 2. 将引擎生成的图片转换为edge图片
+    多线程里实现
 """
 
 
@@ -68,11 +69,12 @@ class Thread_Transfer(threading.Thread):
     批量转换edge图片
     """
 
-    def __init__(self, threadID, root, dir_2, files):
+    def __init__(self, threadID, root, dir_2, cp, files):
         threading.Thread.__init__(self)
         self.root = root
         self.dir2 = dir_2
         self.files = files
+        self.cp = cp
         print("start thread {0} files count {1}".format(threadID, len(files)))
 
     def run(self):
@@ -81,23 +83,35 @@ class Thread_Transfer(threading.Thread):
             path2 = os.path.join(self.dir2, name)
             if not os.path.exists(path2):
                 shutil.copy(path1, path2)
-                image_transfer(path2)
+                self.image_transfer(path2)
+
+    def image_transfer(self, im_path):
+        if im_path.find('.jpg') >= 0:
+            img = utils.evalute_face(im_path, self.cp, False)
+            img = utils.img_edge(img)
+            img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
+            cv2.imwrite(im_path, img)
 
 
-def batch_transfer(dir):
+def batch_transfer(work_path, export_path):
     """
     批量转换edge图片
-    默认开启8个线程， 根据自己电脑cpu核数自定义
-    :param dir: 转换目录
+    默认开启16个线程， 根据自己电脑cpu核数自定义
+    :param work_path: current script's path
+    :param export_path: 转换目录
     :return:
     """
-    if os.path.exists(dir):
-        dir_2 = dir + "_2"
+    if os.path.exists(export_path):
+        root, _ = os.path.split(work_path)
+        print("root", root)
+        cp = os.path.join(root, "dat/79999_iter.pth")
+        print(cp)
+        dir_2 = export_path + "_2"
         if os.path.exists(dir_2):
             shutil.rmtree(dir_2)
         os.mkdir(dir_2)
-        thread_cnt = 16
-        for root, dirs, files in os.walk(dir, topdown=False):
+        thread_cnt = 2
+        for root, dirs, files in os.walk(export_path, topdown=False):
             count = len(files)
             split = int(count / thread_cnt)
             thread_pool = []
@@ -106,28 +120,20 @@ def batch_transfer(dir):
                 end = split * (i + 1)
                 end = end if (i < thread_cnt - 1) else count
                 files_ = files[start: end]
-                thread = Thread_Transfer(i, root, dir_2, files_)
+                thread = Thread_Transfer(i, root, dir_2, cp, files_)
                 thread.start()
                 thread_pool.append(thread)
             for thread in thread_pool:
                 thread.join()
-
     else:
-        print("there is not dir ", dir)
-
-
-def image_transfer(im_path):
-    if im_path.find('.jpg') >= 0:
-        img = utils.evalute_face(im_path, "./dat/79999_iter.pth", False)
-        img = utils.img_edge(img)
-        img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)
-        cv2.imwrite(im_path, img)
+        print("there is not dir ", export_path)
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        path = sys.argv[1]
-        batch_transfer(path)
+        work_path = os.path.join(os.getcwd(), sys.argv[0])
+        exp_path = sys.argv[1]
+        batch_transfer(work_path, exp_path)
     else:
         pwd = os.getcwd()
         project_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")

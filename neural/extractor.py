@@ -46,7 +46,7 @@ class Extractor(nn.Module):
         self.initial_step = 0
         self.args = args
         self.model_path = "./output/extractor"
-        self.params_path = "./output/params"
+        self.prev_path = "./output/preview"
         self.training = False
         self.params_cnt = self.args.params_cnt
         self.dataset = None
@@ -68,12 +68,9 @@ class Extractor(nn.Module):
             ResidualBlock.make_layer(4, channels=self.params_cnt),  # 10. (batch, params_cnt, 16, 16)
         )
         self.fc = nn.Linear(95 * 16 * 16, 95)
-        self.optimizer = optim.SGD(self.parameters(),
-                                   lr=args.extractor_learning_rate,
-                                   momentum=momentum)
+        self.optimizer = optim.Adam(self.parameters(), lr=args.extractor_learning_rate)
 
     def forward(self, input):
-        batch = input.size(0)
         output = self.model(input)
         output = output.view(output.size(0), -1)
         output = self.fc(output)
@@ -109,23 +106,28 @@ class Extractor(nn.Module):
         param_ = self.forward(image)
         self.net.send_params(param_, name, step)
 
-    def asyn_train(self, cuda):
+    def asyn_train(self, cuda, step):
         """
         cache 中累计一定量的时候就可以asyn train
-        :return:
+        :param cuda: gpu speed up
+        :param step: step 0: not export to preview
+        :return: loss, type scalar
         """
         self.train_refer = self.train_refer - 1
 
         image1, image2 = self.dataset.get_cache(cuda)
         if self.train_refer <= 0 or image1 is None:
             self.change_mode(Extractor.TRAIN_SYNC)
-        if image1 is not None:
-            self.optimizer.zero_grad()
-            loss = F.mse_loss(image1, image2)
-            loss.backward()
-            self.optimizer.step()
-            return True, loss
-        return False, 0
+            return False, 0
+
+        if step > 0:
+            path = "{1}/ext_{0}.jpg".format(step, self.prev_path)
+            ops.save_grey(path, image1, image2)
+        self.optimizer.zero_grad()
+        loss = F.mse_loss(image1, image2)
+        loss.backward()
+        self.optimizer.step()
+        return True, loss
 
     def change_mode(self, mode):
         """
@@ -133,6 +135,8 @@ class Extractor(nn.Module):
         :param mode: train mode
         """
         self.train_refer = 32
+        if mode == Extractor.TRAIN_ASYN:
+            self.train_refer = 33
         self.train_mode = mode
 
     def batch_train(self, cuda):
@@ -156,14 +160,15 @@ class Extractor(nn.Module):
                     images = images.cuda()
                 self.sync_train(images, names, step)
             else:
-                valid, loss = self.asyn_train(cuda)
+                x_step = step if (step % self.args.extractor_prev_freq == 0) else 0
+                valid, loss = self.asyn_train(cuda, step=x_step)
                 if valid:
                     loss_ = loss.detach().numpy()
                     loss_display = loss_ * 100
                     progress.set_description("loss: {:.3f}".format(loss_display))
-                    self.writer.add_scalar('feature extractor/loss', loss_display, step)
+                    self.writer.add_scalar('extractor/loss', loss_display, step)
                     utils.update_optimizer_lr(self.optimizer, loss_)
-                    if (step + 1) % self.args.extractor_save_freq == 0:
+                    if step % self.args.extractor_save_freq == 0:
                         lr = self.args.extractor_learning_rate * loss_display
                         utils.update_optimizer_lr(self.optimizer, lr)
                         self.writer.add_scalar('extractor/learning rate', lr, step)
@@ -188,6 +193,8 @@ class Extractor(nn.Module):
         """
         ops.clear_folder(self.model_path)
         ops.clear_files(self.args.path_to_cache)
+        ops.clear_files(self.args.path_tensor_log)
+        ops.clear_files(self.prev_path)
 
     def save(self, step):
         """
@@ -197,7 +204,7 @@ class Extractor(nn.Module):
         state = {'net': self.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
         if not os.path.exists(self.model_path):
             os.mkdir(self.model_path)
-        torch.save(state, '{1}/model_extractor_{0}.pth'.format(step + 1, self.model_path))
+        torch.save(state, '{1}/model_extractor_{0}.pth'.format(step, self.model_path))
 
     def inference(self, path, photo):
         """

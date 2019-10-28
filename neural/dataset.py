@@ -3,13 +3,13 @@
 # @Author: penghuailiang
 # @Date  : 2019-10-04
 
-import numpy as np
 import torch
 import os
 import cv2
 import random
 import struct
 import utils
+import numpy as np
 import util.logit as log
 from util.exception import NeuralException
 
@@ -88,20 +88,24 @@ class FaceDataset:
         返回 64X64
         """
         cache = self.args.path_to_cache
+
         if os.path.exists(cache):
-            for root, dirs, files in os.walk(cache, topdown=False):
-                for name in files:
-                    path = os.path.join(root, name)
-                    idx = name.rindex('_')
-                    name2 = name[7:idx] + ".jpg"  # 7 is: neural_
-                    path2 = os.path.join(self.path, name2)
-                    image_1 = self.process_item(path, False, cuda=cuda)
-                    image_2 = cv2.imread(path2, cv2.IMREAD_GRAYSCALE)
-                    os.remove(path)
-                    image_1 = torch.from_numpy(image_1 / 255.0)
-                    image_2 = torch.from_numpy(image_2 / 255.0)
-                    image_2.requires_grad_(True)
-                    return image_2, image_1
+            try:
+                for root, dirs, files in os.walk(cache, topdown=False):
+                    for name in files:
+                        path = os.path.join(root, name)
+                        idx = name.rindex('_')
+                        name2 = name[7:idx] + ".jpg"  # 7 is: neural_
+                        path2 = os.path.join(self.path, name2)
+                        image_1 = self.process_item(path, False, cuda=cuda)
+                        image_2 = cv2.imread(path2, cv2.IMREAD_GRAYSCALE)
+                        os.remove(path)
+                        image_1 = torch.from_numpy(image_1 / 255.0)
+                        image_2 = torch.from_numpy(image_2 / 255.0)
+                        image_2.requires_grad_(True)
+                        return image_2, image_1
+            except Exception as e:
+                log.warn(e)
         return None, None
 
     def pre_process(self, cuda):
