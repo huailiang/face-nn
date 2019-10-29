@@ -22,7 +22,7 @@ def generate_detector():
     return detector, predictor, facerec
 
 
-def align_face(img, size):
+def align_face(img, size=(512, 512)):
     """
     :param img:  input photo, numpy array
     :param size: output shape
@@ -35,7 +35,7 @@ def align_face(img, size):
     d = dets[0]  # 默认处理第一个检测到的人脸区域
     bb = np.zeros(4, dtype=np.int32)
 
-    ext = 0
+    ext = 16
     bb[0] = np.maximum(d.left() - ext, 0)
     bb[1] = np.maximum(d.top() - ext, 0)
     bb[2] = np.minimum(d.right() + ext, img.shape[1])
@@ -53,7 +53,7 @@ def align_face(img, size):
     return scaled
 
 
-def face_features(path_img, path_save):
+def face_features(path_img, path_save=None):
     """
     提取脸部特征图片
     :param path_img: input photo path, str
@@ -65,8 +65,10 @@ def face_features(path_img, path_save):
         if img.shape[0] * img.shape[1] > 512 * 512:
             img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
         scaled = align_face(img)
-        cv2.imwrite(path_save, img)
-        cv2.imwrite(path_save.replace("align_", "align2_"), scaled)
+        if path_save is not None:
+            cv2.imwrite(path_save, img)
+            cv2.imwrite(path_save.replace("align_", "align2_"), scaled)
+        return scaled
     except Exception as e:
         log.error(e)
 

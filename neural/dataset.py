@@ -105,10 +105,14 @@ class FaceDataset:
                         image_2.requires_grad_(True)
                         return image_2, image_1
             except Exception as e:
-                log.warn(e)
+                log.debug(e)
         return None, None
 
     def pre_process(self, cuda):
+        """
+        batch process dataset's images
+        :param cuda: gpu speed up
+        """
         for name in self.names:
             path = os.path.join(self.path, name + ".jpg")
             self.process_item(path, save=True, cuda=cuda)
@@ -116,7 +120,7 @@ class FaceDataset:
     def process_item(self, path, save, cuda):
         """
         预处理 change database to 64x64 edge pictures
-        :param path: 图片路径
+        :param path: 图片路径 512x512
         :param save: 是否将处理好的图片保存本地
         :param cuda: gpu speedup
         """

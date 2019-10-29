@@ -5,6 +5,7 @@
 
 
 import utils
+import ops
 import logging
 import torch
 import align
@@ -59,7 +60,13 @@ if __name__ == '__main__':
         imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             imitator.cuda()
-        imitator.load_checkpoint("model_imitator_14000.pth", training=True, cuda=cuda)
+        imitator.load_checkpoint("model_imitator_14000.pth", True, cuda=cuda)
+    elif args.phase == "inference_extractor":
+        log.info("inference extractor")
+        extractor = Extractor("neural extractor", args)
+        if cuda:
+            extractor.cuda()
+        extractor.load_checkpoint("model_extractor_4000.pth", True, cuda)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
         checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")
@@ -68,12 +75,22 @@ if __name__ == '__main__':
         log.info(features.size())
     elif args.phase == "faceparsing":
         log.info("faceparsing")
-        im = utils.evalute_face("./output/face/db_0000_3.jpg", args.extractor_checkpoint, True)
+        im = utils.evalute_face("./output/face/db_0000_3.jpg", args.extractor_checkpoint, cuda)
         cv2.imwrite("./output/eval.jpg", im)
     elif args.phase == "align":
-        align.face_features("./output/image/timg.jpeg", "test.jpg")
+        align.face_features("../export/regular/model.jpg", "../export/regular/out.jpg")
     elif args.phase == "dataset":
         dataset = FaceDataset(args, "test")
         dataset.pre_process(cuda)
+    elif args.phase == "preview":
+        log.info(" preview picture ")
+        path = "../export/regular/model.jpg"
+        img = cv2.imread(path)
+        img2 = utils.out_evaluate(img, args.extractor_checkpoint, cuda)
+        img3 = utils.img_edge(img2)
+        img3_ = ops.fill_grey(img3)
+        img4 = align.face_features(path)
+        log.info("{0} {1} {2} {3}".format(img.shape, img2.shape, img3_.shape, img4.shape))
+        ops.merge_4image(img, img2, img3_, img4, show=True)
     else:
         log.error("not known phase %s", args.phase)

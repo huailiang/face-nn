@@ -36,7 +36,8 @@ namespace XEngine.Editor
         GameObject helmet;
         Camera camera;
         Vector3 cam1 = new Vector3(0, 1.0f, -10.0f);
-        Vector3 cam2 = new Vector3(0, 1.73f, -8.8f);
+        Vector3 cam2 = new Vector3(0, 1.72f, -8.7f);
+        Vector3 cam3 = new Vector3(0, 1.72f, -8.6f);
         bool focusFace;
 
         public FacePaint(FaceData dt)
@@ -199,7 +200,8 @@ namespace XEngine.Editor
             if (helmet != null && camera != null)
             {
                 helmet.SetActive(!focusFace);
-                camera.transform.position = focusFace ? cam2 : cam1;
+                var cam = roleShape == RoleShape.FEMALE ? cam3 : cam2;
+                camera.transform.position = focusFace ? cam : cam1;
                 camera.fieldOfView = focusFace ? 18 : 60;
             }
         }

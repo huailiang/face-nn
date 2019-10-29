@@ -53,7 +53,7 @@ namespace XEngine.Editor
         }
 
         RoleShape shape = RoleShape.FEMALE;
-        bool complete = true;
+        bool complete = true, addNoise = true;
         int datacnt = 10000;
         float weight = 0.4f;
 
@@ -69,8 +69,13 @@ namespace XEngine.Editor
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("complate show");
+            GUILayout.Label("complete show");
             complete = GUILayout.Toggle(complete, "");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("trainset   noise");
+            addNoise = GUILayout.Toggle(addNoise, "");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -84,7 +89,7 @@ namespace XEngine.Editor
             GUILayout.Space(8);
             if (GUILayout.Button("Generate"))
             {
-                RandomExportModels((int)(datacnt * weight * 0.8), shape, "trainset", true, complete);
+                RandomExportModels((int)(datacnt * weight * 0.8), shape, "trainset", addNoise, complete);
                 RandomExportModels((int)(datacnt * weight * 0.2), shape, "testset", false, complete);
                 EditorUtility.Open(EXPORT);
             }

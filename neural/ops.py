@@ -173,56 +173,25 @@ def merge_4image(image1, image2, image3, image4, size=512, show=False):
     image2_ = np.append(img_3, img_4, axis=1)
     image = np.append(image1_, image2_, axis=0)
     if show:
+        # cv2.imshow("contact", image1_)
+        # cv2.imshow("contact", image2_)
         cv2.imshow("contact", image)
         cv2.waitKey()
         cv2.destroyAllWindows()
     return image
 
 
-if __name__ == '__main__':
-    log.init("")
-    img1 = cv2.imread("./output/db_3.jpg")
-    img2 = cv2.imread("./output/db_4.jpg")
-    img3 = cv2.imread("./output/db_1.jpg")
-    img4 = cv2.imread("./output/db_2.jpg")
-    merge_4image(img1, img2, img3, img4, show=True)
+def fill_grey(image):
+    shape = image.shape
+    if len(shape) == 2:
+        image = image[:, :, np.newaxis]
+        shape = image.shape
+    if shape[2] == 1:
+        new_image = np.zeros((shape[0], shape[1], 3), dtype=np.uint8)
+        for i in range(shape[0]):
+            for j in range(shape[1]):
+                v = image[i][j]
+                new_image[i][j] = [v, v, v]
+        return new_image
+    return image
 
-""" 
-# tensorflow implement, not use again
-
-def instance_norm(input, name="instance_norm", is_training=True):
-    with tf.variable_scope(name):
-        depth = input.get_shape()[3]
-        scale = tf.get_variable("scale", [depth], initializer=tf.random_normal_initializer(1.0, 0.02, dtype=tf.float32))
-        offset = tf.get_variable("offset", [depth], initializer=tf.constant_initializer(0.0))
-        mean, variance = tf.nn.moments(input, axes=[1, 2], keep_dims=True)
-        epsilon = 1e-5
-        inv = tf.rsqrt(variance + epsilon)
-        normalized = (input - mean) * inv
-        return scale * normalized + offset
-
-
-def deconv2d(input_, output_dim, ks=4, s=2, name="deconv2d"):
-    # Upsampling procedure, like suggested in this article:
-    # https://distill.pub/2016/deconv-checkerboard/. At first upsample
-    # tensor like an image and then apply convolutions.
-    with tf.variable_scope(name):
-        input_ = tf.image.resize_images(images=input_, size=tf.shape(input_)[1:3] * s,
-                                        method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)  # That is optional
-        return conv2d(input_=input_, output_dim=output_dim, ks=ks, s=1, padding='SAME')
-
-
-def lrelu(x, leak=0.2, name="lrelu"):
-    return tf.maximum(x, leak * x)
-
-
-def linear(input_, output_size, scope=None, stddev=0.02, bias_start=0.0, with_w=False):
-    with tf.variable_scope(scope or "Linear"):
-        matrix = tf.get_variable("Matrix", [input_.get_shape()[-1], output_size], tf.float32,
-                                 tf.random_normal_initializer(stddev=stddev))
-        bias = tf.get_variable("bias", [output_size], initializer=tf.constant_initializer(bias_start))
-        if with_w:
-            return tf.matmul(input_, matrix) + bias, matrix, bias
-        else:
-            return tf.matmul(input_, matrix) + bias
-"""

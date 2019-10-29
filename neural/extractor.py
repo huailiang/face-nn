@@ -7,6 +7,7 @@ import align
 import utils
 import ops
 import os
+import cv2
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -69,6 +70,7 @@ class Extractor(nn.Module):
         )
         self.fc = nn.Linear(95 * 16 * 16, 95)
         self.optimizer = optim.Adam(self.parameters(), lr=args.extractor_learning_rate)
+        utils.debug_parameters(self, "_extractor_")
 
     def forward(self, input):
         output = self.model(input)
@@ -136,7 +138,7 @@ class Extractor(nn.Module):
         """
         self.train_refer = 32
         if mode == Extractor.TRAIN_ASYN:
-            self.train_refer = 33
+            self.train_refer = 36
         self.train_mode = mode
 
     def batch_train(self, cuda):
@@ -175,16 +177,20 @@ class Extractor(nn.Module):
                         self.save(step)
         self.writer.close()
 
-    def load_checkpoint(self, path):
+    def load_checkpoint(self, path, training=False, cuda=False):
         """
         从checkpoint 中恢复net
         :param path: checkpoint's path
+        :param training: 恢复之后 是否接着train
+        :param cuda: gpu speedup
         """
-        checkpoint = torch.load(path)
-        self.model.load_state_dict(checkpoint['net'])
+        checkpoint = torch.load(self.args.path_to_inference + "/" + path)
+        self.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.initial_step = checkpoint['epoch']
         log.info("recovery imitator from %s", path)
+        if training:
+            self.batch_train(cuda)
 
     def clean(self):
         """
@@ -206,17 +212,25 @@ class Extractor(nn.Module):
             os.mkdir(self.model_path)
         torch.save(state, '{1}/model_extractor_{0}.pth'.format(step, self.model_path))
 
-    def inference(self, path, photo):
+    def inference(self, cp_name, photo_path, cuda):
         """
         feature extractor: 由图片生成捏脸参数
-        :param path: checkpoint's path
-        :param photo: input photo
-        :return: params [batch, 95]
+        :param cuda: gpu speed up
+        :param cp_name: checkpoint's path
+        :param photo_path: input photo's path
+        :return: params [1, 95]
         """
-        align.align_face()
-        self.load_checkpoint(path)
-        _, params_ = self.forward(path)
-        return params_
+        img = cv2.imread(photo_path)
+        scaled = align.align_face(img, size=(64, 64))
+        self.load_checkpoint(cp_name, training=False, cuda=cuda)
+        img = utils.out_evaluate(scaled, self.args.extractor_checkpoint, cuda)
+        img = utils.img_edge(img)
+        with torch.no_grad:
+            input = torch.from_numpy(img)
+            input = input.view([1, 1, 64, 64])
+            params_ = self.forward(input)
+            log.info(params_)
+            return params_
 
     def evaluate(self):
         """
