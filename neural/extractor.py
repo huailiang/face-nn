@@ -13,7 +13,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import util.logit as log
-import numpy as np
 from tqdm import tqdm
 from dataset import FaceDataset
 from net import Net
@@ -108,28 +107,22 @@ class Extractor(nn.Module):
         param_ = self.forward(image)
         self.net.send_params(param_, name, step)
 
-    def asyn_train(self, cuda, step):
+    def asyn_train(self, image1, image2):
         """
         cache 中累计一定量的时候就可以asyn train
-        :param cuda: gpu speed up
-        :param step: step 0: not export to preview
+        :param image1: input image
+        :param image2: generate image
         :return: loss, type scalar
         """
         self.train_refer = self.train_refer - 1
-
-        image1, image2 = self.dataset.get_cache(cuda)
-        if self.train_refer <= 0 or image1 is None:
+        if self.train_refer <= 0:
             self.change_mode(Extractor.TRAIN_SYNC)
-            return False, 0
 
-        if step > 0:
-            path = "{1}/ext_{0}.jpg".format(step, self.prev_path)
-            ops.save_grey(path, image1, image2)
         self.optimizer.zero_grad()
         loss = F.mse_loss(image1, image2)
         loss.backward()
         self.optimizer.step()
-        return True, loss
+        return loss
 
     def change_mode(self, mode):
         """
@@ -156,25 +149,33 @@ class Extractor(nn.Module):
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
             if self.train_mode == Extractor.TRAIN_SYNC:
-                progress.set_description("sync mode")
+                progress.set_description("sync  mode ")
                 names, _, images = self.dataset.get_batch(batch_size=self.args.batch_size, size=64)
                 if cuda:
                     images = images.cuda()
                 self.sync_train(images, names, step)
             else:
-                x_step = step if (step % self.args.extractor_prev_freq == 0) else 0
-                valid, loss = self.asyn_train(cuda, step=x_step)
-                if valid:
-                    loss_ = loss.detach().numpy()
-                    loss_display = loss_ * 100
-                    progress.set_description("loss: {:.3f}".format(loss_display))
-                    self.writer.add_scalar('extractor/loss', loss_display, step)
-                    utils.update_optimizer_lr(self.optimizer, loss_)
-                    if step % self.args.extractor_save_freq == 0:
-                        lr = self.args.extractor_learning_rate * loss_display
-                        utils.update_optimizer_lr(self.optimizer, lr)
-                        self.writer.add_scalar('extractor/learning rate', lr, step)
-                        self.save(step)
+                image1, image2, name = self.dataset.get_cache(cuda)
+                if image1 is None or image2 is None:
+                    self.change_mode(Extractor.TRAIN_SYNC)
+                    continue
+                loss = self.asyn_train(image1, image2)
+                loss_ = loss.detach().numpy()
+                loss_display = loss_ * 100
+                progress.set_description("loss: {:.3f}".format(loss_display))
+                self.writer.add_scalar('extractor/loss', loss_display, step)
+                if step % self.args.extractor_prev_freq == 0:
+                    path = "{1}/{2}_{0}.jpg".format(step, self.prev_path, name[3:-6])
+                    orig_path = os.path.join(self.args.path_to_dataset+"2", name)
+                    orig_img = cv2.imread(orig_path)
+                    parse_img = utils.out_evaluate(orig_img, self.args.extractor_checkpoint, cuda)
+                    ops.save_extractor(path, image1, image2, orig_img, parse_img)
+
+                    lr = self.args.extractor_learning_rate * loss_display
+                    self.writer.add_scalar('extractor/learning rate', lr, step)
+                    utils.update_optimizer_lr(self.optimizer, lr)
+            if step % self.args.extractor_save_freq == 0:
+                self.save(step)
         self.writer.close()
 
     def load_checkpoint(self, path, training=False, cuda=False):

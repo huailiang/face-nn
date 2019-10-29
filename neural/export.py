@@ -93,16 +93,16 @@ class Thread_Transfer(threading.Thread):
             cv2.imwrite(im_path, img)
 
 
-def batch_transfer(work_path, export_path):
+def batch_transfer(curr_path, export_path):
     """
     批量转换edge图片
     默认开启16个线程， 根据自己电脑cpu核数自定义
-    :param work_path: current script's path
+    :param curr_path: current script's path
     :param export_path: 转换目录
     :return:
     """
     if os.path.exists(export_path):
-        root, _ = os.path.split(work_path)
+        root, _ = os.path.split(curr_path)
         print("root", root)
         cp = os.path.join(root, "dat/79999_iter.pth")
         print(cp)
@@ -125,6 +125,8 @@ def batch_transfer(work_path, export_path):
                 thread_pool.append(thread)
             for thread in thread_pool:
                 thread.join()
+        os.rename(exp_path, exp_path+"2")
+        os.rename(exp_path+"_2", exp_path)
     else:
         print("there is not dir ", export_path)
 

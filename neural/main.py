@@ -10,6 +10,7 @@ import logging
 import torch
 import align
 import cv2
+import os
 import util.logit as log
 from dataset import FaceDataset
 from imitator import Imitator
@@ -17,18 +18,18 @@ from extractor import Extractor
 from parse import parser
 
 
-def init_device(args):
+def init_device(arguments):
     """
     检查配置和硬件是否支持gpu
-    :param args: 配置
+    :param arguments: 配置
     :return: 返回True 则支持gpu
     """
     support_gpu = torch.cuda.is_available()
-    log.info("neural face network use gpu: %s", support_gpu and args.use_gpu)
-    if support_gpu and args.use_gpu:
-        if not args.gpuid:
-            args.gpuid = 0
-        dev = torch.device("cuda:%d" % args.gpuid)
+    log.info("neural face network use gpu: %s", support_gpu and arguments.use_gpu)
+    if support_gpu and arguments.use_gpu:
+        if not arguments.gpuid:
+            arguments.gpuid = 0
+        dev = torch.device("cuda:%d" % arguments.gpuid)
         return True, dev
     else:
         dev = torch.device("cpu")
@@ -66,7 +67,7 @@ if __name__ == '__main__':
         extractor = Extractor("neural extractor", args)
         if cuda:
             extractor.cuda()
-        extractor.load_checkpoint("model_extractor_4000.pth", True, cuda)
+        extractor.load_checkpoint("model_extractor_825000.pth", True, cuda)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
         checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")
@@ -92,5 +93,12 @@ if __name__ == '__main__':
         img4 = align.face_features(path)
         log.info("{0} {1} {2} {3}".format(img.shape, img2.shape, img3_.shape, img4.shape))
         ops.merge_4image(img, img2, img3_, img4, show=True)
+    elif args.phase == "cache":
+        dataset = FaceDataset(args, "train")
+        image1, image2, name = dataset.get_cache(cuda)
+        orig_path = os.path.join(args.path_to_dataset + "2", name)
+        orig_img = cv2.imread(orig_path)
+        parse_img = utils.out_evaluate(orig_img, args.extractor_checkpoint, cuda)
+        ops.save_extractor('../export/test.jpg', image1, image2, orig_img, parse_img)
     else:
         log.error("not known phase %s", args.phase)

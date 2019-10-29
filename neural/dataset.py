@@ -103,10 +103,10 @@ class FaceDataset:
                         image_1 = torch.from_numpy(image_1 / 255.0)
                         image_2 = torch.from_numpy(image_2 / 255.0)
                         image_2.requires_grad_(True)
-                        return image_2, image_1
+                        return image_2, image_1, name2
             except Exception as e:
                 log.debug(e)
-        return None, None
+        return None, None, None
 
     def pre_process(self, cuda):
         """

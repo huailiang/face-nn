@@ -115,14 +115,16 @@ def save_img(path, tensor1, tensor2):
     cv2.imwrite(path, img)
 
 
-def save_grey(path, tensor1, tensor2):
+def save_extractor(path, tensor1, tensor2, img3, img4):
     image1 = tensor1.cpu().detach().numpy() * 255
     image2 = tensor2.cpu().detach().numpy() * 255
     shape = image1.shape
     if len(shape) == 2:
         image1 = image1[:, :, np.newaxis]
         image2 = image2[:, :, np.newaxis]
-    img = merge_image(image1, image2)
+    img1 = fill_grey(image1)
+    img2 = fill_grey(image2)
+    img = merge_4image(img1, img2, img3, img4)
     cv2.imwrite(path, img)
 
 
@@ -142,9 +144,9 @@ def merge_image(image1, image2, mode="h", size=512, show=False):
     if mode == 'h':
         image = np.append(img1_, img2_, axis=1)  # (256, 512, 3)
     elif mode == 'v':
-        image2 = np.append(img1_, img2_, axis=0)
+        image = np.append(img1_, img2_, axis=0)
     else:
-        log.warn("not implements mode: %s", mode)
+        log.warn("not implements mode: %s".format(mode))
         return
     if show:
         cv2.imshow("contact", image)
@@ -173,8 +175,6 @@ def merge_4image(image1, image2, image3, image4, size=512, show=False):
     image2_ = np.append(img_3, img_4, axis=1)
     image = np.append(image1_, image2_, axis=0)
     if show:
-        # cv2.imshow("contact", image1_)
-        # cv2.imshow("contact", image2_)
         cv2.imshow("contact", image)
         cv2.waitKey()
         cv2.destroyAllWindows()
