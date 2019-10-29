@@ -110,7 +110,7 @@ def batch_transfer(work_path, export_path):
         if os.path.exists(dir_2):
             shutil.rmtree(dir_2)
         os.mkdir(dir_2)
-        thread_cnt = 2
+        thread_cnt = 16
         for root, dirs, files in os.walk(export_path, topdown=False):
             count = len(files)
             split = int(count / thread_cnt)
