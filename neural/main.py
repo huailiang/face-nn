@@ -67,7 +67,7 @@ if __name__ == '__main__':
         extractor = Extractor("neural extractor", args)
         if cuda:
             extractor.cuda()
-        extractor.load_checkpoint("model_extractor_825000.pth", True, cuda)
+        extractor.load_checkpoint("model_extractor_845000.pth", True, cuda)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
         checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")

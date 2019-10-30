@@ -140,7 +140,7 @@ namespace XEngine.Editor
                             shape = (RoleShape)shape,
                             name = name
                         };
-                        NeuralInput(data, true);
+                        NeuralInput(data, true, true);
                         break;
                     }
                 }
@@ -198,7 +198,7 @@ namespace XEngine.Editor
                     name = name
                 };
                 UnityEditor.EditorUtility.DisplayProgressBar(prefix, string.Format("is generating {0}/{1}", j, expc), (float)j / expc);
-                NeuralInput(data, complete);
+                NeuralInput(data, complete, true);
             }
             UnityEditor.EditorUtility.DisplayProgressBar(prefix, "post processing, wait for a moment", 1);
             bw.Close();
@@ -244,6 +244,7 @@ namespace XEngine.Editor
         }
 
 
+
         private static void ProcessFile(FileInfo info, bool complete)
         {
             if (info != null)
@@ -264,15 +265,19 @@ namespace XEngine.Editor
                     shape = shape,
                     name = "model_" + info.Name.Replace(".bytes", "")
                 };
-                NeuralInput(data, complete);
+                NeuralInput(data, complete, true);
                 br.Close();
                 fs.Close();
             }
         }
 
 
-        private static void NeuralInput(NeuralData data, bool complete)
+        private static void NeuralInput(NeuralData data, bool complete, bool repaint)
         {
+            if (repaint)
+            {
+                if (prev != null) { ScriptableObject.DestroyImmediate(prev); prev = null; }
+            }
             if (prev == null) prev = ScriptableObject.CreateInstance<FashionPreview>();
             prev.NeuralProcess(data, complete);
             FashionPreview.preview = prev;
@@ -307,7 +312,7 @@ namespace XEngine.Editor
                     shape = msg.shape,
                     name = "neural_" + msg.name
                 };
-                NeuralInput(data, false);
+                NeuralInput(data, false, false);
                 MoveDestDir("neural_*", "cache/", false);
             }
             if (!connect.Connected) EditorApplication.update -= Update;
@@ -336,12 +341,15 @@ namespace XEngine.Editor
             {
                 string path = "Assets/Engine/Editor/EditorResources/CameraOuput.renderTexture";
                 rt = AssetDatabase.LoadAssetAtPath<RenderTexture>(path);
+                RenderTexture.active = rt;
             }
-            rt.Release();
+            else rt.Release();
+
             camera.targetTexture = rt;
             camera.Render();
             camera.Render();
             SaveRenderTex(rt, name, shape);
+            rt.Release();
             Clear();
         }
 
@@ -349,7 +357,6 @@ namespace XEngine.Editor
         private static void Clear()
         {
             camera.targetTexture = null;
-            RenderTexture.active = null;
             rt.Release();
         }
 

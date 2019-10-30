@@ -116,8 +116,8 @@ def save_img(path, tensor1, tensor2):
 
 
 def save_extractor(path, tensor1, tensor2, img3, img4):
-    image1 = tensor1.cpu().detach().numpy() * 255
-    image2 = tensor2.cpu().detach().numpy() * 255
+    image1 = 255 - tensor1.cpu().detach().numpy() * 255
+    image2 = 255 - tensor2.cpu().detach().numpy() * 255
     shape = image1.shape
     if len(shape) == 2:
         image1 = image1[:, :, np.newaxis]

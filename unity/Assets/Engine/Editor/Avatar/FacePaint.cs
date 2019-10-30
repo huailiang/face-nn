@@ -54,12 +54,13 @@ namespace XEngine.Editor
             var skr = face.gameObject.GetComponent<SkinnedMeshRenderer>();
             child = "Player_" + shape.ToString().ToLower() + "_helmet";
             helmet = go.transform.Find(child).gameObject;
-            camera = GameObject.FindObjectOfType<Camera>();
             outputMat = skr.sharedMaterial;
             roleShape = shape;
-            FecthMainTex();
+            if (camera == null) camera = GameObject.FindObjectOfType<Camera>();
+            if (mainTex == null) FecthMainTex();
             if (mainRt == null) CreateRT();
             Update();
+            EditorSceneManager.sceneClosed -= OnSceneClose;
             EditorSceneManager.sceneClosed += OnSceneClose;
         }
 

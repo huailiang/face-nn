@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='face')
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='train_extractor',
+    default='inference_extractor',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',
@@ -134,7 +134,7 @@ parser.add_argument(
     '--extractor_learning_rate',
     dest='extractor_learning_rate',
     type=float,
-    default=0.2,
+    default=0.02,
     help='learning rate of feature extractor')
 parser.add_argument(
     '--extractor_prev_freq',

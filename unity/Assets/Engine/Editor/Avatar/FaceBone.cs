@@ -240,16 +240,19 @@ namespace XEngine.Editor
 
         public void Initial(GameObject go, RoleShape shape)
         {
-            RoleParts = go.GetComponent<XRoleParts>();
-            string path = "Assets/Resource/Config/" + shape.ToString().ToLower();
-            TextAsset ta = AssetDatabase.LoadAssetAtPath<TextAsset>(path + ".bytes");
-            if (ta != null)
+            if (RoleParts == null)
             {
-                MemoryStream ms = new MemoryStream(ta.bytes);
-                fbData = new FaceBoneDatas(ms);
-                CleanData();
-                MakeControlGroups();
-                ms.Close();
+                RoleParts = go.GetComponent<XRoleParts>();
+                string path = "Assets/Resource/Config/" + shape.ToString().ToLower();
+                TextAsset ta = AssetDatabase.LoadAssetAtPath<TextAsset>(path + ".bytes");
+                if (ta != null)
+                {
+                    MemoryStream ms = new MemoryStream(ta.bytes);
+                    fbData = new FaceBoneDatas(ms);
+                    CleanData();
+                    MakeControlGroups();
+                    ms.Close();
+                }
             }
         }
 

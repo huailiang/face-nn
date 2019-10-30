@@ -44,9 +44,9 @@ namespace XEngine.Editor
         {
             OnEnable();
             this.shape = data.shape;
-            CreateAvatar();
+            bool isnew = CreateAvatar();
             suit_select = UnityEngine.Random.Range(0, fashionInfo.Length - 1);
-            DrawSuit(complete);
+            DrawSuit(isnew, complete);
             Update();
             bone.NeuralProcess(data.boneArgs);
             paint.NeuralProcess();
@@ -102,7 +102,7 @@ namespace XEngine.Editor
                 suit_select = EditorGUILayout.Popup(suit_select, fashionDesInfo);
                 if (suit_pre != suit_select || shape != shape_pre)
                 {
-                    DrawSuit(true);
+                    DrawSuit(true, true);
                     suit_pre = suit_select;
                     shape_pre = shape;
                 }
@@ -113,37 +113,41 @@ namespace XEngine.Editor
             bone.OnGui();
         }
 
-        private void CreateAvatar()
+        private bool CreateAvatar()
         {
-            XEditorUtil.ClearCreatures();
-
-            List<int> list = new List<int>();
-            var table = XFashionLibrary._profession.Table;
-            presentid = table.Where(x => x.Shape == (int)shape).Select(x => x.PresentID).First();
-            string path = "Assets/Resource/Prefabs/Player_" + shape.ToString().ToLower() + ".prefab";
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-            if (prefab != null)
+            if (go == null || go.name != shape.ToString())
             {
-                GameObject root = GameObject.Find("Player");
-                if (root == null)
+                XEditorUtil.ClearCreatures();
+                List<int> list = new List<int>();
+                var table = XFashionLibrary._profession.Table;
+                presentid = table.Where(x => x.Shape == (int)shape).Select(x => x.PresentID).First();
+                string path = "Assets/Resource/Prefabs/Player_" + shape.ToString().ToLower() + ".prefab";
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (prefab != null)
                 {
-                    root = new GameObject("Player");
-                    root.transform.position = new Vector3(0f, 0f, -8f);
+                    GameObject root = GameObject.Find("Player");
+                    if (root == null)
+                    {
+                        root = new GameObject("Player");
+                        root.transform.position = new Vector3(0f, 0f, -8f);
+                    }
+                    go = Instantiate(prefab);
+                    go.transform.SetParent(root.transform);
+                    go.name = shape.ToString();
+                    go.transform.localScale = Vector3.one;
+                    go.transform.rotation = Quaternion.Euler(0, 180, 0);
+                    go.transform.localPosition = Vector3.zero;
+                    Selection.activeGameObject = go;
+                    fashionInfo = XFashionLibrary.GetFashionsInfo(shape);
+                    fashionDesInfo = new string[fashionInfo.Length];
+                    for (int i = 0; i < fashionInfo.Length; i++)
+                    {
+                        fashionDesInfo[i] = fashionInfo[i].name;
+                    }
                 }
-                go = Instantiate(prefab);
-                go.transform.SetParent(root.transform);
-                go.name = shape.ToString();
-                go.transform.localScale = Vector3.one;
-                go.transform.rotation = Quaternion.Euler(0, 180, 0);
-                go.transform.localPosition = Vector3.zero;
-                Selection.activeGameObject = go;
-                fashionInfo = XFashionLibrary.GetFashionsInfo(shape);
-                fashionDesInfo = new string[fashionInfo.Length];
-                for (int i = 0; i < fashionInfo.Length; i++)
-                {
-                    fashionDesInfo[i] = fashionInfo[i].name;
-                }
+                return true;
             }
+            return false;
         }
 
 
@@ -159,13 +163,16 @@ namespace XEngine.Editor
             }
         }
 
-        private void DrawSuit(bool complete)
+        private void DrawSuit(bool initial, bool complete)
         {
-            if (fashionInfo.Length <= suit_select) suit_select = 0;
-            FashionSuit.RowData rowData = fashionInfo[suit_select];
-            FashionUtility.DrawSuit(go, rowData, (uint)presentid, 1, complete);
-            paint.Initial(go, shape);
-            bone.Initial(go, shape);
+            if (initial)
+            {
+                if (fashionInfo.Length <= suit_select) suit_select = 0;
+                FashionSuit.RowData rowData = fashionInfo[suit_select];
+                FashionUtility.DrawSuit(go, rowData, (uint)presentid, 1, complete);
+                paint.Initial(go, shape);
+                bone.Initial(go, shape);
+            }
         }
 
         private void PlayAnim()

@@ -67,7 +67,7 @@ class Extractor(nn.Module):
             group(64, self.params_cnt, kernel_size=3, stride=1, padding=1),  # 9. (batch, params_cnt, 16, 16)
             ResidualBlock.make_layer(4, channels=self.params_cnt),  # 10. (batch, params_cnt, 16, 16)
         )
-        self.fc = nn.Linear(95 * 16 * 16, 95)
+        self.fc = nn.Linear(self.params_cnt * 16 * 16, self.params_cnt)
         self.optimizer = optim.Adam(self.parameters(), lr=args.extractor_learning_rate)
         utils.debug_parameters(self, "_extractor_")
 
@@ -161,7 +161,7 @@ class Extractor(nn.Module):
                     continue
                 loss = self.asyn_train(image1, image2)
                 loss_ = loss.detach().numpy()
-                loss_display = loss_ * 100
+                loss_display = loss_ * 1000
                 progress.set_description("loss: {:.3f}".format(loss_display))
                 self.writer.add_scalar('extractor/loss', loss_display, step)
                 if step % self.args.extractor_prev_freq == 0:
