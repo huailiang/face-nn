@@ -11,6 +11,7 @@ import util.logit as log
 import utils
 import ops
 import os
+import torch.nn.functional as F
 from tqdm import tqdm
 from dataset import FaceDataset
 from tensorboardX import SummaryWriter
@@ -90,8 +91,8 @@ class Imitator(nn.Module):
         """
         self.optimizer.zero_grad()
         y_ = self.forward(params)
-        loss = utils.discriminative_loss(reference, y_, lightcnn_inst)
-        # utils.net_parameters(self.model, "imitator")
+        # loss = utils.discriminative_loss(reference, y_, lightcnn_inst)
+        loss = F.l1_loss(reference, y_)
 
         loss.backward()  # 求导  loss: [1] scalar
         self.optimizer.step()  # 更新网络参数权重
@@ -114,13 +115,13 @@ class Imitator(nn.Module):
         total_steps = self.args.total_steps
         progress = tqdm(range(initial_step, total_steps + 1), initial=initial_step, total=total_steps)
         for step in progress:
-            names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
+            names, params, images = dataset.get_batch(batch_size=self.args.batch_size, edge=False)
             if cuda:
                 params = params.cuda()
                 images = images.cuda()
 
             loss, y_ = self.itr_train(params, images, lightcnn_inst)
-            loss_ = loss.detach().numpy()
+            loss_ = loss.cpu().detach().numpy()
             progress.set_description("loss: {:.3f}".format(loss_))
             self.writer.add_scalar('imitator/loss', loss_, step)
             self.upload_weights(step)
@@ -194,7 +195,7 @@ class Imitator(nn.Module):
         checkpoint = torch.load(location, map_location="cpu")
         for step in range(steps):
             log.info("step: %d", step)
-            names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
+            names, params, images = dataset.get_batch(batch_size=self.args.batch_size, edge=False)
             loss, _ = self.itr_train(params, images, checkpoint)
             accuracy += 1.0 - loss
         accuracy = accuracy / steps

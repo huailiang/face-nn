@@ -75,7 +75,7 @@ class Thread_Transfer(threading.Thread):
         self.dir2 = dir_2
         self.files = files
         self.cp = cp
-        print("start thread {0} files count {1}".format(threadID, len(files)))
+        print("thread {0} files count {1}".format(threadID, len(files)))
 
     def run(self):
         for name in self.files:
@@ -125,8 +125,8 @@ def batch_transfer(curr_path, export_path):
                 thread_pool.append(thread)
             for thread in thread_pool:
                 thread.join()
-        os.rename(exp_path, exp_path+"2")
-        os.rename(exp_path+"_2", exp_path)
+        os.rename(exp_path, exp_path + "2")
+        os.rename(exp_path + "_2", exp_path)
     else:
         print("there is not dir ", export_path)
 

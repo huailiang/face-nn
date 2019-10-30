@@ -44,11 +44,7 @@ namespace XEngine.Editor
         {
             if (m_AssemblyTypes == null)
             {
-                m_AssemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(t =>
-                    {
-                        return t.GetTypes();
-                    });
+                m_AssemblyTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes());
             }
             return m_AssemblyTypes;
         }
@@ -175,7 +171,6 @@ namespace XEngine.Editor
             Open(Application.persistentDataPath);
         }
 
-
         [MenuItem("Help/IO/OpenShellDirectory")]
         public static void OpenAssetbundle()
         {
@@ -189,22 +184,22 @@ namespace XEngine.Editor
         }
 
         [MenuItem("Help/RestartUnity")]
-        private static void RestartUnity()
+        public static void RestartUnity()
         {
 #if UNITY_EDITOR_WIN
-        string install = Path.GetDirectoryName(EditorApplication.applicationContentsPath);
-        string path = Path.Combine(install, "Unity.exe");
-        string[] args = path.Split('\\');
-        System.Diagnostics.Process po = new System.Diagnostics.Process();
-        Debug.Log("install: " + install + " path: " + path);
-        po.StartInfo.FileName = path;
-        po.Start();
+            string install = Path.GetDirectoryName(EditorApplication.applicationContentsPath);
+            string path = Path.Combine(install, "Unity.exe");
+            string[] args = path.Split('\\');
+            System.Diagnostics.Process po = new System.Diagnostics.Process();
+            Debug.Log("install: " + install + " path: " + path);
+            po.StartInfo.FileName = path;
+            po.Start();
 
-        System.Diagnostics.Process[] pro = System.Diagnostics.Process.GetProcessesByName(args[args.Length - 1].Split('.')[0]);//Unity
-        foreach (var item in pro)
-        {
-            item.Kill();
-        }
+            System.Diagnostics.Process[] pro = System.Diagnostics.Process.GetProcessesByName(args[args.Length - 1].Split('.')[0]);//Unity
+            foreach (var item in pro)
+            {
+                item.Kill();
+            }
 #endif
         }
 
@@ -224,8 +219,8 @@ namespace XEngine.Editor
             string ex = shell + " " + arg;
             System.Diagnostics.Process.Start("/bin/bash", ex);
 #elif UNITY_EDITOR_WIN
-        path = path.Replace("/", "\\");
-        System.Diagnostics.Process.Start("explorer.exe", path);
+            path = path.Replace("/", "\\");
+            System.Diagnostics.Process.Start("explorer.exe", path);
 #endif
         }
     }

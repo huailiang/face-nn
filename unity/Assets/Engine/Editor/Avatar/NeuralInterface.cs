@@ -89,9 +89,12 @@ namespace XEngine.Editor
             GUILayout.Space(8);
             if (GUILayout.Button("Generate"))
             {
-                RandomExportModels((int)(datacnt * weight * 0.8), shape, "trainset", addNoise, complete);
-                RandomExportModels((int)(datacnt * weight * 0.2), shape, "testset", false, complete);
-                EditorUtility.Open(EXPORT);
+                if (UnityEditor.EditorUtility.DisplayDialog("warn", "make sure enough memory's left to generate?", "ok", "cancel"))
+                {
+                    RandomExportModels((int)(datacnt * weight * 0.8), shape, "trainset", addNoise, complete);
+                    RandomExportModels((int)(datacnt * weight * 0.2), shape, "testset", false, complete);
+                    EditorUtility.Open(EXPORT);
+                }
             }
             GUILayout.EndVertical();
         }

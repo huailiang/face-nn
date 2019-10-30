@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='face')
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='inference_extractor',
+    default='train_imitator',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',
@@ -84,7 +84,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(2e5),
+    default=int(1e6),
     help='total steps for imitator')
 parser.add_argument(
     '--batch_size',
@@ -96,13 +96,13 @@ parser.add_argument(
     '--prev_freq',
     dest='prev_freq',
     type=int,
-    default=1000,
+    default=5000,
     help='generate preview image when training')
 parser.add_argument(
     '--save_freq',
     dest='save_freq',
     type=int,
-    default=2000,
+    default=10000,
     help='Save model every save_freq steps')
 parser.add_argument(
     '--lightcnn',
@@ -114,7 +114,7 @@ parser.add_argument(
     '--learning_rate',
     dest='learning_rate',
     type=float,
-    default=0.1,
+    default=0.01,
     help='learning rate of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #

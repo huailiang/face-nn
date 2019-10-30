@@ -150,7 +150,7 @@ class Extractor(nn.Module):
         for step in progress:
             if self.train_mode == Extractor.TRAIN_SYNC:
                 progress.set_description("sync  mode ")
-                names, _, images = self.dataset.get_batch(batch_size=self.args.batch_size, size=64)
+                names, _, images = self.dataset.get_batch(batch_size=self.args.batch_size, edge=True)
                 if cuda:
                     images = images.cuda()
                 self.sync_train(images, names, step)
@@ -244,7 +244,7 @@ class Extractor(nn.Module):
         accuracy = 0.0
         for step in range(steps):
             log.info("step: %d", step)
-            names, params, images = dataset.get_batch(batch_size=self.args.batch_size)
+            names, params, images = dataset.get_batch(batch_size=self.args.batch_size, edge=False)
             loss, _ = self.itr_train(images)
             accuracy += 1.0 - loss
         accuracy = accuracy / steps
