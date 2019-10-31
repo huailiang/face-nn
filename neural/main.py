@@ -61,7 +61,7 @@ if __name__ == '__main__':
         imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             imitator.cuda()
-        imitator.load_checkpoint("model_imitator_30000.pth", True, cuda=cuda)
+        imitator.load_checkpoint("model_imitator_40000.pth", True, cuda=cuda)
     elif args.phase == "inference_extractor":
         log.info("inference extractor")
         extractor = Extractor("neural extractor", args)

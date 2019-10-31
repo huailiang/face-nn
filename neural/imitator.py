@@ -43,17 +43,15 @@ class Imitator(nn.Module):
             self.clean()
         self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
-            utils.deconv_layer(95, 64, kernel_size=8, pad=2),  # 1. (batch, 64, 4, 4)
-            ResidualBlock.make_layer(4, 64),
-            utils.deconv_layer(64, 32, kernel_size=6, stride=4, pad=5),  # 2. (batch, 32, 8, 8)
-            utils.deconv_layer(32, 32, kernel_size=3, stride=3, pad=4),  # 3. (batch, 32, 16, 16)
-            ResidualBlock.make_layer(4, 32),
-            utils.deconv_layer(32, 16, kernel_size=4, stride=2, pad=1),  # 4. (batch, 16, 32, 32)
-            utils.deconv_layer(16, 8, kernel_size=4, stride=2, pad=1),  # 5. (batch, 8, 64, 64)
-            ResidualBlock.make_layer(2, 8),
-            utils.deconv_layer(8, 8, kernel_size=4, stride=2, pad=1),  # 6. (batch, 8, 128, 128)
-            utils.deconv_layer(8, 4, kernel_size=4, stride=2, pad=1),  # 7. (batch, 4, 256, 256)
-            nn.ConvTranspose2d(4, 3, kernel_size=4, stride=2, padding=1),  # 8. (batch, 3, 512, 512)
+            utils.deconv_layer(95, 512, kernel_size=4),  # 1. (batch, 512, 4, 4)
+            ResidualBlock.make_layer(2, 512),  # enhance input signal
+            utils.deconv_layer(512, 512, kernel_size=4, stride=2, pad=1),  # 2. (batch, 512, 8, 8)
+            utils.deconv_layer(512, 512, kernel_size=4, stride=2, pad=1),  # 3. (batch, 512, 16, 16)
+            utils.deconv_layer(512, 256, kernel_size=4, stride=2, pad=1),  # 4. (batch, 256, 32, 32)
+            utils.deconv_layer(256, 128, kernel_size=4, stride=2, pad=1),  # 5. (batch, 128, 64, 64)
+            utils.deconv_layer(128, 64, kernel_size=4, stride=2, pad=1),  # 6. (batch, 64, 128, 128)
+            utils.deconv_layer(64, 64, kernel_size=4, stride=2, pad=1),  # 7. (batch, 64, 256, 256)
+            nn.ConvTranspose2d(64, 3, kernel_size=4, stride=2, padding=1),  # 8. (batch, 3, 512, 512)
             nn.Sigmoid(),
             nn.Dropout(0.5),
         )
@@ -117,7 +115,7 @@ class Imitator(nn.Module):
             if (step + 1) % self.args.prev_freq == 0:
                 path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
                 ops.save_img(path, images, y_)
-                lr = self.args.learning_rate * loss_
+                lr = self.args.learning_rate * (total_steps - step) / float(total_steps) + 1e-6
                 utils.update_optimizer_lr(self.optimizer, lr)
                 self.writer.add_scalar('imitator/learning rate', lr, step)
                 self.upload_weights(step)
@@ -129,6 +127,7 @@ class Imitator(nn.Module):
         """
         把neural net的权重以图片的方式上传到tensorboard
         :param step: train step
+        :return weights picture
         """
         for module in self.model._modules.values():
             if isinstance(module, nn.Sequential):
@@ -136,9 +135,10 @@ class Imitator(nn.Module):
                     if isinstance(it, nn.ConvTranspose2d):
                         if it.in_channels == 32 and it.out_channels == 32:
                             name = "weight_{0}_{1}".format(it.in_channels, it.out_channels)
-                            weights = it.weight.reshape(3, 48, -1)
+                            # log.info(it.weight.shape)
+                            weights = it.weight.reshape(4, 64, -1)
                             self.writer.add_image(name, weights, step)
-                            break
+                            return weights
 
     def load_checkpoint(self, path, training=False, cuda=False):
         """

@@ -84,13 +84,13 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(4e5),
+    default=int(1e5),
     help='total steps for imitator')
 parser.add_argument(
     '--batch_size',
     dest='batch_size',
     type=int,
-    default=2,
+    default=1,
     help='# images in batch')
 parser.add_argument(
     '--prev_freq',
