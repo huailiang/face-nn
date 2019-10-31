@@ -66,17 +66,17 @@ parser.add_argument(
     default=int(0),
     help='device GPU ID, if use_gpu set True')
 parser.add_argument(
-    '--open_tensorboard_image',
-    dest='open_tensorboard_image',
-    type=bool,
-    default=bool(False),
-    help='open tensorboard image upload')
-parser.add_argument(
     '--udp_port',
     dest='udp_port',
     type=int,
     default=int(5011),
     help='socket port for connecting engine')
+parser.add_argument(
+    '--lightcnn',
+    dest='lightcnn',
+    type=str,
+    default="./dat/LightCNN_29Layers_V2_checkpoint.pth.tar",
+    help='light cnn pre-train model')
 
 # ========================= IMITATOR PARAMETERS ========================= #
 
@@ -84,19 +84,19 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(1e6),
+    default=int(4e5),
     help='total steps for imitator')
 parser.add_argument(
     '--batch_size',
     dest='batch_size',
     type=int,
-    default=1,
+    default=2,
     help='# images in batch')
 parser.add_argument(
     '--prev_freq',
     dest='prev_freq',
     type=int,
-    default=5000,
+    default=1000,
     help='generate preview image when training')
 parser.add_argument(
     '--save_freq',
@@ -104,12 +104,6 @@ parser.add_argument(
     type=int,
     default=10000,
     help='Save model every save_freq steps')
-parser.add_argument(
-    '--lightcnn',
-    dest='lightcnn',
-    type=str,
-    default="./dat/LightCNN_29Layers_V2_checkpoint.pth.tar",
-    help='light cnn pre-train model')
 parser.add_argument(
     '--learning_rate',
     dest='learning_rate',

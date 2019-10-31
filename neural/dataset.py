@@ -57,13 +57,16 @@ class FaceDataset:
         formatter: [batch, ?]
         :param edge: edge 和 原始对应不同的文件夹， Boolean
         :param batch_size:  batch size
+        :returns names, params, images, if edge mode,[batch, 1, 64, 64], else [batch, 3, 512, 512]
         """
         names = []
         cnt = self.cnt
         param_cnt = self.args.params_cnt
         size = 64 if edge else 512
+        deep = 1 if edge else 3
         np_params = np.zeros((batch_size, param_cnt), dtype=np.float32)
-        np_images = np.zeros((batch_size, 1, size, size), dtype=np.float32)
+        np_images = np.zeros((batch_size, deep, size, size), dtype=np.float32)
+        read_mode = cv2.IMREAD_GRAYSCALE if edge else cv2.IMREAD_COLOR
         for i in range(batch_size):
             ind = random.randint(0, cnt - 1)
             name = self.names[ind]
@@ -74,13 +77,15 @@ class FaceDataset:
                 path = os.path.join(self.path, name)
             else:
                 path = os.path.join(self.path+"2", name)
-            image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-            np_images[i] = image[np.newaxis, :, :] / 255.0
+            image = cv2.imread(path, read_mode)
+            if not edge:
+                np_images[i] = np.swapaxes(image, 0, 2) / 255.
+            else:
+                np_images[i] = image[np.newaxis, :, :] / 255.
         params = torch.from_numpy(np_params)
         params.requires_grad = True
         images = torch.from_numpy(np_images)
         log.debug("batch leaf:{0}  grad:{1} type:{2}".format(params.is_leaf, params.requires_grad, params.dtype))
-        log.debug("numpy params type:{0}".format(np_params.dtype))
         return names, params, images
 
     def get_cache(self, cuda):

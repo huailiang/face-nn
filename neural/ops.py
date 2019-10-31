@@ -128,7 +128,7 @@ def save_extractor(path, tensor1, tensor2, img3, img4):
     cv2.imwrite(path, img)
 
 
-def merge_image(image1, image2, mode="h", size=512, show=False):
+def merge_image(image1, image2, mode="h", size=512, show=False, transpose=True):
     """
     拼接图片
     :param image1: numpy array
@@ -136,6 +136,7 @@ def merge_image(image1, image2, mode="h", size=512, show=False):
     :param mode: 'h': 横向拼接 'v': 纵向拼接
     :param size: 输出分辨率
     :param show: 窗口显示
+    :param transpose: 转置长和宽 cv2顺序[H, W, C]
     :return: numpy array
     """
     size_ = (int(size / 2), int(size / 2))
@@ -148,6 +149,8 @@ def merge_image(image1, image2, mode="h", size=512, show=False):
     else:
         log.warn("not implements mode: %s".format(mode))
         return
+    if transpose:
+        image = image.swapaxes(0, 1)
     if show:
         cv2.imshow("contact", image)
         cv2.waitKey()
@@ -155,7 +158,7 @@ def merge_image(image1, image2, mode="h", size=512, show=False):
     return image
 
 
-def merge_4image(image1, image2, image3, image4, size=512, show=False):
+def merge_4image(image1, image2, image3, image4, size=512, show=False, transpose=True):
     """
     拼接图片
     :param image1: input image1
@@ -164,7 +167,8 @@ def merge_4image(image1, image2, image3, image4, size=512, show=False):
     :param image4: input image4
     :param size: 输出分辨率
     :param show: 窗口显示
-    :return:
+    :param transpose: 转置长和宽 cv2顺序[H, W, C]
+    :return: merged image
     """
     size_ = (int(size / 2), int(size / 2))
     img_1 = cv2.resize(image1, size_)
@@ -174,6 +178,8 @@ def merge_4image(image1, image2, image3, image4, size=512, show=False):
     image1_ = np.append(img_1, img_2, axis=1)
     image2_ = np.append(img_3, img_4, axis=1)
     image = np.append(image1_, image2_, axis=0)
+    if transpose:
+        image = image.swapaxes(0, 1)
     if show:
         cv2.imshow("contact", image)
         cv2.waitKey()

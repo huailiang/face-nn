@@ -40,8 +40,8 @@ def init_weights(m):
     :param m: model
     """
     classcache = m.__class__.__name__
-    if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-        nn.init.normal_(m.weight.data, 1.0, 0.2)
+    if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear) or isinstance(m, nn.ConvTranspose2d):
+        nn.init.normal_(m.weight.data, 0.0, 0.2)
         if m.bias is not None:
             nn.init.constant_(m.bias.data, 0.0)
     if isinstance(m, nn.BatchNorm2d):
@@ -74,7 +74,7 @@ def deconv_layer(in_chanel, out_chanel, kernel_size, stride=1, pad=0):
     :return: nn.Sequential
     """
     return nn.Sequential(nn.ConvTranspose2d(in_chanel, out_chanel, kernel_size=kernel_size, stride=stride, padding=pad),
-        nn.BatchNorm2d(out_chanel), nn.ReLU())
+                         nn.BatchNorm2d(out_chanel), nn.ReLU())
 
 
 def conv_layer(in_chanel, out_chanel, kernel_size, stride, pad=0):

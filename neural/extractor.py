@@ -66,6 +66,7 @@ class Extractor(nn.Module):
             ResidualBlock.make_layer(8, channels=64),  # 8. (batch, 64, 16, 16)
             group(64, self.params_cnt, kernel_size=3, stride=1, padding=1),  # 9. (batch, params_cnt, 16, 16)
             ResidualBlock.make_layer(4, channels=self.params_cnt),  # 10. (batch, params_cnt, 16, 16)
+            nn.Dropout(0.5),
         )
         self.fc = nn.Linear(self.params_cnt * 16 * 16, self.params_cnt)
         self.optimizer = optim.Adam(self.parameters(), lr=args.extractor_learning_rate)

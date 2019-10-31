@@ -27,12 +27,11 @@ output: tensor (batch, 3, 512, 512)
 
 
 class Imitator(nn.Module):
-    def __init__(self, name, args, momentum=0.8, clean=True):
+    def __init__(self, name, args, clean=True):
         """
         imitator
         :param name: imitator name
         :param args: argparse options
-        :param momentum: momentum for optimizer
         """
         super(Imitator, self).__init__()
         self.name = name
@@ -44,25 +43,19 @@ class Imitator(nn.Module):
             self.clean()
         self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
-            nn.ConstantPad2d(3, 0.5),
-            utils.conv_layer(95, 64, 4, 1),  # 1. (batch, 64, 4, 4)
-            ResidualBlock(64, 64),
-            nn.ReplicationPad2d(9),
-            utils.conv_layer(64, 32, 7, 2),  # 2. (batch, 32, 8, 8)
-            nn.ReflectionPad2d(5),
-            utils.conv_layer(32, 32, 3, 1),  # 3. (batch, 32, 16, 16)
-            ResidualBlock(32, 32),
-            nn.ReplicationPad2d(9),
-            utils.conv_layer(32, 16, 3, 1),  # 4. (batch, 16, 32, 32)
-            nn.ReflectionPad2d(17),
-            utils.conv_layer(16, 8, 3, 1),  # 5. (batch, 8, 64, 64)
-            ResidualBlock(8, 8),
-            nn.ReplicationPad2d(33),
-            utils.conv_layer(8, 8, 3, 1),  # 6. (batch, 8, 128, 128)
-            nn.ReflectionPad2d(65),
-            utils.conv_layer(8, 8, 3, 1),  # 7. (batch, 8, 256, 256)
-            nn.ReflectionPad2d(129),
-            utils.conv_layer(8, 1, 3, 1),  # 8. (batch, 1, 512, 512) grey
+            utils.deconv_layer(95, 64, kernel_size=8, pad=2),  # 1. (batch, 64, 4, 4)
+            ResidualBlock.make_layer(4, 64),
+            utils.deconv_layer(64, 32, kernel_size=6, stride=4, pad=5),  # 2. (batch, 32, 8, 8)
+            utils.deconv_layer(32, 32, kernel_size=3, stride=3, pad=4),  # 3. (batch, 32, 16, 16)
+            ResidualBlock.make_layer(4, 32),
+            utils.deconv_layer(32, 16, kernel_size=4, stride=2, pad=1),  # 4. (batch, 16, 32, 32)
+            utils.deconv_layer(16, 8, kernel_size=4, stride=2, pad=1),  # 5. (batch, 8, 64, 64)
+            ResidualBlock.make_layer(2, 8),
+            utils.deconv_layer(8, 8, kernel_size=4, stride=2, pad=1),  # 6. (batch, 8, 128, 128)
+            utils.deconv_layer(8, 4, kernel_size=4, stride=2, pad=1),  # 7. (batch, 4, 256, 256)
+            nn.ConvTranspose2d(4, 3, kernel_size=4, stride=2, padding=1),  # 8. (batch, 3, 512, 512)
+            nn.Sigmoid(),
+            nn.Dropout(0.5),
         )
         self.model.apply(utils.init_weights)
         self.optimizer = optim.Adam(self.model.parameters(), lr=args.learning_rate)
@@ -81,19 +74,16 @@ class Imitator(nn.Module):
         y = self.model(_params)
         return (y + 1) * 0.5
 
-    def itr_train(self, params, reference, lightcnn_inst):
+    def itr_train(self, params, reference):
         """
         iterator training
         :param params:  [batch, 95]
         :param reference: reference photo [batch, 1, 512, 512]
-        :param lightcnn_inst: light cnn's model
-        :return loss: [batch]
+        :return loss: [batch], y_: generated picture
         """
         self.optimizer.zero_grad()
         y_ = self.forward(params)
-        # loss = utils.discriminative_loss(reference, y_, lightcnn_inst)
         loss = F.l1_loss(reference, y_)
-
         loss.backward()  # 求导  loss: [1] scalar
         self.optimizer.step()  # 更新网络参数权重
         return loss, y_
@@ -103,13 +93,12 @@ class Imitator(nn.Module):
         batch training
         :param cuda: 是否开启gpu加速运算
         """
-        location = self.args.lightcnn
-        lightcnn_inst = utils.load_lightcnn(location)
         rnd_input = torch.randn(self.args.batch_size, self.args.params_cnt)
         if cuda:
             rnd_input = rnd_input.cuda()
         self.writer.add_graph(self, input_to_model=rnd_input)
 
+        self.model.train()
         dataset = FaceDataset(self.args, mode="train")
         initial_step = self.initial_step
         total_steps = self.args.total_steps
@@ -120,11 +109,10 @@ class Imitator(nn.Module):
                 params = params.cuda()
                 images = images.cuda()
 
-            loss, y_ = self.itr_train(params, images, lightcnn_inst)
+            loss, y_ = self.itr_train(params, images)
             loss_ = loss.cpu().detach().numpy()
             progress.set_description("loss: {:.3f}".format(loss_))
             self.writer.add_scalar('imitator/loss', loss_, step)
-            self.upload_weights(step)
 
             if (step + 1) % self.args.prev_freq == 0:
                 path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
@@ -132,6 +120,7 @@ class Imitator(nn.Module):
                 lr = self.args.learning_rate * loss_
                 utils.update_optimizer_lr(self.optimizer, lr)
                 self.writer.add_scalar('imitator/learning rate', lr, step)
+                self.upload_weights(step)
             if (step + 1) % self.args.save_freq == 0:
                 self.save(step)
         self.writer.close()
@@ -141,18 +130,14 @@ class Imitator(nn.Module):
         把neural net的权重以图片的方式上传到tensorboard
         :param step: train step
         """
-        if self.args.open_tensorboard_image:
-            for module in self.model._modules.values():
-                if isinstance(module, nn.Sequential):
-                    for it in module._modules.values():
-                        if isinstance(it, nn.Conv2d):
+        for module in self.model._modules.values():
+            if isinstance(module, nn.Sequential):
+                for it in module._modules.values():
+                    if isinstance(it, nn.ConvTranspose2d):
+                        if it.in_channels == 32 and it.out_channels == 32:
                             name = "weight_{0}_{1}".format(it.in_channels, it.out_channels)
-                            if it.in_channels == 32 and it.out_channels == 32:
-                                weights = it.weight.reshape(3, 48, -1)
-                                self.writer.add_image(name, weights, step)
-                            if it.in_channels == 16:
-                                weights = it.weight.reshape(3, 24, -1)
-                                self.writer.add_image(name, weights, step)
+                            weights = it.weight.reshape(3, 48, -1)
+                            self.writer.add_image(name, weights, step)
                             break
 
     def load_checkpoint(self, path, training=False, cuda=False):
@@ -192,11 +177,10 @@ class Imitator(nn.Module):
         steps = 100
         accuracy = 0.0
         location = self.args.lightcnn
-        checkpoint = torch.load(location, map_location="cpu")
         for step in range(steps):
             log.info("step: %d", step)
             names, params, images = dataset.get_batch(batch_size=self.args.batch_size, edge=False)
-            loss, _ = self.itr_train(params, images, checkpoint)
+            loss, _ = self.itr_train(params, images)
             accuracy += 1.0 - loss
         accuracy = accuracy / steps
         log.info("accuracy rate is %f", accuracy)
