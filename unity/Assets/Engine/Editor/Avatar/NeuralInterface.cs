@@ -60,7 +60,7 @@ namespace XEngine.Editor
         private void OnGUI()
         {
             GUILayout.BeginVertical();
-            GUILayout.Label("Generate Database", XEditorUtil.titleLableStyle);
+            GUILayout.Label("Generate Dataset", XEditorUtil.titleLableStyle);
             GUILayout.Space(12);
 
             GUILayout.BeginHorizontal();

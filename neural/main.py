@@ -61,7 +61,7 @@ if __name__ == '__main__':
         imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             imitator.cuda()
-        imitator.load_checkpoint("model_imitator_40000.pth", True, cuda=cuda)
+        imitator.load_checkpoint("model_imitator_100000.pth", True, cuda=cuda)
     elif args.phase == "inference_extractor":
         log.info("inference extractor")
         extractor = Extractor("neural extractor", args)
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         log.info(" preview picture ")
         path = "../export/regular/model.jpg"
         img = cv2.imread(path)
-        img2 = utils.out_evaluate(img, args.parsing_checkpoint, cuda)
+        img2 = utils.parse_evaluate(img, args.parsing_checkpoint, cuda)
         img3 = utils.img_edge(img2)
         img3_ = ops.fill_grey(img3)
         img4 = align.face_features(path)
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         image1, image2, name = dataset.get_cache(cuda)
         orig_path = os.path.join(args.path_to_dataset + "2", name)
         orig_img = cv2.imread(orig_path)
-        parse_img = utils.out_evaluate(orig_img, args.parsing_checkpoint, cuda)
+        parse_img = utils.parse_evaluate(orig_img, args.parsing_checkpoint, cuda)
         ops.save_extractor('../export/test.jpg', image1, image2, orig_img, parse_img)
     else:
         log.error("not known phase %s", args.phase)

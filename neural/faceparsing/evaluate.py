@@ -10,7 +10,6 @@ import torch
 import torch.nn as nn
 import os.path as osp
 import numpy as np
-from PIL import Image
 import torchvision.transforms as transforms
 
 
@@ -55,23 +54,26 @@ _net_ = None
 _to_tensor_ = None
 
 
-def out_evaluate(image, cp, cuda=False):
+def parse_evaluate(img, cp, cuda=False):
     """
     global _net_, _to_tensor_ for performance
+    :param img: numpy array
+    :param cp: args.parsing_checkpoint, str
+    :param cuda: use gpu to speedup
     """
     global _net_
     global _to_tensor_
-    if _net_ is None or _to_tensor_ is None:
-        _net_, _to_tensor_ = _build_net(cp)
     with torch.no_grad():
-        img = _to_tensor_(image)
-        img = torch.unsqueeze(img, 0)
+        if _net_ is None or _to_tensor_ is None:
+            _net_, _to_tensor_ = _build_net(cp)
+        image = _to_tensor_(img)
+        image = torch.unsqueeze(image, 0)
         if cuda:
-            img = img.cuda()
+            image = image.cuda()
             _net_.cuda()
-        out = _net_(img)[0]
+        out = _net_(image)[0]
         parsing = out.squeeze(0).cpu().numpy().argmax(0)
-        return vis_parsing_maps(image, parsing, stride=1)
+        return vis_parsing_maps(img, parsing, stride=1)
 
 
 def _img_edge(img):
@@ -86,7 +88,8 @@ def _img_edge(img):
     return cv2.Canny(x_grad, y_grad, 20, 40)
 
 
-def inner_evaluate(src_path):
+if __name__ == '__main__':
+    src_path = "../../export/faceparsing/src"
     root, name = os.path.split(src_path)
     dst_pth = os.path.join(root, 'dst')
     edge_pth = os.path.join(root, 'edge')
@@ -94,25 +97,16 @@ def inner_evaluate(src_path):
         os.mkdir(dst_pth)
     if not os.path.exists(edge_pth):
         os.mkdir(edge_pth)
-    net, to_tensor = _build_net('../dat/79999_iter.pth')
     with torch.no_grad():
         list_image = os.listdir(src_path)
         total = len(list_image)
         progress = tqdm(range(0, total), initial=0, total=total)
         for step in progress:
-            img = Image.open(osp.join(src_path, list_image[step]))
-            image = img.resize((512, 512), Image.BILINEAR)
-            img = to_tensor(image)
-            img = torch.unsqueeze(img, 0)
-            out = net(img)[0]
-            parsing = out.squeeze(0).cpu().numpy().argmax(0)
-            img = vis_parsing_maps(image, parsing, stride=1)
+            img = cv2.imread(osp.join(src_path, list_image[step]))
+            image = cv2.resize(img, (512, 512), cv2.INTER_LINEAR)
+            img = parse_evaluate(image, '../dat/79999_iter.pth', True)
             save_path = osp.join(dst_pth, list_image[step])
             cv2.imwrite(save_path, img)
             save_path = osp.join(edge_pth, list_image[step])
             edge = _img_edge(img)
             cv2.imwrite(save_path, edge)
-
-
-if __name__ == '__main__':
-    inner_evaluate("../../export/faceparsing/src")

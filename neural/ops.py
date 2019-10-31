@@ -81,7 +81,7 @@ def generate_file(path, content):
         log.error("io error, load imitator failed ", e)
 
 
-def normal_2_image(tensor):
+def tensor_2_image(tensor):
     """
     将tensor转numpy array 给cv2使用
     :param tensor: [batch, c, w, h]
@@ -93,7 +93,7 @@ def normal_2_image(tensor):
         img = tensor[i].cpu().detach().numpy()
         img = np.swapaxes(img, 0, 2)  # [h, w, c]
         img = np.swapaxes(img, 0, 1)  # [w, h, c]
-        images.append(img * 256)
+        images.append(img * 255)
     return images
 
 
@@ -104,8 +104,8 @@ def save_img(path, tensor1, tensor2):
     :param tensor1: shape: [Batch, C, W, H)
     :param tensor2: shape: [Batch, C, W, H)
     """
-    image1 = normal_2_image(tensor1)
-    image2 = normal_2_image(tensor2)
+    image1 = tensor_2_image(tensor1)
+    image2 = tensor_2_image(tensor2)
     if len(image1) > 1:
         img = merge_4image(image1[0], image2[0], image1[1], image2[1])
     elif len(image1) > 0:

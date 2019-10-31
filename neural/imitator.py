@@ -4,13 +4,15 @@
 # @Date  : 2019/10/15
 
 
+import utils
+import ops
+import os
+import cv2
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import util.logit as log
-import utils
-import ops
-import os
+import numpy as np
 import torch.nn.functional as F
 from tqdm import tqdm
 from dataset import FaceDataset
@@ -114,9 +116,10 @@ class Imitator(nn.Module):
 
             if (step + 1) % self.args.prev_freq == 0:
                 path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
-                ops.save_img(path, images, y_)
+                # ops.save_img(path, images, y_)
+                self.imitator_capture(path, images, y_, self.args.parsing_checkpoint)
                 x = step / float(total_steps)
-                lr = self.args.learning_rate * (x ** 2 - 2 * x + 1) + 1e-6
+                lr = self.args.learning_rate * (x ** 2 - 2 * x + 1) + 1e-4
                 utils.update_optimizer_lr(self.optimizer, lr)
                 self.writer.add_scalar('imitator/learning rate', lr, step)
                 self.upload_weights(step)
@@ -134,9 +137,8 @@ class Imitator(nn.Module):
             if isinstance(module, nn.Sequential):
                 for it in module._modules.values():
                     if isinstance(it, nn.ConvTranspose2d):
-                        if it.in_channels == 32 and it.out_channels == 32:
+                        if it.in_channels == 64 and it.out_channels == 64:
                             name = "weight_{0}_{1}".format(it.in_channels, it.out_channels)
-                            # log.info(it.weight.shape)
                             weights = it.weight.reshape(4, 64, -1)
                             self.writer.add_image(name, weights, step)
                             return weights
@@ -205,3 +207,21 @@ class Imitator(nn.Module):
         if not os.path.exists(self.model_path):
             os.mkdir(self.model_path)
         torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
+
+    @staticmethod
+    def imitator_capture(path, tensor1, tensor2, parse):
+        """
+        imitator 快照
+        :param path: save path
+        :param tensor1: input photo
+        :param tensor2: generated image
+        :param parse: parse checkpoint's path
+        """
+        img1 = ops.tensor_2_image(tensor1)[0].swapaxes(0, 1).astype(np.uint8)
+        img2 = ops.tensor_2_image(tensor2)[0].swapaxes(0, 1).astype(np.uint8)
+        img1 = cv2.resize(img1, (512, 512), interpolation=cv2.INTER_LINEAR)
+        img3 = utils.parse_evaluate(img1, parse, True)
+        img4 = utils.img_edge(img3)
+        img4 = 255 - ops.fill_grey(img4)
+        image = ops.merge_4image(img1, img2, img3, img4, transpose=False)
+        cv2.imwrite(path, image)
