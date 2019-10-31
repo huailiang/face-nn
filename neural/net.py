@@ -13,7 +13,7 @@ import util.logit as log
 
 class Net(object):
     """
-    此模块用来和引擎通信
+    此模块用来和引擎通信 unity菜单栏：Tools->Connect
     使用udp在进程间通信，udp不保证时序性，也不保证引擎一定能收到
     """
 

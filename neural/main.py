@@ -70,7 +70,7 @@ if __name__ == '__main__':
         extractor.load_checkpoint("model_extractor_845000.pth", True, cuda)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
-        checkpoint = torch.load("./dat/LightCNN_29Layers_V2_checkpoint.pth.tar", map_location="cpu")
+        checkpoint = torch.load(args.lightcnn, map_location="cpu")
         img = torch.randn(1, 3, 512, 512)
         features = utils.feature256(img, checkpoint)
         log.info(features.size())
