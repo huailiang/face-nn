@@ -76,7 +76,7 @@ if __name__ == '__main__':
         log.info(features.size())
     elif args.phase == "faceparsing":
         log.info("faceparsing")
-        im = utils.evalute_face("./output/face/db_0000_3.jpg", args.extractor_checkpoint, cuda)
+        im = utils.evalute_face("./output/face/db_0000_3.jpg", args.parsing_checkpoint, cuda)
         cv2.imwrite("./output/eval.jpg", im)
     elif args.phase == "align":
         align.face_features("../export/regular/model.jpg", "../export/regular/out.jpg")
@@ -87,7 +87,7 @@ if __name__ == '__main__':
         log.info(" preview picture ")
         path = "../export/regular/model.jpg"
         img = cv2.imread(path)
-        img2 = utils.out_evaluate(img, args.extractor_checkpoint, cuda)
+        img2 = utils.out_evaluate(img, args.parsing_checkpoint, cuda)
         img3 = utils.img_edge(img2)
         img3_ = ops.fill_grey(img3)
         img4 = align.face_features(path)
@@ -98,7 +98,7 @@ if __name__ == '__main__':
         image1, image2, name = dataset.get_cache(cuda)
         orig_path = os.path.join(args.path_to_dataset + "2", name)
         orig_img = cv2.imread(orig_path)
-        parse_img = utils.out_evaluate(orig_img, args.extractor_checkpoint, cuda)
+        parse_img = utils.out_evaluate(orig_img, args.parsing_checkpoint, cuda)
         ops.save_extractor('../export/test.jpg', image1, image2, orig_img, parse_img)
     else:
         log.error("not known phase %s", args.phase)

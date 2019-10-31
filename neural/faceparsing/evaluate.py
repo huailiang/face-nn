@@ -14,7 +14,7 @@ from PIL import Image
 import torchvision.transforms as transforms
 
 
-def vis_parsing_maps(im, parsing_anno, stride, save_im, save_path):
+def vis_parsing_maps(im, parsing_anno, stride):
     part_colors = [[255, 255, 255], [255, 85, 0], [255, 170, 0], [255, 0, 85], [255, 0, 170], [0, 255, 0], [85, 255, 0],
                    [170, 255, 0], [255, 255, 85], [0, 255, 170], [0, 0, 255], [85, 0, 255], [170, 0, 255], [0, 85, 255],
                    [255, 255, 255], [255, 255, 0], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 85, 255],
@@ -32,25 +32,11 @@ def vis_parsing_maps(im, parsing_anno, stride, save_im, save_path):
         vis_parsing_anno_color[index[0], index[1], :] = part_colors[pi]
 
     vis_parsing_anno_color = vis_parsing_anno_color.astype(np.uint8)
-    vis_im = cv2.addWeighted(cv2.cvtColor(vis_im, cv2.COLOR_RGB2BGR), 0.2, vis_parsing_anno_color, 0.8, 0)
-    if save_im:
-        cv2.imwrite(save_path, img_edge(vis_parsing_anno_color))
+    vis_im = cv2.addWeighted(cv2.cvtColor(vis_im, cv2.COLOR_RGB2BGR), 0.01, vis_parsing_anno_color, 0.99, 0)
     return vis_im
 
 
-def img_edge(img):
-    """
-    提取原始图像的边缘
-    :param img: input image
-    :return: edge image
-    """
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    x_grad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
-    y_grad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
-    return cv2.Canny(x_grad, y_grad, 30, 50)
-
-
-def build_net(cp, cuda=False):
+def _build_net(cp, cuda=False):
     n_classes = 19
     net = BiSeNet(n_classes=n_classes)
 
@@ -76,7 +62,7 @@ def out_evaluate(image, cp, cuda=False):
     global _net_
     global _to_tensor_
     if _net_ is None or _to_tensor_ is None:
-        _net_, _to_tensor_ = build_net(cp)
+        _net_, _to_tensor_ = _build_net(cp)
     with torch.no_grad():
         img = _to_tensor_(image)
         img = torch.unsqueeze(img, 0)
@@ -85,13 +71,30 @@ def out_evaluate(image, cp, cuda=False):
             _net_.cuda()
         out = _net_(img)[0]
         parsing = out.squeeze(0).cpu().numpy().argmax(0)
-        return vis_parsing_maps(image, parsing, stride=1, save_im=False, save_path="")
+        return vis_parsing_maps(image, parsing, stride=1)
 
 
-def inner_evaluate(dst_pth, src_path):
+def _img_edge(img):
+    """
+    提取原始图像的边缘
+    :param img: input image
+    :return: edge image
+    """
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    x_grad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
+    y_grad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
+    return cv2.Canny(x_grad, y_grad, 20, 40)
+
+
+def inner_evaluate(src_path):
+    root, name = os.path.split(src_path)
+    dst_pth = os.path.join(root, 'dst')
+    edge_pth = os.path.join(root, 'edge')
     if not os.path.exists(dst_pth):
-        os.makedirs(dst_pth)
-    net, to_tensor = build_net('../dat/79999_iter.pth')
+        os.mkdir(dst_pth)
+    if not os.path.exists(edge_pth):
+        os.mkdir(edge_pth)
+    net, to_tensor = _build_net('../dat/79999_iter.pth')
     with torch.no_grad():
         list_image = os.listdir(src_path)
         total = len(list_image)
@@ -103,7 +106,13 @@ def inner_evaluate(dst_pth, src_path):
             img = torch.unsqueeze(img, 0)
             out = net(img)[0]
             parsing = out.squeeze(0).cpu().numpy().argmax(0)
-            vis_parsing_maps(image, parsing,
-                             stride=1, save_im=True,
-                             save_path=osp.join(dst_pth, list_image[step]))
+            img = vis_parsing_maps(image, parsing, stride=1)
+            save_path = osp.join(dst_pth, list_image[step])
+            cv2.imwrite(save_path, img)
+            save_path = osp.join(edge_pth, list_image[step])
+            edge = _img_edge(img)
+            cv2.imwrite(save_path, edge)
 
+
+if __name__ == '__main__':
+    inner_evaluate("../../export/faceparsing/src")

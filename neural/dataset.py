@@ -132,7 +132,7 @@ class FaceDataset:
         :param cuda: gpu speedup
         """
         # log.info(path)
-        img = utils.evalute_face(path, self.args.extractor_checkpoint, cuda)
+        img = utils.evalute_face(path, self.args.parsing_checkpoint, cuda)
         img = utils.img_edge(img)
         if img.shape[0] != 64:
             img = cv2.resize(img, (64, 64), interpolation=cv2.INTER_AREA)

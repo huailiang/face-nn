@@ -169,7 +169,7 @@ class Extractor(nn.Module):
                     path = "{1}/{2}_{0}.jpg".format(step, self.prev_path, name[3:-6])
                     orig_path = os.path.join(self.args.path_to_dataset+"2", name)
                     orig_img = cv2.imread(orig_path)
-                    parse_img = utils.out_evaluate(orig_img, self.args.extractor_checkpoint, cuda)
+                    parse_img = utils.out_evaluate(orig_img, self.args.parsing_checkpoint, cuda)
                     ops.save_extractor(path, image1, image2, orig_img, parse_img)
 
                     lr = self.args.extractor_learning_rate * loss_display
@@ -225,7 +225,7 @@ class Extractor(nn.Module):
         img = cv2.imread(photo_path)
         scaled = align.align_face(img, size=(64, 64))
         self.load_checkpoint(cp_name, training=False, cuda=cuda)
-        img = utils.out_evaluate(scaled, self.args.extractor_checkpoint, cuda)
+        img = utils.out_evaluate(scaled, self.args.parsing_checkpoint, cuda)
         img = utils.img_edge(img)
         with torch.no_grad:
             input = torch.from_numpy(img)

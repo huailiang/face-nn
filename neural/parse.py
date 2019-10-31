@@ -77,6 +77,12 @@ parser.add_argument(
     type=str,
     default="./dat/LightCNN_29Layers_V2_checkpoint.pth.tar",
     help='light cnn pre-train model')
+parser.add_argument(
+    '--parsing_checkpoint',
+    dest='parsing_checkpoint',
+    type=str,
+    default="./dat/79999_iter.pth",
+    help='faceparsing trained model')
 
 # ========================= IMITATOR PARAMETERS ========================= #
 
@@ -112,12 +118,6 @@ parser.add_argument(
     help='learning rate of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #
-parser.add_argument(
-    '--extractor_checkpoint',
-    dest='extractor_checkpoint',
-    type=str,
-    default="./dat/79999_iter.pth",
-    help='faceparsing trained model')
 parser.add_argument(
     '--total_extractor_steps',
     dest='total_extractor_steps',

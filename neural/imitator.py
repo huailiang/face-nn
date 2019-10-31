@@ -115,7 +115,8 @@ class Imitator(nn.Module):
             if (step + 1) % self.args.prev_freq == 0:
                 path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
                 ops.save_img(path, images, y_)
-                lr = self.args.learning_rate * (total_steps - step) / float(total_steps) + 1e-6
+                x = step / float(total_steps)
+                lr = self.args.learning_rate * (x ** 2 - 2 * x + 1) + 1e-6
                 utils.update_optimizer_lr(self.optimizer, lr)
                 self.writer.add_scalar('imitator/learning rate', lr, step)
                 self.upload_weights(step)
