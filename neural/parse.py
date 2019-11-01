@@ -90,7 +90,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(2e5),
+    default=int(4e4),
     help='total steps for imitator')
 parser.add_argument(
     '--batch_size',
@@ -102,19 +102,19 @@ parser.add_argument(
     '--prev_freq',
     dest='prev_freq',
     type=int,
-    default=1000,
+    default=200,
     help='generate preview image when training')
 parser.add_argument(
     '--save_freq',
     dest='save_freq',
     type=int,
-    default=10000,
+    default=5000,
     help='Save model every save_freq steps')
 parser.add_argument(
     '--learning_rate',
     dest='learning_rate',
     type=float,
-    default=0.01,
+    default=0.1,
     help='learning rate of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #

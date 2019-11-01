@@ -46,7 +46,7 @@ class Imitator(nn.Module):
         self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
             utils.deconv_layer(95, 512, kernel_size=4),  # 1. (batch, 512, 4, 4)
-            ResidualBlock.make_layer(2, 512),  # enhance input signal
+            # ResidualBlock(512, 512),  # enhance input signal
             utils.deconv_layer(512, 512, kernel_size=4, stride=2, pad=1),  # 2. (batch, 512, 8, 8)
             utils.deconv_layer(512, 512, kernel_size=4, stride=2, pad=1),  # 3. (batch, 512, 16, 16)
             utils.deconv_layer(512, 256, kernel_size=4, stride=2, pad=1),  # 4. (batch, 256, 32, 32)
@@ -55,7 +55,6 @@ class Imitator(nn.Module):
             utils.deconv_layer(64, 64, kernel_size=4, stride=2, pad=1),  # 7. (batch, 64, 256, 256)
             nn.ConvTranspose2d(64, 3, kernel_size=4, stride=2, padding=1),  # 8. (batch, 3, 512, 512)
             nn.Sigmoid(),
-            nn.Dropout(0.5),
         )
         self.model.apply(utils.init_weights)
         self.optimizer = optim.Adam(self.model.parameters(), lr=args.learning_rate)
@@ -69,10 +68,10 @@ class Imitator(nn.Module):
         batch = params.size(0)
         length = params.size(1)
         _params = params.reshape((batch, length, 1, 1))
-        _params = (_params * 2) - 1
         _params.requires_grad_(True)
         y = self.model(_params)
-        return (y + 1) * 0.5
+        # return (y + 1) * 0.5  # 图形学里面提亮算法 可以降低loss
+        return y
 
     def itr_train(self, params, reference):
         """
@@ -116,8 +115,7 @@ class Imitator(nn.Module):
 
             if (step + 1) % self.args.prev_freq == 0:
                 path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
-                # ops.save_img(path, images, y_)
-                self.imitator_capture(path, images, y_, self.args.parsing_checkpoint)
+                self.capture(path, images, y_, self.args.parsing_checkpoint)
                 x = step / float(total_steps)
                 lr = self.args.learning_rate * (x ** 2 - 2 * x + 1) + 1e-4
                 utils.update_optimizer_lr(self.optimizer, lr)
@@ -179,7 +177,6 @@ class Imitator(nn.Module):
         dataset = FaceDataset(self.args, mode="test")
         steps = 100
         accuracy = 0.0
-        location = self.args.lightcnn
         for step in range(steps):
             log.info("step: %d", step)
             names, params, images = dataset.get_batch(batch_size=self.args.batch_size, edge=False)
@@ -209,7 +206,7 @@ class Imitator(nn.Module):
         torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
 
     @staticmethod
-    def imitator_capture(path, tensor1, tensor2, parse):
+    def capture(path, tensor1, tensor2, parse):
         """
         imitator 快照
         :param path: save path

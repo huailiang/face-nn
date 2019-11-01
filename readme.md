@@ -14,7 +14,6 @@
 8.  tqdm-4.23.4
 9.  argparse-1.4.0
 10. scipy-1.0.1
-11. Pillow
 ```
 
 

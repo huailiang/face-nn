@@ -81,6 +81,39 @@ def generate_file(path, content):
         log.error("io error, load imitator failed ", e)
 
 
+def to_gray(rgb):
+    """
+    灰度处理
+    :param rgb: Tensor(RGB)
+    :return: Tensor(Gray)
+    """
+    if len(rgb.shape) >= 3:
+        arr = np.mean(rgb, axis=2)
+        return arr[:, :, np.newaxis]
+    else:
+        raise NeuralException("to gray error")
+
+
+def fill_grey(image):
+    """
+    [W, H, 1] -> [W, H, 3]
+    :param image: input image
+    :return: transfer image
+    """
+    shape = image.shape
+    if len(shape) == 2:
+        image = image[:, :, np.newaxis]
+        shape = image.shape
+    if shape[2] == 1:
+        new_image = np.zeros((shape[0], shape[1], 3), dtype=np.uint8)
+        for i in range(shape[0]):
+            for j in range(shape[1]):
+                v = image[i][j]
+                new_image[i][j] = [v, v, v]
+        return new_image
+    return image
+
+
 def tensor_2_image(tensor):
     """
     将tensor转numpy array 给cv2使用
@@ -112,19 +145,6 @@ def save_img(path, tensor1, tensor2):
         img = merge_image(image1[0], image2[0], mode='h')
     else:
         raise NeuralException("tensor error")
-    cv2.imwrite(path, img)
-
-
-def save_extractor(path, tensor1, tensor2, img3, img4):
-    image1 = 255 - tensor1.cpu().detach().numpy() * 255
-    image2 = 255 - tensor2.cpu().detach().numpy() * 255
-    shape = image1.shape
-    if len(shape) == 2:
-        image1 = image1[:, :, np.newaxis]
-        image2 = image2[:, :, np.newaxis]
-    img1 = fill_grey(image1)
-    img2 = fill_grey(image2)
-    img = merge_4image(img1, img2, img3, img4)
     cv2.imwrite(path, img)
 
 
@@ -185,19 +205,3 @@ def merge_4image(image1, image2, image3, image4, size=512, show=False, transpose
         cv2.waitKey()
         cv2.destroyAllWindows()
     return image
-
-
-def fill_grey(image):
-    shape = image.shape
-    if len(shape) == 2:
-        image = image[:, :, np.newaxis]
-        shape = image.shape
-    if shape[2] == 1:
-        new_image = np.zeros((shape[0], shape[1], 3), dtype=np.uint8)
-        for i in range(shape[0]):
-            for j in range(shape[1]):
-                v = image[i][j]
-                new_image[i][j] = [v, v, v]
-        return new_image
-    return image
-

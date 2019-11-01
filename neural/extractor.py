@@ -10,6 +10,7 @@ import os
 import cv2
 import torch
 import torch.nn as nn
+import numpy as np
 import torch.nn.functional as F
 import torch.optim as optim
 import util.logit as log
@@ -166,12 +167,7 @@ class Extractor(nn.Module):
                 progress.set_description("loss: {:.3f}".format(loss_display))
                 self.writer.add_scalar('extractor/loss', loss_display, step)
                 if step % self.args.extractor_prev_freq == 0:
-                    path = "{1}/{2}_{0}.jpg".format(step, self.prev_path, name[3:-6])
-                    orig_path = os.path.join(self.args.path_to_dataset+"2", name)
-                    orig_img = cv2.imread(orig_path)
-                    parse_img = utils.parse_evaluate(orig_img, self.args.parsing_checkpoint, cuda)
-                    ops.save_extractor(path, image1, image2, orig_img, parse_img)
-
+                    self.capture(image1, image2, name, step, cuda)
                     lr = self.args.extractor_learning_rate * loss_display
                     self.writer.add_scalar('extractor/learning rate', lr, step)
                     utils.update_optimizer_lr(self.optimizer, lr)
@@ -251,3 +247,27 @@ class Extractor(nn.Module):
         accuracy = accuracy / steps
         log.info("accuracy rate is %f", accuracy)
         return accuracy
+
+    def capture(self, tensor1, tensor2, name, step, cuda):
+        """
+        extractor 快照
+        :param tensor1: input photo
+        :param tensor2: generated image
+        :param cuda: use gpu to speed up
+        :param step: train step
+        :param name: picture name
+        """
+        path = "{1}/{2}_{0}.jpg".format(step, self.prev_path, name[3:-6])
+        orig_path = os.path.join(self.args.path_to_dataset + "2", name)
+        img3 = cv2.imread(orig_path)
+        img4 = utils.parse_evaluate(img3, self.args.parsing_checkpoint, cuda)
+        image1 = 255 - tensor1.cpu().detach().numpy() * 255
+        image2 = 255 - tensor2.cpu().detach().numpy() * 255
+        shape = image1.shape
+        if len(shape) == 2:
+            image1 = image1[:, :, np.newaxis]
+            image2 = image2[:, :, np.newaxis]
+        img1 = ops.fill_grey(image1)
+        img2 = ops.fill_grey(image2)
+        img = ops.merge_4image(img1, img2, img3, img4)
+        cv2.imwrite(path, img)

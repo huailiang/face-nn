@@ -37,12 +37,15 @@ class resblock(nn.Module):
         super(resblock, self).__init__()
         self.conv1 = mfm(in_channels, out_channels, kernel_size=3, stride=1, padding=1)
         self.conv2 = mfm(in_channels, out_channels, kernel_size=3, stride=1, padding=1)
+        self.bn = nn.BatchNorm2d(out_channels)
 
     def forward(self, x):
         res = x
         out = self.conv1(x)
         out = self.conv2(out)
         out = out + res
+        out = self.bn(out)
+        out = F.relu(out)
         return out
 
 

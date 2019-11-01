@@ -132,32 +132,60 @@ def add_console_to_emit(fn):
     return new
 
 
+def is_init():
+    try:
+        type(eval("_log"))
+    except:
+        return False
+    else:
+        return True
+
+
 def set_level(level):
-    _log.setLevel(level)
+    if is_init():
+        _log.setLevel(level)
 
 
 def debug(msg, *args, **kwargs):
-    _log.debug(msg, *args, **kwargs)
+    if is_init():
+        _log.debug(msg, *args, **kwargs)
+    else:
+        print(msg, *args)
 
 
 def info(msg, *args, **kwargs):
-    _log.info(msg, *args, **kwargs)
+    if is_init():
+        _log.info(msg, *args, **kwargs)
+    else:
+        print(msg, *args)
 
 
 def warn(msg, *args, **kwargs):
-    _log.warning(msg, *args, **kwargs)
+    if is_init():
+        _log.warning(msg, *args, **kwargs)
+    else:
+        print(msg, *args)
 
 
 def error(msg, *args, **kwargs):
-    _log.error(msg, *args, **kwargs)
+    if is_init():
+        _log.error(msg, *args, **kwargs)
+    else:
+        print(msg, *args)
 
 
 def fatal(msg, *args, **kwargs):
-    _log.fatal(msg, *args, **kwargs)
+    if is_init():
+        _log.fatal(msg, *args, **kwargs)
+    else:
+        print(msg, *args)
 
 
 def critical(msg, *args, **kwargs):
-    _log.critical(msg, *args, **kwargs)
+    if is_init():
+        _log.critical(msg, *args, **kwargs)
+    else:
+        print(msg, *args)
 
 
 if __name__ == '__main__':

@@ -7,7 +7,6 @@ from __future__ import division
 
 import random
 import scipy.misc
-from util.exception import NeuralException
 from lightcnn.extract_features import *
 import torch.nn as nn
 import util.logit as log
@@ -41,25 +40,12 @@ def init_weights(m):
     """
     classcache = m.__class__.__name__
     if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear) or isinstance(m, nn.ConvTranspose2d):
-        nn.init.normal_(m.weight.data, 0.0, 0.2)
+        nn.init.normal_(m.weight.data, 0.4, 0.2)
         if m.bias is not None:
             nn.init.constant_(m.bias.data, 0.0)
     if isinstance(m, nn.BatchNorm2d):
         nn.init.normal_(m.weight.data, 0.0, 0.2)
         nn.init.constant_(m.bias.data, 0.0)
-
-
-def to_gray(rgb):
-    """
-    灰度处理
-    :param rgb: Tensor(RGB)
-    :return: Tensor(Gray)
-    """
-    if len(rgb.shape) >= 3:
-        arr = np.mean(rgb, axis=2)
-        return arr[:, :, np.newaxis]
-    else:
-        raise NeuralException("to gray error")
 
 
 def deconv_layer(in_chanel, out_chanel, kernel_size, stride=1, pad=0):
