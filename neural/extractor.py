@@ -193,7 +193,6 @@ class Extractor(nn.Module):
     def clean(self):
         """
         清空前记得备份
-        :return:
         """
         ops.clear_folder(self.model_path)
         ops.clear_files(self.args.path_to_cache)

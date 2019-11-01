@@ -17,7 +17,6 @@ import torch.nn.functional as F
 from tqdm import tqdm
 from dataset import FaceDataset
 from tensorboardX import SummaryWriter
-from module import ResidualBlock
 
 """
 imitator
@@ -46,7 +45,6 @@ class Imitator(nn.Module):
         self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
             utils.deconv_layer(95, 512, kernel_size=4),  # 1. (batch, 512, 4, 4)
-            # ResidualBlock(512, 512),  # enhance input signal
             utils.deconv_layer(512, 512, kernel_size=4, stride=2, pad=1),  # 2. (batch, 512, 8, 8)
             utils.deconv_layer(512, 512, kernel_size=4, stride=2, pad=1),  # 3. (batch, 512, 16, 16)
             utils.deconv_layer(512, 256, kernel_size=4, stride=2, pad=1),  # 4. (batch, 256, 32, 32)
@@ -69,9 +67,7 @@ class Imitator(nn.Module):
         length = params.size(1)
         _params = params.reshape((batch, length, 1, 1))
         _params.requires_grad_(True)
-        y = self.model(_params)
-        # return (y + 1) * 0.5  # 图形学里面提亮算法 可以降低loss
-        return y
+        return self.model(_params)
 
     def itr_train(self, params, reference):
         """

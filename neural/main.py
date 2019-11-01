@@ -10,7 +10,6 @@ import logging
 import torch
 import align
 import cv2
-import os
 import util.logit as log
 from dataset import FaceDataset
 from imitator import Imitator
@@ -93,12 +92,5 @@ if __name__ == '__main__':
         img4 = align.face_features(path)
         log.info("{0} {1} {2} {3}".format(img.shape, img2.shape, img3_.shape, img4.shape))
         ops.merge_4image(img, img2, img3_, img4, show=True)
-    elif args.phase == "cache":
-        dataset = FaceDataset(args, "train")
-        image1, image2, name = dataset.get_cache(cuda)
-        orig_path = os.path.join(args.path_to_dataset + "2", name)
-        orig_img = cv2.imread(orig_path)
-        parse_img = utils.parse_evaluate(orig_img, args.parsing_checkpoint, cuda)
-        ops.save_extractor('../export/test.jpg', image1, image2, orig_img, parse_img)
     else:
         log.error("not known phase %s", args.phase)
