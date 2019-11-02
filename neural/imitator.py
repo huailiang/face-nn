@@ -61,7 +61,7 @@ class Imitator(nn.Module):
         """
         construct network
         :param params: [batch, 95]
-        :return: (batch, 1, 512, 512)
+        :return: (batch, 3, 512, 512)
         """
         batch = params.size(0)
         length = params.size(1)
@@ -73,7 +73,7 @@ class Imitator(nn.Module):
         """
         iterator training
         :param params:  [batch, 95]
-        :param reference: reference photo [batch, 1, 512, 512]
+        :param reference: reference photo [batch, 3, 512, 512]
         :return loss: [batch], y_: generated picture
         """
         self.optimizer.zero_grad()
@@ -111,7 +111,7 @@ class Imitator(nn.Module):
 
             if (step + 1) % self.args.prev_freq == 0:
                 path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
-                self.capture(path, images, y_, self.args.parsing_checkpoint)
+                self.capture(path, images, y_, self.args.parsing_checkpoint, cuda)
                 x = step / float(total_steps)
                 lr = self.args.learning_rate * (x ** 2 - 2 * x + 1) + 1e-4
                 utils.update_optimizer_lr(self.optimizer, lr)
@@ -202,9 +202,10 @@ class Imitator(nn.Module):
         torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
 
     @staticmethod
-    def capture(path, tensor1, tensor2, parse):
+    def capture(path, tensor1, tensor2, parse, cuda):
         """
         imitator 快照
+        :param cuda: use gpu
         :param path: save path
         :param tensor1: input photo
         :param tensor2: generated image
@@ -213,7 +214,7 @@ class Imitator(nn.Module):
         img1 = ops.tensor_2_image(tensor1)[0].swapaxes(0, 1).astype(np.uint8)
         img2 = ops.tensor_2_image(tensor2)[0].swapaxes(0, 1).astype(np.uint8)
         img1 = cv2.resize(img1, (512, 512), interpolation=cv2.INTER_LINEAR)
-        img3 = utils.parse_evaluate(img1, parse, True)
+        img3 = utils.parse_evaluate(img1, parse, cuda)
         img4 = utils.img_edge(img3)
         img4 = 255 - ops.fill_grey(img4)
         image = ops.merge_4image(img1, img2, img3, img4, transpose=False)

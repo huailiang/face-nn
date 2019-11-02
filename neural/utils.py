@@ -10,16 +10,29 @@ import scipy.misc
 from lightcnn.extract_features import *
 import torch.nn as nn
 import util.logit as log
+from torchvision.transforms import Compose, CenterCrop, ToTensor, Resize
 from faceparsing.evaluate import *
 
 
-def random_params(cnt):
+def random_params(cnt=95):
     """
     随机生成捏脸参数
+    :param cnt: param count
     """
     params = []
     for i in range(cnt):
         params.append(random.randint(0, 1000) / 1000.0)
+    return params
+
+
+def init_params(cnt=95):
+    """
+    初始捏脸参数
+    :param cnt: param count
+    """
+    params = []
+    for i in range(cnt):
+        params.append(0.5)
     return params
 
 
@@ -91,10 +104,15 @@ def load_lightcnn(location, cuda=False):
     if cuda:
         checkpoint = torch.load(location)
         model = torch.nn.DataParallel(model).cuda()
+        model.load_state_dict(checkpoint['state_dict'])
     else:
+        from collections import OrderedDict
         checkpoint = torch.load(location, map_location="cpu")
-        model = torch.nn.DataParallel(model)
-    model.load_state_dict(checkpoint['state_dict'])
+        new_state_dict = model.state_dict()
+        for k, v in checkpoint['state_dict'].items():
+            _name = k[7:]  # remove `module.`
+            new_state_dict[_name] = v
+        model.load_state_dict(new_state_dict)
     return model
 
 
@@ -151,7 +169,7 @@ def batch_feature256(img, lightcnn_inst):
        :return: 256维特征参数 tensor [batch, 256]
        """
     transform = transforms.Compose([transforms.ToTensor()])
-    img = F.max_pool2d(img, (4, 4))
+    log.info(img.size())
     _, features = lightcnn_inst(img)
     log.debug("features shape:{0} {1} {2}".format(features.size(), features.requires_grad, img.requires_grad))
     return features

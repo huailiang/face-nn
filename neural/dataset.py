@@ -79,9 +79,9 @@ class FaceDataset:
                 path = os.path.join(self.path+"2", name)
             image = cv2.imread(path, read_mode)
             if not edge:
-                np_images[i] = np.swapaxes(image, 0, 2) / 255.
+                np_images[i] = np.swapaxes(image, 0, 2) / 255.  # [C, W, H]
             else:
-                np_images[i] = image[np.newaxis, :, :] / 255.
+                np_images[i] = image[np.newaxis, :, :] / 255.   # [1, H, W]
         params = torch.from_numpy(np_params)
         params.requires_grad = True
         images = torch.from_numpy(np_images)
