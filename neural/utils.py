@@ -10,7 +10,6 @@ import scipy.misc
 from lightcnn.extract_features import *
 import torch.nn as nn
 import util.logit as log
-from torchvision.transforms import Compose, CenterCrop, ToTensor, Resize
 from faceparsing.evaluate import *
 
 
@@ -169,7 +168,7 @@ def batch_feature256(img, lightcnn_inst):
        :return: 256维特征参数 tensor [batch, 256]
        """
     transform = transforms.Compose([transforms.ToTensor()])
-    log.info(img.size())
+    log.debug(img.size())
     _, features = lightcnn_inst(img)
     log.debug("features shape:{0} {1} {2}".format(features.size(), features.requires_grad, img.requires_grad))
     return features

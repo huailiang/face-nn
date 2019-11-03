@@ -5,7 +5,7 @@
 
 import utils
 import util.logit as log
-import torch.nn.functional as F
+from tqdm import tqdm
 from imitator import Imitator
 from faceparsing.evaluate import *
 
@@ -29,7 +29,7 @@ class Evaluate:
         self.lightcnn_inst = utils.load_lightcnn(location)
         self.cuda = cuda
         self.parsing = self.args.parsing_checkpoint
-        self.max_itr = 1
+        self.max_itr = 4
         self.imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             self.imitator.cuda()
@@ -59,7 +59,7 @@ class Evaluate:
         evaluate loss use l1 at pixel space
         :param y: input photo, numpy array  [H, W, C]
         :param y_: generated image, tensor  [B, C, W, H]
-        :return: l2 loss
+        :return: l1 loss in pixel space
         """
         img1 = parse_evaluate(y, cp=self.parsing, cuda=self.cuda)
         img2 = y_.cpu().detach().numpy()
@@ -67,25 +67,21 @@ class Evaluate:
         img2 = img2.reshape(shape[1], shape[2], shape[3])
         img2 = np.swapaxes(img2, 0, 2)
         img2 = parse_evaluate(img2, cp=self.parsing, cuda=self.cuda)
-        img1 = utils.img_edge(img1)
-        img2 = utils.img_edge(img2)
-        # downsample
-        img1 = cv2.resize(img1, dsize=(64, 64), interpolation=cv2.INTER_AREA)
-        img2 = cv2.resize(img2, dsize=(64, 64), interpolation=cv2.INTER_AREA)
-        img1_ = torch.from_numpy(img1)
-        img2_ = torch.from_numpy(img2)
-        return F.l1_loss(img1_, img2_)
+        img1 = utils.img_edge(img1).astype(np.float32)
+        img2 = utils.img_edge(img2).astype(np.float32)
+        return np.mean(img1 - img2)
 
     def evaluate_ls(self, y, y_, alpha):
         """
         评估损失Ls
         :param y: input photo, numpy array
-        :param y_:  generated image
+        :param y_:  generated image, tensor [b,c,w,h]
         :param alpha: 权重
         :return: ls
         """
         l1 = self.discrim_l1(y, y_)
         l2 = self.discrim_l2(y, y_)
+        log.debug("l1:{0:.3f} l2:{1:.3f}".format(l1, l2))
         return alpha * l1 + l2
 
     def itr_train(self, y):
@@ -95,33 +91,45 @@ class Evaluate:
         :return:
         """
         param_cnt = self.args.params_cnt
-        x = utils.random_params(param_cnt)
-        np_params = np.zeros((1, param_cnt), dtype=np.float32)
+        np_params = 0.5 * np.ones((1, param_cnt), dtype=np.float32)
         x_ = torch.from_numpy(np_params)
         alpha = 0.1
         learning_rate = 0.01
-        loss_ = 100
-        idx_ = 0  # batch index
-        for i in range(self.max_itr):
-            log.info("step {0}".format(i))
-            for j in range(1):
+        idx = 0  # batch index
+        steps = param_cnt
+        progress = tqdm(range(0, steps), initial=0, total=steps)  # type: tqdm
+        for j in progress:
+            loss_ = 0
+            for i in range(self.max_itr):
                 y_ = self.imitator(x_)
                 loss = self.evaluate_ls(y, y_, alpha)
-                x_[idx_][j] += learning_rate * loss
-                if x_[idx_][j] < 0:
-                    x_[idx_][j] = 0
-                if x_[idx_][j] > 1:
-                    x_[idx_][j] = 1
-                log.info("current loss: {0} min loss: {1}".format(loss, loss_))
+                delta = loss - loss_
+                x_[idx][j] = self.update_x(x_[idx][j], learning_rate * delta)
+                loss_ = loss
+                progress.set_description("loss: {0:.3f} loss_: {1:.3f} delta: {2:.3f}".format(loss, loss_, delta))
         return x_
+
+    @staticmethod
+    def update_x(x, loss):
+        """
+        更新梯度
+        :param x: input scalar
+        :param loss: gradient loss
+        :return: updated value, scalar
+        """
+        x -= loss
+        if x < 0:
+            x = 0
+        elif x > 1:
+            x = 1
+        return x
 
 
 if __name__ == '__main__':
     import logging
     from parse import parser
-    import cv2
 
-    log.info("evaluation")
+    log.info("evaluation mode start")
     args = parser.parse_args()
     log.init("FaceNeural", logging.INFO, log_path="./output/neural_log.txt")
     evl = Evaluate("test", args)
