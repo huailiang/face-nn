@@ -4,7 +4,9 @@
 # @Date  : 2019/10/31
 
 import utils
+import ops
 import util.logit as log
+import numpy as np
 from tqdm import tqdm
 from imitator import Imitator
 from faceparsing.evaluate import *
@@ -108,6 +110,30 @@ class Evaluate:
                 loss_ = loss
                 progress.set_description("loss: {0:.3f} loss_: {1:.3f} delta: {2:.3f}".format(loss, loss_, delta))
         return x_
+
+    def capture(self, x1, x2, refer):
+        """
+        capture for result
+        :param refer: reference picture
+        :param x1: origin params, torch tensor [b,params]
+        :param x2: generated image with grad, torch tensor [b,params]
+        """
+        x1_ = self.imitator(x1)
+        x2_ = self.imitator(x2)
+        x1_ = x1.cpu().detach().numpy()
+        x2_ = x2.cpu().detach().numpy()
+        shape = x1_.shape
+        if len(shape) >= 4:
+            x1_ = x1.reshape(shape[1], shape[2], shape[3])
+            x2_ = x2_.reshape(shape[1], shape[2], shape[3])
+
+        x1_ = np.swapaxes(x1_, 0, 2) * 255.
+        x2_ = np.swapaxes(x2_, 0, 2) * 255.
+        x1_ = x1_.astype(np.uint8)
+        x2_ = x2_.astype(np.uint8)
+        tmp = (0.5 * np.ones(512, 512, 3)).astype(np.uint8)
+        image = ops.merge_4image(x1_, x2_, tmp, refer)
+        cv2.imwrite("./output/eval.jpg", image)
 
     @staticmethod
     def update_x(x, loss):
