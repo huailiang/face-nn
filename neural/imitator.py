@@ -16,6 +16,7 @@ import numpy as np
 import torch.nn.functional as F
 from tqdm import tqdm
 from dataset import FaceDataset
+from util.exception import NeuralException
 from tensorboardX import SummaryWriter
 
 """
@@ -144,7 +145,10 @@ class Imitator(nn.Module):
         :param path: checkpoint's path
         :param cuda: gpu speedup
         """
-        checkpoint = torch.load(self.args.path_to_inference + "/" + path)
+        path_ = self.args.path_to_inference + "/" + path
+        if not os.path.exists(path_):
+            raise NeuralException("not exist checkpoint of imitator with path " + path)
+        checkpoint = torch.load(path_)
         self.model.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.initial_step = checkpoint['epoch']

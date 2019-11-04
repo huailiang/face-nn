@@ -3,7 +3,7 @@
 # @Author: penghuailiang
 # @Date  : 2019-09-27
 
-
+import re
 import cv2
 import os
 import shutil
@@ -63,6 +63,29 @@ def clear_files(dir):
         log.error("io error, load imitator failed ", e)
 
 
+def get_imit_cp(dir, ext=None):
+    """
+    匹配查找最近生成的checkpoint
+    :param dir: search directory
+    :param ext: 文件后缀
+    """
+    try:
+        m_time = 0
+        rst = None
+        for file in os.listdir(dir):
+            path = os.path.join(dir, file)
+            time = os.path.getmtime(path)
+            match = True
+            if ext is not None:
+                match = file.endswith(ext)
+            if match and (m_time == 0 or time > m_time):
+                m_time = time
+                rst = path
+        return rst
+    except IOError as e:
+        log.error('get_imit_cp, io error')
+
+
 def generate_file(path, content):
     """
     生成文件
@@ -105,12 +128,9 @@ def fill_grey(image):
         image = image[:, :, np.newaxis]
         shape = image.shape
     if shape[2] == 1:
-        new_image = np.zeros((shape[0], shape[1], 3), dtype=np.uint8)
-        for i in range(shape[0]):
-            for j in range(shape[1]):
-                v = image[i][j]
-                new_image[i][j] = [v, v, v]
-        return new_image
+        return np.pad(image, ((0, 0), (0, 0), (1, 1)), 'edge')
+    elif shape[2] == 3:
+        return np.mean(image, axis=2)
     return image
 
 

@@ -18,6 +18,7 @@ from tqdm import tqdm
 from dataset import FaceDataset
 from net import Net
 from module import ResidualBlock, group
+from util.exception import NeuralException
 from tensorboardX import SummaryWriter
 
 """
@@ -182,7 +183,10 @@ class Extractor(nn.Module):
         :param training: 恢复之后 是否接着train
         :param cuda: gpu speedup
         """
-        checkpoint = torch.load(self.args.path_to_inference + "/" + path)
+        path_ = self.args.path_to_inference + "/" + path
+        if not os.path.exists(path_):
+            raise NeuralException("not exist checkpoint of extractor with path "+path)
+        checkpoint = torch.load(path_)
         self.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.initial_step = checkpoint['epoch']

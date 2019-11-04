@@ -6,8 +6,6 @@
 import utils
 import ops
 import util.logit as log
-import numpy as np
-from tqdm import tqdm
 from imitator import Imitator
 from faceparsing.evaluate import *
 
@@ -31,11 +29,13 @@ class Evaluate:
         self.lightcnn_inst = utils.load_lightcnn(location)
         self.cuda = cuda
         self.parsing = self.args.parsing_checkpoint
-        self.max_itr = 4
+        self.max_itr = 8
+        self.prev_path = "./output/eval"
+        self.clean()
         self.imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             self.imitator.cuda()
-        self.imitator.load_checkpoint("model_imitator_15000.pth", False, cuda=cuda)
+        self.imitator.load_checkpoint("model_imitator_40000.pth", False, cuda=cuda)
 
     def discrim_l1(self, y, y_):
         """
@@ -55,100 +55,144 @@ class Evaluate:
         y_ = torch.from_numpy(y_)
         return utils.discriminative_loss(y, y_, self.lightcnn_inst)
 
-    def discrim_l2(self, y, y_):
+    def discrim_l2(self, y, y_, export, step):
         """
         facial semantic feature loss
         evaluate loss use l1 at pixel space
+        :param step: train step
+        :param export: export for preview in train
         :param y: input photo, numpy array  [H, W, C]
         :param y_: generated image, tensor  [B, C, W, H]
         :return: l1 loss in pixel space
         """
-        img1 = parse_evaluate(y, cp=self.parsing, cuda=self.cuda)
-        img2 = y_.cpu().detach().numpy()
-        shape = img2.shape
-        img2 = img2.reshape(shape[1], shape[2], shape[3])
-        img2 = np.swapaxes(img2, 0, 2)
-        img2 = parse_evaluate(img2, cp=self.parsing, cuda=self.cuda)
-        img1 = utils.img_edge(img1).astype(np.float32)
-        img2 = utils.img_edge(img2).astype(np.float32)
-        return np.mean(img1 - img2)
+        img1 = parse_evaluate(y.astype(np.uint8), cp=self.parsing, cuda=self.cuda)
+        y_ = y_.cpu().detach().numpy()
+        y_ = np.squeeze(y_, axis=0)
+        y_ = np.swapaxes(y_, 0, 2) * 255
+        img2 = parse_evaluate(y_.astype(np.uint8), cp=self.parsing, cuda=self.cuda)
+        edge_img1 = utils.img_edge(img1).astype(np.float32)
+        edge_img2 = utils.img_edge(img2).astype(np.float32)
+        if export:
+            path = os.path.join(self.prev_path, "l2_{0}.jpg".format(step))
+            edge1_v3 = 255. - ops.fill_grey(edge_img1)
+            edge2_v3 = 255. - ops.fill_grey(edge_img2)
+            image = ops.merge_4image(y, y_, edge1_v3, edge2_v3, transpose=False)
+            cv2.imwrite(path, image)
+        return np.mean(np.abs(edge_img1 - edge_img2))
 
-    def evaluate_ls(self, y, y_, alpha):
+    def evaluate_ls(self, y, y_, export, step):
         """
         评估损失Ls
         :param y: input photo, numpy array
         :param y_:  generated image, tensor [b,c,w,h]
-        :param alpha: 权重
+        :param step: train step
+        :param export: export for preview in train
         :return: ls
         """
         l1 = self.discrim_l1(y, y_)
-        l2 = self.discrim_l2(y, y_)
-        log.debug("l1:{0:.3f} l2:{1:.3f}".format(l1, l2))
+        l2 = self.discrim_l2(y, y_, export, step)
+        alpha = 200  # weight balance
+        # log.info("l1:{0:.5f} l2:{1:.5f}".format(l1 * alpha, l2))
         return alpha * l1 + l2
 
     def itr_train(self, y):
         """
         iterator train
         :param y: numpy array
-        :return:
         """
         param_cnt = self.args.params_cnt
         np_params = 0.5 * np.ones((1, param_cnt), dtype=np.float32)
         x_ = torch.from_numpy(np_params)
-        alpha = 0.1
+        if self.cuda:
+            x_ = x_.cuda()
         learning_rate = 0.01
         idx = 0  # batch index
-        steps = param_cnt
-        progress = tqdm(range(0, steps), initial=0, total=steps)  # type: tqdm
-        for j in progress:
-            loss_ = 0
-            for i in range(self.max_itr):
-                y_ = self.imitator(x_)
-                loss = self.evaluate_ls(y, y_, alpha)
-                delta = loss - loss_
-                x_[idx][j] = self.update_x(x_[idx][j], learning_rate * delta)
-                loss_ = loss
-                progress.set_description("loss: {0:.3f} loss_: {1:.3f} delta: {2:.3f}".format(loss, loss_, delta))
+        steps = 1  # param_cnt
+        loss_ = 0
+        # progress = tqdm(range(0, steps), initial=0, total=steps)  # type: # tqdm
+        with torch.no_grad():
+            for j in range(steps):
+                # for j in progress:
+                for i in range(self.max_itr):
+                    y_ = self.imitator(x_)
+                    export = i == self.max_itr - 1
+                    loss = self.evaluate_ls(y, y_, export, j)
+                    delta = loss - loss_
+                    loss_ = loss
+                    x_[idx][j] = self.update_x(x_[idx][j], learning_rate * delta)
+                    description = "loss: {0:.5f} delta:{1:.5} x:{2:.5}".format(loss, delta, x_[idx][j])
+                    # progress.set_description(description)
+                    log.info(description)
+                loss_ = loss + learning_rate
         return x_
 
-    def capture(self, x1, x2, refer):
-        """
-        capture for result
-        :param refer: reference picture
-        :param x1: origin params, torch tensor [b,params]
-        :param x2: generated image with grad, torch tensor [b,params]
-        """
-        x1_ = self.imitator(x1)
-        x2_ = self.imitator(x2)
-        x1_ = x1.cpu().detach().numpy()
-        x2_ = x2.cpu().detach().numpy()
-        shape = x1_.shape
-        if len(shape) >= 4:
-            x1_ = x1.reshape(shape[1], shape[2], shape[3])
-            x2_ = x2_.reshape(shape[1], shape[2], shape[3])
+    def for_train(self, y):
+        param_cnt = self.args.params_cnt
+        np_params = 0.5 * np.ones((1, param_cnt), dtype=np.float32)
+        param_cnt = self.args.params_cnt
+        x_ = torch.from_numpy(np_params)
+        if self.cuda:
+            x_ = x_.cuda()
 
-        x1_ = np.swapaxes(x1_, 0, 2) * 255.
-        x2_ = np.swapaxes(x2_, 0, 2) * 255.
-        x1_ = x1_.astype(np.uint8)
-        x2_ = x2_.astype(np.uint8)
-        tmp = (0.5 * np.ones(512, 512, 3)).astype(np.uint8)
-        image = ops.merge_4image(x1_, x2_, tmp, refer)
-        cv2.imwrite("./output/eval.jpg", image)
+        mini_loss = 10000
+        tmp_x = 0
+        progress = tqdm(range(0, param_cnt), initial=0, total=param_cnt)
+        with torch.no_grad():
+            for p in progress:
+                for i in range(10):
+                    x_[0][p] = i * 0.1
+                    y_ = self.imitator(x_)
+                    loss = self.evaluate_ls(y, y_, False, i)
+                    if loss < mini_loss:
+                        tmp_x = x_[0][p]
+                x_[0][p] = tmp_x
+        return x_
 
     @staticmethod
-    def update_x(x, loss):
+    def update_x(x, delta_loss):
         """
         更新梯度
         :param x: input scalar
-        :param loss: gradient loss
+        :param delta_loss: gradient loss, delta * lr
         :return: updated value, scalar
         """
-        x -= loss
-        if x < 0:
-            x = 0
-        elif x > 1:
-            x = 1
-        return x
+        delta = delta_loss.item()
+        # 避免更新幅度过大或者过小
+        dir = -1 if delta < 0 else 1
+        if abs(delta) < 1e-3:
+            delta = dir * 1e-3
+        elif abs(delta) > 0.4:
+            delta = dir * 0.4
+
+        delta_x = -delta
+        new_x = x + delta_x
+        if new_x < 0:
+            new_x = 0
+        elif new_x > 1:
+            new_x = 1
+        return new_x
+
+    def output(self, x, refer):
+        """
+        capture for result
+        :param refer: reference picture
+        :param x: generated image with grad, torch tensor [b,params]
+        """
+        y_ = self.imitator.forward(x)
+        y_ = y_.cpu().detach().numpy()
+        y_ = np.squeeze(y_, axis=0)
+
+        y_ = np.swapaxes(y_, 0, 2) * 255.
+        y_ = y_.astype(np.uint8)
+        image_ = ops.merge_image(refer, y_, transpose=False)
+        path = os.path.join(self.prev_path, "eval.jpg")
+        cv2.imwrite(path, image_)
+
+    def clean(self):
+        """
+        clean for new iter
+        """
+        ops.clear_files(self.prev_path)
 
 
 if __name__ == '__main__':
@@ -158,6 +202,8 @@ if __name__ == '__main__':
     log.info("evaluation mode start")
     args = parser.parse_args()
     log.init("FaceNeural", logging.INFO, log_path="./output/neural_log.txt")
-    evl = Evaluate("test", args)
-    img = cv2.imread("../export/testset_female2/db_0000_4.jpg").astype(np.float32)
-    evl.itr_train(img)
+    evl = Evaluate("test", args, cuda=True)
+    img = cv2.imread("../export/testset_female/db_0000_4.jpg").astype(np.float32)
+    x_ = evl.for_train(img)
+    # x_ = evl.itr_train(img)
+    evl.output(x_, img)

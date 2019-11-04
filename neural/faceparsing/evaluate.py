@@ -57,7 +57,7 @@ _to_tensor_ = None
 def parse_evaluate(img, cp, cuda=False):
     """
     global _net_, _to_tensor_ for performance
-    :param img: numpy array
+    :param img: numpy array, 注意一定要是np.uint8, 而不是np.float32
     :param cp: args.parsing_checkpoint, str
     :param cuda: use gpu to speedup
     """

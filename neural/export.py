@@ -106,10 +106,10 @@ def batch_transfer(curr_path, export_path):
         print("root", root)
         cp = os.path.join(root, "dat/79999_iter.pth")
         print(cp)
-        dir_2 = export_path + "_2"
-        if os.path.exists(dir_2):
-            shutil.rmtree(dir_2)
-        os.mkdir(dir_2)
+        dir2 = export_path + "2"
+        if os.path.exists(dir2):
+            shutil.rmtree(dir2)
+        os.mkdir(dir2)
         thread_cnt = 16
         for root, dirs, files in os.walk(export_path, topdown=False):
             count = len(files)
@@ -120,13 +120,11 @@ def batch_transfer(curr_path, export_path):
                 end = split * (i + 1)
                 end = end if (i < thread_cnt - 1) else count
                 files_ = files[start: end]
-                thread = Thread_Transfer(i, root, dir_2, cp, files_)
+                thread = Thread_Transfer(i, root, dir2, cp, files_)
                 thread.start()
                 thread_pool.append(thread)
             for thread in thread_pool:
                 thread.join()
-        os.rename(exp_path, exp_path + "2")
-        os.rename(exp_path + "_2", exp_path)
     else:
         print("there is not dir ", export_path)
 
