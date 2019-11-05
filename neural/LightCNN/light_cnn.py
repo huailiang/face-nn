@@ -37,14 +37,14 @@ class resblock(nn.Module):
         super(resblock, self).__init__()
         self.conv1 = mfm(in_channels, out_channels, kernel_size=3, stride=1, padding=1)
         self.conv2 = mfm(in_channels, out_channels, kernel_size=3, stride=1, padding=1)
-        self.bn = nn.BatchNorm2d(out_channels)
+        # self.bn = nn.BatchNorm2d(out_channels)
 
     def forward(self, x):
         res = x
         out = self.conv1(x)
         out = self.conv2(out)
         out = out + res
-        out = self.bn(out)
+        # out = self.bn(out)
         out = F.relu(out)
         return out
 
@@ -120,7 +120,7 @@ class network_29layers(nn.Module):
 
 
 class network_29layers_v2(nn.Module):
-    def __init__(self, block, layers, num_classes=79077):
+    def __init__(self, block, layers, num_classes=80013):
         super(network_29layers_v2, self).__init__()
         self.conv1 = mfm(1, 48, 5, 1, 2)
         self.block1 = self._make_layer(block, layers[0], 48, 48)

@@ -69,10 +69,11 @@ if __name__ == '__main__':
         extractor.load_checkpoint("model_extractor_845000.pth", True, cuda)
     elif args.phase == "lightcnn":
         log.info("light cnn test")
-        checkpoint = torch.load(args.lightcnn, map_location="cpu")
-        img = torch.randn(1, 3, 512, 512)
-        features = utils.feature256(img, checkpoint)
+        lightcnn_inst = utils.load_lightcnn(args.lightcnn, cuda)
+        img = torch.ones(1, 1, 512, 512)
+        features = utils.feature256(img, lightcnn_inst)
         log.info(features.size())
+        log.info("features: {0} {1}".format(features[0][1], features[0][0]))
     elif args.phase == "faceparsing":
         log.info("faceparsing")
         im = utils.evalute_face("./output/face/db_0000_3.jpg", args.parsing_checkpoint, cuda)

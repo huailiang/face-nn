@@ -3,7 +3,6 @@
 # @Author: penghuailiang
 # @Date  : 2019-09-27
 
-import re
 import cv2
 import os
 import shutil

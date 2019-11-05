@@ -26,7 +26,7 @@ class Evaluate:
         self.name = name
         self.args = args
         location = self.args.lightcnn
-        self.lightcnn_inst = utils.load_lightcnn(location)
+        self.lightcnn_inst = utils.load_lightcnn(location, cuda)
         self.cuda = cuda
         self.parsing = self.args.parsing_checkpoint
         self.max_itr = 8
@@ -35,6 +35,7 @@ class Evaluate:
         self.imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             self.imitator.cuda()
+        self.imitator.eval()
         self.imitator.load_checkpoint("model_imitator_40000.pth", False, cuda=cuda)
 
     def discrim_l1(self, y, y_):
@@ -59,10 +60,10 @@ class Evaluate:
         """
         facial semantic feature loss
         evaluate loss use l1 at pixel space
-        :param step: train step
-        :param export: export for preview in train
         :param y: input photo, numpy array  [H, W, C]
         :param y_: generated image, tensor  [B, C, W, H]
+        :param export: export for preview in train
+        :param step: train step
         :return: l1 loss in pixel space
         """
         img1 = parse_evaluate(y.astype(np.uint8), cp=self.parsing, cuda=self.cuda)
@@ -92,7 +93,7 @@ class Evaluate:
         l1 = self.discrim_l1(y, y_)
         l2 = self.discrim_l2(y, y_, export, step)
         alpha = 200  # weight balance
-        # log.info("l1:{0:.5f} l2:{1:.5f}".format(l1 * alpha, l2))
+        # log.info("l1:{0:.5f} l2:{1:.5f}".format(l1, l2))
         return alpha * l1 + l2
 
     def itr_train(self, y):
@@ -106,7 +107,7 @@ class Evaluate:
         if self.cuda:
             x_ = x_.cuda()
         learning_rate = 0.01
-        idx = 0  # batch index
+        ix = 0  # batch index
         steps = 1  # param_cnt
         loss_ = 0
         # progress = tqdm(range(0, steps), initial=0, total=steps)  # type: # tqdm
@@ -119,8 +120,8 @@ class Evaluate:
                     loss = self.evaluate_ls(y, y_, export, j)
                     delta = loss - loss_
                     loss_ = loss
-                    x_[idx][j] = self.update_x(x_[idx][j], learning_rate * delta)
-                    description = "loss: {0:.5f} delta:{1:.5} x:{2:.5}".format(loss, delta, x_[idx][j])
+                    x_[ix][j] = self.update_x(x_[ix][j], learning_rate * delta)
+                    description = "loss: {0:.5f} delta:{1:.5} x:{2:.5}".format(loss, delta, x_[ix][j])
                     # progress.set_description(description)
                     log.info(description)
                 loss_ = loss + learning_rate
@@ -133,19 +134,23 @@ class Evaluate:
         x_ = torch.from_numpy(np_params)
         if self.cuda:
             x_ = x_.cuda()
-
-        mini_loss = 10000
-        tmp_x = 0
-        progress = tqdm(range(0, param_cnt), initial=0, total=param_cnt)
+        m_progress = tqdm(range(0, param_cnt), initial=0, total=param_cnt)
         with torch.no_grad():
-            for p in progress:
-                for i in range(10):
-                    x_[0][p] = i * 0.1
-                    y_ = self.imitator(x_)
-                    loss = self.evaluate_ls(y, y_, False, i)
-                    if loss < mini_loss:
-                        tmp_x = x_[0][p]
-                x_[0][p] = tmp_x
+            loop = 4
+            for _ in range(loop):
+                m_progress.pos = 0
+                for p in m_progress:
+                    mini_loss = 1e5
+                    tmp_x = 0
+                    for i in range(10):
+                        x_[0][p] = i * 0.1 + 0.025 * _
+                        y_ = self.imitator(x_)
+                        loss = self.evaluate_ls(y, y_, False, i).item()
+                        if loss < mini_loss:
+                            tmp_x = x_[0][p].item()
+                            mini_loss = loss
+                    x_[0][p] = tmp_x
+                    m_progress.set_description("{0}/{1} {2:.4f}".format(_, loop, tmp_x))
         return x_
 
     @staticmethod
