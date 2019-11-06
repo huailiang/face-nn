@@ -38,7 +38,8 @@ def vis_parsing_maps(im, parsing_anno, stride):
 def _build_net(cp, cuda=False):
     n_classes = 19
     net = BiSeNet(n_classes=n_classes)
-
+    for p in net.parameters():
+        p.requires_grad = False
     if cuda:
         net.cuda()
         net.load_state_dict(torch.load(cp))
@@ -66,6 +67,7 @@ def parse_evaluate(img, cp, cuda=False):
     with torch.no_grad():
         if _net_ is None or _to_tensor_ is None:
             _net_, _to_tensor_ = _build_net(cp)
+
         image = _to_tensor_(img)
         image = torch.unsqueeze(image, 0)
         if cuda:

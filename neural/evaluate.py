@@ -8,6 +8,8 @@ import ops
 import util.logit as log
 from imitator import Imitator
 from faceparsing.evaluate import *
+import torch.optim as optim
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
 """
@@ -28,15 +30,18 @@ class Evaluate:
         self.args = args
         location = self.args.lightcnn
         self.lightcnn_inst = utils.load_lightcnn(location, cuda)
+        utils.lock_net(self.lightcnn_inst)
         self.cuda = cuda
         self.parsing = self.args.parsing_checkpoint
-        self.max_itr = 8
+        self.max_itr = 256
+        self.losses = []
         self.prev_path = "./output/eval"
         self.clean()
         self.imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             self.imitator.cuda()
         self.imitator.eval()
+        utils.lock_net(self.imitator)
         self.imitator.load_checkpoint("model_imitator_40000.pth", False, cuda=cuda)
 
     def discrim_l1(self, y, y_):
@@ -47,23 +52,21 @@ class Evaluate:
         :return: l1 loss
         """
         y = cv2.resize(y, dsize=(128, 128), interpolation=cv2.INTER_LINEAR)
-        y = np.swapaxes(y, 0, 2)
+        y = np.swapaxes(y, 0, 2).astype(np.float32)
         y = np.mean(y, axis=0)[np.newaxis, np.newaxis, :, :]
         y = torch.from_numpy(y)
-        y_ = y_.cpu().detach().numpy()
-        y_ = y_.reshape(512, 512, 3)
-        y_ = cv2.resize(y_, dsize=(128, 128), interpolation=cv2.INTER_LINEAR)
-        y_ = np.mean(y_, axis=2)[np.newaxis, np.newaxis, :, :]
-        y_ = torch.from_numpy(y_)
+        if self.cuda:
+            y = y.cuda()
+        y_ = F.max_pool2d(y_, kernel_size=(4, 4), stride=4)  # 512->128
+        y_ = torch.mean(y_, dim=1).view(1, 1, 128, 128)  # gray
         return utils.discriminative_loss(y, y_, self.lightcnn_inst)
 
-    def discrim_l2(self, y, y_, export, step):
+    def discrim_l2(self, y, y_, step):
         """
         facial semantic feature loss
         evaluate loss use l1 at pixel space
         :param y: input photo, numpy array  [H, W, C]
         :param y_: generated image, tensor  [B, C, W, H]
-        :param export: export for preview in train
         :param step: train step
         :return: l1 loss in pixel space
         """
@@ -74,7 +77,8 @@ class Evaluate:
         img2 = parse_evaluate(y_.astype(np.uint8), cp=self.parsing, cuda=self.cuda)
         edge_img1 = utils.img_edge(img1).astype(np.float32)
         edge_img2 = utils.img_edge(img2).astype(np.float32)
-        if export:
+
+        if step % 50 == 0:
             path = os.path.join(self.prev_path, "l2_{0}.jpg".format(step))
             edge1_v3 = 255. - ops.fill_grey(edge_img1)
             edge2_v3 = 255. - ops.fill_grey(edge_img2)
@@ -82,120 +86,43 @@ class Evaluate:
             cv2.imwrite(path, image)
         return np.mean(np.abs(edge_img1 - edge_img2))
 
-    def evaluate_ls(self, y, y_, export, step):
+    def evaluate_ls(self, y, y_, step):
         """
         评估损失Ls
         :param y: input photo, numpy array
         :param y_:  generated image, tensor [b,c,w,h]
         :param step: train step
-        :param export: export for preview in train
         :return: ls
         """
         l1 = self.discrim_l1(y, y_)
-        l2 = self.discrim_l2(y, y_, export, step)
-        alpha = 500  # weight balance
-        # log.info("l1:{0:.5f} l2:{1:.5f}".format(l1, l2))
-        return alpha * l1 + l2
+        l2 = self.discrim_l2(y, y_, step)
+        alpha = 2  # weight balance
+        ls = alpha * l1 + l2
+        log.info("{0:3} l1:{1:.4f} l2:{2:.4f} ls:{3:.4f}".format(step + 1, l1, l2, ls))
+        self.losses.append((l1.item(), l2.item(), ls.item()))
+        return ls
 
     def itr_train(self, y):
         """
         iterator train
-        :param y: numpy array
+        :param y: numpy array, image [H, W, C]
         """
         param_cnt = self.args.params_cnt
         np_params = 0.5 * np.ones((1, param_cnt), dtype=np.float32)
-        x_ = torch.from_numpy(np_params)
+        t_params = torch.from_numpy(np_params)
         if self.cuda:
-            x_ = x_.cuda()
-        learning_rate = 0.04
-        ix = 0  # batch index
-        steps = 1  # param_cnt
-        loss_ = 0
-        # progress = tqdm(range(0, steps), initial=0, total=steps)  # type: # tqdm
-        with torch.no_grad():
-            for j in range(steps):
-                # for j in progress:
-                j = 83
-                for i in range(self.max_itr):
-                    y_ = self.imitator(x_)
-                    export = i == self.max_itr - 1
-                    loss = self.evaluate_ls(y, y_, export, j)
-                    delta = loss - loss_
-                    if loss_ == 0:
-                        delta /= 1e3
-                    loss_ = loss
-                    x_[ix][j] = self.update_x(x_[ix][j], learning_rate * delta)
-                    description = "loss: {0:.5f} delta:{1:.5} x:{2:.5}".format(loss, delta, x_[ix][j])
-                    # progress.set_description(description)
-                    log.info(description)
-                loss_ = loss + learning_rate
-        return x_
-
-    def for_train(self, y):
-        plt.style.use('seaborn-whitegrid')
-        param_cnt = self.args.params_cnt
-        np_params = 0.5 * np.ones((1, param_cnt), dtype=np.float32)
-        param_cnt = 1  # self.args.params_cnt
-        input = torch.from_numpy(np_params)
-        if self.cuda:
-            input = input.cuda()
-        m_progress = tqdm(range(0, param_cnt), initial=0, total=param_cnt)
-        p_x = []
-        p_y = []
-        with torch.no_grad():
-            for p in m_progress:
-                p = 89
-                mini_loss = 1e5
-                tmp_x = 0
-                cross = 50
-                for i in range(cross):
-                    x_step = i / float(cross)
-                    input[0][p] = x_step
-                    p_x.append(x_step)
-                    y_ = self.imitator(input)
-                    loss = self.evaluate_ls(y, y_, False, i).item()
-                    if loss < mini_loss:
-                        tmp_x = x_step
-                        mini_loss = loss
-                    p_y.append(loss)
-                    self.capture(y_, i + 1)
-                    log.info("{0} mini:{1:.4f} loss:{2:.4f}".format(i + 1, mini_loss, loss))
-                input[0][p] = tmp_x
-                plt.ylabel("loss")
-                plt.title('step-{0}'.format(p + 1))
-                plt.plot(p_x, p_y)
-                plt.savefig(os.path.join(self.prev_path, "curve.png"))
-                plt.show()
-            m_progress.close()
-        return input
-
-    @staticmethod
-    def update_x(x, delta_loss):
-        """
-        更新梯度
-        :param x: input scalar
-        :param delta_loss: gradient loss, delta * lr
-        :return: updated value, scalar
-        """
-        delta = delta_loss.item()
-        # 避免更新幅度过大或者过小
-        dir = -1 if delta < 0 else 1
-        if abs(delta) > 0.4:
-            delta = dir * 0.4
-
-        delta_x = -delta
-        new_x = x + delta_x
-        if new_x < 0:
-            new_x = 0
-        elif new_x > 1:
-            new_x = 1
-        return new_x
-
-    def capture(self, y_, step):
-        y_ = y_.cpu().detach().numpy()
-        y_ = np.squeeze(y_, axis=0)
-        y_ = (np.swapaxes(y_, 0, 2) * 255.).astype(np.uint8)
-        cv2.imwrite("{0}/step-{1}.jpg".format(self.prev_path, step), y_)
+            t_params = t_params.cuda()
+        t_params.requires_grad = True
+        self.losses.clear()
+        optimize = optim.Adam([t_params], lr=0.01)
+        for i in range(self.max_itr):
+            y_ = self.imitator.forward(t_params)
+            loss = self.evaluate_ls(y, y_, i)
+            loss.backward()
+            optimize.step()
+            optimize.zero_grad()
+        self.plot()
+        return t_params
 
     def output(self, x, refer):
         """
@@ -219,6 +146,22 @@ class Evaluate:
         """
         ops.clear_files(self.prev_path)
 
+    def plot(self):
+        plt.style.use('seaborn-whitegrid')
+        x = range(self.max_itr)
+        y1 = []
+        y2 = []
+        y3 = []
+        for it in self.losses:
+            y1.append(it[0])
+            y2.append(it[1])
+            y3.append(it[2])
+        plt.plot(x, y1, color='r')
+        plt.plot(x, y2, color='g')
+        plt.plot(x, y3, color='b')
+        path = os.path.join(self.prev_path, "curve.png")
+        plt.savefig(path)
+
 
 if __name__ == '__main__':
     import logging
@@ -229,6 +172,5 @@ if __name__ == '__main__':
     log.init("FaceNeural", logging.INFO, log_path="./output/neural_log.txt")
     evl = Evaluate("test", args, cuda=True)
     img = cv2.imread("../export/testset_female/db_0000_4.jpg").astype(np.float32)
-    x_ = evl.for_train(img)
-    # x_ = evl.itr_train(img)
+    x_ = evl.itr_train(img)
     evl.output(x_, img)

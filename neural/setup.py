@@ -25,6 +25,7 @@ setup(name="neural",
                         "torch",
                         'torchvision',
                         'tensorboardX',
-                        'scikit-image', 'matplotlib'],
+                        'scikit-image',
+                        'matplotlib'],
       python_requires=">=3.5"
       )
