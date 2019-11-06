@@ -55,6 +55,12 @@
 pip3 install dlib
 ```
 
+或者使用conda安装
+
+```
+conda install -c menpo dlib
+```
+
 dlib 引用模型下载地址:
 
 http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2 

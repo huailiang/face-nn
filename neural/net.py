@@ -17,15 +17,15 @@ class Net(object):
     使用udp在进程间通信，udp不保证时序性，也不保证引擎一定能收到
     """
 
-    def __init__(self, port, args):
+    def __init__(self, port, arguments):
         """
         net initial
         :param port: udp 端口号
-        :param args: parse options
+        :param arguments: parse options
         """
         atexit.register(self.close)
         self.port = port
-        self.args = args
+        self.args = arguments
         self.buffer_size = 1024
         self.open = False
         log.info("socket start,  port:" + str(port))

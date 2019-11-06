@@ -8,10 +8,11 @@ import ops
 import util.logit as log
 from imitator import Imitator
 from faceparsing.evaluate import *
+import matplotlib.pyplot as plt
 
 """
 面部相似性度量
-    Ls = alpha * L1 + L2
+ Ls = alpha * L1 + L2
 """
 
 
@@ -92,7 +93,7 @@ class Evaluate:
         """
         l1 = self.discrim_l1(y, y_)
         l2 = self.discrim_l2(y, y_, export, step)
-        alpha = 200  # weight balance
+        alpha = 500  # weight balance
         # log.info("l1:{0:.5f} l2:{1:.5f}".format(l1, l2))
         return alpha * l1 + l2
 
@@ -106,7 +107,7 @@ class Evaluate:
         x_ = torch.from_numpy(np_params)
         if self.cuda:
             x_ = x_.cuda()
-        learning_rate = 0.01
+        learning_rate = 0.04
         ix = 0  # batch index
         steps = 1  # param_cnt
         loss_ = 0
@@ -114,11 +115,14 @@ class Evaluate:
         with torch.no_grad():
             for j in range(steps):
                 # for j in progress:
+                j = 83
                 for i in range(self.max_itr):
                     y_ = self.imitator(x_)
                     export = i == self.max_itr - 1
                     loss = self.evaluate_ls(y, y_, export, j)
                     delta = loss - loss_
+                    if loss_ == 0:
+                        delta /= 1e3
                     loss_ = loss
                     x_[ix][j] = self.update_x(x_[ix][j], learning_rate * delta)
                     description = "loss: {0:.5f} delta:{1:.5} x:{2:.5}".format(loss, delta, x_[ix][j])
@@ -128,30 +132,42 @@ class Evaluate:
         return x_
 
     def for_train(self, y):
+        plt.style.use('seaborn-whitegrid')
         param_cnt = self.args.params_cnt
         np_params = 0.5 * np.ones((1, param_cnt), dtype=np.float32)
-        param_cnt = self.args.params_cnt
-        x_ = torch.from_numpy(np_params)
+        param_cnt = 1  # self.args.params_cnt
+        input = torch.from_numpy(np_params)
         if self.cuda:
-            x_ = x_.cuda()
+            input = input.cuda()
         m_progress = tqdm(range(0, param_cnt), initial=0, total=param_cnt)
+        p_x = []
+        p_y = []
         with torch.no_grad():
-            loop = 4
-            for _ in range(loop):
-                m_progress.pos = 0
-                for p in m_progress:
-                    mini_loss = 1e5
-                    tmp_x = 0
-                    for i in range(10):
-                        x_[0][p] = i * 0.1 + 0.025 * _
-                        y_ = self.imitator(x_)
-                        loss = self.evaluate_ls(y, y_, False, i).item()
-                        if loss < mini_loss:
-                            tmp_x = x_[0][p].item()
-                            mini_loss = loss
-                    x_[0][p] = tmp_x
-                    m_progress.set_description("{0}/{1} {2:.4f}".format(_, loop, tmp_x))
-        return x_
+            for p in m_progress:
+                p = 89
+                mini_loss = 1e5
+                tmp_x = 0
+                cross = 50
+                for i in range(cross):
+                    x_step = i / float(cross)
+                    input[0][p] = x_step
+                    p_x.append(x_step)
+                    y_ = self.imitator(input)
+                    loss = self.evaluate_ls(y, y_, False, i).item()
+                    if loss < mini_loss:
+                        tmp_x = x_step
+                        mini_loss = loss
+                    p_y.append(loss)
+                    self.capture(y_, i + 1)
+                    log.info("{0} mini:{1:.4f} loss:{2:.4f}".format(i + 1, mini_loss, loss))
+                input[0][p] = tmp_x
+                plt.ylabel("loss")
+                plt.title('step-{0}'.format(p + 1))
+                plt.plot(p_x, p_y)
+                plt.savefig(os.path.join(self.prev_path, "curve.png"))
+                plt.show()
+            m_progress.close()
+        return input
 
     @staticmethod
     def update_x(x, delta_loss):
@@ -164,9 +180,7 @@ class Evaluate:
         delta = delta_loss.item()
         # 避免更新幅度过大或者过小
         dir = -1 if delta < 0 else 1
-        if abs(delta) < 1e-3:
-            delta = dir * 1e-3
-        elif abs(delta) > 0.4:
+        if abs(delta) > 0.4:
             delta = dir * 0.4
 
         delta_x = -delta
@@ -176,6 +190,12 @@ class Evaluate:
         elif new_x > 1:
             new_x = 1
         return new_x
+
+    def capture(self, y_, step):
+        y_ = y_.cpu().detach().numpy()
+        y_ = np.squeeze(y_, axis=0)
+        y_ = (np.swapaxes(y_, 0, 2) * 255.).astype(np.uint8)
+        cv2.imwrite("{0}/step-{1}.jpg".format(self.prev_path, step), y_)
 
     def output(self, x, refer):
         """

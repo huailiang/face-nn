@@ -105,50 +105,35 @@ namespace XEngine.Editor
         {
             XEditorUtil.SetupEnv();
             string file = UnityEditor.EditorUtility.OpenFilePanel("Select model file", MODEL, "bytes");
-            FileInfo info = new FileInfo(file);
-            ProcessFile(info, true);
-            MoveDestDir("model_*", "regular/");
-            EditorUtility.Open(EXPORT + "regular/");
+            if (!string.IsNullOrEmpty(file))
+            {
+                FileInfo info = new FileInfo(file);
+                ProcessFile(info, true);
+                MoveDestDir("model_*", "regular/");
+                EditorUtility.Open(EXPORT + "regular/");
+            }
         }
 
         [MenuItem("Tools/SelectPicture")]
         public static void Picture2Model()
         {
             XEditorUtil.SetupEnv();
-            string picture = UnityEditor.EditorUtility.OpenFilePanel("Select model file", EXPORT, "jpg");
-            int idx = picture.LastIndexOf('/') + 1;
-            string descript = picture.Substring(0, idx) + "db_description";
-            if (!string.IsNullOrEmpty(descript))
+            string name = "";
+            float[] args = new float[CNT];
+            if (ParseFromPicture(ref args, ref name))
             {
-                string key = picture.Substring(idx).Replace(".jpg", "");
-                FileInfo info = new FileInfo(descript);
-                FileStream fs = new FileStream(descript, FileMode.Open, FileAccess.Read);
-                BinaryReader reader = new BinaryReader(fs);
-                int cnt = reader.ReadInt32();
-                float[] args = new float[CNT];
-                while (cnt-- > 0)
+                string str = "";
+                int shape = int.Parse(name[name.Length - 1].ToString());
+                for (int i = 0; i < CNT; i++) str += i + "-" + args[i].ToString("f3") + " ";
+                Debug.Log(str);
+                NeuralData data = new NeuralData
                 {
-                    string name = reader.ReadString();
-                    for (int i = 0; i < CNT; i++) args[i] = reader.ReadSingle();
-                    string str = string.Empty;
-                    if (name == key)
-                    {
-                        int shape = int.Parse(name[name.Length - 1].ToString());
-                        for (int i = 0; i < CNT; i++) str += args[i].ToString("f3") + " ";
-                        Debug.Log(str);
-                        NeuralData data = new NeuralData
-                        {
-                            callback = Capture,
-                            boneArgs = args,
-                            shape = (RoleShape)shape,
-                            name = name
-                        };
-                        NeuralInput(data, true, true);
-                        break;
-                    }
-                }
-                reader.Close();
-                fs.Close();
+                    callback = Capture,
+                    boneArgs = args,
+                    shape = (RoleShape)shape,
+                    name = name
+                };
+                NeuralInput(data, true, true);
             }
         }
 
@@ -173,6 +158,30 @@ namespace XEngine.Editor
         {
             var window = EditorWindow.GetWindowWithRect<NeuralInterface>(new Rect(0, 0, 320, 400));
             window.Show();
+        }
+
+        public static bool ParseFromPicture(ref float[] args, ref string name)
+        {
+            string picture = UnityEditor.EditorUtility.OpenFilePanel("Select model file", EXPORT, "jpg");
+            int idx = picture.LastIndexOf('/') + 1;
+            string descript = picture.Substring(0, idx) + "db_description";
+            if (!string.IsNullOrEmpty(picture))
+            {
+                string key = picture.Substring(idx).Replace(".jpg", "");
+                FileInfo info = new FileInfo(descript);
+                FileStream fs = new FileStream(descript, FileMode.Open, FileAccess.Read);
+                BinaryReader reader = new BinaryReader(fs);
+                int cnt = reader.ReadInt32();
+                while (cnt-- > 0)
+                {
+                    name = reader.ReadString();
+                    for (int i = 0; i < CNT; i++) args[i] = reader.ReadSingle();
+                    if (name == key) return true;
+                }
+                reader.Close();
+                fs.Close();
+            }
+            return false;
         }
 
 
@@ -245,8 +254,6 @@ namespace XEngine.Editor
                 UnityEditor.EditorUtility.ClearProgressBar();
             }
         }
-
-
 
         private static void ProcessFile(FileInfo info, bool complete)
         {

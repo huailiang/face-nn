@@ -51,6 +51,23 @@ class FaceDataset:
         else:
             log.info("can't be found path %s. Skip it.", self.path)
 
+    def get_picture(self, idx=-1):
+        """
+        从dataset获取一张图片
+        :param idx: -1 代表随机获取, 否则代表数据集里对应的编号
+        :return: name 图片名不带后缀; param,捏脸参数, list; image,对应图片的numpy array
+        """
+        count = len(self.names)
+        if idx >= count:
+            raise NeuralException("dataset override array bounds")
+        if idx == -1:
+            idx = random.randint(0, count)
+        name = self.names[idx]
+        param = self.params[idx]
+        path = os.path.join(self.path, name + ".jpg")
+        image = cv2.imread(path)
+        return name, param, image
+
     def get_batch(self, batch_size, edge):
         """
         以<name, params, image>的形式返回

@@ -147,7 +147,7 @@ class Imitator(nn.Module):
         """
         path_ = self.args.path_to_inference + "/" + path
         if not os.path.exists(path_):
-            raise NeuralException("not exist checkpoint of imitator with path " + path)
+            raise NeuralException("not exist checkpoint of imitator with path " + path_)
         checkpoint = torch.load(path_)
         self.model.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
@@ -156,21 +156,10 @@ class Imitator(nn.Module):
         if training:
             self.batch_train(cuda)
 
-    def inference(self, path, params, cuda=False):
-        """
-        imitator生成图片
-        :param path: checkpoint's path
-        :param params: engine's params
-        :param cuda: gpu speedup
-        :return: images [batch, 1, 512, 512]
-        """
-        self.load_checkpoint(path, cuda=cuda)
-        _, images = self.forward(params)
-        return images
-
     def evaluate(self):
         """
         评估准确率
+        方法是loss取反，只是一个相对值
         :return: accuracy rate
         """
         self.model.eval()

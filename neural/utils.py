@@ -6,7 +6,6 @@
 from __future__ import division
 
 import random
-import scipy.misc
 from lightcnn.extract_features import *
 import torch.nn as nn
 import torch.nn.functional as F
@@ -96,7 +95,7 @@ def load_lightcnn(location, cuda=False):
     load light cnn to memory
     :param location: lightcnn path
     :param cuda: gpu speed up
-    :return: 29-layer light cnn model
+    :return: 29-layer-v2 light cnn model
     """
     model = LightCNN_29Layers_v2(num_classes=80013)
     lock_net(model)
@@ -151,7 +150,7 @@ def feature256(img, lightcnn_inst):
     for i in range(batch):
         _img = img[i].cpu().detach().numpy()
         _img = _img.reshape((_img.shape[1], _img.shape[2]))
-        _img = scipy.misc.imresize(arr=_img, size=(128, 128), interp='bilinear')
+        _img = cv2.resize(_img, dsize=(128,128), interpolation=cv2.INTER_LINEAR)
         _img = transform(_img)
         _img = _img.view(1, 1, 128, 128)
         _, features = lightcnn_inst(_img)
@@ -270,7 +269,7 @@ def save_batch(input_painting_batch, input_photo_batch, output_painting_batch, o
     outputs = np.concatenate([batch_to_img(output_painting_batch), batch_to_img(output_photo_batch)], axis=0)
     to_save = np.concatenate([inputs, outputs], axis=1)
     to_save = np.clip(to_save, a_min=0., a_max=255.).astype(np.uint8)
-    scipy.misc.imsave(filepath, arr=to_save)
+    cv2.imwrite(filepath, to_save)
 
 
 def normalize_arr_of_imgs(arr):

@@ -412,6 +412,12 @@ namespace XEngine.Editor
             int cnt = len1 + len2;
             if (folds == null) folds = new bool[cnt];
             if (icons == null) icons = new Object[cnt];
+            if (GUILayout.Button("Sync", GUILayout.Width(120)))
+            {
+                string name = "";
+                if (NeuralInterface.ParseFromPicture(ref args, ref name))
+                    NeuralProcess(args);
+            }
             rect = GUILayout.BeginScrollView(rect);
             for (int i = 0; i < len1; i++)
             {
@@ -469,6 +475,8 @@ namespace XEngine.Editor
             EditorGUILayout.EndHorizontal();
             ix++;
         }
+
+       
 
         private void ProcessKneadBone(int groupId, float weight)
         {

@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='face')
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='train_imitator',
+    default='prev_imitator',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',
@@ -90,7 +90,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(4e4),
+    default=int(5e4),
     help='total steps for imitator')
 parser.add_argument(
     '--batch_size',
@@ -102,7 +102,7 @@ parser.add_argument(
     '--prev_freq',
     dest='prev_freq',
     type=int,
-    default=200,
+    default=1000,
     help='generate preview image when training')
 parser.add_argument(
     '--save_freq',

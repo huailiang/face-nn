@@ -3,7 +3,6 @@
 # @Author: penghuailiang
 # @Date  : 2019-09-20
 
-
 import utils
 import ops
 import logging
@@ -11,6 +10,7 @@ import torch
 import align
 import cv2
 import util.logit as log
+import numpy as np
 from dataset import FaceDataset
 from imitator import Imitator
 from extractor import Extractor
@@ -60,7 +60,22 @@ if __name__ == '__main__':
         imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             imitator.cuda()
-        imitator.load_checkpoint("model_imitator_130000.pth", True, cuda=cuda)
+        imitator.load_checkpoint("model_imitator_40000.pth", True, cuda=cuda)
+    elif args.phase == "prev_imitator":
+        log.info("preview imitator")
+        imitator = Imitator("neural imitator", args, clean=False)
+        imitator.load_checkpoint("model_imitator_40000.pth", False, cuda=False)
+        dataset = FaceDataset(args)
+        name, param, img = dataset.get_picture()
+        param = np.array(param, dtype=np.float32)
+        b_param = param[np.newaxis, :]
+        log.info(b_param.shape)
+        t_param = torch.from_numpy(b_param)
+        output = imitator(t_param)
+        output = output.cpu().detach().numpy()
+        output = np.squeeze(output, axis=0)
+        output = output.swapaxes(0, 2) * 255
+        cv2.imwrite('./output/{0}.jpg'.format(name), output)
     elif args.phase == "inference_extractor":
         log.info("inference extractor")
         extractor = Extractor("neural extractor", args)
