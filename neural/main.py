@@ -9,6 +9,7 @@ import logging
 import torch
 import align
 import cv2
+import os
 import util.logit as log
 import numpy as np
 from dataset import FaceDataset
@@ -95,7 +96,18 @@ if __name__ == '__main__':
         im = utils.evalute_face("./output/face/db_0000_3.jpg", args.parsing_checkpoint, cuda)
         cv2.imwrite("./output/eval.jpg", im)
     elif args.phase == "align":
-        align.face_features("../export/regular/model.jpg", "../export/regular/out.jpg")
+        path = '../export/star'
+        for file in os.listdir(path):
+            p = os.path.join(path, file)
+            log.info(p)
+            p2 = os.path.join(path, "a-"+file)
+            al = align.face_features(p, p2)
+            ev = utils.parse_evaluate(al,  args.parsing_checkpoint, cuda=cuda)
+            p = os.path.join(path, "b-"+file)
+            cv2.imwrite(p, ev)
+            ev = 255 - utils.img_edge(ev)
+            p = os.path.join(path, "c-" + file)
+            cv2.imwrite(p, ev)
     elif args.phase == "dataset":
         dataset = FaceDataset(args, "test")
         dataset.pre_process(cuda)

@@ -42,7 +42,7 @@ class Evaluate:
             self.imitator.cuda()
         self.imitator.eval()
         utils.lock_net(self.imitator)
-        self.imitator.load_checkpoint("model_imitator_100000.pth", False, cuda=cuda)
+        self.imitator.load_checkpoint(args.imitator_model, False, cuda=cuda)
 
     def discrim_l1(self, y, y_):
         """
@@ -98,7 +98,7 @@ class Evaluate:
         """
         l1 = self.discrim_l1(y, y_)
         l2 = self.discrim_l2(y, y_, step)
-        alpha = 4  # weight balance
+        alpha = self.args.eval_alpha
         ls = alpha * l1 + l2
         info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f}".format(alpha * l1, l2, ls)
         self.losses.append((l1.item() * alpha, l2.item(), ls.item()))
@@ -116,22 +116,23 @@ class Evaluate:
             t_params = t_params.cuda()
         t_params.requires_grad = True
         self.losses.clear()
-        optimize = optim.Adam([t_params], lr=self.learning_rate)
+        optimizer = optim.Adam([t_params], lr=self.learning_rate)
         progress = tqdm(range(self.max_itr), initial=0, total=self.max_itr)
         for i in progress:
             y_ = self.imitator.forward(t_params)
             loss, info = self.evaluate_ls(y, y_, i)
+            optimizer.zero_grad()
             loss.backward()
-            optimize.step()
-            optimize.zero_grad()
-            t_params.clamp(0., 1.)
+            optimizer.step()
+            # t_params = t_params.clamp(0., 1.)
             progress.set_description(info)
             if self.max_itr % 100 == 0:
                 x = i / float(self.max_itr)
                 lr = self.learning_rate * (x ** 2 - 2 * x + 1) + 1e-4
-                utils.update_optimizer_lr(optimize, lr)
+                utils.update_optimizer_lr(optimizer, lr)
         self.plot()
-        return t_params
+        log.info(t_params)
+        return t_params.clamp(0., 1.)
 
     def output(self, x, refer):
         """

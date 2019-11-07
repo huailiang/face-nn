@@ -96,7 +96,7 @@ class Thread_Transfer(threading.Thread):
 def batch_transfer(curr_path, export_path):
     """
     批量转换edge图片
-    默认开启16个线程， 根据自己电脑cpu核数自定义
+    默认开启16个线程， 根据自己电脑cpu核数去自定义此数值 thread_cnt=16
     :param curr_path: current script's path
     :param export_path: 转换目录
     :return:

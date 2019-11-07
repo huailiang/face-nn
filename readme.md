@@ -117,9 +117,6 @@ baidu  yun:	   [LightCNN-29 v2][i7]
 
 ![](/image/t5.jpg)
 
-利用openCV的candy算法， 提取脸部轮廓:
-
-![](/image/t6.jpg)
 
 
 ## Operation
@@ -139,7 +136,7 @@ mkdir dat/
 # 这里需要将下载的lightcnn, dlib等模型拷贝过来
 copy yours_download_model_path data/
 
-python main.py \
+python3 main.py \
 	--phase=train_imitator \
 	--batch_size=4 \
 	--learning_rate=0.01 \
@@ -158,12 +155,26 @@ tensorboard --logdir logs
 如果因为中间因为偶然因素（比如说断电）退出了训练， 又想从之前保存的model中恢复出来， 这时候可以先把model里的模型文件copy到reinference目录， 然后执行下面命令：
 
 ```sh
-python main.py \
+python3 main.py \
 	--phase=inference_imitator	\
 	--total_steps=30000	\
-	--path_to_dataset="../export/trainset_female/"
+	--path_to_dataset="../export/trainset_female/" \
+	--imitator_model="model_imitator_100000.pth"
 ```
 
+### preview
+
+效果预览, 生成捏脸参数二进制文件
+
+```sh
+python3 main.py \
+	--phase=evaluate \
+	--total_eval_steps=400 \
+	--imitator_model="model_imitator_100000.pth" \
+	--eval_image='../export/testset_female/db_0000_4.jpg'
+```
+
+运行脚本后， 会在output/eval目录生成一个eval.bytes, 然后打开unity, 菜单栏tools->SelectModel, 即可在引擎预览到效果
 
 
 [i1]: https://xueqiu.com/9217191040/133506937

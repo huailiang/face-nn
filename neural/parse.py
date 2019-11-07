@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='face')
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='train_imitator',
+    default='align',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',
@@ -160,7 +160,7 @@ parser.add_argument(
     '--total_eval_steps',
     dest='total_eval_steps',
     type=int,
-    default=int(400),
+    default=int(100),
     help='total iterator of evaluate steps')
 parser.add_argument(
     '--eval_learning_rate',
@@ -175,8 +175,14 @@ parser.add_argument(
     default=10,
     help='generate preview image when iterate')
 parser.add_argument(
+    '--eval_alpha',
+    dest='eval_alpha',
+    type=float,
+    default=3.6,
+    help='alpha weight of evaluate balance between l1 & l2')
+parser.add_argument(
     '--eval_image',
     dest='eval_image',
     type=str,
-    default='../export/testset_female/db_0000_4.jpg',
+    default='../export/testset_female/db_0014_4.jpg',
     help='generate preview image when iterate')
