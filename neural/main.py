@@ -14,6 +14,7 @@ import numpy as np
 from dataset import FaceDataset
 from imitator import Imitator
 from extractor import Extractor
+from evaluate import Evaluate
 from parse import parser
 
 
@@ -60,11 +61,11 @@ if __name__ == '__main__':
         imitator = Imitator("neural imitator", args, clean=False)
         if cuda:
             imitator.cuda()
-        imitator.load_checkpoint("model_imitator_40000.pth", True, cuda=cuda)
+        imitator.load_checkpoint(args.imitator_model, True, cuda=cuda)
     elif args.phase == "prev_imitator":
         log.info("preview imitator")
         imitator = Imitator("neural imitator", args, clean=False)
-        imitator.load_checkpoint("model_imitator_40000.pth", False, cuda=False)
+        imitator.load_checkpoint(args.imitator_model, False, cuda=False)
         dataset = FaceDataset(args)
         name, param, img = dataset.get_picture()
         param = np.array(param, dtype=np.float32)
@@ -108,5 +109,11 @@ if __name__ == '__main__':
         img4 = align.face_features(path)
         log.info("{0} {1} {2} {3}".format(img.shape, img2.shape, img3_.shape, img4.shape))
         ops.merge_4image(img, img2, img3_, img4, show=True)
+    elif args.phase == "evaluate":
+        log.info("evaluation mode start")
+        evl = Evaluate(args, cuda=cuda)
+        img = cv2.imread(args.eval_image).astype(np.float32)
+        x_ = evl.itr_train(img)
+        evl.output(x_, img)
     else:
         log.error("not known phase %s", args.phase)

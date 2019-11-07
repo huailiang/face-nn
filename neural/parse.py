@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='face')
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='prev_imitator',
+    default='train_imitator',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',
@@ -90,7 +90,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(5e4),
+    default=int(4e5),
     help='total steps for imitator')
 parser.add_argument(
     '--batch_size',
@@ -115,7 +115,13 @@ parser.add_argument(
     dest='learning_rate',
     type=float,
     default=0.1,
-    help='learning rate of imitator')
+    help='initial learning rate of imitator')
+parser.add_argument(
+    '--imitator_model',
+    dest='imitator_model',
+    type=str,
+    default='model_imitator_100000.pth',
+    help='pre_trained model of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #
 parser.add_argument(
@@ -129,7 +135,7 @@ parser.add_argument(
     dest='extractor_learning_rate',
     type=float,
     default=0.02,
-    help='learning rate of feature extractor')
+    help='initial learning rate of feature extractor')
 parser.add_argument(
     '--extractor_prev_freq',
     dest='extractor_prev_freq',
@@ -142,3 +148,35 @@ parser.add_argument(
     type=int,
     default=5000,
     help='Save model every save_freq steps')
+parser.add_argument(
+    '--extractor_model',
+    dest='extractor_model',
+    type=str,
+    default='model_extractor_845000.pth',
+    help='pre_trained model of extractor')
+
+# ========================= EVALUATE PARAMETERS ========================= #
+parser.add_argument(
+    '--total_eval_steps',
+    dest='total_eval_steps',
+    type=int,
+    default=int(400),
+    help='total iterator of evaluate steps')
+parser.add_argument(
+    '--eval_learning_rate',
+    dest='eval_learning_rate',
+    type=float,
+    default=0.1,
+    help='initial learning rate of evaluate')
+parser.add_argument(
+    '--eval_prev_freq',
+    dest='eval_prev_freq',
+    type=int,
+    default=10,
+    help='generate preview image when iterate')
+parser.add_argument(
+    '--eval_image',
+    dest='eval_image',
+    type=str,
+    default='../export/testset_female/db_0000_4.jpg',
+    help='generate preview image when iterate')

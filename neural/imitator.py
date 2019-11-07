@@ -14,6 +14,7 @@ import torch.optim as optim
 import util.logit as log
 import numpy as np
 import torch.nn.functional as F
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 from dataset import FaceDataset
 from util.exception import NeuralException
@@ -166,19 +167,31 @@ class Imitator(nn.Module):
         dataset = FaceDataset(self.args, mode="test")
         steps = 100
         accuracy = 0.0
+        losses = []
         for step in range(steps):
             log.info("step: %d", step)
             names, params, images = dataset.get_batch(batch_size=self.args.batch_size, edge=False)
             loss, _ = self.itr_train(params, images)
             accuracy += 1.0 - loss
+            losses.append(loss.item())
+        self.plot(losses)
         accuracy = accuracy / steps
         log.info("accuracy rate is %f", accuracy)
         return accuracy
 
+    def plot(self, losses):
+        plt.style.use('seaborn-whitegrid')
+        steps = len(losses)
+        x = range(steps)
+        plt.plot(x, losses)
+        plt.xlabel('step')
+        plt.ylabel('loss')
+        path = os.path.join(self.prev_path, "curve.png")
+        plt.savefig(path)
+
     def clean(self):
         """
         清空前记得手动备份
-        :return:
         """
         ops.clear_files(self.args.path_tensor_log)
         ops.clear_files(self.prev_path)
