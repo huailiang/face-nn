@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from dataset import FaceDataset
 from util.exception import NeuralException
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 """
 imitator
@@ -186,7 +186,7 @@ class Imitator(nn.Module):
         plt.plot(x, losses)
         plt.xlabel('step')
         plt.ylabel('loss')
-        path = os.path.join(self.prev_path, "curve.png")
+        path = os.path.join(self.prev_path, "imitator.png")
         plt.savefig(path)
 
     def clean(self):

@@ -19,7 +19,7 @@ from dataset import FaceDataset
 from net import Net
 from module import ResidualBlock, group
 from util.exception import NeuralException
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 """
 feature extractor
