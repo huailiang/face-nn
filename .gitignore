@@ -3,6 +3,7 @@ unity/*.sln
 unity/obj
 unity/Library
 unity/Temp
+unity/models
 libproj/
 **/*.FBX*
 unity/Assets/Table*

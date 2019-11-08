@@ -19,7 +19,7 @@ from dataset import FaceDataset
 from net import Net
 from module import ResidualBlock, group
 from util.exception import NeuralException
-from torch.utils.tensorboard import SummaryWriter
+from tensorboardX import SummaryWriter
 
 """
 feature extractor
@@ -185,8 +185,11 @@ class Extractor(nn.Module):
         """
         path_ = self.args.path_to_inference + "/" + path
         if not os.path.exists(path_):
-            raise NeuralException("not exist checkpoint of extractor with path "+path)
-        checkpoint = torch.load(path_)
+            raise NeuralException("not exist checkpoint of extractor with path " + path)
+        if cuda:
+            checkpoint = torch.load(path_)
+        else:
+            checkpoint = torch.load(path_, map_location='cpu')
         self.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.initial_step = checkpoint['epoch']
@@ -229,7 +232,7 @@ class Extractor(nn.Module):
         with torch.no_grad:
             input = torch.from_numpy(img)
             input = input.view([1, 1, 64, 64])
-            params_ = self.forward(input)
+            params_ = self(input)
             log.info(params_)
             return params_
 

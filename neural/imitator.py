@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from dataset import FaceDataset
 from util.exception import NeuralException
-from torch.utils.tensorboard import SummaryWriter
+from tensorboardX import SummaryWriter
 
 """
 imitator
@@ -58,7 +58,6 @@ class Imitator(nn.Module):
         )
         self.model.apply(utils.init_weights)
         self.optimizer = optim.Adam(self.model.parameters(), lr=args.learning_rate)
-        optim.SGD
 
     def forward(self, params):
         """
@@ -149,7 +148,10 @@ class Imitator(nn.Module):
         path_ = self.args.path_to_inference + "/" + path
         if not os.path.exists(path_):
             raise NeuralException("not exist checkpoint of imitator with path " + path_)
-        checkpoint = torch.load(path_)
+        if cuda:
+            checkpoint = torch.load(path_)
+        else:
+            checkpoint = torch.load(path_, map_location='cpu')
         self.model.load_state_dict(checkpoint['net'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         self.initial_step = checkpoint['epoch']

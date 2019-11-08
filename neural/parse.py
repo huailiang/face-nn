@@ -160,7 +160,7 @@ parser.add_argument(
     '--total_eval_steps',
     dest='total_eval_steps',
     type=int,
-    default=int(500),
+    default=int(50),
     help='total iterator of evaluate steps')
 parser.add_argument(
     '--eval_learning_rate',

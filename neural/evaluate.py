@@ -155,8 +155,7 @@ class Evaluate:
         list_param = np_param.tolist()
         dataset = self.args.path_to_dataset
         shape = utils.curr_roleshape(dataset)
-        path = os.path.join(self.prev_path, "eval.bytes")
-        f = open(path, 'wb')
+        f = open("../unity/models/eval.bytes", 'wb')
         write_layer(f, shape, list_param)
         f.close()
 
@@ -190,7 +189,7 @@ if __name__ == '__main__':
     log.info("evaluation mode start")
     args = parser.parse_args()
     log.init("FaceNeural", logging.INFO, log_path="./output/evaluate.txt")
-    evl = Evaluate(args, cuda=True)
+    evl = Evaluate(args, cuda=torch.cuda.is_available())
     img = cv2.imread(args.eval_image).astype(np.float32)
     x_ = evl.itr_train(img)
     evl.output(x_, img)
