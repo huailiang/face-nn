@@ -58,6 +58,7 @@ class Imitator(nn.Module):
         )
         self.model.apply(utils.init_weights)
         self.optimizer = optim.Adam(self.model.parameters(), lr=args.learning_rate)
+        optim.SGD
 
     def forward(self, params):
         """
@@ -68,7 +69,6 @@ class Imitator(nn.Module):
         batch = params.size(0)
         length = params.size(1)
         _params = params.reshape((batch, length, 1, 1))
-        _params.requires_grad_(True)
         return self.model(_params)
 
     def itr_train(self, params, reference):

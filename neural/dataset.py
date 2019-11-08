@@ -100,7 +100,7 @@ class FaceDataset:
             else:
                 np_images[i] = image[np.newaxis, :, :] / 255.  # [1, H, W]
         params = torch.from_numpy(np_params)
-        params.requires_grad = True
+        # params.requires_grad = True
         images = torch.from_numpy(np_images)
         log.debug("batch leaf:{0}  grad:{1} type:{2}".format(params.is_leaf, params.requires_grad, params.dtype))
         return names, params, images

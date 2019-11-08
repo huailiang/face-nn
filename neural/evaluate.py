@@ -9,7 +9,6 @@ import util.logit as log
 from imitator import Imitator
 from export import write_layer
 from faceparsing.evaluate import *
-import torch.optim as optim
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
@@ -29,7 +28,6 @@ class Evaluate:
         self.args = arguments
         location = self.args.lightcnn
         self.lightcnn_inst = utils.load_lightcnn(location, cuda)
-        utils.lock_net(self.lightcnn_inst)
         self.cuda = cuda
         self.parsing = self.args.parsing_checkpoint
         self.max_itr = arguments.total_eval_steps
@@ -41,7 +39,6 @@ class Evaluate:
         if cuda:
             self.imitator.cuda()
         self.imitator.eval()
-        utils.lock_net(self.imitator)
         self.imitator.load_checkpoint(args.imitator_model, False, cuda=cuda)
 
     def discrim_l1(self, y, y_):
@@ -110,32 +107,27 @@ class Evaluate:
         :param y: numpy array, image [H, W, C]
         """
         param_cnt = self.args.params_cnt
-        np_params = 0.5 * np.ones((1, param_cnt), dtype=np.float32)
-        t_params = torch.from_numpy(np_params)
+        t_params = 0.5 * torch.ones((1, param_cnt), dtype=torch.float32)
         if self.cuda:
             t_params = t_params.cuda()
         t_params.requires_grad = True
         self.losses.clear()
-        optimizer = optim.Adam([t_params], lr=self.learning_rate)
+        lr = self.learning_rate
         progress = tqdm(range(self.max_itr), initial=0, total=self.max_itr)
         for i in progress:
             y_ = self.imitator.forward(t_params)
             loss, info = self.evaluate_ls(y, y_, i)
-            optimizer.zero_grad()
-            loss.backward(retain_graph=True)
-            optimizer.step()
-            log.info(t_params)
-            log.info(t_params.requires_grad)
-            t_params = t_params.clamp(0., 1.)
-            log.info("op grad:{0}".format(t_params.requires_grad))
+            loss.backward()
+            t_params.data = t_params.data - lr * t_params.grad.data
+            t_params.data = t_params.data.clamp(0., 1.)
+            t_params.grad.zero_()
             progress.set_description(info)
             if self.max_itr % 100 == 0:
                 x = i / float(self.max_itr)
                 lr = self.learning_rate * (x ** 2 - 2 * x + 1) + 1e-4
-                utils.update_optimizer_lr(optimizer, lr)
         self.plot()
-        log.info(t_params)
-        return t_params.clamp(0., 1.)
+        log.info("steps:{0} params:{1}".format(self.max_itr, t_params.data))
+        return t_params
 
     def output(self, x, refer):
         """

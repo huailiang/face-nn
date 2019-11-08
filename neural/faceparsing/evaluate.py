@@ -88,18 +88,17 @@ def parse_evaluate(img, cp, cuda=False):
     """
     global _net_
     global _to_tensor_
-    with torch.no_grad():
-        if _net_ is None or _to_tensor_ is None:
-            _net_, _to_tensor_ = _build_net(cp)
-
-        image = _to_tensor_(img)
-        image = torch.unsqueeze(image, 0)
-        if cuda:
-            image = image.cuda()
-            _net_.cuda()
-        out = _net_(image)[0]
-        parsing = out.squeeze(0).cpu().numpy().argmax(0)
-        return vis_parsing_maps(img, parsing, stride=1)
+    # with torch.no_grad():
+    if _net_ is None or _to_tensor_ is None:
+        _net_, _to_tensor_ = _build_net(cp)
+    image = _to_tensor_(img)
+    image = torch.unsqueeze(image, 0)
+    if cuda:
+        image = image.cuda()
+        _net_.cuda()
+    out = _net_(image)[0]
+    parsing = out.squeeze(0).cpu().numpy().argmax(0)
+    return vis_parsing_maps(img, parsing, stride=1)
 
 
 def _img_edge(img):

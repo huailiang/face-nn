@@ -112,7 +112,7 @@ if __name__ == '__main__':
         dataset = FaceDataset(args, "test")
         dataset.pre_process(cuda)
     elif args.phase == "preview":
-        log.info(" preview picture ")
+        log.info("preview picture")
         path = "../export/regular/model.jpg"
         img = cv2.imread(path)
         img2 = utils.parse_evaluate(img, args.parsing_checkpoint, cuda)

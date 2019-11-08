@@ -98,7 +98,7 @@ def load_lightcnn(location, cuda=False):
     :return: 29-layer-v2 light cnn model
     """
     model = LightCNN_29Layers_v2(num_classes=80013)
-    lock_net(model)
+    # lock_net(model)
     model.eval()
     if cuda:
         checkpoint = torch.load(location)
