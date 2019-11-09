@@ -56,10 +56,10 @@ def clear_files(dir):
                 for name in files:
                     os.remove(os.path.join(root, name))
         else:
-            log.warn("not exist directory: %s", dir)
+            log.warn("not exist directory: %s, create new", dir)
             os.mkdir(dir)
     except IOError as e:
-        log.error("io error, load imitator failed ", e)
+        log.error("io error, load imitator failed {0}".format(e))
 
 
 def get_imit_cp(dir, ext=None):
@@ -100,7 +100,7 @@ def generate_file(path, content):
         f.write(content)
         f.close()
     except IOError as e:
-        log.error("io error, load imitator failed ", e)
+        log.error("io error, load imitator failed {0}".format(e))
 
 
 def to_gray(rgb):
@@ -116,7 +116,7 @@ def to_gray(rgb):
         raise NeuralException("to gray error")
 
 
-def fill_grey(image):
+def fill_gray(image):
     """
     [W, H, 1] -> [W, H, 3]
     :param image: input image

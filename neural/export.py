@@ -140,6 +140,8 @@ if __name__ == '__main__':
         model_path = os.path.join(project_path, "unity/models/")
         log.info(model_path)
         shapes = [3, 4]
+        if os.path.exists(model_path):
+            os.mkdir(model_path)
         for i in shapes:
             for j in range(0, 10):
                 export_layer(model_path, i, j)

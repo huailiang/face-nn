@@ -227,7 +227,7 @@ class Extractor(nn.Module):
         img = cv2.imread(photo_path)
         scaled = align.align_face(img, size=(64, 64))
         self.load_checkpoint(cp_name, training=False, cuda=cuda)
-        img = utils.parse_evaluate(scaled, self.args.parsing_checkpoint, cuda)
+        img = utils.faceparsing_ndarray(scaled, self.args.parsing_checkpoint, cuda)
         img = utils.img_edge(img)
         with torch.no_grad:
             input = torch.from_numpy(img)
@@ -266,14 +266,14 @@ class Extractor(nn.Module):
         path = "{1}/{2}_{0}.jpg".format(step, self.prev_path, name[3:-6])
         orig_path = os.path.join(self.args.path_to_dataset + "2", name)
         img3 = cv2.imread(orig_path)
-        img4 = utils.parse_evaluate(img3, self.args.parsing_checkpoint, cuda)
+        img4 = utils.faceparsing_ndarray(img3, self.args.parsing_checkpoint, cuda)
         image1 = 255 - tensor1.cpu().detach().numpy() * 255
         image2 = 255 - tensor2.cpu().detach().numpy() * 255
         shape = image1.shape
         if len(shape) == 2:
             image1 = image1[:, :, np.newaxis]
             image2 = image2[:, :, np.newaxis]
-        img1 = ops.fill_grey(image1)
-        img2 = ops.fill_grey(image2)
+        img1 = ops.fill_gray(image1)
+        img2 = ops.fill_gray(image2)
         img = ops.merge_4image(img1, img2, img3, img4)
         cv2.imwrite(path, img)

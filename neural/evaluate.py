@@ -34,6 +34,7 @@ class Evaluate:
         self.learning_rate = arguments.eval_learning_rate
         self.losses = []
         self.prev_path = "./output/eval"
+        self.model_path = "../unity/models"
         self.clean()
         self.imitator = Imitator("neural imitator", arguments, clean=False)
         if cuda:
@@ -58,46 +59,41 @@ class Evaluate:
         y_ = torch.mean(y_, dim=1).view(1, 1, 128, 128)  # gray
         return utils.discriminative_loss(y, y_, self.lightcnn_inst)
 
-    def discrim_l2(self, y, y_, step):
+    def discrim_l2(self, y, y_):
         """
         facial semantic feature loss
         evaluate loss use l1 at pixel space
         :param y: input photo, numpy array  [H, W, C]
         :param y_: generated image, tensor  [B, C, W, H]
-        :param step: train step
         :return: l1 loss in pixel space
         """
-        img1 = parse_evaluate(y.astype(np.uint8), cp=self.parsing, cuda=self.cuda)
-        y_ = y_.cpu().detach().numpy()
-        y_ = np.squeeze(y_, axis=0)
-        y_ = np.swapaxes(y_, 0, 2) * 255
-        img2 = parse_evaluate(y_.astype(np.uint8), cp=self.parsing, cuda=self.cuda)
-        edge_img1 = utils.img_edge(img1).astype(np.float32)
-        edge_img2 = utils.img_edge(img2).astype(np.float32)
+        y = y[np.newaxis, :, :, ]
+        y = np.swapaxes(y, 1, 2)
+        y = np.swapaxes(y, 1, 3)
+        y = torch.from_numpy(y)
+        if self.cuda:
+            y = y.cuda()
+        img1 = faceparsing_tensor(y, self.parsing, cuda=self.cuda)
+        y_ = y_.transpose(2, 3) * 255
+        # log.info("grad:{0} {1}".format(y.requires_grad, y_.requires_grad))
+        img2 = faceparsing_tensor(y_, self.parsing, cuda=self.cuda)
         w_g = 1.0
         w_r = 1.0
+        dist = (w_g * img1 - w_r * img2).bool()
+        return torch.sum(dist) / 10000.
 
-        if step % self.args.eval_prev_freq == 0:
-            path = os.path.join(self.prev_path, "l2_{0}.jpg".format(step))
-            edge1_v3 = 255. - ops.fill_grey(edge_img1)
-            edge2_v3 = 255. - ops.fill_grey(edge_img2)
-            merge = ops.merge_4image(y, y_, edge1_v3, edge2_v3, transpose=False)
-            cv2.imwrite(path, merge)
-        return np.mean(np.abs(w_r * edge_img1 - w_g * edge_img2))
-
-    def evaluate_ls(self, y, y_, step):
+    def evaluate_ls(self, y, y_):
         """
         评估损失Ls
         :param y: input photo, numpy array
         :param y_:  generated image, tensor [b,c,w,h]
-        :param step: train step
         :return: ls, description
         """
         l1 = self.discrim_l1(y, y_)
-        l2 = self.discrim_l2(y, y_, step)
+        l2 = self.discrim_l2(y, y_)
         alpha = self.args.eval_alpha
         ls = alpha * l1 + l2
-        info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f}".format(alpha * l1, l2, ls)
+        info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f} y:{3:.4}".format(alpha * l1, l2, ls, torch.mean(y_))
         self.losses.append((l1.item() * alpha, l2.item(), ls.item()))
         return ls, info
 
@@ -113,15 +109,15 @@ class Evaluate:
         t_params.requires_grad = True
         self.losses.clear()
         lr = self.learning_rate
-        progress = tqdm(range(self.max_itr), initial=0, total=self.max_itr)
-        for i in progress:
-            y_ = self.imitator.forward(t_params)
-            loss, info = self.evaluate_ls(y, y_, i)
+        m_progress = tqdm(range(self.max_itr), initial=0, total=self.max_itr)
+        for i in m_progress:
+            y_ = self.imitator(t_params)
+            loss, info = self.evaluate_ls(y, y_)
             loss.backward()
             t_params.data = t_params.data - lr * t_params.grad.data
             t_params.data = t_params.data.clamp(0., 1.)
             t_params.grad.zero_()
-            progress.set_description(info)
+            m_progress.set_description(info)
             if self.max_itr % 100 == 0:
                 x = i / float(self.max_itr)
                 lr = self.learning_rate * (x ** 2 - 2 * x + 1) + 1e-4
@@ -136,10 +132,10 @@ class Evaluate:
         :param refer: reference picture
         """
         self.write(x)
-        y_ = self.imitator.forward(x)
+        y_ = self.imitator(x)
         y_ = y_.cpu().detach().numpy()
         y_ = np.squeeze(y_, axis=0)
-        y_ = np.swapaxes(y_, 0, 2) * 255.
+        y_ = np.swapaxes(y_, 0, 2) * 255
         y_ = y_.astype(np.uint8)
         image_ = ops.merge_image(refer, y_, transpose=False)
         path = os.path.join(self.prev_path, "eval.jpg")
@@ -155,7 +151,8 @@ class Evaluate:
         list_param = np_param.tolist()
         dataset = self.args.path_to_dataset
         shape = utils.curr_roleshape(dataset)
-        f = open("../unity/models/eval.bytes", 'wb')
+        path = os.path.join(self.model_path, "eval.bytes")
+        f = open(path, 'wb')
         write_layer(f, shape, list_param)
         f.close()
 
@@ -164,8 +161,12 @@ class Evaluate:
         clean for new iter
         """
         ops.clear_files(self.prev_path)
+        ops.clear_files(self.model_path)
 
     def plot(self):
+        """
+        plot loss
+        """
         plt.style.use('seaborn-whitegrid')
         x = range(self.max_itr)
         y1 = []
@@ -178,7 +179,7 @@ class Evaluate:
         plt.ylabel("loss")
         plt.xlabel('step')
         plt.legend()
-        path = os.path.join(self.prev_path, "eval.png")
+        path = os.path.join(self.prev_path, "loss.png")
         plt.savefig(path)
 
 

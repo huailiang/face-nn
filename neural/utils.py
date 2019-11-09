@@ -213,7 +213,7 @@ def evalute_face(img_path, cp, cuda):
     :return: face-parsing image
     """
     image = cv2.imread(img_path)
-    return parse_evaluate(image, cp=cp, cuda=cuda)
+    return faceparsing_ndarray(image, cp=cp, cuda=cuda)
 
 
 def content_loss(img1, img2):

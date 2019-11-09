@@ -62,8 +62,6 @@ def vis_parsing_maps(im, parsing_anno, stride):
 def _build_net(cp, cuda=False):
     n_classes = 19
     net = BiSeNet(n_classes=n_classes)
-    for p in net.parameters():
-        p.requires_grad = False
     if cuda:
         net.cuda()
         net.load_state_dict(torch.load(cp))
@@ -71,7 +69,11 @@ def _build_net(cp, cuda=False):
         net.load_state_dict(torch.load(cp, map_location="cpu"))
     net.eval()
     to_tensor = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)), ])
+        [
+            transforms.ToTensor(),  # [H, W, C]->[C, H, W]
+            # 这里是用来增强数据
+            # transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        ])
     return net, to_tensor
 
 
@@ -79,35 +81,57 @@ _net_ = None
 _to_tensor_ = None
 
 
-def parse_evaluate(img, cp, cuda=False):
+def build_net(cp, cuda=False):
     """
     global _net_, _to_tensor_ for performance
-    :param img: numpy array, 注意一定要是np.uint8, 而不是np.float32
-    :param cp: args.parsing_checkpoint, str
     :param cuda: use gpu to speedup
+    :param cp: args.parsing_checkpoint, str
     """
     global _net_
     global _to_tensor_
-    # with torch.no_grad():
     if _net_ is None or _to_tensor_ is None:
-        _net_, _to_tensor_ = _build_net(cp)
-    image = _to_tensor_(img)
-    image = torch.unsqueeze(image, 0)
+        _net_, _to_tensor_ = _build_net(cp, cuda)
+
+
+def faceparsing_ndarray(input, cp, cuda=False):
+    """
+    evaluate with numpy array
+    :param input: numpy array, 注意一定要是np.uint8, 而不是np.float32 [H, W, C]
+    :param cp: args.parsing_checkpoint, str
+    :param cuda: use gpu to speedup
+    """
+    build_net(cp, cuda)
+    tensor = _to_tensor_(input)
+    tensor = torch.unsqueeze(tensor, 0)
     if cuda:
-        image = image.cuda()
-        _net_.cuda()
-    out = _net_(image)[0]
-    parsing = out.squeeze(0).cpu().numpy().argmax(0)
-    return vis_parsing_maps(img, parsing, stride=1)
+        tensor = tensor.cuda()
+    out = _net_(tensor)[0]
+    parsing = out.squeeze(0).cpu().detach().numpy().argmax(0)
+    return vis_parsing_maps(input, parsing, stride=1)
 
 
-def _img_edge(img):
+def faceparsing_tensor(tensor, cp, cuda=False):
+    """
+    evaluate with torch tensor
+    :param tensor: torch tensor [B, H, W, C]
+    :param cp: args.parsing_checkpoint, str
+    :param cuda: use gpu to speedup
+    :return  tensor: [H, W]
+    """
+    build_net(cp, cuda)
+    out = _net_(tensor)[0]
+    out = out.squeeze()
+    out = torch.argmax(out, dim=0)
+    return out
+
+
+def _img_edge(input):
     """
     提取原始图像的边缘
-    :param img: input image
+    :param input: input image
     :return: edge image
     """
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    gray = cv2.cvtColor(input, cv2.COLOR_RGB2GRAY)
     x_grad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
     y_grad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
     return cv2.Canny(x_grad, y_grad, 20, 40)
@@ -129,7 +153,8 @@ if __name__ == '__main__':
         for step in progress:
             img = cv2.imread(osp.join(src_path, list_image[step]))
             image = cv2.resize(img, (512, 512), cv2.INTER_LINEAR)
-            img = parse_evaluate(image, '../dat/79999_iter.pth', True)
+            cuda = torch.cuda.is_available()
+            img = faceparsing_ndarray(image, '../dat/79999_iter.pth', cuda)
             save_path = osp.join(dst_pth, list_image[step])
             cv2.imwrite(save_path, img)
             save_path = osp.join(edge_pth, list_image[step])

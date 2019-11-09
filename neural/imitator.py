@@ -61,7 +61,7 @@ class Imitator(nn.Module):
 
     def forward(self, params):
         """
-        construct network
+        forward module
         :param params: [batch, 95]
         :return: (batch, 3, 512, 512)
         """
@@ -222,8 +222,8 @@ class Imitator(nn.Module):
         img1 = ops.tensor_2_image(tensor1)[0].swapaxes(0, 1).astype(np.uint8)
         img2 = ops.tensor_2_image(tensor2)[0].swapaxes(0, 1).astype(np.uint8)
         img1 = cv2.resize(img1, (512, 512), interpolation=cv2.INTER_LINEAR)
-        img3 = utils.parse_evaluate(img1, parse, cuda)
+        img3 = utils.faceparsing_ndarray(img1, parse, cuda)
         img4 = utils.img_edge(img3)
-        img4 = 255 - ops.fill_grey(img4)
+        img4 = 255 - ops.fill_gray(img4)
         image = ops.merge_4image(img1, img2, img3, img4, transpose=False)
         cv2.imwrite(path, image)
