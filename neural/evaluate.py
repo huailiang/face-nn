@@ -42,24 +42,38 @@ class Evaluate:
         self.imitator.eval()
         self.imitator.load_checkpoint(args.imitator_model, False, cuda=cuda)
 
-    def discrim_l1(self, y, y_):
+    def _init_l1_l2(self, y):
+        """
+        init reference photo l1 & l2
+        :param y: input photo, numpy array [H, W, C]
+        """
+        y_ = cv2.resize(y, dsize=(128, 128), interpolation=cv2.INTER_LINEAR)
+        y_ = np.swapaxes(y_, 0, 2).astype(np.float32)
+        y_ = np.mean(y_, axis=0)[np.newaxis, np.newaxis, :, :]
+        y_ = torch.from_numpy(y_)
+        if self.cuda:
+            y_ = y_.cuda()
+        self.l1_y = y_
+        y = y[np.newaxis, :, :, ]
+        y = np.swapaxes(y, 1, 2)
+        y = np.swapaxes(y, 1, 3)
+        y = torch.from_numpy(y)
+        if self.cuda:
+            y = y.cuda()
+        self.l2_y = y
+
+    def discrim_l1(self, y_):
         """
         content loss evaluated by lightcnn
         :param y: input photo, numpy array [H, W, C]
         :param y_: generated image, torch tensor [B, C, W, H]
         :return: l1 loss
         """
-        y = cv2.resize(y, dsize=(128, 128), interpolation=cv2.INTER_LINEAR)
-        y = np.swapaxes(y, 0, 2).astype(np.float32)
-        y = np.mean(y, axis=0)[np.newaxis, np.newaxis, :, :]
-        y = torch.from_numpy(y)
-        if self.cuda:
-            y = y.cuda()
         y_ = F.max_pool2d(y_, kernel_size=(4, 4), stride=4)  # 512->128
         y_ = torch.mean(y_, dim=1).view(1, 1, 128, 128)  # gray
-        return utils.discriminative_loss(y, y_, self.lightcnn_inst)
+        return utils.discriminative_loss(self.l1_y, y_, self.lightcnn_inst)
 
-    def discrim_l2(self, y, y_):
+    def discrim_l2(self, y_):
         """
         facial semantic feature loss
         evaluate loss use l1 at pixel space
@@ -67,20 +81,14 @@ class Evaluate:
         :param y_: generated image, tensor  [B, C, W, H]
         :return: l1 loss in pixel space
         """
-        y = y[np.newaxis, :, :, ]
-        y = np.swapaxes(y, 1, 2)
-        y = np.swapaxes(y, 1, 3)
-        y = torch.from_numpy(y)
-        if self.cuda:
-            y = y.cuda()
-        img1 = faceparsing_tensor(y, self.parsing, cuda=self.cuda)
+        input = faceparsing_tensor(self.l2_y, self.parsing, cuda=self.cuda)
         y_ = y_.transpose(2, 3) * 255
-        # log.info("grad:{0} {1}".format(y.requires_grad, y_.requires_grad))
         img2 = faceparsing_tensor(y_, self.parsing, cuda=self.cuda)
         w_g = 1.0
         w_r = 1.0
-        dist = (w_g * img1 - w_r * img2).bool()
-        return torch.sum(dist) / 10000.
+        dist = (w_g * input - w_r * img2)
+        dist = torch.tanh(dist ** 2 * 4)
+        return torch.sum(dist) / 1000000.
 
     def evaluate_ls(self, y, y_):
         """
@@ -89,11 +97,11 @@ class Evaluate:
         :param y_:  generated image, tensor [b,c,w,h]
         :return: ls, description
         """
-        l1 = self.discrim_l1(y, y_)
-        l2 = self.discrim_l2(y, y_)
+        l1 = self.discrim_l1(y_)
+        l2 = self.discrim_l2(y_)
         alpha = self.args.eval_alpha
         ls = alpha * l1 + l2
-        info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f} y:{3:.4}".format(alpha * l1, l2, ls, torch.mean(y_))
+        info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f}".format(alpha * l1, l2, ls)
         self.losses.append((l1.item() * alpha, l2.item(), ls.item()))
         return ls, info
 
@@ -109,6 +117,7 @@ class Evaluate:
         t_params.requires_grad = True
         self.losses.clear()
         lr = self.learning_rate
+        self._init_l1_l2(y)
         m_progress = tqdm(range(self.max_itr), initial=0, total=self.max_itr)
         for i in m_progress:
             y_ = self.imitator(t_params)

@@ -160,7 +160,7 @@ parser.add_argument(
     '--total_eval_steps',
     dest='total_eval_steps',
     type=int,
-    default=int(80),
+    default=int(40),
     help='total iterator of evaluate steps')
 parser.add_argument(
     '--eval_learning_rate',
@@ -178,7 +178,7 @@ parser.add_argument(
     '--eval_alpha',
     dest='eval_alpha',
     type=float,
-    default=6.,
+    default=3.6,
     help='alpha weight of evaluate balance between l1 & l2')
 parser.add_argument(
     '--eval_image',

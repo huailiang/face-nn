@@ -121,7 +121,7 @@ def faceparsing_tensor(tensor, cp, cuda=False):
     build_net(cp, cuda)
     out = _net_(tensor)[0]
     out = out.squeeze()
-    out = torch.argmax(out, dim=0)
+    # out = torch.argmax(out, dim=0)
     return out
 
 
