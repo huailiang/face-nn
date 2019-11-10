@@ -65,7 +65,6 @@ class Evaluate:
     def discrim_l1(self, y_):
         """
         content loss evaluated by lightcnn
-        :param y: input photo, numpy array [H, W, C]
         :param y_: generated image, torch tensor [B, C, W, H]
         :return: l1 loss
         """
@@ -77,7 +76,6 @@ class Evaluate:
         """
         facial semantic feature loss
         evaluate loss use l1 at pixel space
-        :param y: input photo, numpy array  [H, W, C]
         :param y_: generated image, tensor  [B, C, W, H]
         :return: l1 loss in pixel space
         """

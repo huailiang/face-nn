@@ -13,12 +13,13 @@
 7.  tqdm-4.23.4
 8.  argparse-1.4.0
 9.  scipy-1.0.1
+10. tensorboardX
 ```
 
 
 ## 论文
 
-网易伏羲实验室、密歇根大学、北航和浙大的研究者提出了一种游戏角色自动创建方法，利用 Face-to-Parameter 的转换快速创建游戏角色，用户还可以自行基于模型结果再次进行修改，直到得到自己满意的人物。此项目按照[论文][i2]里的描述建立。
+网易的研究者提出了一种游戏角色自动创建方法，利用 Face-to-Parameter 的转换快速创建游戏角色，用户还可以自行基于模型结果再次进行修改，直到得到自己满意的人物。此项目按照[论文][i2]里的描述建立。
 
 
 [Face-to-ParameterTranslationforGameCharacterAuto-Creation][i2]
@@ -38,9 +39,11 @@
 
 打开Unity, 点击菜单栏Tools->GenerateDatabase
 
-在export会生成两个文件夹trainset和testset， 分别用作训练集和测试集。 trainset随机生成的噪点大概是1/95。
+![](/image/t6.jpg)
 
-这里由引擎随机生成2000张图片， 其中80%用作训练集， 20%用作验证集。同时在图片同目录会生成二进制文件db_description，记录捏脸相关的参数。
+点击generate按钮之后，在export目录会生成两个文件夹trainset和testset， 分别用作训练集和测试集。 勾选trainset noise之后，trainset随机生成的噪点大概是1/95。
+
+这里引擎最大随机生成10000张图片， 其中80%用作训练集， 20%用作验证集。同时在图片同目录会生成二进制文件db_description，记录捏脸相关的参数。
 
 生成图片分辨率：512x512,  代替论文的是这里使用Unity引擎代替Justice引擎。
 
