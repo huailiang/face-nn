@@ -125,18 +125,21 @@ class Evaluate:
             t_params.data = t_params.data.clamp(0., 1.)
             t_params.grad.zero_()
             m_progress.set_description(info)
-            if self.max_itr % 100 == 0:
+            if i % self.args.eval_prev_freq == 0:
                 x = i / float(self.max_itr)
                 lr = self.learning_rate * (x ** 2 - 2 * x + 1) + 1e-4
+                self.output(t_params, y, i)
+                self.plot()
         self.plot()
         log.info("steps:{0} params:{1}".format(self.max_itr, t_params.data))
         return t_params
 
-    def output(self, x, refer):
+    def output(self, x, refer, step):
         """
         capture for result
         :param x: generated image with grad, torch tensor [b,params]
         :param refer: reference picture
+        :param step: train step
         """
         self.write(x)
         y_ = self.imitator(x)
@@ -145,7 +148,7 @@ class Evaluate:
         y_ = np.swapaxes(y_, 0, 2) * 255
         y_ = y_.astype(np.uint8)
         image_ = ops.merge_image(refer, y_, transpose=False)
-        path = os.path.join(self.prev_path, "eval.jpg")
+        path = os.path.join(self.prev_path, "eval_{0}.jpg".format(step))
         cv2.imwrite(path, image_)
 
     def write(self, params):
@@ -174,20 +177,23 @@ class Evaluate:
         """
         plot loss
         """
-        plt.style.use('seaborn-whitegrid')
-        x = range(self.max_itr)
-        y1 = []
-        y2 = []
-        for it in self.losses:
-            y1.append(it[0])
-            y2.append(it[1])
-        plt.plot(x, y1, color='r', label='l1')
-        plt.plot(x, y2, color='g', label='l2')
-        plt.ylabel("loss")
-        plt.xlabel('step')
-        plt.legend()
-        path = os.path.join(self.prev_path, "loss.png")
-        plt.savefig(path)
+        count = len(self.losses)
+        if count > 0:
+            plt.style.use('seaborn-whitegrid')
+            x = range(count)
+            y1 = []
+            y2 = []
+            for it in self.losses:
+                y1.append(it[0])
+                y2.append(it[1])
+            plt.plot(x, y1, color='r', label='l1')
+            plt.plot(x, y2, color='g', label='l2')
+            plt.ylabel("loss")
+            plt.xlabel('step')
+            plt.legend()
+            path = os.path.join(self.prev_path, "loss.png")
+            plt.savefig(path)
+            plt.close('all')
 
 
 if __name__ == '__main__':
@@ -199,5 +205,4 @@ if __name__ == '__main__':
     log.init("FaceNeural", logging.INFO, log_path="./output/evaluate.txt")
     evl = Evaluate(args, cuda=torch.cuda.is_available())
     img = cv2.imread(args.eval_image).astype(np.float32)
-    x_ = evl.itr_train(img)
-    evl.output(x_, img)
+    evl.itr_train(img)

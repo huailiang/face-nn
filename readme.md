@@ -164,6 +164,18 @@ python3 main.py \
 	--imitator_model="model_imitator_100000.pth"
 ```
 
+
+##### imitator pretrained model:
+
+在引擎里裁掉头发的model:
+https://pan.baidu.com/s/1RWmvCJHOeXSFDxERQ26mUg
+在引擎里完整显示(包含头发、脖子等)的model:
+https://pan.baidu.com/s/1z0YvwsfBAFnhETjj0Zby-g
+
+train中的效果参考视频：
+ https://youtu.be/FKJ-rvXS39U
+ https://www.bilibili.com/video/av75311069/
+
 ### preview
 
 效果预览, 生成捏脸参数二进制文件
