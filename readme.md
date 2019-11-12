@@ -103,7 +103,7 @@ baidu  yun:	   [LightCNN-29 v2][i7]
 
 
 
-不同于论文里使用的resnet50，此项目引用的模型是resnet18。
+不同于论文里使用的resnet50，此项目引用的模型是BiSeNet
 
 预训练model:	https://pan.baidu.com/s/1AEc7CJGirsdxOouD3boRBQ  
 
@@ -113,11 +113,6 @@ baidu  yun:	   [LightCNN-29 v2][i7]
 最后的效果如图：
 
 ![](/image/t3.jpg)
-
-
-去掉skybox(背景), 然后隐藏掉身体和脖子部分， 处理效果后如下:
-
-![](/image/t5.jpg)
 
 
 
@@ -151,6 +146,10 @@ python3 main.py \
 tensorboard --logdir logs
 
 ```
+
+最后训练得到的效果如下图：
+
+![](/image/t7.jpg)
 
 ### reinference
 
@@ -188,7 +187,7 @@ train中的效果参考视频：
 ```sh
 python3 main.py \
 	--phase=evaluate \
-	--total_eval_steps=400 \
+	--total_eval_steps=1000 \
 	--imitator_model="model_imitator_100000.pth" \
 	--eval_image='../export/testset_female/db_0000_4.jpg'
 ```
@@ -203,3 +202,4 @@ python3 main.py \
 [i5]: https://github.com/AlfredXiangWu/LightCNN
 [i6]: https://drive.google.com/open?id=1Jn6aXtQ84WY-7J3Tpr2_j6sX0ch9yucS
 [i7]: https://pan.baidu.com/s/1E_rGkbqzf0ppyl5ks9FSLQ
+[i8]: https://github.com/zllrunning/face-parsing.PyTorch

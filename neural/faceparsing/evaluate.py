@@ -13,7 +13,7 @@ import numpy as np
 import torchvision.transforms as transforms
 
 
-def vis_parsing_maps(im, parsing_anno, stride):
+def vis_parsing_maps(im, parsing, stride):
     """
     # 显示所有部位
     part_colors = [[255, 0, 0], [255, 85, 0], [255, 170, 0], [255, 0, 85], [255, 0, 170], [0, 255, 0], [85, 255, 0],
@@ -45,13 +45,13 @@ def vis_parsing_maps(im, parsing_anno, stride):
 
     im = np.array(im)
     vis_im = im.copy().astype(np.uint8)
-    vis_parsing_anno = parsing_anno.copy().astype(np.uint8)
-    vis_parsing_anno = cv2.resize(vis_parsing_anno, None, fx=stride, fy=stride, interpolation=cv2.INTER_NEAREST)
-    vis_parsing_anno_color = np.zeros((vis_parsing_anno.shape[0], vis_parsing_anno.shape[1], 3)) + 255
+    vis_parsing = parsing.copy().astype(np.uint8)
+    vis_parsing = cv2.resize(vis_parsing, None, fx=stride, fy=stride, interpolation=cv2.INTER_NEAREST)
+    vis_parsing_anno_color = np.zeros((vis_parsing.shape[0], vis_parsing.shape[1], 3)) + 255
 
-    num_of_class = np.max(vis_parsing_anno)
+    num_of_class = np.max(vis_parsing)
     for pi in range(1, num_of_class + 1):
-        index = np.where(vis_parsing_anno == pi)
+        index = np.where(vis_parsing == pi)
         vis_parsing_anno_color[index[0], index[1], :] = part_colors[pi]
 
     vis_parsing_anno_color = vis_parsing_anno_color.astype(np.uint8)
@@ -60,8 +60,7 @@ def vis_parsing_maps(im, parsing_anno, stride):
 
 
 def _build_net(cp, cuda=False):
-    n_classes = 19
-    net = BiSeNet(n_classes=n_classes)
+    net = BiSeNet(n_classes=19)
     if cuda:
         net.cuda()
         net.load_state_dict(torch.load(cp))
@@ -121,7 +120,7 @@ def faceparsing_tensor(tensor, cp, cuda=False):
     build_net(cp, cuda)
     out = _net_(tensor)[0]
     out = out.squeeze()
-    # out = torch.argmax(out, dim=0)
+    out = torch.max(out, dim=0).values
     return out
 
 

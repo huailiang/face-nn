@@ -86,12 +86,11 @@ class Evaluate:
         w_r = 1.0
         dist = (w_g * input - w_r * img2)
         dist = torch.tanh(dist ** 2 * 4)
-        return torch.sum(dist) / 1000000.
+        return torch.sum(dist) / 100000.
 
-    def evaluate_ls(self, y, y_):
+    def evaluate_ls(self, y_):
         """
         评估损失Ls
-        :param y: input photo, numpy array
         :param y_:  generated image, tensor [b,c,w,h]
         :return: ls, description
         """
@@ -119,7 +118,7 @@ class Evaluate:
         m_progress = tqdm(range(self.max_itr), initial=0, total=self.max_itr)
         for i in m_progress:
             y_ = self.imitator(t_params)
-            loss, info = self.evaluate_ls(y, y_)
+            loss, info = self.evaluate_ls(y_)
             loss.backward()
             t_params.data = t_params.data - lr * t_params.grad.data
             t_params.data = t_params.data.clamp(0., 1.)
@@ -127,7 +126,7 @@ class Evaluate:
             m_progress.set_description(info)
             if i % self.args.eval_prev_freq == 0:
                 x = i / float(self.max_itr)
-                lr = self.learning_rate * (x ** 2 - 2 * x + 1) + 1e-4
+                lr = self.learning_rate * (x ** 2 - 2 * x + 1) + 1e-3
                 self.output(t_params, y, i)
                 self.plot()
         self.plot()
@@ -178,7 +177,7 @@ class Evaluate:
         plot loss
         """
         count = len(self.losses)
-        if count > 0:
+        if count > 1:
             plt.style.use('seaborn-whitegrid')
             x = range(count)
             y1 = []

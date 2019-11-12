@@ -160,29 +160,29 @@ parser.add_argument(
     '--total_eval_steps',
     dest='total_eval_steps',
     type=int,
-    default=int(40),
+    default=int(1000),
     help='total iterator of evaluate steps')
 parser.add_argument(
     '--eval_learning_rate',
     dest='eval_learning_rate',
     type=float,
-    default=0.2,
+    default=0.1,
     help='initial learning rate of evaluate')
 parser.add_argument(
     '--eval_prev_freq',
     dest='eval_prev_freq',
     type=int,
-    default=10,
+    default=50,
     help='generate preview image when iterate')
 parser.add_argument(
     '--eval_alpha',
     dest='eval_alpha',
     type=float,
-    default=3.6,
+    default=6,
     help='alpha weight of evaluate balance between l1 & l2')
 parser.add_argument(
     '--eval_image',
     dest='eval_image',
     type=str,
-    default='../export/testset_female/db_0014_4.jpg',
+    default='../export/testset_female/db_0477_4.jpg',
     help='generate preview image when iterate')
