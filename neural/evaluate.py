@@ -60,7 +60,7 @@ class Evaluate:
         y = torch.from_numpy(y)
         if self.cuda:
             y = y.cuda()
-        self.l2_y = y
+        self.l2_y = y / 255.
 
     def discrim_l1(self, y_):
         """
@@ -79,14 +79,12 @@ class Evaluate:
         :param y_: generated image, tensor  [B, C, W, H]
         :return: l1 loss in pixel space
         """
-        input = faceparsing_tensor(self.l2_y, self.parsing, cuda=self.cuda)
-        y_ = y_.transpose(2, 3) * 255
-        img2 = faceparsing_tensor(y_, self.parsing, cuda=self.cuda)
-        w_g = 1.0
-        w_r = 1.0
-        dist = (w_g * input - w_r * img2)
-        dist = torch.tanh(dist ** 2 * 4)
-        return torch.sum(dist) / 100000.
+        w_r = [1.2, 1.4, 1.1, .7, 1., 1.]
+        w_g = [1.2, 1.4, 1.1, .7, 1., 1.]
+        part1, _ = faceparsing_tensor(self.l2_y, self.parsing, w_r, cuda=self.cuda)
+        y_ = y_.transpose(2, 3)
+        part2, _ = faceparsing_tensor(y_, self.parsing, w_g, cuda=self.cuda)
+        return F.l1_loss(part1, part2)
 
     def evaluate_ls(self, y_):
         """

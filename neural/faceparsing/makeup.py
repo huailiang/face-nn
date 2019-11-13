@@ -46,6 +46,8 @@ def hair(image, parsing, part=17, color=[230, 50, 20]):
 
 if __name__ == '__main__':
     # 1  face
+    # 3. eyebrow
+    # 4. eye
     # 10 nose
     # 11 teeth
     # 12 upper lip

@@ -178,11 +178,11 @@ parser.add_argument(
     '--eval_alpha',
     dest='eval_alpha',
     type=float,
-    default=6,
+    default=2,
     help='alpha weight of evaluate balance between l1 & l2')
 parser.add_argument(
     '--eval_image',
     dest='eval_image',
     type=str,
-    default='../export/testset_female/db_0477_4.jpg',
+    default='../export/trainset_female/db_0005_4.jpg',
     help='generate preview image when iterate')

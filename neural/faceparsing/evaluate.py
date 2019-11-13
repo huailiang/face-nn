@@ -12,6 +12,9 @@ import os.path as osp
 import numpy as np
 import torchvision.transforms as transforms
 
+_net_ = None
+_to_tensor_ = None
+
 
 def vis_parsing_maps(im, parsing, stride):
     """
@@ -20,24 +23,18 @@ def vis_parsing_maps(im, parsing, stride):
                    [170, 255, 0], [0, 255, 85], [0, 255, 170], [0, 0, 255], [85, 0, 255], [170, 0, 255], [0, 85, 255],
                    [0, 170, 255], [255, 255, 0], [255, 255, 85], [255, 255, 170], [255, 0, 255], [255, 85, 255],
                    [255, 170, 255], [0, 255, 255], [85, 255, 255], [170, 255, 255]]
-
-    # 不显示头发 脖子等
-    part_colors = [[255, 255, 255], [255, 85, 0], [255, 170, 0], [255, 0, 85], [255, 0, 170], [0, 255, 0], [85, 255, 0],
-                   [170, 255, 0], [255, 255, 85], [0, 255, 170], [0, 0, 255], [85, 0, 255], [170, 0, 255], [0, 85, 255],
-                   [255, 255, 255], [255, 255, 0], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 85, 255],
-                   [255, 170, 255], [0, 255, 255], [85, 255, 255], [170, 255, 255]]
     """
     # 只显示鼻子 眼睛 眉毛 嘴巴
-    part_colors = [[255, 255, 255], [255, 255, 255], [255, 170, 0], [255, 170, 0], [255, 0, 170], [0, 255, 0],
+    part_colors = [[255, 255, 255], [255, 255, 255], [25, 170, 0], [255, 170, 0], [254, 0, 170], [254, 0, 170],
                    [255, 255, 255],
-                   [255, 255, 255], [255, 255, 255], [255, 255, 255], [0, 0, 255], [85, 0, 255], [170, 0, 255],
+                   [255, 255, 255], [255, 255, 255], [255, 255, 255], [0, 0, 254], [85, 0, 255], [170, 0, 255],
                    [0, 85, 255],
                    [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255],
                    [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]
     """
     part_colors = [[255, 255, 255], [脸], [左眉], [右眉], [左眼], [右眼],
-                   [255, 255, 255],
-                   [左耳], [右耳], [255, 255, 255], [鼻子], [中唇], [上唇], 
+                   7[255, 255, 255],
+                   8[左耳], 9[右耳], [255, 255, 255], [鼻子], [牙齿], [上唇], 
                    [下唇],
                    [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255],
                    [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]
@@ -46,17 +43,16 @@ def vis_parsing_maps(im, parsing, stride):
     im = np.array(im)
     vis_im = im.copy().astype(np.uint8)
     vis_parsing = parsing.copy().astype(np.uint8)
-    vis_parsing = cv2.resize(vis_parsing, None, fx=stride, fy=stride, interpolation=cv2.INTER_NEAREST)
     vis_parsing_anno_color = np.zeros((vis_parsing.shape[0], vis_parsing.shape[1], 3)) + 255
-
     num_of_class = np.max(vis_parsing)
     for pi in range(1, num_of_class + 1):
         index = np.where(vis_parsing == pi)
+        if part_colors[pi] != [255, 255, 255]:
+            print("index: ", pi, len(index[0]), part_colors[pi])
         vis_parsing_anno_color[index[0], index[1], :] = part_colors[pi]
 
     vis_parsing_anno_color = vis_parsing_anno_color.astype(np.uint8)
-    vis_im = cv2.addWeighted(cv2.cvtColor(vis_im, cv2.COLOR_RGB2BGR), 0.01, vis_parsing_anno_color, 0.99, 0)
-    return vis_im
+    return vis_parsing_anno_color
 
 
 def _build_net(cp, cuda=False):
@@ -74,10 +70,6 @@ def _build_net(cp, cuda=False):
             # transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
     return net, to_tensor
-
-
-_net_ = None
-_to_tensor_ = None
 
 
 def build_net(cp, cuda=False):
@@ -100,62 +92,57 @@ def faceparsing_ndarray(input, cp, cuda=False):
     :param cuda: use gpu to speedup
     """
     build_net(cp, cuda)
-    tensor = _to_tensor_(input)
-    tensor = torch.unsqueeze(tensor, 0)
+    input_ = _to_tensor_(input)
+    input_ = torch.unsqueeze(input_, 0)
     if cuda:
-        tensor = tensor.cuda()
-    out = _net_(tensor)[0]
+        input_ = input_.cuda()
+    out = _net_(input_)[0]
     parsing = out.squeeze(0).cpu().detach().numpy().argmax(0)
     return vis_parsing_maps(input, parsing, stride=1)
 
 
-def faceparsing_tensor(tensor, cp, cuda=False):
+def faceparsing_tensor(input, cp, w, cuda=False):
     """
     evaluate with torch tensor
-    :param tensor: torch tensor [B, H, W, C]
+    :param input: torch tensor [B, H, W, C] rang: [0-1], not [0-255]
     :param cp: args.parsing_checkpoint, str
+    :param w: tuple len=6 [eyebrow，eye，nose，teeth，up lip，lower lip]
     :param cuda: use gpu to speedup
-    :return  tensor: [H, W]
+    :return  tensor, shape:[H, W]
     """
     build_net(cp, cuda)
-    out = _net_(tensor)[0]
+    out = _net_(input)[0]
     out = out.squeeze()
-    out = torch.max(out, dim=0).values
-    return out
-
-
-def _img_edge(input):
-    """
-    提取原始图像的边缘
-    :param input: input image
-    :return: edge image
-    """
-    gray = cv2.cvtColor(input, cv2.COLOR_RGB2GRAY)
-    x_grad = cv2.Sobel(gray, cv2.CV_16SC1, 1, 0)
-    y_grad = cv2.Sobel(gray, cv2.CV_16SC1, 0, 1)
-    return cv2.Canny(x_grad, y_grad, 20, 40)
+    return w[0] * out[3] + w[1] * out[4] + w[2] * out[10] + out[11] + out[12] + out[13], out[1]
 
 
 if __name__ == '__main__':
     src_path = "../../export/faceparsing/src"
     root, name = os.path.split(src_path)
     dst_pth = os.path.join(root, 'dst')
-    edge_pth = os.path.join(root, 'edge')
     if not os.path.exists(dst_pth):
         os.mkdir(dst_pth)
-    if not os.path.exists(edge_pth):
-        os.mkdir(edge_pth)
     with torch.no_grad():
         list_image = os.listdir(src_path)
         total = len(list_image)
+        cuda = torch.cuda.is_available()
         progress = tqdm(range(0, total), initial=0, total=total)
         for step in progress:
             img = cv2.imread(osp.join(src_path, list_image[step]))
             image = cv2.resize(img, (512, 512), cv2.INTER_LINEAR)
-            cuda = torch.cuda.is_available()
-            img = faceparsing_ndarray(image, '../dat/79999_iter.pth', cuda)
-            save_path = osp.join(dst_pth, list_image[step])
-            cv2.imwrite(save_path, img)
-            save_path = osp.join(edge_pth, list_image[step])
-            edge = 255 - _img_edge(img)
-            cv2.imwrite(save_path, edge)
+            img_1 = faceparsing_ndarray(image, '../dat/79999_iter.pth', cuda)
+            save_path = os.path.join(dst_pth, "c-" + list_image[step])
+            cv2.imwrite(save_path, img_1)
+            image = image[np.newaxis, :, :, :]
+            image = np.swapaxes(image, 1, 3)
+            image = np.swapaxes(image, 2, 3)
+
+            tensor = torch.from_numpy(image).float() / 255.
+            if cuda:
+                tensor = tensor.cuda()
+            weight = [1.2, 1.4, 1.1, .7, 1., 1.]
+            lsi = faceparsing_tensor(tensor, '../dat/79999_iter.pth', weight, cuda)
+            for idx, tensor in enumerate(lsi):
+                save_path = osp.join(dst_pth, '{0}-{1}'.format(idx, list_image[step]))
+                map = tensor.cpu().detach().numpy()
+                cv2.imwrite(save_path, map * 10)
