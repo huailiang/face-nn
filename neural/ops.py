@@ -118,7 +118,7 @@ def to_gray(rgb):
 
 def fill_gray(image):
     """
-    [W, H, 1] -> [W, H, 3]
+    [W, H, 1] -> [W, H, 3] or [W, H]->[W, H, 3]
     :param image: input image
     :return: transfer image
     """
@@ -200,10 +200,10 @@ def merge_image(image1, image2, mode="h", size=512, show=False, transpose=True):
 def merge_4image(image1, image2, image3, image4, size=512, show=False, transpose=True):
     """
     拼接图片
-    :param image1: input image1
-    :param image2: input image2
-    :param image3: input image3
-    :param image4: input image4
+    :param image1: input image1, numpy array
+    :param image2: input image2, numpy array
+    :param image3: input image3, numpy array
+    :param image4: input image4, numpy array
     :param size: 输出分辨率
     :param show: 窗口显示
     :param transpose: 转置长和宽 cv2顺序[H, W, C]

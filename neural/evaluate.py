@@ -37,6 +37,7 @@ class Evaluate:
         self.model_path = "../unity/models"
         self.clean()
         self.imitator = Imitator("neural imitator", arguments, clean=False)
+        self.l2_c = (None, None)
         if cuda:
             self.imitator.cuda()
         self.imitator.eval()
@@ -84,6 +85,7 @@ class Evaluate:
         part1, _ = faceparsing_tensor(self.l2_y, self.parsing, w_r, cuda=self.cuda)
         y_ = y_.transpose(2, 3)
         part2, _ = faceparsing_tensor(y_, self.parsing, w_g, cuda=self.cuda)
+        self.l2_c = (part1 * 10, part2 * 10)
         return F.l1_loss(part1, part2)
 
     def evaluate_ls(self, y_):
@@ -113,7 +115,7 @@ class Evaluate:
         self.losses.clear()
         lr = self.learning_rate
         self._init_l1_l2(y)
-        m_progress = tqdm(range(self.max_itr), initial=0, total=self.max_itr)
+        m_progress = tqdm(range(1, self.max_itr + 1))
         for i in m_progress:
             y_ = self.imitator(t_params)
             loss, info = self.evaluate_ls(y_)
@@ -122,11 +124,12 @@ class Evaluate:
             t_params.data = t_params.data.clamp(0., 1.)
             t_params.grad.zero_()
             m_progress.set_description(info)
-            if i % self.args.eval_prev_freq == 0:
+            if i % self.args.eval_prev_freq == 0 or i == 1:
                 x = i / float(self.max_itr)
                 lr = self.learning_rate * (x ** 2 - 2 * x + 1) + 1e-3
                 self.output(t_params, y, i)
-                self.plot()
+                if i != 1:
+                    self.plot()
         self.plot()
         log.info("steps:{0} params:{1}".format(self.max_itr, t_params.data))
         return t_params
@@ -144,7 +147,13 @@ class Evaluate:
         y_ = np.squeeze(y_, axis=0)
         y_ = np.swapaxes(y_, 0, 2) * 255
         y_ = y_.astype(np.uint8)
-        image_ = ops.merge_image(refer, y_, transpose=False)
+        im1 = self.l2_c[0]
+        im2 = self.l2_c[1]
+        np_im1 = im1.cpu().detach().numpy()
+        np_im2 = im2.cpu().detach().numpy()
+        f_im1 = ops.fill_gray(np_im1)
+        f_im2 = ops.fill_gray(np_im2)
+        image_ = ops.merge_4image(refer, y_, f_im1, f_im2, transpose=False)
         path = os.path.join(self.prev_path, "eval_{0}.jpg".format(step))
         cv2.imwrite(path, image_)
 
@@ -175,7 +184,7 @@ class Evaluate:
         plot loss
         """
         count = len(self.losses)
-        if count > 1:
+        if count > 0:
             plt.style.use('seaborn-whitegrid')
             x = range(count)
             y1 = []
