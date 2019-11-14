@@ -114,7 +114,7 @@ class Imitator(nn.Module):
                 path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
                 self.capture(path, images, y_, self.args.parsing_checkpoint, cuda)
                 x = step / float(total_steps)
-                lr = self.args.learning_rate * (x ** 2 - 2 * x + 1) + 1e-4
+                lr = self.args.learning_rate * (x ** 2 - 2 * x + 1) + 1e-3
                 utils.update_optimizer_lr(self.optimizer, lr)
                 self.writer.add_scalar('imitator/learning rate', lr, step)
                 self.upload_weights(step)
@@ -207,7 +207,8 @@ class Imitator(nn.Module):
         state = {'net': self.model.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
         if not os.path.exists(self.model_path):
             os.mkdir(self.model_path)
-        torch.save(state, '{1}/model_imitator_{0}.pth'.format(step + 1, self.model_path))
+        ext = "cuda" if self.cuda() else "cpu"
+        torch.save(state, '{1}/model_imitator_{0}_{2}.pth'.format(step + 1, self.model_path, ext))
 
     @staticmethod
     def capture(path, tensor1, tensor2, parse, cuda):

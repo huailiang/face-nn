@@ -37,26 +37,29 @@ class resblock(nn.Module):
         super(resblock, self).__init__()
         self.conv1 = mfm(in_channels, out_channels, kernel_size=3, stride=1, padding=1)
         self.conv2 = mfm(in_channels, out_channels, kernel_size=3, stride=1, padding=1)
-        # self.bn = nn.BatchNorm2d(out_channels)
 
     def forward(self, x):
         res = x
         out = self.conv1(x)
         out = self.conv2(out)
         out = out + res
-        # out = self.bn(out)
-        out = F.relu(out)
         return out
 
 
 class network_9layers(nn.Module):
     def __init__(self, num_classes=79077):
         super(network_9layers, self).__init__()
-        self.features = nn.Sequential(mfm(1, 48, 5, 1, 2), nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True),
-                                      group(48, 96, 3, 1, 1), nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True),
-                                      group(96, 192, 3, 1, 1), nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True),
-                                      group(192, 128, 3, 1, 1), group(128, 128, 3, 1, 1),
-                                      nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True), )
+        self.features = nn.Sequential(
+            mfm(1, 48, 5, 1, 2),
+            nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True),
+            group(48, 96, 3, 1, 1),
+            nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True),
+            group(96, 192, 3, 1, 1),
+            nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True),
+            group(192, 128, 3, 1, 1),
+            group(128, 128, 3, 1, 1),
+            nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True),
+        )
         self.fc1 = mfm(8 * 8 * 128, 256, type=0)
         self.fc2 = nn.Linear(256, num_classes)
 
@@ -120,7 +123,7 @@ class network_29layers(nn.Module):
 
 
 class network_29layers_v2(nn.Module):
-    def __init__(self, block, layers, num_classes=80013):
+    def __init__(self, block, layers, num_classes=79077):
         super(network_29layers_v2, self).__init__()
         self.conv1 = mfm(1, 48, 5, 1, 2)
         self.block1 = self._make_layer(block, layers[0], 48, 48)
@@ -134,8 +137,7 @@ class network_29layers_v2(nn.Module):
         self.fc = nn.Linear(8 * 8 * 128, 256)
         self.fc2 = nn.Linear(256, num_classes, bias=False)
 
-    @staticmethod
-    def _make_layer(block, num_blocks, in_channels, out_channels):
+    def _make_layer(self, block, num_blocks, in_channels, out_channels):
         layers = []
         for i in range(0, num_blocks):
             layers.append(block(in_channels, out_channels))

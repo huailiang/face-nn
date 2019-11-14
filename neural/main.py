@@ -17,6 +17,7 @@ from imitator import Imitator
 from extractor import Extractor
 from evaluate import Evaluate
 from parse import parser
+import torchvision.transforms as transforms
 
 
 def init_device(arguments):
@@ -87,10 +88,17 @@ if __name__ == '__main__':
     elif args.phase == "lightcnn":
         log.info("light cnn test")
         lightcnn_inst = utils.load_lightcnn(args.lightcnn, cuda)
-        img = torch.ones(1, 1, 512, 512)
-        features = utils.feature256(img, lightcnn_inst)
-        log.info(features.size())
-        log.info("features: {0} {1}".format(features[0][1], features[0][0]))
+        transform = transforms.Compose([transforms.ToTensor()])
+        im1 = cv2.imread('../export/star/a-rb1.jpg', cv2.IMREAD_GRAYSCALE)
+        im2 = cv2.imread('../export/star/a-lyf.jpg', cv2.IMREAD_GRAYSCALE)
+        im1 = cv2.resize(im1, dsize=(128, 128), interpolation=cv2.INTER_LINEAR)
+        im2 = cv2.resize(im2, dsize=(128, 128), interpolation=cv2.INTER_LINEAR)
+        im1 = np.reshape(im1, (128, 128, 1))
+        im2 = np.reshape(im2, (128, 128, 1))
+        img = transform(im1).view(1, 1, 128, 128)
+        img2 = transform(im2).view(1, 1, 128, 128)
+        features = utils.discriminative_loss(img, img2, lightcnn_inst)
+        log.info("loss feature:{0}".format(features))
     elif args.phase == "faceparsing":
         log.info("faceparsing")
         im = utils.evalute_face("./output/face/db_0000_3.jpg", args.parsing_checkpoint, cuda)
@@ -100,10 +108,10 @@ if __name__ == '__main__':
         for file in os.listdir(path):
             p = os.path.join(path, file)
             log.info(p)
-            p2 = os.path.join(path, "a-"+file)
+            p2 = os.path.join(path, "a-" + file)
             al = align.face_features(p, p2)
             ev = utils.faceparsing_ndarray(al, args.parsing_checkpoint, cuda=cuda)
-            p = os.path.join(path, "b-"+file)
+            p = os.path.join(path, "b-" + file)
             cv2.imwrite(p, ev)
             ev = 255 - utils.img_edge(ev)
             p = os.path.join(path, "c-" + file)

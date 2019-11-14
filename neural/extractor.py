@@ -214,7 +214,8 @@ class Extractor(nn.Module):
         state = {'net': self.state_dict(), 'optimizer': self.optimizer.state_dict(), 'epoch': step}
         if not os.path.exists(self.model_path):
             os.mkdir(self.model_path)
-        torch.save(state, '{1}/model_extractor_{0}.pth'.format(step, self.model_path))
+        ext = "cuda" if self.cuda() else "cpu"
+        torch.save(state, '{1}/model_extractor_{0}_{2}.pth'.format(step, self.model_path, ext))
 
     def inference(self, cp_name, photo_path, cuda):
         """

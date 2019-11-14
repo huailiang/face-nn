@@ -33,8 +33,8 @@ def vis_parsing_maps(im, parsing, stride):
                    [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]
     """
     part_colors = [[255, 255, 255], [脸], [左眉], [右眉], [左眼], [右眼],
-                   7[255, 255, 255],
-                   8[左耳], 9[右耳], [255, 255, 255], [鼻子], [牙齿], [上唇], 
+                   [255, 255, 255],
+                   [左耳], [右耳], [255, 255, 255], [鼻子], [牙齿], [上唇], 
                    [下唇],
                    [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255],
                    [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]
@@ -47,8 +47,6 @@ def vis_parsing_maps(im, parsing, stride):
     num_of_class = np.max(vis_parsing)
     for pi in range(1, num_of_class + 1):
         index = np.where(vis_parsing == pi)
-        if part_colors[pi] != [255, 255, 255]:
-            print("index: ", pi, len(index[0]), part_colors[pi])
         vis_parsing_anno_color[index[0], index[1], :] = part_colors[pi]
 
     vis_parsing_anno_color = vis_parsing_anno_color.astype(np.uint8)

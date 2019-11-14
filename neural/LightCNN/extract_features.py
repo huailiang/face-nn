@@ -55,8 +55,7 @@ def main():
         if args.cuda:
             input = input.cuda()
         with torch.no_grad():
-            input_var = torch.autograd.Variable(input)
-            _, features = model(input_var)
+            _, features = model(input)
             end = time.time() - start
             print("{}({}/{}). Time: {}".format(os.path.join('../dat/', img_name), count, len(img_list), end))
             save_feature(args.save_path, img_name, features.data.cpu().numpy()[0])

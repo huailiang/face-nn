@@ -37,7 +37,7 @@ class Evaluate:
         self.model_path = "../unity/models"
         self.clean()
         self.imitator = Imitator("neural imitator", arguments, clean=False)
-        self.l2_c = (None, None)
+        self.l2_c = (torch.ones((512, 512)), torch.ones((512, 512)))
         if cuda:
             self.imitator.cuda()
         self.imitator.eval()
@@ -91,15 +91,17 @@ class Evaluate:
     def evaluate_ls(self, y_):
         """
         评估损失Ls
+        由于l1表示的是余弦距离的损失， 其范围又在0-1之间 所以这里使用1-l1
+        (余弦距离越大 表示越接近)
         :param y_:  generated image, tensor [b,c,w,h]
         :return: ls, description
         """
         l1 = self.discrim_l1(y_)
         l2 = self.discrim_l2(y_)
         alpha = self.args.eval_alpha
-        ls = alpha * l1 + l2
-        info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f}".format(alpha * l1, l2, ls)
-        self.losses.append((l1.item() * alpha, l2.item(), ls.item()))
+        ls = alpha * (1 - l1) + l2
+        info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f}".format(1 - l1, l2, ls)
+        self.losses.append((1 - l1.item(), l2.item()/3, ls.item()))
         return ls, info
 
     def itr_train(self, y):
@@ -116,6 +118,7 @@ class Evaluate:
         lr = self.learning_rate
         self._init_l1_l2(y)
         m_progress = tqdm(range(1, self.max_itr + 1))
+        self.output(t_params, y, 0)
         for i in m_progress:
             y_ = self.imitator(t_params)
             loss, info = self.evaluate_ls(y_)
@@ -124,12 +127,11 @@ class Evaluate:
             t_params.data = t_params.data.clamp(0., 1.)
             t_params.grad.zero_()
             m_progress.set_description(info)
-            if i % self.args.eval_prev_freq == 0 or i == 1:
+            if i % self.args.eval_prev_freq == 0:
                 x = i / float(self.max_itr)
                 lr = self.learning_rate * (x ** 2 - 2 * x + 1) + 1e-3
                 self.output(t_params, y, i)
-                if i != 1:
-                    self.plot()
+                self.plot()
         self.plot()
         log.info("steps:{0} params:{1}".format(self.max_itr, t_params.data))
         return t_params

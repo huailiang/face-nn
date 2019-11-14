@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description='face')
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='train_imitator',
+    default='lightcnn',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',
@@ -90,7 +90,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(4e5),
+    default=int(5e5),
     help='total steps for imitator')
 parser.add_argument(
     '--batch_size',
@@ -120,7 +120,7 @@ parser.add_argument(
     '--imitator_model',
     dest='imitator_model',
     type=str,
-    default='model_imitator_100000.pth',
+    default='imitator_100000_cuda.pth',
     help='pre_trained model of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #
@@ -152,7 +152,7 @@ parser.add_argument(
     '--extractor_model',
     dest='extractor_model',
     type=str,
-    default='model_extractor_845000.pth',
+    default='extractor_845000_cuda.pth',
     help='pre_trained model of extractor')
 
 # ========================= EVALUATE PARAMETERS ========================= #
@@ -166,7 +166,7 @@ parser.add_argument(
     '--eval_learning_rate',
     dest='eval_learning_rate',
     type=float,
-    default=0.1,
+    default=0.4,
     help='initial learning rate of evaluate')
 parser.add_argument(
     '--eval_prev_freq',
@@ -178,11 +178,11 @@ parser.add_argument(
     '--eval_alpha',
     dest='eval_alpha',
     type=float,
-    default=2.5,
+    default=1.2,
     help='alpha weight of evaluate balance between l1 & l2')
 parser.add_argument(
     '--eval_image',
     dest='eval_image',
     type=str,
-    default='../export/trainset_female2/db_0006_4.jpg',
+    default='../export/testset_female2/db_0106_4.jpg',
     help='generate preview image when iterate')

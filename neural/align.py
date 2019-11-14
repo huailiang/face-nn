@@ -87,13 +87,3 @@ def export(path):
             path1 = os.path.join(root, file)
             path2 = os.path.join(root, "align_" + file)
             face_features(path1, path2)
-
-
-if __name__ == '__main__':
-    log.init("align")
-    pwd = os.getcwd()
-    project_path = os.path.abspath(os.path.dirname(pwd) + os.path.sep + ".")
-    model_path = os.path.join(project_path, "neural/output/image/")
-    log.info(model_path)
-    clean(model_path)
-    export(model_path)
