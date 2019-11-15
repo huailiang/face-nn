@@ -40,7 +40,7 @@ def main():
     else:
         print("=> no checkpoint found at '{}'".format(args.resume))
 
-    img_list = read_list('../dat/LightCNN_list.txt')
+    img_list = read_list('../dat/LightCNN_list')
     transform = transforms.Compose([transforms.ToTensor()])
     count = 0
     input = torch.zeros(1, 1, 128, 128)

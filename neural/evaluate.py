@@ -100,8 +100,8 @@ class Evaluate:
         l2 = self.discrim_l2(y_)
         alpha = self.args.eval_alpha
         ls = alpha * (1 - l1) + l2
-        info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f}".format(1 - l1, l2, ls)
-        self.losses.append((1 - l1.item(), l2.item()/3, ls.item()))
+        info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f}".format(l1, l2, ls)
+        self.losses.append((l1.item(), l2.item() / 3, ls.item()))
         return ls, info
 
     def itr_train(self, y):
