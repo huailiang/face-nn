@@ -54,7 +54,7 @@ namespace XEngine.Editor
 
         RoleShape shape = RoleShape.FEMALE;
         bool complete = true, addNoise = true;
-        int datacnt = 10000;
+        int datacnt = 16000;
         float weight = 0.4f;
 
         private void OnGUI()
@@ -180,7 +180,7 @@ namespace XEngine.Editor
             bw.Write(expc);
             for (int j = 0; j < expc; j++)
             {
-                string name = string.Format("db_{0:0000}_{1}", j, (int)shape);
+                string name = string.Format("db_{0:00000}_{1}", j, (int)shape);
                 bw.Write(name);
                 for (int i = 0; i < CNT; i++)
                 {

@@ -41,7 +41,7 @@ class FaceDataset:
             f = open(path, "rb")
             self.cnt = struct.unpack("i", f.read(4))[0]
             for it in range(self.cnt):
-                kk = f.read(10)[1:]  # 第一个是c#字符串的长度
+                kk = f.read(11)[1:]  # 第一个是c#字符串的长度
                 self.names.append(str(kk, encoding='utf-8'))
                 v = []
                 for i in range(args.params_cnt):
