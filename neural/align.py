@@ -35,9 +35,9 @@ def align_face(img, size=(512, 512)):
     d = dets[0]  # 默认处理第一个检测到的人脸区域
     bb = np.zeros(4, dtype=np.int32)
 
-    ext = 16
+    ext = 8
     bb[0] = np.maximum(d.left() - ext, 0)
-    bb[1] = np.maximum(d.top() - ext, 0)
+    bb[1] = np.maximum(d.top() - ext - 20, 0)
     bb[2] = np.minimum(d.right() + ext, img.shape[1])
     bb[3] = np.minimum(d.bottom() + ext, img.shape[0])
 

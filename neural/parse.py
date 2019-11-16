@@ -90,7 +90,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(5e5),
+    default=int(6e5),
     help='total steps for imitator')
 parser.add_argument(
     '--batch_size',
@@ -120,7 +120,7 @@ parser.add_argument(
     '--imitator_model',
     dest='imitator_model',
     type=str,
-    default='imitator_100000_cuda.pth',
+    default='imitator_550000_cuda.pth',
     help='pre_trained model of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #
@@ -166,7 +166,7 @@ parser.add_argument(
     '--eval_learning_rate',
     dest='eval_learning_rate',
     type=float,
-    default=0.4,
+    default=0.2,
     help='initial learning rate of evaluate')
 parser.add_argument(
     '--eval_prev_freq',
@@ -184,5 +184,5 @@ parser.add_argument(
     '--eval_image',
     dest='eval_image',
     type=str,
-    default='../export/testset_female2/db_0106_4.jpg',
+    default='../export/testset_female/db_0239_4.jpg',
     help='generate preview image when iterate')

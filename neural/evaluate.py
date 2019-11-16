@@ -80,8 +80,9 @@ class Evaluate:
         :param y_: generated image, tensor  [B, C, W, H]
         :return: l1 loss in pixel space
         """
-        w_r = [1.2, 1.4, 1.1, .7, 1., 1.]
-        w_g = [1.2, 1.4, 1.1, .7, 1., 1.]
+        # [eyebrow，eye，nose，teeth，up lip，lower lip]
+        w_r = [1., 1.1, 1.1, 1.2, 1., 1.]
+        w_g = [1., 1.1, 1.1, 1.2, 1., 1.]
         part1, _ = faceparsing_tensor(self.l2_y, self.parsing, w_r, cuda=self.cuda)
         y_ = y_.transpose(2, 3)
         part2, _ = faceparsing_tensor(y_, self.parsing, w_g, cuda=self.cuda)

@@ -412,12 +412,25 @@ namespace XEngine.Editor
             int cnt = len1 + len2;
             if (folds == null) folds = new bool[cnt];
             if (icons == null) icons = new Object[cnt];
-            if (GUILayout.Button("Sync", GUILayout.Width(120)))
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Sync-Picture", GUILayout.Width(120)))
             {
                 string name = "";
                 if (NeuralInterface.ParseFromPicture(ref args, ref name))
                     NeuralProcess(args);
             }
+            if (GUILayout.Button("Sync-Model", GUILayout.Width(120)))
+            {
+                string file = UnityEditor.EditorUtility.OpenFilePanel("Select model file", NeuralInterface.MODEL, "bytes");
+                if (!string.IsNullOrEmpty(file))
+                {
+                    FileInfo info = new FileInfo(file);
+                    RoleShape shape;
+                    float[] args = NeuralInterface.ProcessFile(info, out shape);
+                    NeuralProcess(args);
+                }
+            }
+            GUILayout.EndHorizontal();
             rect = GUILayout.BeginScrollView(rect);
             for (int i = 0; i < len1; i++)
             {

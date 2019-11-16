@@ -43,9 +43,9 @@
 
 点击generate按钮之后，在export目录会生成两个文件夹trainset和testset， 分别用作训练集和测试集。 勾选trainset noise之后，trainset随机生成的噪点大概是1/95。
 
-这里引擎最大随机生成10000张图片， 其中80%用作训练集， 20%用作验证集。同时在图片同目录会生成二进制文件db_description，记录捏脸相关的参数。
+这里引擎最大随机生成10000张图片， 其中80%用作训练集。同时在图片同目录会生成二进制文件db_description，记录捏脸相关的参数，作为imitator输入的参数。
 
-生成图片分辨率：512x512,  代替论文的是这里使用Unity引擎代替Justice引擎。
+生成图片分辨率：512x512,  不同的是使用Unity引擎代替论文里的Justice引擎。
 
 ![](/image/t4.jpg)
 
@@ -150,6 +150,8 @@ tensorboard --logdir logs
 最后训练得到的效果如下图：
 
 ![](/image/t7.jpg)
+
+(上图是左上角是参考图，右上角是imitator生成图，左下角是生成图的脸部语义切割图， 右下角是部位边缘图)
 
 ### reinference
 

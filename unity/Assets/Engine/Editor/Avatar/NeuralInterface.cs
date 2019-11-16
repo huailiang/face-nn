@@ -23,7 +23,7 @@ namespace XEngine.Editor
         static Connect connect;
         static FashionPreview prev;
 
-        static string EXPORT
+        public static string EXPORT
         {
             get
             {
@@ -37,7 +37,7 @@ namespace XEngine.Editor
             }
         }
 
-        static string MODEL
+        public static string MODEL
         {
             get
             {
@@ -138,21 +138,6 @@ namespace XEngine.Editor
         }
 
 
-        [MenuItem("Tools/BatchExportModels")]
-        public static void BatchModels()
-        {
-            XEditorUtil.SetupEnv();
-            DirectoryInfo dir = new DirectoryInfo(MODEL);
-            var files = dir.GetFiles("*.bytes");
-            for (int i = 0; i < files.Length; i++)
-            {
-                ProcessFile(files[i], true);
-            }
-            MoveDestDir("model_*", "regular/");
-            EditorUtility.Open(EXPORT + "regular/");
-        }
-
-
         [MenuItem("Tools/GenerateDatabase")]
         private static void GenerateDatabase2()
         {
@@ -162,7 +147,7 @@ namespace XEngine.Editor
 
         public static bool ParseFromPicture(ref float[] args, ref string name)
         {
-            string picture = UnityEditor.EditorUtility.OpenFilePanel("Select model file", EXPORT, "jpg");
+            string picture = UnityEditor.EditorUtility.OpenFilePanel("select picture", EXPORT, "jpg");
             int idx = picture.LastIndexOf('/') + 1;
             string descript = picture.Substring(0, idx) + "db_description";
             if (!string.IsNullOrEmpty(picture))
@@ -224,8 +209,8 @@ namespace XEngine.Editor
             int rnd = UnityEngine.Random.Range(0, CNT);
             if (indx == rnd)
             {
-                rnd = UnityEngine.Random.Range(-10, 10);
-                return ((arg * 80) + 10 + rnd) / 100.0f;
+                rnd = UnityEngine.Random.Range(-40, 40);
+                return (arg * 30 + 30 + rnd) / 100.0f;
             }
             return arg;
         }
@@ -259,15 +244,8 @@ namespace XEngine.Editor
         {
             if (info != null)
             {
-                string file = info.FullName;
-                FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);
-                float[] args = new float[CNT];
-                BinaryReader br = new BinaryReader(fs);
-                RoleShape shape = (RoleShape)br.ReadInt32();
-                for (int i = 0; i < CNT; i++)
-                {
-                    args[i] = br.ReadSingle();
-                }
+                RoleShape shape = RoleShape.FEMALE;
+                var args = ProcessFile(info, out shape);
                 NeuralData data = new NeuralData
                 {
                     callback = Capture,
@@ -276,9 +254,24 @@ namespace XEngine.Editor
                     name = "model_" + info.Name.Replace(".bytes", "")
                 };
                 NeuralInput(data, complete, true);
-                br.Close();
-                fs.Close();
+
             }
+        }
+
+        public static float[] ProcessFile(FileInfo info, out RoleShape shape)
+        {
+            string file = info.FullName;
+            FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);
+            float[] args = new float[CNT];
+            BinaryReader br = new BinaryReader(fs);
+            shape = (RoleShape)br.ReadInt32();
+            for (int i = 0; i < CNT; i++)
+            {
+                args[i] = br.ReadSingle();
+            }
+            br.Close();
+            fs.Close();
+            return args;
         }
 
 

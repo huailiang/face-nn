@@ -108,13 +108,13 @@ if __name__ == '__main__':
         for file in os.listdir(path):
             p = os.path.join(path, file)
             log.info(p)
-            p2 = os.path.join(path, "a-" + file)
+            p2 = os.path.join(path, "a_" + file)
             al = align.face_features(p, p2)
             ev = utils.faceparsing_ndarray(al, args.parsing_checkpoint, cuda=cuda)
-            p = os.path.join(path, "b-" + file)
+            p = os.path.join(path, "b_" + file)
             cv2.imwrite(p, ev)
             ev = 255 - utils.img_edge(ev)
-            p = os.path.join(path, "c-" + file)
+            p = os.path.join(path, "c_" + file)
             cv2.imwrite(p, ev)
     elif args.phase == "dataset":
         dataset = FaceDataset(args, "test")

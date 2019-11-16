@@ -41,7 +41,6 @@ def vis_parsing_maps(im, parsing, stride):
     """
 
     im = np.array(im)
-    vis_im = im.copy().astype(np.uint8)
     vis_parsing = parsing.copy().astype(np.uint8)
     vis_parsing_anno_color = np.zeros((vis_parsing.shape[0], vis_parsing.shape[1], 3)) + 255
     num_of_class = np.max(vis_parsing)
@@ -94,7 +93,7 @@ def faceparsing_ndarray(input, cp, cuda=False):
     input_ = torch.unsqueeze(input_, 0)
     if cuda:
         input_ = input_.cuda()
-    out = _net_(input_)[0]
+    out = _net_(input_)
     parsing = out.squeeze(0).cpu().detach().numpy().argmax(0)
     return vis_parsing_maps(input, parsing, stride=1)
 
@@ -109,7 +108,7 @@ def faceparsing_tensor(input, cp, w, cuda=False):
     :return  tensor, shape:[H, W]
     """
     build_net(cp, cuda)
-    out = _net_(input)[0]
+    out = _net_(input)
     out = out.squeeze()
     return w[0] * out[3] + w[1] * out[4] + w[2] * out[10] + out[11] + out[12] + out[13], out[1]
 
