@@ -81,8 +81,8 @@ class Evaluate:
         :return: l1 loss in pixel space
         """
         # [eyebrow，eye，nose，teeth，up lip，lower lip]
-        w_r = [1., 1.1, 1.1, 1.2, 1., 1.]
-        w_g = [1., 1.1, 1.1, 1.2, 1., 1.]
+        w_r = [1.1, 1.1, 1.1, 1.2, 1., 1.]
+        w_g = [1.1, 1.1, 1.1, 1.2, 1., 1.]
         part1, _ = faceparsing_tensor(self.l2_y, self.parsing, w_r, cuda=self.cuda)
         y_ = y_.transpose(2, 3)
         part2, _ = faceparsing_tensor(y_, self.parsing, w_g, cuda=self.cuda)
@@ -119,18 +119,19 @@ class Evaluate:
         lr = self.learning_rate
         self._init_l1_l2(y)
         m_progress = tqdm(range(1, self.max_itr + 1))
-        self.output(t_params, y, 0)
         for i in m_progress:
             y_ = self.imitator(t_params)
             loss, info = self.evaluate_ls(y_)
             loss.backward()
+            if i == 1:
+                self.output(t_params, y, 0)
             t_params.data = t_params.data - lr * t_params.grad.data
             t_params.data = t_params.data.clamp(0., 1.)
             t_params.grad.zero_()
             m_progress.set_description(info)
             if i % self.args.eval_prev_freq == 0:
                 x = i / float(self.max_itr)
-                lr = self.learning_rate * (x ** 2 - 2 * x + 1) + 1e-3
+                lr = self.learning_rate * (1 - x) + 1e-2
                 self.output(t_params, y, i)
                 self.plot()
         self.plot()

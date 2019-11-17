@@ -180,7 +180,7 @@ train中的效果参考视频：
 
  https://youtu.be/FKJ-rvXS39U
 
- https://www.bilibili.com/video/av75311069/
+ https://www.bilibili.com/video/av76020308/
 
 ### preview
 
