@@ -13,7 +13,7 @@ import util.logit as log
 from faceparsing.evaluate import *
 
 
-def random_params(cnt=95):
+def random_params(cnt=103):
     """
     随机生成捏脸参数
     :param cnt: param count
@@ -21,10 +21,14 @@ def random_params(cnt=95):
     params = []
     for i in range(cnt):
         params.append(random.randint(0, 1000) / 1000.0)
+    r = random.randint(95, 97)
+    params[r] = 1
+    r = random.randint(98, 100)
+    params[r] = 1
     return params
 
 
-def init_params(cnt=95):
+def init_params(cnt=103):
     """
     初始捏脸参数
     :param cnt: param count
@@ -32,6 +36,10 @@ def init_params(cnt=95):
     params = []
     for i in range(cnt):
         params.append(0.5)
+    params[95] = 1
+    params[98] = 1
+    params[101] = 0
+    params[102] = 0
     return params
 
 

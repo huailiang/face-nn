@@ -134,12 +134,32 @@ namespace XEngine.Editor
             }
         }
 
+        private int MaxIndex(float[] args, int start, int len)
+        {
+            int r = 0; float tmp = args[start];
+            for (int i = 1; i < len; i++)
+            {
+                if (args[start + i] > tmp)
+                {
+                    tmp = args[start + i];
+                    r = i;
+                }
+            }
+            return r;
+        }
+
+        private void ParseArgs(float[] args)
+        {
+            iBrow = MaxIndex(args, 0, 3);
+            iEye = MaxIndex(args, 3, 3);
+            color1 = Color.white * args[6];
+            color2 = Color.white * args[7];
+        }
+
         public void OnGui()
         {
             AnlyData();
             GUILayout.BeginVertical();
-            GUILayout.Space(16);
-            GUILayout.Label("Face Paint");
             focusFace = GUILayout.Toggle(focusFace, " focus face");
             GuiItem("brew ", brows, ref iBrow, ref color1);
             GuiItem("eye  ", eyes, ref iEye, ref color2);
@@ -163,9 +183,10 @@ namespace XEngine.Editor
             GUILayout.EndHorizontal();
         }
 
-        public void NeuralProcess()
+        public void NeuralProcess(float[] args)
         {
             AnlyData();
+            ParseArgs(args);
             UpdatePainTex();
             UpdateHsv();
             FocusFace();

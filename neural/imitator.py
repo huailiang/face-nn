@@ -46,7 +46,7 @@ class Imitator(nn.Module):
             self.clean()
         self.writer = SummaryWriter(comment='imitator', log_dir=args.path_tensor_log)
         self.model = nn.Sequential(
-            utils.deconv_layer(95, 512, kernel_size=4),  # 1. (batch, 512, 4, 4)
+            utils.deconv_layer(args.params_cnt, 512, kernel_size=4),  # 1. (batch, 512, 4, 4)
             utils.deconv_layer(512, 512, kernel_size=4, stride=2, pad=1),  # 2. (batch, 512, 8, 8)
             utils.deconv_layer(512, 512, kernel_size=4, stride=2, pad=1),  # 3. (batch, 512, 16, 16)
             utils.deconv_layer(512, 256, kernel_size=4, stride=2, pad=1),  # 4. (batch, 256, 32, 32)
@@ -62,7 +62,7 @@ class Imitator(nn.Module):
     def forward(self, params):
         """
         forward module
-        :param params: [batch, 95]
+        :param params: [batch, params_cnt]
         :return: (batch, 3, 512, 512)
         """
         batch = params.size(0)
@@ -73,7 +73,7 @@ class Imitator(nn.Module):
     def itr_train(self, params, reference):
         """
         iterator training
-        :param params:  [batch, 95]
+        :param params:  [batch, params_cnt]
         :param reference: reference photo [batch, 3, 512, 512]
         :return loss: [batch], y_: generated picture
         """
@@ -114,7 +114,7 @@ class Imitator(nn.Module):
                 path = "{1}/imit_{0}.jpg".format(step + 1, self.prev_path)
                 self.capture(path, images, y_, self.args.parsing_checkpoint, cuda)
                 x = step / float(total_steps)
-                lr = self.args.learning_rate * (x ** 2 - 2 * x + 1) + 1e-3
+                lr = self.args.learning_rate * (x ** 2 - 2 * x + 1) + 2e-3
                 utils.update_optimizer_lr(self.optimizer, lr)
                 self.writer.add_scalar('imitator/learning rate', lr, step)
                 self.upload_weights(step)

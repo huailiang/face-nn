@@ -8,6 +8,7 @@ namespace XEngine.Editor
     public class NeuralData
     {
         public float[] boneArgs;
+        public float[] paintArgs;
         public Action<string, RoleShape> callback;
         public RoleShape shape;
         public string name;
@@ -19,7 +20,8 @@ namespace XEngine.Editor
         static Camera camera;
         static string export;
         static string model;
-        const int CNT = 95;
+        public const int CNT = 95;
+        public const int CNT2 = 8;
         static Connect connect;
         static FashionPreview prev;
 
@@ -52,7 +54,9 @@ namespace XEngine.Editor
             }
         }
 
+        enum Dataset { TRAINSET, TESTSET }
         RoleShape shape = RoleShape.FEMALE;
+        Dataset set = Dataset.TRAINSET;
         bool complete = true, addNoise = true;
         int datacnt = 16000;
         float weight = 0.4f;
@@ -61,38 +65,19 @@ namespace XEngine.Editor
         {
             GUILayout.BeginVertical();
             GUILayout.Label("Generate Dataset", XEditorUtil.titleLableStyle);
-            GUILayout.Space(12);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Role Shape");
-            shape = (RoleShape)EditorGUILayout.EnumPopup(shape, GUILayout.Width(120));
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("complete show");
-            complete = GUILayout.Toggle(complete, "");
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("trainset   noise");
-            addNoise = GUILayout.Toggle(addNoise, "");
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("data capacity");
-            weight = GUILayout.HorizontalSlider(weight, 0, 1, GUILayout.Width(120));
-            GUILayout.EndHorizontal();
-
-            GUILayout.Label("  database " + (int)(datacnt * weight));
-            GUILayout.Label("  trainset  " + (int)(datacnt * weight * 0.8));
-            GUILayout.Label("  testset   " + (int)(datacnt * weight * 0.2));
+            GUILayout.Space(10);
+            shape = (RoleShape)EditorGUILayout.EnumPopup("Gender", shape);
+            set = (Dataset)EditorGUILayout.EnumPopup("Dataset", set);
+            complete = EditorGUILayout.Toggle("complete show", complete);
+            addNoise = EditorGUILayout.Toggle("trainset noise", addNoise);
+            weight = EditorGUILayout.Slider("data capacity", weight, 0, 1);
+            GUILayout.Label("count: " + (int)(datacnt * weight));
             GUILayout.Space(8);
             if (GUILayout.Button("Generate"))
             {
                 if (UnityEditor.EditorUtility.DisplayDialog("warn", "make sure enough memory's left to generate?", "ok", "cancel"))
                 {
-                    RandomExportModels((int)(datacnt * weight * 0.8), shape, "trainset", addNoise, complete);
-                    RandomExportModels((int)(datacnt * weight * 0.2), shape, "testset", false, complete);
+                    RandomExportModels((int)(datacnt * weight), shape, set.ToString().ToLower(), addNoise, complete);
                     EditorUtility.Open(EXPORT);
                 }
             }
@@ -120,7 +105,8 @@ namespace XEngine.Editor
             XEditorUtil.SetupEnv();
             string name = "";
             float[] args = new float[CNT];
-            if (ParseFromPicture(ref args, ref name))
+            float[] args2 = new float[CNT2];
+            if (ParseFromPicture(ref args, ref args2, ref name))
             {
                 string str = "";
                 int shape = int.Parse(name[name.Length - 1].ToString());
@@ -130,6 +116,7 @@ namespace XEngine.Editor
                 {
                     callback = Capture,
                     boneArgs = args,
+                    paintArgs = args2,
                     shape = (RoleShape)shape,
                     name = name
                 };
@@ -141,11 +128,11 @@ namespace XEngine.Editor
         [MenuItem("Tools/GenerateDatabase")]
         private static void GenerateDatabase2()
         {
-            var window = EditorWindow.GetWindowWithRect<NeuralInterface>(new Rect(0, 0, 320, 400));
+            var window = EditorWindow.GetWindowWithRect<NeuralInterface>(new Rect(0, 0, 320, 200));
             window.Show();
         }
 
-        public static bool ParseFromPicture(ref float[] args, ref string name)
+        public static bool ParseFromPicture(ref float[] args, ref float[] args2, ref string name)
         {
             string picture = UnityEditor.EditorUtility.OpenFilePanel("select picture", EXPORT, "jpg");
             int idx = picture.LastIndexOf('/') + 1;
@@ -161,6 +148,7 @@ namespace XEngine.Editor
                 {
                     name = reader.ReadString();
                     for (int i = 0; i < CNT; i++) args[i] = reader.ReadSingle();
+                    for (int i = 0; i < CNT2; i++) args2[i] = reader.ReadSingle();
                     if (name == key) return true;
                 }
                 reader.Close();
@@ -174,7 +162,6 @@ namespace XEngine.Editor
         {
             XEditorUtil.SetupEnv();
             float[] args = new float[CNT];
-
             FileStream fs = new FileStream(EXPORT + "db_description", FileMode.OpenOrCreate, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
             bw.Write(expc);
@@ -187,10 +174,19 @@ namespace XEngine.Editor
                     args[i] = UnityEngine.Random.Range(0.0f, 1.0f);
                     bw.Write(noise ? AddNoise(args[i], i) : args[i]);
                 }
+                float[] args2 = new float[CNT2];
+                int r = UnityEngine.Random.Range(0, 3);
+                args2[r] = 1;
+                r = UnityEngine.Random.Range(3, 6);
+                args2[r] = 1;
+                args2[6] = UnityEngine.Random.Range(0.2f, 0.8f);
+                args2[7] = UnityEngine.Random.Range(0.2f, 0.8f);
+                for (int i = 0; i < CNT2; i++) bw.Write(args2[i]);
                 NeuralData data = new NeuralData
                 {
                     callback = Capture,
                     boneArgs = args,
+                    paintArgs = args2,
                     shape = shape,
                     name = name
                 };
@@ -244,34 +240,33 @@ namespace XEngine.Editor
         {
             if (info != null)
             {
-                RoleShape shape = RoleShape.FEMALE;
-                var args = ProcessFile(info, out shape);
+                float[] args, args2;
+                var shape = ProcessFile(info, out args, out args2);
                 NeuralData data = new NeuralData
                 {
                     callback = Capture,
                     boneArgs = args,
+                    paintArgs = args2,
                     shape = shape,
                     name = "model_" + info.Name.Replace(".bytes", "")
                 };
                 NeuralInput(data, complete, true);
-
             }
         }
 
-        public static float[] ProcessFile(FileInfo info, out RoleShape shape)
+        public static RoleShape ProcessFile(FileInfo info, out float[] args, out float[] args2)
         {
             string file = info.FullName;
             FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);
-            float[] args = new float[CNT];
+            args = new float[CNT];
+            args2 = new float[CNT2];
             BinaryReader br = new BinaryReader(fs);
-            shape = (RoleShape)br.ReadInt32();
-            for (int i = 0; i < CNT; i++)
-            {
-                args[i] = br.ReadSingle();
-            }
+            RoleShape shape = (RoleShape)br.ReadInt32();
+            for (int i = 0; i < CNT; i++) args[i] = br.ReadSingle();
+            for (int i = 0; i < CNT2; i++) args2[i] = br.ReadSingle();
             br.Close();
             fs.Close();
-            return args;
+            return shape;
         }
 
 
@@ -306,12 +301,17 @@ namespace XEngine.Editor
         private static void Update()
         {
             var msg = connect.FetchMessage();
+            float[] args1 = new float[CNT];
+            float[] args2 = new float[CNT2];
+            Array.Copy(msg.param, args1, CNT);
+            Array.Copy(msg.param, 95, args2, 0, CNT2);
             if (msg != null)
             {
                 NeuralData data = new NeuralData
                 {
                     callback = Capture,
-                    boneArgs = msg.param,
+                    boneArgs = args1,
+                    paintArgs = args2,
                     shape = msg.shape,
                     name = "neural_" + msg.name
                 };

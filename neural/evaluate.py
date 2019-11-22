@@ -81,8 +81,8 @@ class Evaluate:
         :return: l1 loss in pixel space
         """
         # [eyebrow，eye，nose，teeth，up lip，lower lip]
-        w_r = [1.1, 1.1, 1.1, 1.2, 1., 1.]
-        w_g = [1.1, 1.1, 1.1, 1.2, 1., 1.]
+        w_r = [1.1, 1.1, 1., 0.7, 1., 1.]
+        w_g = [1.1, 1.1, 1., 0.7, 1., 1.]
         part1, _ = faceparsing_tensor(self.l2_y, self.parsing, w_r, cuda=self.cuda)
         y_ = y_.transpose(2, 3)
         part2, _ = faceparsing_tensor(y_, self.parsing, w_g, cuda=self.cuda)
@@ -164,7 +164,7 @@ class Evaluate:
     def write(self, params):
         """
         生成二进制文件 能够在unity里还原出来
-        :param params: 捏脸参数 tensor [batch, 95]
+        :param params: 捏脸参数 tensor [batch, params_cnt]
         """
         np_param = params.cpu().detach().numpy()
         np_param = np_param[0]

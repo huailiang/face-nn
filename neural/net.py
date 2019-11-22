@@ -41,7 +41,7 @@ class Net(object):
         """
         batch params
         :param step: train step
-        :param param: torch.Tensor [batch, 95]
+        :param param: torch.Tensor [batch, 103]
         :param name: list of name [batch]
         """
         list_ = param.cpu().detach().numpy().tolist()

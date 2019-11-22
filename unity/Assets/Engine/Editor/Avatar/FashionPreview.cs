@@ -1,5 +1,6 @@
 ﻿using CFUtilPoolLib;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace XEngine.Editor
                 {
                     ScriptableObject.DestroyImmediate(preview);
                 }
-                var window = EditorWindow.GetWindowWithRect(typeof(FashionPreview), new Rect(0, 0, 440, 640), true, "Preview");
+                var window = EditorWindow.GetWindowWithRect(typeof(FashionPreview), new Rect(0, 0, 440, 730), true, XEditorUtil.Config.preview);
                 preview = window as FashionPreview;
                 preview.Show();
             }
@@ -49,7 +50,7 @@ namespace XEngine.Editor
             DrawSuit(isnew, complete);
             Update();
             bone.NeuralProcess(data.boneArgs);
-            paint.NeuralProcess();
+            paint.NeuralProcess(data.paintArgs);
             data.callback(data.name, data.shape);
         }
 
@@ -76,20 +77,9 @@ namespace XEngine.Editor
         void OnGUI()
         {
             GUILayout.BeginVertical();
-            GUILayout.Label(XEditorUtil.Config.suit_pre, XEditorUtil.titleLableStyle);
-            GUILayout.Space(8);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Role Shape");
-            shape = (RoleShape)EditorGUILayout.EnumPopup(shape);
-            GUILayout.EndHorizontal();
             GUILayout.Space(4);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Select Clip");
-            clip = (AnimationClip)EditorGUILayout.ObjectField(clip, typeof(AnimationClip), true);
-            GUILayout.EndHorizontal();
-            GUILayout.Space(4);
+            shape = (RoleShape)EditorGUILayout.EnumPopup("Gender", shape);
+            clip = (AnimationClip)EditorGUILayout.ObjectField("Clip    ", clip, typeof(AnimationClip), true);
 
             if (go == null || (go != null && go.name != shape.ToString()) || shape.ToString() != go.name)
             {
@@ -97,18 +87,41 @@ namespace XEngine.Editor
             }
             if (fashionInfo != null)
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Select Suit");
-                suit_select = EditorGUILayout.Popup(suit_select, fashionDesInfo);
+                suit_select = EditorGUILayout.Popup("Suit    ", suit_select, fashionDesInfo);
                 if (suit_pre != suit_select || shape != shape_pre)
                 {
                     DrawSuit(true, true);
                     suit_pre = suit_select;
                     shape_pre = shape;
                 }
-                GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
+            GUILayout.Space(12);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Sync-Picture", GUILayout.Width(120)))
+            {
+                string name = "";
+                float[] args = new float[NeuralInterface.CNT];
+                float[] args2 = new float[NeuralInterface.CNT2];
+                if (NeuralInterface.ParseFromPicture(ref args, ref args2, ref name))
+                {
+                    bone.NeuralProcess(args);
+                    paint.NeuralProcess(args2);
+                }
+            }
+            if (GUILayout.Button("Sync-Model", GUILayout.Width(120)))
+            {
+                string file = UnityEditor.EditorUtility.OpenFilePanel("Select model file", NeuralInterface.MODEL, "bytes");
+                if (!string.IsNullOrEmpty(file))
+                {
+                    FileInfo info = new FileInfo(file);
+                    float[] args, args2;
+                    NeuralInterface.ProcessFile(info, out args, out args2);
+                    bone.NeuralProcess(args);
+                    paint.NeuralProcess(args2);
+                }
+            }
+            GUILayout.EndHorizontal();
             paint.OnGui();
             bone.OnGui();
         }

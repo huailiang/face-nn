@@ -22,10 +22,10 @@ from util.exception import NeuralException
 from tensorboardX import SummaryWriter
 
 """
-feature extractor
+extractor 测试用 不是论文里的方法
 photo生成engine face's params
 input: photo solution: 64x64
-output: engine params [95]
+output: engine params [params_cnt]
 """
 
 
@@ -223,7 +223,7 @@ class Extractor(nn.Module):
         :param cuda: gpu speed up
         :param cp_name: checkpoint's path
         :param photo_path: input photo's path
-        :return: params [1, 95]
+        :return: params [1, params_cnt]
         """
         img = cv2.imread(photo_path)
         scaled = align.align_face(img, size=(64, 64))

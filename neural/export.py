@@ -24,8 +24,8 @@ import util.logit as log
 
 def write_layer(f, shape, args):
     f.write(struct.pack('i', shape))
-    for i in range(0, 95):
-        byte = struct.pack('f', args[i])
+    for it in args:
+        byte = struct.pack('f', it)
         f.write(byte)
 
 
@@ -56,8 +56,10 @@ def move2unity(name):
 def export_layer(path, shape, weight):
     shape = shape
     args = []
-    for _ in range(0, 95):
+    for _ in range(95):
         args.append(weight / 10.0)
+    for _ in range(8):
+        args.append(0)
     name = os.path.join(path, str(shape) + "-" + str(weight) + ".bytes")
     f = open(name, 'wb')
     write_layer(f, shape, args)
@@ -140,7 +142,7 @@ if __name__ == '__main__':
         model_path = os.path.join(project_path, "unity/models/")
         log.info(model_path)
         shapes = [3, 4]
-        if os.path.exists(model_path):
+        if not os.path.exists(model_path):
             os.mkdir(model_path)
         for i in shapes:
             for j in range(0, 10):
