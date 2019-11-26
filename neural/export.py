@@ -56,10 +56,8 @@ def move2unity(name):
 def export_layer(path, shape, weight):
     shape = shape
     args = []
-    for _ in range(95):
+    for _ in range(103):
         args.append(weight / 10.0)
-    for _ in range(8):
-        args.append(0)
     name = os.path.join(path, str(shape) + "-" + str(weight) + ".bytes")
     f = open(name, 'wb')
     write_layer(f, shape, args)

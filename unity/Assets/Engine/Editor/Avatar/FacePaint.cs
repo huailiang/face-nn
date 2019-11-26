@@ -150,10 +150,9 @@ namespace XEngine.Editor
 
         private void ParseArgs(float[] args)
         {
-            iBrow = MaxIndex(args, 0, 3);
-            iEye = MaxIndex(args, 3, 3);
-            color1 = Color.white * args[6];
-            color2 = Color.white * args[7];
+            iBrow = MaxIndex(args, 1, 3);
+            float s = args[0] * 0.6f + 0.2f;
+            color1 = Color.white * s;
         }
 
         public void OnGui()

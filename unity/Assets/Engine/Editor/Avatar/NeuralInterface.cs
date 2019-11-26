@@ -21,7 +21,7 @@ namespace XEngine.Editor
         static string export;
         static string model;
         public const int CNT = 95;
-        public const int CNT2 = 8;
+        public const int CNT2 = 4;
         static Connect connect;
         static FashionPreview prev;
 
@@ -175,12 +175,9 @@ namespace XEngine.Editor
                     bw.Write(noise ? AddNoise(args[i], i) : args[i]);
                 }
                 float[] args2 = new float[CNT2];
-                int r = UnityEngine.Random.Range(0, 3);
+                int r = UnityEngine.Random.Range(1, 4);
                 args2[r] = 1;
-                r = UnityEngine.Random.Range(3, 6);
-                args2[r] = 1;
-                args2[6] = UnityEngine.Random.Range(0.2f, 0.8f);
-                args2[7] = UnityEngine.Random.Range(0.2f, 0.8f);
+                args2[0] = UnityEngine.Random.Range(0.0f, 1.0f);
                 for (int i = 0; i < CNT2; i++) bw.Write(args2[i]);
                 NeuralData data = new NeuralData
                 {

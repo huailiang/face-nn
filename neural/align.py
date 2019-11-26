@@ -39,7 +39,7 @@ def align_face(img, size=(512, 512)):
     bb[0] = np.maximum(d.left() - ext, 0)
     bb[1] = np.maximum(d.top() - ext - 20, 0)
     bb[2] = np.minimum(d.right() + ext, img.shape[1])
-    bb[3] = np.minimum(d.bottom() + ext, img.shape[0])
+    bb[3] = np.minimum(d.bottom() + 2, img.shape[0])
 
     rec = dlib.rectangle(bb[0], bb[1], bb[2], bb[3])
     shape = predictor(img, rec)  # 获取landmark

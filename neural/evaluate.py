@@ -81,8 +81,8 @@ class Evaluate:
         :return: l1 loss in pixel space
         """
         # [eyebrow，eye，nose，teeth，up lip，lower lip]
-        w_r = [1.1, 1.1, 1., 0.7, 1., 1.]
-        w_g = [1.1, 1.1, 1., 0.7, 1., 1.]
+        w_r = [1.1, 1., 1., 0.7, 1., 1.]
+        w_g = [1.1, 1., 1., 0.7, 1., 1.]
         part1, _ = faceparsing_tensor(self.l2_y, self.parsing, w_r, cuda=self.cuda)
         y_ = y_.transpose(2, 3)
         part2, _ = faceparsing_tensor(y_, self.parsing, w_g, cuda=self.cuda)
@@ -104,6 +104,24 @@ class Evaluate:
         info = "l1:{0:.3f} l2:{1:.3f} ls:{2:.3f}".format(l1, l2, ls)
         self.losses.append((l1.item(), l2.item() / 3, ls.item()))
         return ls, info
+
+    def argmax_params(self, params, start, count):
+        """
+        One-hot编码 argmax 处理
+        :param params: 处理params
+        :param start: One-hot 偏移起始地址
+        :param count: One-hot 编码长度
+        """
+        dims = params.size()[0]
+        for dim in range(dims):
+            tmp = params[dim, start]
+            mx = start
+            for idx in range(start + 1, start + count):
+                if params[dim, idx] > tmp:
+                    mx = idx
+                    tmp = params[dim, idx]
+            for idx in range(start, start + count):
+                params[dim, idx] = 1. if idx == mx else 0
 
     def itr_train(self, y):
         """
@@ -127,6 +145,7 @@ class Evaluate:
                 self.output(t_params, y, 0)
             t_params.data = t_params.data - lr * t_params.grad.data
             t_params.data = t_params.data.clamp(0., 1.)
+            self.argmax_params(t_params.data, 96, 3)
             t_params.grad.zero_()
             m_progress.set_description(info)
             if i % self.args.eval_prev_freq == 0:

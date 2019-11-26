@@ -111,11 +111,6 @@ if __name__ == '__main__':
             p2 = os.path.join(path, "a_" + file)
             al = align.face_features(p, p2)
             ev = utils.faceparsing_ndarray(al, args.parsing_checkpoint, cuda=cuda)
-            p = os.path.join(path, "b_" + file)
-            cv2.imwrite(p, ev)
-            ev = 255 - utils.img_edge(ev)
-            p = os.path.join(path, "c_" + file)
-            cv2.imwrite(p, ev)
     elif args.phase == "dataset":
         dataset = FaceDataset(args, "test")
         dataset.pre_process(cuda)

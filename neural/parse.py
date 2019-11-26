@@ -20,13 +20,13 @@ parser = argparse.ArgumentParser(description='face')
 parser.add_argument(
     '--phase',
     dest='phase',
-    default='train_imitator',
+    default='inference_imitator',
     help='Specify current phase: train or inference.')
 parser.add_argument(
     '--params_cnt',
     dest='params_cnt',
     type=int,
-    default=int(103),
+    default=int(99),
     help='count of engine face params')
 parser.add_argument(
     '--path_to_dataset',
@@ -90,7 +90,7 @@ parser.add_argument(
     '--total_steps',
     dest='total_steps',
     type=int,
-    default=int(2e5),
+    default=int(6e5),
     help='total steps for imitator')
 parser.add_argument(
     '--batch_size',
@@ -102,7 +102,7 @@ parser.add_argument(
     '--prev_freq',
     dest='prev_freq',
     type=int,
-    default=5000,
+    default=1000,
     help='generate preview image when training')
 parser.add_argument(
     '--save_freq',
@@ -120,7 +120,7 @@ parser.add_argument(
     '--imitator_model',
     dest='imitator_model',
     type=str,
-    default='imitator_200000_cuda.pth',
+    default='imitator_230000_cuda.pth',
     help='pre_trained model of imitator')
 
 # ========================= EXTRACTOR PARAMETERS ========================= #
@@ -166,7 +166,7 @@ parser.add_argument(
     '--eval_learning_rate',
     dest='eval_learning_rate',
     type=float,
-    default=0.8,
+    default=0.6,
     help='initial learning rate of evaluate')
 parser.add_argument(
     '--eval_prev_freq',
@@ -184,5 +184,5 @@ parser.add_argument(
     '--eval_image',
     dest='eval_image',
     type=str,
-    default='../export/star/a_zzy2.jpg',
+    default='../export/star/a_rb2.jpg',
     help='generate preview image when iterate')
