@@ -168,13 +168,8 @@ python3 main.py \
 
 ##### imitator pretrained model:
 
-在引擎里裁掉头发的model:
 
-https://pan.baidu.com/s/1RWmvCJHOeXSFDxERQ26mUg
-
-在引擎里完整显示(包含头发、脖子等)的model:
-
-https://pan.baidu.com/s/1z0YvwsfBAFnhETjj0Zby-g
+https://pan.baidu.com/s/1qDRPAzn3m9VxX2Z-oENBWQ
 
 train中的效果参考视频：
 
